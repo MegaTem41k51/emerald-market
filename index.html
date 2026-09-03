@@ -3,15 +3,23 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EMERALD Market — Купить и продать скины CS2</title>
+    <title>EMERALDMarket — Купить и продать скины CS2</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
+        html, body {
+            height: 100%;
             font-family: 'Montserrat', system-ui, sans-serif;
             background: #0b0c10;
             color: #e4e6eb;
             line-height: 1.6;
-            overflow-x: hidden;
+        }
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .content {
+            flex: 1;
         }
         .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
 
@@ -68,7 +76,7 @@
         }
         .lang-switch button:hover:not(.active) { color: #e4e6eb; }
 
-        .nav { display: flex; gap: 24px; font-weight: 500; font-size: 14px; }
+        .nav { display: flex; gap: 24px; font-weight: 500; font-size: 14px; flex-wrap: wrap; }
         .nav a {
             color: #a0a3ad;
             cursor: pointer;
@@ -288,21 +296,25 @@
             color: #2ecc71;
         }
 
-        /* ===== SKIN GRID ===== */
+        /* ===== SKIN GRID - ОДИНАКОВЫЕ КАРТОЧКИ ===== */
         .skin-grid {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 16px;
             margin-top: 16px;
         }
         .skin-card {
             background: #14161c;
             border-radius: 10px;
-            padding: 12px;
+            padding: 14px 14px 18px;
             border: 1px solid #26282f;
             transition: all 0.2s;
             cursor: pointer;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 220px;
+            width: 100%;
         }
         .skin-card:hover {
             transform: translateY(-4px);
@@ -312,13 +324,18 @@
         .skin-card .image {
             background: #1c1d23;
             border-radius: 6px;
-            height: 90px;
+            height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            flex-shrink: 0;
         }
         .skin-card .image img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .skin-card .image-placeholder {
+            color: #4a4d5a;
+            font-size: 11px;
+        }
         .skin-card .badge {
             position: absolute;
             top: 8px;
@@ -330,21 +347,37 @@
             border-radius: 4px;
             border: 1px solid rgba(46,204,113,0.15);
             font-weight: 600;
+            text-transform: uppercase;
+        }
+        .skin-card .weapon {
+            font-size: 11px;
+            color: #8a8d99;
+            margin-top: 6px;
+            font-weight: 500;
         }
         .skin-card .name {
             font-size: 13px;
             font-weight: 600;
-            margin-top: 8px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            margin-top: 2px;
         }
-        .skin-card .exterior { font-size: 11px; color: #8a8d99; }
-        .skin-card .price { color: #2ecc71; font-weight: 700; font-size: 15px; margin-top: 4px; }
+        .skin-card .exterior {
+            font-size: 11px;
+            color: #8a8d99;
+            margin-top: 2px;
+        }
+        .skin-card .price {
+            color: #2ecc71;
+            font-weight: 700;
+            font-size: 16px;
+            margin-top: 6px;
+        }
         .skin-card .select-btn {
-            margin-top: 8px;
+            margin-top: auto;
             width: 100%;
-            padding: 4px;
+            padding: 6px 0;
             background: transparent;
             border: 1px solid #2c2e36;
             border-radius: 4px;
@@ -630,7 +663,8 @@
             background: #101116;
             border-top: 1px solid #26282f;
             padding: 40px 0 24px;
-            margin-top: 40px;
+            margin-top: auto;
+            flex-shrink: 0;
         }
         .footer-grid {
             display: grid;
@@ -647,8 +681,6 @@
             transition: color 0.2s;
         }
         .footer-grid .col a:hover { color: #2ecc71; }
-        .footer-grid .col a.admin-link { color: #2ecc71; font-weight: 600; }
-        .footer-grid .col a.admin-link:hover { color: #27ae60; }
         .footer-bottom {
             text-align: center;
             margin-top: 32px;
@@ -660,11 +692,11 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1200px) {
-            .skin-grid { grid-template-columns: repeat(5, 1fr); }
+            .skin-grid { grid-template-columns: repeat(4, 1fr); }
         }
         @media (max-width: 992px) {
             .sell-grid { grid-template-columns: 1fr; }
-            .skin-grid { grid-template-columns: repeat(4, 1fr); }
+            .skin-grid { grid-template-columns: repeat(3, 1fr); }
             .hero h1 { font-size: 32px; }
         }
         @media (max-width: 600px) {
@@ -677,12 +709,13 @@
     </style>
 </head>
 <body>
+<div class="wrapper">
 
 <!-- ===== HEADER ===== -->
 <header class="header">
     <div class="container header-inner">
         <a href="#" class="logo" id="logoLink">
-            EMERALD<span>MARKET</span>
+            EMERALD<span>Market</span>
             <div class="lang-switch">
                 <button class="active" data-lang="ru">RU</button>
                 <button data-lang="en">EN</button>
@@ -701,7 +734,10 @@
     </div>
 </header>
 
-<!-- ===== HERO (ГЛАВНАЯ СТРАНИЦА) ===== -->
+<!-- ===== CONTENT ===== -->
+<div class="content">
+
+<!-- ===== HERO ===== -->
 <section class="hero page active" id="heroPage">
     <div class="container">
         <h1><span data-lang-text="sellTitle">Продать скины CS2</span></h1>
@@ -783,7 +819,6 @@
 <!-- ===== PROFILE PAGE ===== -->
 <div class="page" id="profilePage">
     <div class="container">
-        <!-- Блок входа (показывается если нет пользователя) -->
         <div id="profileLoginBox" style="display:none;">
             <div class="profile-login-box">
                 <div class="icon">🔐</div>
@@ -793,7 +828,6 @@
             </div>
         </div>
 
-        <!-- Профиль (показывается если пользователь авторизован) -->
         <div id="profileContent" style="display:none;">
             <div class="profile-header">
                 <div class="profile-avatar" id="profileAvatar">K</div>
@@ -824,7 +858,7 @@
     </div>
 </div>
 
-<!-- ===== ADMIN PANEL ===== -->
+<!-- ===== ADMIN ===== -->
 <div class="page" id="adminPage">
     <div class="container">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
@@ -882,59 +916,16 @@
     </div>
 </div>
 
-<!-- ===== LOGIN MODAL ===== -->
-<div class="modal-overlay" id="loginModal">
-    <div class="modal-content">
-        <h2 data-lang-text="loginTitle">📱 Вход через Telegram</h2>
-        <p style="color:#8a8d99; margin-bottom:12px;" data-lang-text="loginDesc">Введите логин и пароль</p>
-        <div class="error" id="loginError" data-lang-text="loginError">❌ Неверный логин или пароль</div>
-        <input type="text" id="loginInput" placeholder="Telegram логин..." autofocus>
-        <input type="password" id="passwordInput" placeholder="Пароль...">
-        <div class="modal-actions">
-            <button class="btn-outline" id="loginCancel" data-lang-text="cancel">Отмена</button>
-            <button class="btn btn-telegram" id="loginConfirm" data-lang-text="login">Войти</button>
-        </div>
-    </div>
-</div>
-
-<!-- ===== ADD SKIN MODAL ===== -->
-<div class="modal-overlay" id="addSkinModal">
-    <div class="modal-content" style="max-width:450px;">
-        <h2 data-lang-text="addSkinTitle">➕ Добавить скин</h2>
-        <input type="text" id="newSkinName" placeholder="Название (AWP | Dragon Lore)">
-        <input type="text" id="newSkinWeapon" placeholder="Оружие (AWP)">
-        <select id="newSkinExterior" style="width:100%; padding:10px 14px; background:#1c1d23; border:1px solid #26282f; color:#e4e6eb; border-radius:6px; margin-bottom:12px;">
-            <option value="Прямо с завода">Прямо с завода</option>
-            <option value="Немного поношенное">Немного поношенное</option>
-            <option value="После полевых испытаний">После полевых испытаний</option>
-            <option value="Поношенное">Поношенное</option>
-            <option value="Закалённое в боях">Закалённое в боях</option>
-        </select>
-        <input type="number" id="newSkinPrice" placeholder="Цена (USD)" step="0.01" min="0">
-        <select id="newSkinRarity" style="width:100%; padding:10px 14px; background:#1c1d23; border:1px solid #26282f; color:#e4e6eb; border-radius:6px; margin-bottom:12px;">
-            <option value="covert">Тайное</option>
-            <option value="classified">Засекреченное</option>
-            <option value="restricted">Ограниченное</option>
-            <option value="mil-spec">Армейское</option>
-            <option value="industrial">Промышленное</option>
-        </select>
-        <input type="text" id="newSkinImage" placeholder="URL картинки (опционально)">
-        <div class="modal-actions">
-            <button class="btn-outline" id="addSkinCancel" data-lang-text="cancel">Отмена</button>
-            <button class="btn btn-success" id="addSkinConfirm" data-lang-text="addSkin">✅ Добавить</button>
-        </div>
-    </div>
-</div>
+</div><!-- end .content -->
 
 <!-- ===== FOOTER ===== -->
 <footer class="footer">
     <div class="container">
         <div class="footer-grid">
             <div class="col">
-                <h4>EMERALD Market</h4>
+                <h4>EMERALDMarket</h4>
                 <a data-lang-text="about">О нас</a>
                 <a data-lang-text="contacts">Контакты</a>
-                <a class="admin-link" id="footerAdminLink" data-lang-text="admin">⚙️ Админка</a>
             </div>
             <div class="col">
                 <h4 data-lang-text="catalog">Каталог</h4>
@@ -953,7 +944,33 @@
     </div>
 </footer>
 
+</div><!-- end .wrapper -->
+
 <script>
+// ==========================================
+// СЕКРЕТНАЯ КОМБИНАЦИЯ: НАЖМИ 4 РАЗА "A"
+// ==========================================
+let secretCode = '';
+let adminOpenCooldown = false;
+
+document.addEventListener('keydown', function(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+        return;
+    }
+    secretCode += e.key;
+    if (secretCode.length > 4) secretCode = secretCode.slice(-4);
+    const aLatin = 'aaaa';
+    const aRussian = 'аааа';
+    if (secretCode.toLowerCase() === aLatin || secretCode.toLowerCase() === aRussian) {
+        if (!adminOpenCooldown) {
+            adminOpenCooldown = true;
+            navigateTo('admin');
+            secretCode = '';
+            setTimeout(() => { adminOpenCooldown = false; }, 2000);
+        }
+    }
+});
+
 // ==========================================
 // ДАННЫЕ
 // ==========================================
@@ -997,9 +1014,6 @@ let appData = {
 
 let registeredUsers = {};
 
-// ==========================================
-// ЗАГРУЗКА / СОХРАНЕНИЕ
-// ==========================================
 function loadData() {
     try {
         const saved = localStorage.getItem(STORAGE_KEY);
@@ -1033,7 +1047,7 @@ const translations = {
         profile: 'Профиль',
         admin: 'Админка',
         sellTitle: 'Продать скины CS2',
-        sellDesc: 'Самые лучше цены на скины. Быстрые выплаты. Мгновенные сделки.',
+        sellDesc: 'Лучшие цены на скины. Быстрые выплаты. Мгновенные сделки.',
         tradeUrl: 'Введите ваш Trade URL',
         total: 'Итого',
         selected: 'Выбрано: 0 скинов',
@@ -1189,9 +1203,6 @@ function updateLanguage() {
         else if (page === 'market') btn.textContent = t('market');
     });
     
-    const adminLink = document.querySelector('.admin-link');
-    if (adminLink) adminLink.textContent = '⚙️ ' + t('admin');
-    
     document.querySelectorAll('.lang-switch button').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.lang === getLang());
     });
@@ -1211,7 +1222,6 @@ function updateLanguage() {
 // НАВИГАЦИЯ
 // ==========================================
 function navigateTo(page) {
-    // Если это hero (главная) — показываем hero секцию, скрываем все pages
     if (page === 'hero') {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById('heroPage').classList.add('active');
@@ -1221,20 +1231,16 @@ function navigateTo(page) {
         return;
     }
     
-    // Скрываем hero и все страницы
     document.getElementById('heroPage').classList.remove('active');
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     
-    // Показываем нужную страницу
     const target = document.getElementById(page + 'Page');
     if (target) target.classList.add('active');
     
-    // Обновляем навигацию
     document.querySelectorAll('.nav a').forEach(a => {
         a.classList.toggle('active', a.dataset.page === page);
     });
     
-    // Рендерим контент
     if (page === 'sell') renderSellSkins();
     else if (page === 'market') renderMarketSkins();
     else if (page === 'profile') renderProfile();
@@ -1250,11 +1256,12 @@ function renderSellSkins() {
     const grid = document.getElementById('sellSkinGrid');
     grid.innerHTML = appData.skins.map(skin => `
         <div class="skin-card" data-id="${skin.id}">
+            <div class="badge">${skin.rarity || ''}</div>
             <div class="image">
                 ${skin.imageUrl ? `<img src="${skin.imageUrl}" alt="${skin.name}">` : 
-                `<span style="color:#4a4d5a; font-size:12px;">${skin.weapon || 'Скин'}</span>`}
+                `<span class="image-placeholder">${skin.weapon || 'Скин'}</span>`}
             </div>
-            <div class="badge">${skin.rarity || ''}</div>
+            <div class="weapon">${skin.weapon || ''}</div>
             <div class="name">${skin.name}</div>
             <div class="exterior">${skin.exterior || ''}</div>
             <div class="price">${formatPrice(skin.price)}</div>
@@ -1280,11 +1287,12 @@ function renderMarketSkins() {
     const grid = document.getElementById('marketSkinGrid');
     grid.innerHTML = appData.skins.map(skin => `
         <div class="skin-card">
+            <div class="badge">${skin.rarity || ''}</div>
             <div class="image">
                 ${skin.imageUrl ? `<img src="${skin.imageUrl}" alt="${skin.name}">` : 
-                `<span style="color:#4a4d5a; font-size:12px;">${skin.weapon || 'Скин'}</span>`}
+                `<span class="image-placeholder">${skin.weapon || 'Скин'}</span>`}
             </div>
-            <div class="badge">${skin.rarity || ''}</div>
+            <div class="weapon">${skin.weapon || ''}</div>
             <div class="name">${skin.name}</div>
             <div class="exterior">${skin.exterior || ''}</div>
             <div class="price">${formatPrice(skin.price)}</div>
@@ -1418,7 +1426,6 @@ function confirmAddSkin() {
     saveData();
     renderAdminSkins();
     document.getElementById('addSkinModal').classList.remove('open');
-    
     document.getElementById('newSkinName').value = '';
     document.getElementById('newSkinWeapon').value = '';
     document.getElementById('newSkinPrice').value = '';
@@ -1570,6 +1577,11 @@ function toggleCurrency(e) {
     if (btn) btn.textContent = appData.currentCurrency;
     renderSellSkins();
     renderMarketSkins();
+    updateSellUI();
+    // Обновляем цены на главной
+    document.getElementById('paidAmount').textContent = appData.currentCurrency === 'RUB' ? 
+        '₽' + (parseFloat(appData.paid.replace(/[$,]/g, '')) * appData.exchangeRate).toLocaleString() : 
+        appData.paid;
 }
 
 // ==========================================
@@ -1578,13 +1590,11 @@ function toggleCurrency(e) {
 document.addEventListener('DOMContentLoaded', function() {
     loadData();
     
-    // Логотип → Главная (hero)
     document.getElementById('logoLink').addEventListener('click', function(e) {
         e.preventDefault();
         navigateTo('hero');
     });
     
-    // Language switch
     document.querySelectorAll('.lang-switch button').forEach(btn => {
         btn.addEventListener('click', function() {
             appData.currentLang = this.dataset.lang;
@@ -1597,7 +1607,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Navigation
     document.querySelectorAll('.nav a, [data-page]').forEach(el => {
         el.addEventListener('click', function(e) {
             e.preventDefault();
@@ -1614,7 +1623,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Hero buttons
     document.querySelectorAll('.hero-buttons .btn[data-page]').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -1622,18 +1630,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Profile login button
     document.getElementById('profileLoginBtn').addEventListener('click', openLogin);
     
-    // Admin
-    document.getElementById('footerAdminLink').addEventListener('click', function(e) {
-        e.preventDefault();
-        if (!appData.currentUser) {
-            alert((getLang() === 'ru' ? '⚠️ Сначала войдите через Telegram!' : '⚠️ Please login via Telegram first!'));
-            return;
-        }
-        navigateTo('admin');
-    });
     document.getElementById('adminLogout').addEventListener('click', function() {
         if (confirm((getLang() === 'ru' ? 'Выйти из админ-панели?' : 'Logout from admin panel?'))) {
             navigateTo('hero');
@@ -1658,10 +1656,11 @@ document.addEventListener('DOMContentLoaded', function() {
             status.textContent = '✅ ' + t('saved');
             status.classList.add('show');
             setTimeout(() => status.classList.remove('show'), 3000);
+            renderSellSkins();
+            renderMarketSkins();
         }
     });
     
-    // Login
     document.getElementById('loginCancel').addEventListener('click', closeLogin);
     document.getElementById('loginConfirm').addEventListener('click', handleLogin);
     document.getElementById('passwordInput').addEventListener('keydown', (e) => {
@@ -1671,14 +1670,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.key === 'Enter') document.getElementById('passwordInput').focus();
     });
     
-    // Profile
     document.getElementById('saveTradeUrl').addEventListener('click', function() {
         appData.profile.tradeUrl = document.getElementById('profileTradeUrl').value;
         saveData();
         alert((getLang() === 'ru' ? '✅ Trade URL сохранен!' : '✅ Trade URL saved!'));
     });
     
-    // Sell
     document.getElementById('sellSelectedBtn').addEventListener('click', function() {
         if (appData.selectedSkins.length === 0) {
             alert((getLang() === 'ru' ? 'Выберите скины для продажи!' : 'Select skins to sell!'));
@@ -1698,19 +1695,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Update user UI
     updateUserUI();
-    
-    // Set language
     updateLanguage();
-    
-    // Initial render — показываем герой (главную)
     navigateTo('hero');
     renderSellSkins();
     renderMarketSkins();
     renderProfile();
     
-    // Update hero stats
     document.getElementById('usersCount').textContent = appData.users.toLocaleString();
     document.getElementById('tradesCount').textContent = appData.trades.toLocaleString();
     document.getElementById('paidAmount').textContent = appData.paid;
@@ -1719,6 +1710,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('🟢 EMERALDMarket успешно загружен!');
     console.log('📦 Скинов в базе:', appData.skins.length);
     console.log('👤 Пользователь:', appData.currentUser || 'не авторизован');
+    console.log('🔐 Секретная комбинация: нажми 4 раза "A" на клавиатуре!');
 });
 </script>
 </body>
