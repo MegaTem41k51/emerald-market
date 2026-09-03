@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMERALDMarket — Купить и продать скины CS2</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Montserrat', system-ui, sans-serif;
+            background: #0b0c10;
+            color: #e4e6eb;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: #111318;
+            border-bottom: 1px solid #26282f;
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: #2ecc71;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo span { color: #8a8d99; font-weight: 400; }
+        .lang-switch {
+            display: flex;
+            gap: 4px;
+            background: #1c1d23;
+            border-radius: 6px;
+            padding: 2px;
+            border: 1px solid #26282f;
+        }
+        .lang-switch button {
+            background: transparent;
+            border: none;
+            color: #8a8d99;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        .lang-switch button.active {
+            background: #2ecc71;
+            color: #0b0c10;
+        }
+        .lang-switch button:hover:not(.active) { color: #e4e6eb; }
+
+        .nav { display: flex; gap: 24px; font-weight: 500; font-size: 14px; }
+        .nav a {
+            color: #a0a3ad;
+            cursor: pointer;
+            transition: color 0.2s;
+            text-decoration: none;
+            padding: 4px 0;
+            border-bottom: 2px solid transparent;
+        }
+        .nav a:hover { color: #2ecc71; }
+        .nav a.active { color: #2ecc71; border-bottom-color: #2ecc71; }
+
+        .header-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            background: #2ecc71;
+            color: #0b0c10 !important;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn:hover { background: #27ae60; transform: scale(1.02); }
+        .btn-outline {
+            background: transparent;
+            color: #b2b4bb !important;
+            border: 1px solid #3a3c46;
+            padding: 7px 18px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-outline:hover { border-color: #2ecc71; color: #2ecc71 !important; }
+        .btn-telegram { background: #0088cc; color: #fff !important; border: 1px solid #006699; }
+        .btn-telegram:hover { background: #006699; }
+        .btn-sm { padding: 4px 14px; font-size: 12px; }
+        .btn-danger { background: #e74c3c; color: #fff !important; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-success { background: #2ecc71; color: #0b0c10 !important; }
+        .btn-success:hover { background: #27ae60; }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #1c1d23;
+            padding: 4px 12px 4px 4px;
+            border-radius: 30px;
+            border: 1px solid #2c2e36;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .user-profile:hover { border-color: #2ecc71; }
+        .user-profile .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #2ecc71;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #0b0c10;
+            flex-shrink: 0;
+        }
+        .user-profile .username { font-size: 14px; font-weight: 500; color: #e4e6eb; }
+        .user-profile .logout-btn {
+            background: none;
+            border: none;
+            color: #8a8d99;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0 4px;
+            transition: color 0.2s;
+        }
+        .user-profile .logout-btn:hover { color: #e74c3c; }
+
+        /* ===== HERO ===== */
+        .hero {
+            padding: 60px 0 40px;
+            text-align: center;
+            background: radial-gradient(ellipse at center, #14161c 0%, #0b0c10 100%);
+            border-bottom: 1px solid #26282f;
+        }
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 800;
+            color: #2ecc71;
+            margin-bottom: 12px;
+        }
+        .hero h1 span { color: #e4e6eb; }
+        .hero p {
+            color: #8a8d99;
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto 24px;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .hero-buttons .btn { padding: 12px 32px; font-size: 16px; }
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            margin-top: 32px;
+            flex-wrap: wrap;
+        }
+        .hero-stats .stat {
+            text-align: center;
+        }
+        .hero-stats .stat .num {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2ecc71;
+        }
+        .hero-stats .stat .label {
+            color: #8a8d99;
+            font-size: 13px;
+        }
+
+        /* ===== PAGES ===== */
+        .page { display: none; padding: 30px 0 60px; }
+        .page.active { display: block; }
+
+        /* ===== SELL PAGE ===== */
+        .sell-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        .sell-left { display: flex; flex-direction: column; gap: 16px; }
+        .sell-right { display: flex; flex-direction: column; gap: 16px; }
+
+        .trade-url-input {
+            background: #14161c;
+            border: 1px solid #26282f;
+            border-radius: 12px;
+            padding: 16px 20px;
+        }
+        .trade-url-input label {
+            display: block;
+            color: #8a8d99;
+            font-size: 13px;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        .trade-url-input input {
+            width: 100%;
+            background: #1c1d23;
+            border: 1px solid #2c2e36;
+            color: #e4e6eb;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+        .trade-url-input input:focus { border-color: #2ecc71; }
+
+        .sell-cart {
+            background: #14161c;
+            border: 1px solid #26282f;
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .sell-cart .total { font-size: 20px; font-weight: 700; color: #2ecc71; }
+        .sell-cart .count { color: #8a8d99; font-size: 14px; }
+
+        .payment-methods {
+            background: #14161c;
+            border: 1px solid #26282f;
+            border-radius: 12px;
+            padding: 16px 20px;
+        }
+        .payment-methods h3 {
+            color: #8a8d99;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        .payment-methods .methods-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .payment-methods .methods-grid .method {
+            background: #1c1d23;
+            border: 1px solid #26282f;
+            border-radius: 6px;
+            padding: 6px 14px;
+            font-size: 12px;
+            color: #b2b4bb;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .payment-methods .methods-grid .method:hover,
+        .payment-methods .methods-grid .method.active {
+            border-color: #2ecc71;
+            color: #2ecc71;
+        }
+
+        /* ===== SKIN GRID ===== */
+        .skin-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .skin-card {
+            background: #14161c;
+            border-radius: 10px;
+            padding: 12px;
+            border: 1px solid #26282f;
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+        .skin-card:hover {
+            transform: translateY(-4px);
+            border-color: #2ecc71;
+            box-shadow: 0 8px 24px rgba(46,204,113,0.06);
+        }
+        .skin-card .image {
+            background: #1c1d23;
+            border-radius: 6px;
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .skin-card .image img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .skin-card .badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(46,204,113,0.12);
+            color: #2ecc71;
+            font-size: 9px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(46,204,113,0.15);
+            font-weight: 600;
+        }
+        .skin-card .name {
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .skin-card .exterior { font-size: 11px; color: #8a8d99; }
+        .skin-card .price { color: #2ecc71; font-weight: 700; font-size: 15px; margin-top: 4px; }
+        .skin-card .select-btn {
+            margin-top: 8px;
+            width: 100%;
+            padding: 4px;
+            background: transparent;
+            border: 1px solid #2c2e36;
+            border-radius: 4px;
+            color: #b2b4bb;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .skin-card .select-btn:hover,
+        .skin-card .select-btn.selected {
+            background: #2ecc71;
+            border-color: #2ecc71;
+            color: #0b0c10;
+        }
+
+        /* ===== PROFILE ===== */
+        .profile-login-box {
+            max-width: 500px;
+            margin: 40px auto;
+            background: #14161c;
+            border: 1px solid #26282f;
+            border-radius: 16px;
+            padding: 48px 40px;
+            text-align: center;
+        }
+        .profile-login-box .icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+        .profile-login-box h2 {
+            color: #e4e6eb;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .profile-login-box p {
+            color: #8a8d99;
+            font-size: 16px;
+            margin-bottom: 24px;
+        }
+        .profile-login-box .btn-telegram {
+            padding: 14px 40px;
+            font-size: 18px;
+        }
+
+        .profile-header {
+            background: #14161c;
+            border: 1px solid #26282f;
+            border-radius: 12px;
+            padding: 24px 32px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .profile-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: #2ecc71;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 700;
+            color: #0b0c10;
+            flex-shrink: 0;
+        }
+        .profile-info h2 { font-size: 24px; }
+        .profile-info .stats {
+            display: flex;
+            gap: 24px;
+            margin-top: 4px;
+            flex-wrap: wrap;
+        }
+        .profile-info .stats .stat { color: #8a8d99; font-size: 14px; }
+        .profile-info .stats .stat strong { color: #2ecc71; }
+
+        .profile-settings {
+            background: #14161c;
+            border: 1px solid #26282f;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .profile-settings h3 {
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+        .profile-settings .setting-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .profile-settings .setting-row label {
+            color: #8a8d99;
+            font-size: 13px;
+            min-width: 100px;
+        }
+        .profile-settings .setting-row input {
+            flex: 1;
+            background: #1c1d23;
+            border: 1px solid #2c2e36;
+            color: #e4e6eb;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            min-width: 200px;
+        }
+        .profile-settings .setting-row input:focus { border-color: #2ecc71; outline: none; }
+
+        .profile-history {
+            background: #14161c;
+            border: 1px solid #26282f;
+            border-radius: 12px;
+            padding: 24px;
+            overflow-x: auto;
+        }
+        .profile-history h3 {
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+        .profile-history table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .profile-history th {
+            text-align: left;
+            padding: 10px 12px;
+            color: #8a8d99;
+            border-bottom: 1px solid #26282f;
+            font-weight: 500;
+        }
+        .profile-history td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #1c1d23;
+        }
+        .profile-history .status-success { color: #2ecc71; }
+        .profile-history .status-fail { color: #e74c3c; }
+        .profile-history .status-pending { color: #f39c12; }
+
+        /* ===== ADMIN ===== */
+        .admin-panel {
+            background: #14161c;
+            border: 1px solid #26282f;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .admin-panel h2 {
+            font-size: 20px;
+            margin-bottom: 16px;
+            color: #2ecc71;
+        }
+        .admin-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .admin-row label {
+            color: #8a8d99;
+            font-size: 13px;
+            min-width: 120px;
+        }
+        .admin-row input,
+        .admin-row select {
+            flex: 1;
+            min-width: 120px;
+            background: #1c1d23;
+            border: 1px solid #2c2e36;
+            color: #e4e6eb;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        .admin-row input:focus,
+        .admin-row select:focus { border-color: #2ecc71; outline: none; }
+        .admin-skin-item {
+            background: #1c1d23;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border: 1px solid #26282f;
+        }
+        .admin-skin-item .row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .admin-skin-item .row input,
+        .admin-skin-item .row select {
+            background: #0b0c10;
+            border: 1px solid #26282f;
+            color: #e4e6eb;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .admin-skin-item .row input:focus,
+        .admin-skin-item .row select:focus { border-color: #2ecc71; outline: none; }
+        .admin-skin-item .row .remove-btn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0 4px;
+        }
+        .admin-add-btn {
+            background: #2ecc71;
+            color: #0b0c10;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .admin-add-btn:hover { background: #27ae60; }
+        .admin-save-btn {
+            background: #2ecc71;
+            color: #0b0c10;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        .admin-save-btn:hover { background: #27ae60; }
+        .admin-status {
+            color: #2ecc71;
+            font-size: 14px;
+            margin-top: 12px;
+            display: none;
+        }
+        .admin-status.show { display: block; }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 500;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-content {
+            background: #14161c;
+            border: 1px solid #26282f;
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 400px;
+            width: 90%;
+        }
+        .modal-content h2 { color: #2ecc71; margin-bottom: 16px; }
+        .modal-content input {
+            width: 100%;
+            padding: 10px 14px;
+            background: #1c1d23;
+            border: 1px solid #26282f;
+            color: #e4e6eb;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        .modal-content input:focus { border-color: #2ecc71; outline: none; }
+        .modal-content .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: none;
+        }
+        .modal-content .error.show { display: block; }
+        .modal-content .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .modal-content .modal-actions .btn { flex: 1; text-align: center; }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: #101116;
+            border-top: 1px solid #26282f;
+            padding: 40px 0 24px;
+            margin-top: 40px;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 30px;
+        }
+        .footer-grid .col h4 { color: #e4e6eb; margin-bottom: 12px; font-size: 16px; }
+        .footer-grid .col a {
+            display: block;
+            color: #8a8d99;
+            font-size: 14px;
+            padding: 4px 0;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .footer-grid .col a:hover { color: #2ecc71; }
+        .footer-grid .col a.admin-link { color: #2ecc71; font-weight: 600; }
+        .footer-grid .col a.admin-link:hover { color: #27ae60; }
+        .footer-bottom {
+            text-align: center;
+            margin-top: 32px;
+            padding-top: 20px;
+            border-top: 1px solid #1c1d23;
+            color: #6a6d7a;
+            font-size: 14px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1200px) {
+            .skin-grid { grid-template-columns: repeat(5, 1fr); }
+        }
+        @media (max-width: 992px) {
+            .sell-grid { grid-template-columns: 1fr; }
+            .skin-grid { grid-template-columns: repeat(4, 1fr); }
+            .hero h1 { font-size: 32px; }
+        }
+        @media (max-width: 600px) {
+            .skin-grid { grid-template-columns: repeat(2, 1fr); }
+            .hero h1 { font-size: 24px; }
+            .hero-stats { gap: 20px; }
+            .profile-header { flex-direction: column; text-align: center; }
+            .profile-login-box { padding: 32px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+    <div class="container header-inner">
+        <div class="logo">
+            EMERALD<span>Market</span>
+            <div class="lang-switch">
+                <button class="active" data-lang="ru">RU</button>
+                <button data-lang="en">EN</button>
+            </div>
+        </div>
+        <nav class="nav">
+            <a class="active" data-page="sell" data-lang-text="sell">Продать скины</a>
+            <a data-page="market" data-lang-text="market">Купить скины</a>
+            <a data-page="profile" data-lang-text="profile">Профиль</a>
+        </nav>
+        <div class="header-actions" id="headerActions">
+            <a href="#" class="btn-outline" id="currencyToggle">USD</a>
+            <a href="#" class="btn btn-telegram" id="telegramLoginBtn" data-lang-text="login">Войти через Telegram</a>
+        </div>
+    </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+    <div class="container">
+        <h1><span data-lang-text="sellTitle">Продать скины CS2</span></h1>
+        <p data-lang-text="sellDesc">Лучшие цены на скины. Быстрые выплаты. Мгновенные сделки.</p>
+        <div class="hero-buttons">
+            <a href="#" class="btn btn-success" data-page="sell" data-lang-text="sell">Продать скины</a>
+            <a href="#" class="btn btn-outline" data-page="market" data-lang-text="market">Купить скины</a>
+        </div>
+        <div class="hero-stats">
+            <div class="stat">
+                <div class="num" id="usersCount">518,043</div>
+                <div class="label" data-lang-text="users">Пользователей</div>
+            </div>
+            <div class="stat">
+                <div class="num" id="tradesCount">4,875,875</div>
+                <div class="label" data-lang-text="trades">Успешных обменов</div>
+            </div>
+            <div class="stat">
+                <div class="num" id="paidAmount">$13,704,974</div>
+                <div class="label" data-lang-text="paid">Выплачено</div>
+            </div>
+            <div class="stat">
+                <div class="num" id="skinsCount">79,799</div>
+                <div class="label" data-lang-text="skinsCount">Скинов доступно</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== SELL PAGE ===== -->
+<div class="page active" id="sellPage">
+    <div class="container">
+        <div class="sell-grid">
+            <div class="sell-left">
+                <div class="trade-url-input">
+                    <label data-lang-text="tradeUrl">Введите ваш Trade URL</label>
+                    <input type="text" id="tradeUrl" placeholder="https://steamcommunity.com/tradeoffer/new/?partner=...">
+                </div>
+                <div class="sell-cart">
+                    <span class="total" id="sellTotal">$0.00</span>
+                    <span class="count" id="sellCount" data-lang-text="selected">Выбрано: 0 скинов</span>
+                    <button class="btn btn-success btn-sm" id="sellSelectedBtn" data-lang-text="sellSelected">Продать выбранные</button>
+                </div>
+                <div class="payment-methods">
+                    <h3 data-lang-text="paymentMethods">Способы оплаты</h3>
+                    <div class="methods-grid">
+                        <span class="method active">USDT</span>
+                        <span class="method">Bitcoin</span>
+                        <span class="method">Ethereum</span>
+                        <span class="method">Litecoin</span>
+                        <span class="method">VISA</span>
+                        <span class="method">Сбер</span>
+                        <span class="method">ЮMoney</span>
+                        <span class="method">TON</span>
+                        <span class="method">TRX</span>
+                        <span class="method">BNB</span>
+                        <span class="method">SOLANA</span>
+                    </div>
+                </div>
+            </div>
+            <div class="sell-right">
+                <div style="background:#14161c; border:1px solid #26282f; border-radius:12px; padding:16px 20px;">
+                    <h3 style="color:#8a8d99; font-size:13px; font-weight:500; margin-bottom:10px;" data-lang-text="selectSkins">Выберите скины для продажи</h3>
+                    <div class="skin-grid" id="sellSkinGrid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MARKET PAGE ===== -->
+<div class="page" id="marketPage">
+    <div class="container">
+        <h2 style="font-size:24px; margin-bottom:16px;" data-lang-text="buyTitle">🛒 Купить скины CS2</h2>
+        <div class="skin-grid" id="marketSkinGrid"></div>
+    </div>
+</div>
+
+<!-- ===== PROFILE PAGE ===== -->
+<div class="page" id="profilePage">
+    <div class="container">
+        <!-- Блок входа (показывается если нет пользователя) -->
+        <div id="profileLoginBox" style="display:none;">
+            <div class="profile-login-box">
+                <div class="icon">🔐</div>
+                <h2 data-lang-text="loginRequired">Авторизуйтесь</h2>
+                <p data-lang-text="loginRequiredDesc">Чтобы получить доступ к этой странице</p>
+                <button class="btn btn-telegram" id="profileLoginBtn" data-lang-text="login">Войти через Telegram</button>
+            </div>
+        </div>
+
+        <!-- Профиль (показывается если пользователь авторизован) -->
+        <div id="profileContent" style="display:none;">
+            <div class="profile-header">
+                <div class="profile-avatar" id="profileAvatar">K</div>
+                <div class="profile-info">
+                    <h2 id="profileName">какашка</h2>
+                    <div class="stats">
+                        <span class="stat">💰 <span data-lang-text="balance">Баланс</span>: <strong id="profileBalance">197.767 ₽</strong></span>
+                        <span class="stat">📈 <span data-lang-text="bought">Куплено на</span>: <strong id="profileBought">39,049.332 ₽</strong></span>
+                        <span class="stat">📊 <span data-lang-text="sold">Продано на</span>: <strong id="profileSold">39,049.332 ₽</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-settings">
+                <h3 data-lang-text="settings">⚙️ Настройки</h3>
+                <div class="setting-row">
+                    <label data-lang-text="tradeUrl">Trade URL</label>
+                    <input type="text" id="profileTradeUrl" placeholder="Введите ваш Trade URL">
+                    <button class="btn btn-sm btn-success" id="saveTradeUrl" data-lang-text="save">Сохранить</button>
+                </div>
+                <div class="setting-row">
+                    <label data-lang-text="telegramBot">Telegram бот</label>
+                    <span style="color:#2ecc71;">✅ <span data-lang-text="connected">Подключен</span></span>
+                    <button class="btn btn-sm btn-danger" data-lang-text="disable">Отключить</button>
+                </div>
+            </div>
+
+            <div class="profile-history">
+                <h3 data-lang-text="history">📋 История</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th><span data-lang-text="typeTime">Тип / Время</span></th>
+                            <th><span data-lang-text="action">Действие</span></th>
+                            <th><span data-lang-text="amount">Сумма</span></th>
+                            <th><span data-lang-text="status">Статус</span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== ADMIN PANEL ===== -->
+<div class="page" id="adminPage">
+    <div class="container">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
+            <h1 style="color:#2ecc71; font-size:28px;" data-lang-text="adminPanel">⚙️ Админ-панель</h1>
+            <div>
+                <button class="btn btn-danger" id="adminLogout" data-lang-text="logout">🚪 Выйти</button>
+                <button class="btn btn-outline" id="adminBack" data-lang-text="back">← На сайт</button>
+            </div>
+        </div>
+
+        <div class="admin-panel">
+            <h2 data-lang-text="stats">📊 Статистика</h2>
+            <div class="admin-row">
+                <label data-lang-text="users">Пользователей:</label>
+                <input type="number" id="adminUsers" value="518043">
+            </div>
+            <div class="admin-row">
+                <label data-lang-text="trades">Успешных обменов:</label>
+                <input type="number" id="adminTrades" value="4875875">
+            </div>
+            <div class="admin-row">
+                <label data-lang-text="paid">Выплачено:</label>
+                <input type="text" id="adminPaid" value="$13,704,974">
+            </div>
+            <div class="admin-row">
+                <label data-lang-text="skinsCount">Скинов доступно:</label>
+                <input type="number" id="adminSkinsCount" value="79799">
+            </div>
+        </div>
+
+        <div class="admin-panel">
+            <h2 data-lang-text="exchangeRate">💱 Курс валют</h2>
+            <div class="admin-row">
+                <label>USD/RUB:</label>
+                <input type="number" id="adminRate" value="86.83" step="0.01">
+                <button class="btn btn-sm btn-success" id="saveRateBtn" data-lang-text="save">Сохранить курс</button>
+            </div>
+        </div>
+
+        <div class="admin-panel">
+            <h2 data-lang-text="manageSkins">🎯 Управление скинами</h2>
+            <div id="adminSkinList"></div>
+            <button class="admin-add-btn" id="adminAddSkin" data-lang-text="addSkin">+ Добавить скин</button>
+            <div style="margin-top:12px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; border-top:1px solid #26282f; padding-top:12px;">
+                <button class="btn btn-danger" id="adminDeleteSkins" data-lang-text="deleteSkins">🗑 Удалить скины</button>
+                <input type="number" id="adminDeleteCount" placeholder="Кол-во" min="1" style="width:80px; background:#1c1d23; border:1px solid #26282f; color:#e4e6eb; padding:6px 10px; border-radius:4px;">
+                <span style="color:#8a8d99; font-size:13px;" data-lang-text="deleteLast">(удалить последние N скинов)</span>
+            </div>
+        </div>
+
+        <div class="admin-panel">
+            <button class="admin-save-btn" id="adminSaveAll" data-lang-text="saveAll">💾 Сохранить все</button>
+            <div class="admin-status" id="adminStatus" data-lang-text="saved">✅ Сохранено!</div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== LOGIN MODAL ===== -->
+<div class="modal-overlay" id="loginModal">
+    <div class="modal-content">
+        <h2 data-lang-text="loginTitle">📱 Вход через Telegram</h2>
+        <p style="color:#8a8d99; margin-bottom:12px;" data-lang-text="loginDesc">Введите логин и пароль</p>
+        <div class="error" id="loginError" data-lang-text="loginError">❌ Неверный логин или пароль</div>
+        <input type="text" id="loginInput" placeholder="Telegram логин..." autofocus>
+        <input type="password" id="passwordInput" placeholder="Пароль...">
+        <div class="modal-actions">
+            <button class="btn-outline" id="loginCancel" data-lang-text="cancel">Отмена</button>
+            <button class="btn btn-telegram" id="loginConfirm" data-lang-text="login">Войти</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== ADD SKIN MODAL ===== -->
+<div class="modal-overlay" id="addSkinModal">
+    <div class="modal-content" style="max-width:450px;">
+        <h2 data-lang-text="addSkinTitle">➕ Добавить скин</h2>
+        <input type="text" id="newSkinName" placeholder="Название (AWP | Dragon Lore)">
+        <input type="text" id="newSkinWeapon" placeholder="Оружие (AWP)">
+        <select id="newSkinExterior" style="width:100%; padding:10px 14px; background:#1c1d23; border:1px solid #26282f; color:#e4e6eb; border-radius:6px; margin-bottom:12px;">
+            <option value="Прямо с завода">Прямо с завода</option>
+            <option value="Немного поношенное">Немного поношенное</option>
+            <option value="После полевых испытаний">После полевых испытаний</option>
+            <option value="Поношенное">Поношенное</option>
+            <option value="Закалённое в боях">Закалённое в боях</option>
+        </select>
+        <input type="number" id="newSkinPrice" placeholder="Цена (USD)" step="0.01" min="0">
+        <select id="newSkinRarity" style="width:100%; padding:10px 14px; background:#1c1d23; border:1px solid #26282f; color:#e4e6eb; border-radius:6px; margin-bottom:12px;">
+            <option value="covert">Тайное</option>
+            <option value="classified">Засекреченное</option>
+            <option value="restricted">Ограниченное</option>
+            <option value="mil-spec">Армейское</option>
+            <option value="industrial">Промышленное</option>
+        </select>
+        <input type="text" id="newSkinImage" placeholder="URL картинки (опционально)">
+        <div class="modal-actions">
+            <button class="btn-outline" id="addSkinCancel" data-lang-text="cancel">Отмена</button>
+            <button class="btn btn-success" id="addSkinConfirm" data-lang-text="addSkin">✅ Добавить</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="col">
+                <h4>EMERALDMarket</h4>
+                <a data-lang-text="about">О нас</a>
+                <a data-lang-text="contacts">Контакты</a>
+                <a class="admin-link" id="footerAdminLink" data-lang-text="admin">⚙️ Админка</a>
+            </div>
+            <div class="col">
+                <h4 data-lang-text="catalog">Каталог</h4>
+                <a data-page="market" data-lang-text="knives">Ножи</a>
+                <a data-page="market" data-lang-text="gloves">Перчатки</a>
+                <a data-page="market" data-lang-text="stickers">Стикеры</a>
+            </div>
+            <div class="col">
+                <h4 data-lang-text="help">Помощь</h4>
+                <a data-lang-text="faq">FAQ</a>
+                <a data-lang-text="guarantees">Гарантии</a>
+                <a data-lang-text="policy">Политика</a>
+            </div>
+        </div>
+        <div class="footer-bottom">© 2025-2026 EMERALDMarket. <span data-lang-text="rights">Все права защищены.</span></div>
+    </div>
+</footer>
+
+<script>
+// ==========================================
+// ДАННЫЕ
+// ==========================================
+const STORAGE_KEY = 'emeraldData';
+const USERS_STORAGE_KEY = 'emeraldUsers';
+
+let appData = {
+    skins: [
+        { id: 1, name: 'AWP | Dragon Lore', exterior: 'Прямо с завода', price: 14500, weapon: 'AWP', rarity: 'covert', imageUrl: '' },
+        { id: 2, name: 'AWP | Dragon Lore', exterior: 'Немного поношенное', price: 9200, weapon: 'AWP', rarity: 'covert', imageUrl: '' },
+        { id: 3, name: 'AWP | Dragon Lore', exterior: 'После полевых испытаний', price: 6400, weapon: 'AWP', rarity: 'covert', imageUrl: '' },
+        { id: 4, name: 'AK-47 | Fire Serpent', exterior: 'Прямо с завода', price: 3800, weapon: 'AK-47', rarity: 'covert', imageUrl: '' },
+        { id: 5, name: 'AK-47 | Fire Serpent', exterior: 'Немного поношенное', price: 2800, weapon: 'AK-47', rarity: 'covert', imageUrl: '' },
+        { id: 6, name: '★ Karambit | Doppler Ruby', exterior: 'Прямо с завода', price: 4200, weapon: 'Karambit', rarity: 'covert', imageUrl: '' },
+        { id: 7, name: '★ Butterfly Knife | Fade', exterior: 'Прямо с завода', price: 2330, weapon: 'Butterfly Knife', rarity: 'covert', imageUrl: '' },
+        { id: 8, name: 'M4A4 | Howl', exterior: 'Прямо с завода', price: 8500, weapon: 'M4A4', rarity: 'covert', imageUrl: '' },
+        { id: 9, name: 'M4A4 | Howl', exterior: 'Немного поношенное', price: 6500, weapon: 'M4A4', rarity: 'covert', imageUrl: '' },
+        { id: 10, name: 'Desert Eagle | Blaze', exterior: 'Прямо с завода', price: 1850, weapon: 'Desert Eagle', rarity: 'covert', imageUrl: '' },
+        { id: 11, name: 'AWP | Gungnir', exterior: 'Прямо с завода', price: 9500, weapon: 'AWP', rarity: 'covert', imageUrl: '' },
+        { id: 12, name: 'AK-47 | Wild Lotus', exterior: 'Прямо с завода', price: 4200, weapon: 'AK-47', rarity: 'covert', imageUrl: '' },
+        { id: 13, name: '★ M9 Bayonet | Doppler Sapphire', exterior: 'Прямо с завода', price: 4980, weapon: 'M9 Bayonet', rarity: 'covert', imageUrl: '' },
+        { id: 14, name: 'USP-S | Kill Confirmed', exterior: 'Прямо с завода', price: 420, weapon: 'USP-S', rarity: 'classified', imageUrl: '' },
+        { id: 15, name: 'AWP | Asiimov', exterior: 'Прямо с завода', price: 850, weapon: 'AWP', rarity: 'covert', imageUrl: '' },
+    ],
+    users: 518043,
+    trades: 4875875,
+    paid: '$13,704,974',
+    skinsCount: 79799,
+    exchangeRate: 86.83,
+    currentLang: 'ru',
+    currentCurrency: 'USD',
+    currentUser: null,
+    selectedSkins: [],
+    history: [
+        { id: 1783341, type: 'Продажа скинов', time: '08.10.2025 - 10:23:44', amount: '+5.381 ₽', status: 'Успех' },
+        { id: 1777318, type: 'Продажа скинов', time: '28.09.2025 - 10:44:53', amount: '+844.434 ₽', status: 'Успех' },
+        { id: 1776682, type: 'Продажа скинов', time: '27.09.2025 - 11:24:23', amount: '+980.19 ₽', status: 'Успех' },
+        { id: 1761033, type: 'Продажа скинов', time: '07.09.2025 - 11:06:39', amount: '+8,091.062 ₽', status: 'Успех' },
+        { id: 1756242, type: 'Продажа скинов', time: '01.09.2025 - 10:17:30', amount: '+2,622.748 ₽', status: 'Успех' },
+        { id: 1744591, type: 'Продажа скинов', time: '17.08.2025 - 11:56:11', amount: '+7,091.378 ₽', status: 'Успех' },
+        { id: 1601193, type: 'Продажа скинов', time: '26.06.2025 - 11:35:49', amount: '+568.425 ₽', status: 'Успех' },
+        { id: 1567912, type: 'Продажа скинов', time: '21.06.2025 - 11:09:06', amount: '+713.09 ₽', status: 'Успех' },
+        { id: 1567874, type: 'Продажа скинов', time: '21.06.2025 - 11:03:24', amount: '+713.09 ₽', status: 'Успех' },
+        { id: 1412571, type: 'Продажа скинов', time: '27.05.2025 - 10:05:11', amount: '+4,694.36 ₽', status: 'Успех' },
+    ],
+    profile: {
+        balance: '197.767 ₽',
+        bought: '39,049.332 ₽',
+        sold: '39,049.332 ₽',
+        tradeUrl: 'https://steamcommunity.com/tradeoffer/new/?partner=...'
+    }
+};
+
+// Хранилище всех зарегистрированных пользователей
+let registeredUsers = {};
+
+// ==========================================
+// ЗАГРУЗКА / СОХРАНЕНИЕ
+// ==========================================
+function loadData() {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            Object.assign(appData, parsed);
+        }
+        const users = localStorage.getItem(USERS_STORAGE_KEY);
+        if (users) {
+            registeredUsers = JSON.parse(users);
+        }
+    } catch(e) {}
+}
+
+function saveData() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(registeredUsers));
+        return true;
+    } catch(e) { return false; }
+}
+
+// ==========================================
+// ЯЗЫКИ
+// ==========================================
+const translations = {
+    ru: {
+        sell: 'Продать скины',
+        market: 'Купить скины',
+        profile: 'Профиль',
+        admin: 'Админка',
+        sellTitle: 'Продать скины CS2',
+        sellDesc: 'Лучшие цены на скины. Быстрые выплаты. Мгновенные сделки.',
+        tradeUrl: 'Введите ваш Trade URL',
+        total: 'Итого',
+        selected: 'Выбрано: 0 скинов',
+        sellSelected: 'Продать выбранные',
+        paymentMethods: 'Способы оплаты',
+        buyTitle: 'Купить скины CS2',
+        settings: 'Настройки',
+        history: 'История',
+        balance: 'Баланс',
+        bought: 'Куплено на',
+        sold: 'Продано на',
+        save: 'Сохранить',
+        cancel: 'Отмена',
+        login: 'Войти через Telegram',
+        loginTitle: 'Вход через Telegram',
+        loginDesc: 'Введите логин и пароль',
+        loginError: 'Неверный логин или пароль',
+        logout: 'Выйти',
+        back: 'На сайт',
+        adminPanel: 'Админ-панель',
+        stats: 'Статистика',
+        users: 'Пользователей',
+        trades: 'Успешных обменов',
+        paid: 'Выплачено',
+        skinsCount: 'Скинов доступно',
+        exchangeRate: 'Курс валют',
+        manageSkins: 'Управление скинами',
+        addSkin: 'Добавить скин',
+        deleteSkins: 'Удалить скины',
+        saveAll: 'Сохранить все',
+        saved: 'Сохранено!',
+        deleteLast: '(удалить последние N скинов)',
+        addSkinTitle: 'Добавить скин',
+        skinName: 'Название',
+        skinWeapon: 'Оружие',
+        skinExterior: 'Износ',
+        skinPrice: 'Цена (USD)',
+        skinRarity: 'Редкость',
+        skinImage: 'URL картинки',
+        status: 'Статус',
+        statusSuccess: 'Успех',
+        statusFail: 'Ошибка',
+        statusPending: 'В обработке',
+        typeTime: 'Тип / Время',
+        action: 'Действие',
+        amount: 'Сумма',
+        about: 'О нас',
+        contacts: 'Контакты',
+        catalog: 'Каталог',
+        knives: 'Ножи',
+        gloves: 'Перчатки',
+        stickers: 'Стикеры',
+        help: 'Помощь',
+        faq: 'FAQ',
+        guarantees: 'Гарантии',
+        policy: 'Политика',
+        rights: 'Все права защищены.',
+        selectSkins: 'Выберите скины для продажи',
+        loginRequired: 'Авторизуйтесь',
+        loginRequiredDesc: 'Чтобы получить доступ к этой странице',
+        telegramBot: 'Telegram бот',
+        connected: 'Подключен',
+        disable: 'Отключить',
+    },
+    en: {
+        sell: 'Sell skins',
+        market: 'Buy skins',
+        profile: 'Profile',
+        admin: 'Admin',
+        sellTitle: 'Sell CS2 Skins',
+        sellDesc: 'Best prices on skins. Fast payouts. Instant trades.',
+        tradeUrl: 'Enter your Trade URL',
+        total: 'Total',
+        selected: 'Selected: 0 skins',
+        sellSelected: 'Sell selected',
+        paymentMethods: 'Payment methods',
+        buyTitle: 'Buy CS2 Skins',
+        settings: 'Settings',
+        history: 'History',
+        balance: 'Balance',
+        bought: 'Bought for',
+        sold: 'Sold for',
+        save: 'Save',
+        cancel: 'Cancel',
+        login: 'Login via Telegram',
+        loginTitle: 'Telegram Login',
+        loginDesc: 'Enter login and password',
+        loginError: 'Invalid login or password',
+        logout: 'Logout',
+        back: 'Back to site',
+        adminPanel: 'Admin Panel',
+        stats: 'Statistics',
+        users: 'Users',
+        trades: 'Successful trades',
+        paid: 'Paid out',
+        skinsCount: 'Skins available',
+        exchangeRate: 'Exchange rate',
+        manageSkins: 'Manage skins',
+        addSkin: 'Add skin',
+        deleteSkins: 'Delete skins',
+        saveAll: 'Save all',
+        saved: 'Saved!',
+        deleteLast: '(delete last N skins)',
+        addSkinTitle: 'Add skin',
+        skinName: 'Name',
+        skinWeapon: 'Weapon',
+        skinExterior: 'Exterior',
+        skinPrice: 'Price (USD)',
+        skinRarity: 'Rarity',
+        skinImage: 'Image URL',
+        status: 'Status',
+        statusSuccess: 'Success',
+        statusFail: 'Failed',
+        statusPending: 'Pending',
+        typeTime: 'Type / Time',
+        action: 'Action',
+        amount: 'Amount',
+        about: 'About',
+        contacts: 'Contacts',
+        catalog: 'Catalog',
+        knives: 'Knives',
+        gloves: 'Gloves',
+        stickers: 'Stickers',
+        help: 'Help',
+        faq: 'FAQ',
+        guarantees: 'Guarantees',
+        policy: 'Policy',
+        rights: 'All rights reserved.',
+        selectSkins: 'Select skins to sell',
+        loginRequired: 'Login Required',
+        loginRequiredDesc: 'To access this page',
+        telegramBot: 'Telegram bot',
+        connected: 'Connected',
+        disable: 'Disable',
+    }
+};
+
+function getLang() {
+    return appData.currentLang || 'ru';
+}
+
+function t(key) {
+    return translations[getLang()]?.[key] || key;
+}
+
+function updateLanguage() {
+    // Update all elements with data-lang-text
+    document.querySelectorAll('[data-lang-text]').forEach(el => {
+        const key = el.dataset.langText;
+        if (key) {
+            el.textContent = t(key);
+        }
+    });
+    
+    // Update nav links
+    document.querySelectorAll('.nav a').forEach(a => {
+        const page = a.dataset.page;
+        if (page) {
+            a.textContent = t(page === 'sell' ? 'sell' : page === 'market' ? 'market' : page === 'profile' ? 'profile' : '');
+        }
+    });
+    
+    // Update hero
+    const heroSpan = document.querySelector('.hero h1 span');
+    if (heroSpan) heroSpan.textContent = t('sellTitle');
+    const heroP = document.querySelector('.hero p');
+    if (heroP) heroP.textContent = t('sellDesc');
+    
+    // Update hero buttons
+    document.querySelectorAll('.hero-buttons .btn').forEach(btn => {
+        const page = btn.dataset.page;
+        if (page === 'sell') btn.textContent = t('sell');
+        else if (page === 'market') btn.textContent = t('market');
+    });
+    
+    // Update footer admin link
+    const adminLink = document.querySelector('.admin-link');
+    if (adminLink) adminLink.textContent = '⚙️ ' + t('admin');
+    
+    // Update lang switch
+    document.querySelectorAll('.lang-switch button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === getLang());
+    });
+    
+    // Update currency toggle
+    const currencyBtn = document.getElementById('currencyToggle');
+    if (currencyBtn) currencyBtn.textContent = appData.currentCurrency;
+    
+    // Update login button
+    const loginBtn = document.getElementById('telegramLoginBtn');
+    if (loginBtn) loginBtn.textContent = t('login');
+    
+    // Update profile
+    if (document.getElementById('profilePage').classList.contains('active')) {
+        renderProfile();
+    }
+}
+
+// ==========================================
+// НАВИГАЦИЯ
+// ==========================================
+function navigateTo(page) {
+    // Hide all pages
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    
+    // Show target
+    const target = document.getElementById(page + 'Page');
+    if (target) target.classList.add('active');
+    
+    // Update nav
+    document.querySelectorAll('.nav a').forEach(a => {
+        a.classList.toggle('active', a.dataset.page === page);
+    });
+    
+    // Render content
+    if (page === 'sell') renderSellSkins();
+    else if (page === 'market') renderMarketSkins();
+    else if (page === 'profile') renderProfile();
+    else if (page === 'admin') renderAdminSkins();
+}
+
+// ==========================================
+// РЕНДЕР СКИНОВ
+// ==========================================
+function renderSellSkins() {
+    const grid = document.getElementById('sellSkinGrid');
+    grid.innerHTML = appData.skins.map(skin => `
+        <div class="skin-card" data-id="${skin.id}">
+            <div class="image">
+                ${skin.imageUrl ? `<img src="${skin.imageUrl}" alt="${skin.name}">` : 
+                `<span style="color:#4a4d5a; font-size:12px;">${skin.weapon || 'Скин'}</span>`}
+            </div>
+            <div class="badge">${skin.rarity || ''}</div>
+            <div class="name">${skin.name}</div>
+            <div class="exterior">${skin.exterior || ''}</div>
+            <div class="price">${formatPrice(skin.price)}</div>
+            <button class="select-btn" onclick="toggleSelectSkin(${skin.id})">${t('sell')}</button>
+        </div>
+    `).join('');
+    
+    // Update selected states
+    document.querySelectorAll('#sellSkinGrid .skin-card').forEach(card => {
+        const btn = card.querySelector('.select-btn');
+        const sid = parseInt(card.dataset.id);
+        if (appData.selectedSkins.includes(sid)) {
+            btn.textContent = '✓ ' + (getLang() === 'ru' ? 'Выбрано' : 'Selected');
+            btn.classList.add('selected');
+        } else {
+            btn.textContent = t('sell');
+            btn.classList.remove('selected');
+        }
+    });
+    updateSellUI();
+}
+
+function renderMarketSkins() {
+    const grid = document.getElementById('marketSkinGrid');
+    grid.innerHTML = appData.skins.map(skin => `
+        <div class="skin-card">
+            <div class="image">
+                ${skin.imageUrl ? `<img src="${skin.imageUrl}" alt="${skin.name}">` : 
+                `<span style="color:#4a4d5a; font-size:12px;">${skin.weapon || 'Скин'}</span>`}
+            </div>
+            <div class="badge">${skin.rarity || ''}</div>
+            <div class="name">${skin.name}</div>
+            <div class="exterior">${skin.exterior || ''}</div>
+            <div class="price">${formatPrice(skin.price)}</div>
+            <button class="select-btn" onclick="alert('${t('buyTitle')} ${skin.name}?')">${t('market')}</button>
+        </div>
+    `).join('');
+}
+
+function toggleSelectSkin(id) {
+    const index = appData.selectedSkins.indexOf(id);
+    if (index > -1) {
+        appData.selectedSkins.splice(index, 1);
+    } else {
+        appData.selectedSkins.push(id);
+    }
+    saveData();
+    renderSellSkins();
+}
+
+function updateSellUI() {
+    const total = appData.selectedSkins.reduce((sum, id) => {
+        const skin = appData.skins.find(s => s.id === id);
+        return sum + (skin ? skin.price : 0);
+    }, 0);
+    document.getElementById('sellTotal').textContent = formatPrice(total);
+    document.getElementById('sellCount').textContent = 
+        (getLang() === 'ru' ? 'Выбрано: ' : 'Selected: ') + appData.selectedSkins.length + ' ' + 
+        (getLang() === 'ru' ? 'скинов' : 'skins');
+}
+
+function formatPrice(price) {
+    if (appData.currentCurrency === 'RUB') {
+        return (price * appData.exchangeRate).toFixed(2) + ' ₽';
+    }
+    return price.toFixed(2) + ' $';
+}
+
+// ==========================================
+// ПРОФИЛЬ
+// ==========================================
+function renderProfile() {
+    const isLoggedIn = appData.currentUser !== null;
+    
+    document.getElementById('profileLoginBox').style.display = isLoggedIn ? 'none' : 'block';
+    document.getElementById('profileContent').style.display = isLoggedIn ? 'block' : 'none';
+    
+    if (!isLoggedIn) return;
+    
+    const p = appData.profile;
+    const user = appData.currentUser;
+    document.getElementById('profileAvatar').textContent = user.charAt(0).toUpperCase();
+    document.getElementById('profileName').textContent = user;
+    document.getElementById('profileBalance').textContent = p.balance || '0 ₽';
+    document.getElementById('profileBought').textContent = p.bought || '0 ₽';
+    document.getElementById('profileSold').textContent = p.sold || '0 ₽';
+    document.getElementById('profileTradeUrl').value = p.tradeUrl || '';
+    
+    const tbody = document.getElementById('historyBody');
+    tbody.innerHTML = appData.history.map(h => `
+        <tr>
+            <td>#${h.id}</td>
+            <td>${h.type}<br><small style="color:#6a6d7a;">${h.time}</small></td>
+            <td>-</td>
+            <td>${h.amount}</td>
+            <td class="status-success">${h.status}</td>
+        </tr>
+    `).join('');
+}
+
+// ==========================================
+// АДМИНКА
+// ==========================================
+function renderAdminSkins() {
+    const container = document.getElementById('adminSkinList');
+    container.innerHTML = appData.skins.map((skin, index) => `
+        <div class="admin-skin-item" data-index="${index}">
+            <div class="row">
+                <span style="color:#8a8d99; font-size:11px; min-width:30px;">#${skin.id}</span>
+                <span style="min-width:20px;">${index + 1}.</span>
+                <input type="text" value="${skin.name}" style="flex:1; min-width:100px;" data-field="name" data-index="${index}">
+                <input type="text" value="${skin.weapon || ''}" style="width:70px;" data-field="weapon" data-index="${index}">
+                <select data-field="exterior" data-index="${index}" style="width:100px;">
+                    ${['Прямо с завода', 'Немного поношенное', 'После полевых испытаний', 'Поношенное', 'Закалённое в боях'].map(opt => 
+                        `<option value="${opt}" ${skin.exterior === opt ? 'selected' : ''}>${opt}</option>`
+                    ).join('')}
+                </select>
+                <input type="number" value="${skin.price}" style="width:80px;" data-field="price" data-index="${index}" step="0.01">
+                <select data-field="rarity" data-index="${index}" style="width:90px;">
+                    ${['covert', 'classified', 'restricted', 'mil-spec', 'industrial'].map(opt => 
+                        `<option value="${opt}" ${skin.rarity === opt ? 'selected' : ''}>${opt}</option>`
+                    ).join('')}
+                </select>
+                <input type="text" value="${skin.imageUrl || ''}" style="width:80px;" placeholder="URL" data-field="imageUrl" data-index="${index}">
+                <button class="remove-btn" onclick="removeAdminSkin(${index})">✕</button>
+            </div>
+        </div>
+    `).join('');
+    
+    // Update stats
+    document.getElementById('adminUsers').value = appData.users;
+    document.getElementById('adminTrades').value = appData.trades;
+    document.getElementById('adminPaid').value = appData.paid;
+    document.getElementById('adminSkinsCount').value = appData.skinsCount;
+    document.getElementById('adminRate').value = appData.exchangeRate;
+}
+
+function removeAdminSkin(index) {
+    if (confirm((getLang() === 'ru' ? 'Удалить скин "' : 'Delete skin "') + appData.skins[index]?.name + '"?')) {
+        appData.skins.splice(index, 1);
+        saveData();
+        renderAdminSkins();
+    }
+}
+
+function addAdminSkin() {
+    document.getElementById('addSkinModal').classList.add('open');
+}
+
+function confirmAddSkin() {
+    const name = document.getElementById('newSkinName').value.trim();
+    const weapon = document.getElementById('newSkinWeapon').value.trim();
+    const exterior = document.getElementById('newSkinExterior').value;
+    const price = parseFloat(document.getElementById('newSkinPrice').value);
+    const rarity = document.getElementById('newSkinRarity').value;
+    const imageUrl = document.getElementById('newSkinImage').value.trim();
+    
+    if (!name || !price || price <= 0) {
+        alert((getLang() === 'ru' ? 'Заполните название и цену (больше 0)' : 'Fill in name and price (greater than 0)'));
+        return;
+    }
+    
+    const maxId = appData.skins.reduce((max, s) => Math.max(max, s.id), 0);
+    appData.skins.push({
+        id: maxId + 1,
+        name,
+        exterior,
+        price,
+        weapon: weapon || 'Unknown',
+        rarity,
+        imageUrl: imageUrl || ''
+    });
+    
+    saveData();
+    renderAdminSkins();
+    document.getElementById('addSkinModal').classList.remove('open');
+    
+    document.getElementById('newSkinName').value = '';
+    document.getElementById('newSkinWeapon').value = '';
+    document.getElementById('newSkinPrice').value = '';
+    document.getElementById('newSkinImage').value = '';
+}
+
+function deleteLastSkins() {
+    const count = parseInt(document.getElementById('adminDeleteCount').value) || 1;
+    if (count <= 0) return;
+    if (confirm((getLang() === 'ru' ? 'Удалить последние ' : 'Delete last ') + count + ' ' + (getLang() === 'ru' ? 'скинов?' : 'skins?'))) {
+        appData.skins.splice(-count);
+        saveData();
+        renderAdminSkins();
+        document.getElementById('adminDeleteCount').value = '';
+    }
+}
+
+function saveAdminAll() {
+    // Save skins from admin form
+    document.querySelectorAll('#adminSkinList .admin-skin-item').forEach(item => {
+        const index = parseInt(item.dataset.index);
+        if (index >= 0 && index < appData.skins.length) {
+            const skin = appData.skins[index];
+            item.querySelectorAll('input[data-field], select[data-field]').forEach(input => {
+                const field = input.dataset.field;
+                if (field === 'price') skin[field] = parseFloat(input.value) || 0;
+                else if (field === 'name') skin[field] = input.value.trim() || skin.name;
+                else if (field === 'weapon') skin[field] = input.value.trim() || skin.weapon;
+                else if (field === 'exterior') skin[field] = input.value;
+                else if (field === 'rarity') skin[field] = input.value;
+                else if (field === 'imageUrl') skin[field] = input.value.trim();
+            });
+        }
+    });
+    
+    // Save stats
+    appData.users = parseInt(document.getElementById('adminUsers').value) || 0;
+    appData.trades = parseInt(document.getElementById('adminTrades').value) || 0;
+    appData.paid = document.getElementById('adminPaid').value || '$0';
+    appData.skinsCount = parseInt(document.getElementById('adminSkinsCount').value) || 0;
+    appData.exchangeRate = parseFloat(document.getElementById('adminRate').value) || 86.83;
+    
+    saveData();
+    
+    const status = document.getElementById('adminStatus');
+    status.textContent = '✅ ' + t('saved');
+    status.classList.add('show');
+    setTimeout(() => status.classList.remove('show'), 3000);
+    
+    // Update hero stats
+    document.getElementById('usersCount').textContent = appData.users.toLocaleString();
+    document.getElementById('tradesCount').textContent = appData.trades.toLocaleString();
+    document.getElementById('paidAmount').textContent = appData.paid;
+    document.getElementById('skinsCount').textContent = appData.skinsCount.toLocaleString();
+}
+
+// ==========================================
+// АВТОРИЗАЦИЯ
+// ==========================================
+function openLogin() {
+    document.getElementById('loginModal').classList.add('open');
+    document.getElementById('loginError').classList.remove('show');
+    document.getElementById('loginInput').value = '';
+    document.getElementById('passwordInput').value = '';
+    document.getElementById('loginInput').focus();
+}
+
+function closeLogin() {
+    document.getElementById('loginModal').classList.remove('open');
+}
+
+function handleLogin() {
+    const login = document.getElementById('loginInput').value.trim();
+    const password = document.getElementById('passwordInput').value.trim();
+    
+    if (!login) {
+        document.getElementById('loginError').textContent = '❌ ' + (getLang() === 'ru' ? 'Введите логин' : 'Enter login');
+        document.getElementById('loginError').classList.add('show');
+        return;
+    }
+    
+    // Проверяем, существует ли уже такой пользователь
+    if (registeredUsers[login]) {
+        // Пользователь существует - вход
+        appData.currentUser = login;
+        // Обновляем данные пользователя (пароль не важен)
+        saveData();
+        closeLogin();
+        updateUserUI();
+        if (document.getElementById('profilePage').classList.contains('active')) {
+            renderProfile();
+        }
+        alert((getLang() === 'ru' ? '✅ Добро пожаловать, ' : '✅ Welcome, ') + login + '!');
+    } else {
+        // Новый пользователь - регистрация
+        if (confirm((getLang() === 'ru' ? 'Пользователь "' + login + '" не найден. Создать новый аккаунт?' : 'User "' + login + '" not found. Create new account?'))) {
+            registeredUsers[login] = { password: password || 'default' };
+            appData.currentUser = login;
+            saveData();
+            closeLogin();
+            updateUserUI();
+            if (document.getElementById('profilePage').classList.contains('active')) {
+                renderProfile();
+            }
+            alert((getLang() === 'ru' ? '✅ Аккаунт создан! Добро пожаловать, ' : '✅ Account created! Welcome, ') + login + '!');
+        }
+    }
+}
+
+function logoutUser() {
+    appData.currentUser = null;
+    saveData();
+    updateUserUI();
+    if (document.getElementById('profilePage').classList.contains('active')) {
+        renderProfile();
+    }
+    if (document.getElementById('adminPage').classList.contains('active')) {
+        navigateTo('sell');
+    }
+    // Обновляем кнопку входа
+    const loginBtn = document.getElementById('telegramLoginBtn');
+    if (loginBtn) loginBtn.textContent = t('login');
+}
+
+function updateUserUI() {
+    const actions = document.getElementById('headerActions');
+    const isLoggedIn = appData.currentUser !== null;
+    
+    if (isLoggedIn) {
+        actions.innerHTML = `
+            <div class="user-profile" onclick="navigateTo('profile')">
+                <div class="avatar">${appData.currentUser.charAt(0).toUpperCase()}</div>
+                <span class="username">${appData.currentUser}</span>
+                <button class="logout-btn" onclick="event.stopPropagation(); logoutUser()">✕</button>
+            </div>
+            <a href="#" class="btn-outline" id="currencyToggle">${appData.currentCurrency}</a>
+        `;
+    } else {
+        actions.innerHTML = `
+            <a href="#" class="btn-outline" id="currencyToggle">${appData.currentCurrency}</a>
+            <a href="#" class="btn btn-telegram" id="telegramLoginBtn">${t('login')}</a>
+        `;
+    }
+    
+    // Привязываем обработчики
+    document.getElementById('currencyToggle')?.addEventListener('click', toggleCurrency);
+    document.getElementById('telegramLoginBtn')?.addEventListener('click', openLogin);
+}
+
+// ==========================================
+// ВАЛЮТА
+// ==========================================
+function toggleCurrency(e) {
+    e.preventDefault();
+    appData.currentCurrency = appData.currentCurrency === 'USD' ? 'RUB' : 'USD';
+    saveData();
+    const btn = document.getElementById('currencyToggle');
+    if (btn) btn.textContent = appData.currentCurrency;
+    renderSellSkins();
+    renderMarketSkins();
+}
+
+// ==========================================
+// ИНИЦИАЛИЗАЦИЯ
+// ==========================================
+document.addEventListener('DOMContentLoaded', function() {
+    loadData();
+    
+    // Language switch
+    document.querySelectorAll('.lang-switch button').forEach(btn => {
+        btn.addEventListener('click', function() {
+            appData.currentLang = this.dataset.lang;
+            saveData();
+            updateLanguage();
+            renderSellSkins();
+            renderMarketSkins();
+            if (document.getElementById('profilePage').classList.contains('active')) renderProfile();
+            if (document.getElementById('adminPage').classList.contains('active')) renderAdminSkins();
+        });
+    });
+    
+    // Navigation
+    document.querySelectorAll('.nav a, [data-page]').forEach(el => {
+        el.addEventListener('click', function(e) {
+            e.preventDefault();
+            const page = this.dataset.page;
+            if (page === 'admin') {
+                if (!appData.currentUser) {
+                    alert((getLang() === 'ru' ? '⚠️ Сначала войдите через Telegram!' : '⚠️ Please login via Telegram first!'));
+                    return;
+                }
+                navigateTo('admin');
+            } else if (page) {
+                navigateTo(page);
+            }
+        });
+    });
+    
+    // Profile login button
+    document.getElementById('profileLoginBtn').addEventListener('click', openLogin);
+    
+    // Admin
+    document.getElementById('footerAdminLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        if (!appData.currentUser) {
+            alert((getLang() === 'ru' ? '⚠️ Сначала войдите через Telegram!' : '⚠️ Please login via Telegram first!'));
+            return;
+        }
+        navigateTo('admin');
+    });
+    document.getElementById('adminLogout').addEventListener('click', function() {
+        if (confirm((getLang() === 'ru' ? 'Выйти из админ-панели?' : 'Logout from admin panel?'))) {
+            navigateTo('sell');
+        }
+    });
+    document.getElementById('adminBack').addEventListener('click', function() {
+        navigateTo('sell');
+    });
+    document.getElementById('adminAddSkin').addEventListener('click', addAdminSkin);
+    document.getElementById('addSkinCancel').addEventListener('click', () => {
+        document.getElementById('addSkinModal').classList.remove('open');
+    });
+    document.getElementById('addSkinConfirm').addEventListener('click', confirmAddSkin);
+    document.getElementById('adminDeleteSkins').addEventListener('click', deleteLastSkins);
+    document.getElementById('adminSaveAll').addEventListener('click', saveAdminAll);
+    document.getElementById('saveRateBtn').addEventListener('click', () => {
+        const rate = parseFloat(document.getElementById('adminRate').value);
+        if (rate > 0) {
+            appData.exchangeRate = rate;
+            saveData();
+            const status = document.getElementById('adminStatus');
+            status.textContent = '✅ ' + t('saved');
+            status.classList.add('show');
+            setTimeout(() => status.classList.remove('show'), 3000);
+        }
+    });
+    
+    // Login
+    document.getElementById('loginCancel').addEventListener('click', closeLogin);
+    document.getElementById('loginConfirm').addEventListener('click', handleLogin);
+    document.getElementById('passwordInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') handleLogin();
+    });
+    document.getElementById('loginInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') document.getElementById('passwordInput').focus();
+    });
+    
+    // Profile
+    document.getElementById('saveTradeUrl').addEventListener('click', function() {
+        appData.profile.tradeUrl = document.getElementById('profileTradeUrl').value;
+        saveData();
+        alert((getLang() === 'ru' ? '✅ Trade URL сохранен!' : '✅ Trade URL saved!'));
+    });
+    
+    // Sell
+    document.getElementById('sellSelectedBtn').addEventListener('click', function() {
+        if (appData.selectedSkins.length === 0) {
+            alert((getLang() === 'ru' ? 'Выберите скины для продажи!' : 'Select skins to sell!'));
+            return;
+        }
+        const total = appData.selectedSkins.reduce((sum, id) => {
+            const skin = appData.skins.find(s => s.id === id);
+            return sum + (skin ? skin.price : 0);
+        }, 0);
+        if (confirm((getLang() === 'ru' ? 'Продать выбранные скины на ' : 'Sell selected skins for ') + formatPrice(total) + '?')) {
+            const soldIds = [...appData.selectedSkins];
+            appData.skins = appData.skins.filter(s => !soldIds.includes(s.id));
+            appData.selectedSkins = [];
+            saveData();
+            renderSellSkins();
+            alert((getLang() === 'ru' ? '✅ Скины проданы! Деньги зачислены на баланс.' : '✅ Skins sold! Money credited to balance.'));
+        }
+    });
+    
+    // Update user UI
+    updateUserUI();
+    
+    // Set language
+    updateLanguage();
+    
+    // Initial render
+    navigateTo('sell');
+    renderSellSkins();
+    renderMarketSkins();
+    renderProfile();
+    
+    // Update hero stats
+    document.getElementById('usersCount').textContent = appData.users.toLocaleString();
+    document.getElementById('tradesCount').textContent = appData.trades.toLocaleString();
+    document.getElementById('paidAmount').textContent = appData.paid;
+    document.getElementById('skinsCount').textContent = appData.skinsCount.toLocaleString();
+    
+    console.log('🟢 EMERALDMarket успешно загружен!');
+    console.log('📦 Скинов в базе:', appData.skins.length);
+    console.log('👤 Пользователь:', appData.currentUser || 'не авторизован');
+});
+</script>
+</body>
+</html>
