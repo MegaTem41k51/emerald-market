@@ -10,19 +10,21 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// ВАЖНО! Если этих переменных нет на Render - добавь их в Environment!
 const STEAM_API_KEY = process.env.STEAM_API_KEY;
-const SESSION_SECRET = process.env.SESSION_SECRET || 'secret';
+const SESSION_SECRET = process.env.SESSION_SECRET || 'my_super_secret_123';
 const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
 
+// ХРАНИМ СЕССИИ В ФАЙЛЕ, ЧТОБЫ ОНИ НЕ ПРОПАДАЛИ!
 app.use(session({
     store: new FileStore(),
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: process.env.NODE_ENV === 'production' }
+    cookie: { secure: process.env.NODE_ENV === 'production', maxAge: 1000 * 60 * 60 * 24 * 7 } // 7 дней
 }));
 
 app.use(passport.initialize());
@@ -50,6 +52,7 @@ app.get('/logout', (req, res) => {
     });
 });
 
+// ТОТ САМЫЙ ЭНДПОИНТ, КОТОРЫЙ ДОЛЖЕН ВОЗВРАЩАТЬ ТЕБЯ
 app.get('/api/user', (req, res) => {
     if (req.user) {
         res.json({ 
