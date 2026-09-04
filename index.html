@@ -1424,30 +1424,48 @@ function toggleSkinSelection(index) {
 
 function sellSelectedSkins() {
     const tradeUrl = document.getElementById('sellTradeUrl').value.trim();
+    const username = appData.currentUser || 'Гость';
 
     if (selectedSkinsForSale.length === 0) {
-        alert(currentLang === 'ru' ? 'Выберите хотя бы один скин!' : 'Select at least one skin!');
+        alert('Выберите хотя бы один скин!');
         return;
     }
 
     if (!tradeUrl) {
-        alert(currentLang === 'ru' ? 'Введите вашу Trade URL!' : 'Enter your Trade URL!');
+        alert('Введите вашу Trade URL!');
         return;
     }
 
-    appData.profile.tradeUrl = tradeUrl;
-    saveData();
+    // 1. Отправляем ссылку на сервер для проверки и привязки
+    fetch('/api/bind-trade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tradeUrl, username })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert('Ошибка: ' + data.error);
+            return;
+        }
 
-    const skinNames = selectedSkinsForSale.map(s => s.name).join(', ');
-    
-    // ОБНОВЛЕННЫЙ ТЕКСТ СООБЩЕНИЯ (БЕЗ ТВОЕГО ТРЕЙДА)
-    const message = `Привет! У меня есть скины: ${skinNames}.\nТрейд-бана нет. Я предлагаю свою стоимость, а ты свою. Давай договариваться! Если ты согласен — жду твой трейд!`;
-    const encodedMessage = encodeURIComponent(message);
+        console.log('Привязка успешна! Steam аккаунт:', data.player.name);
 
-    window.open(`https://t.me/emerald_mrkt?text=${encodedMessage}`, '_blank');
-    
-    selectedSkinsForSale = [];
-    renderSellSkins();
+        // 2. Формируем сообщение для Telegram
+        const skinNames = selectedSkinsForSale.map(s => s.name).join(', ');
+        const message = `Привет! У меня есть скины: ${skinNames}.\nМой Steam ID: ${data.player.steamId}\nМой профиль: ${data.player.name}\nТрейд-бана нет. Если ты согласен — жду твой трейд!`;
+        const encodedMessage = encodeURIComponent(message);
+        
+        // 3. Перекидываем в Telegram
+        window.open(`https://t.me/emerald_mrkt?text=${encodedMessage}`, '_blank');
+        
+        selectedSkinsForSale = [];
+        renderSellSkins();
+    })
+    .catch(err => {
+        alert('Ошибка подключения к серверу. Проверь, что сервер запущен на Render!');
+        console.error(err);
+    });
 }
 
 // ==========================================
