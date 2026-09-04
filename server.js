@@ -8,12 +8,12 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 3000;
 
 // Переменные окружения (обязательно добавь на Render)
 const STEAM_API_KEY = process.env.STEAM_API_KEY;
 const SESSION_SECRET = process.env.SESSION_SECRET || 'my_super_secret_key';
-const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
