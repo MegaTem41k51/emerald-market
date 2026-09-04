@@ -10,11 +10,6 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ВАЖНО: Добавь на Render в Environment:
-// BASE_URL = https://emerald-market-2.onrender.com
-// STEAM_API_KEY = твой_ключ
-// SESSION_SECRET = случайная_строка
-
 const STEAM_API_KEY = process.env.STEAM_API_KEY;
 const SESSION_SECRET = process.env.SESSION_SECRET || 'secret';
 const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
@@ -22,7 +17,6 @@ const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
 
-// Храним сессии в файле, чтобы они не пропадали
 app.use(session({
     store: new FileStore(),
     secret: SESSION_SECRET,

@@ -5,263 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EMERALDMarket</title>
     
-    <!-- Yandex.Metrika counter -->
-    <script type="text/javascript">
-        (function(m,e,t,r,i,k,a){
-            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-            m[i].l=1*new Date();
-            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=112281730', 'ym');
-
-        ym(112281730, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
-    </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/112281730" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-    <!-- /Yandex.Metrika counter -->
-    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; font-family: 'Montserrat', system-ui, sans-serif; background: #0b0c10; color: #e4e6eb; transition: background 0.3s, color 0.3s; overflow-x: hidden; }
         
-        .rain-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
-        }
-        .rain {
-            position: absolute;
-            width: 2px;
-            background: linear-gradient(to bottom, rgba(46,204,113,0.1), rgba(46,204,113,0.3));
-            animation: rainFall linear infinite;
-        }
-        @keyframes rainFall {
-            0% { transform: translateY(-100vh) rotate(10deg); opacity: 0.3; }
-            100% { transform: translateY(100vh) rotate(10deg); opacity: 0.8; }
-        }
+        .rain-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+        .rain { position: absolute; width: 2px; background: linear-gradient(to bottom, rgba(46,204,113,0.1), rgba(46,204,113,0.3)); animation: rainFall linear infinite; }
+        @keyframes rainFall { 0% { transform: translateY(-100vh) rotate(10deg); opacity: 0.3; } 100% { transform: translateY(100vh) rotate(10deg); opacity: 0.8; } }
         .rain-slow { animation-duration: 3s; }
         .rain-medium { animation-duration: 2s; }
         .rain-fast { animation-duration: 1.2s; }
 
-        body.light { 
-            background: #e8ecf1; 
-            color: #1a1a2e; 
-        }
-        body.light .header { 
-            background: #f0f2f5; 
-            border-bottom-color: #d0d4da; 
-        }
-        body.light .header .logo span { color: #888; }
-        body.light .nav a { color: #555; }
-        body.light .nav a.active { color: #2ecc71; }
-        body.light .hero { 
-            background: #f0f2f5; 
-            border-bottom-color: #d0d4da; 
-        }
-        body.light .hero h1 span { color: #333; }
-        body.light .hero p { color: #666; }
-        body.light .sell-sidebar { 
-            background: #f0f2f5; 
-            border-color: #d0d4da; 
-        }
-        body.light .sell-sidebar .title { color: #2ecc71; }
-        body.light .sell-sidebar .trade-input { 
-            background: #e8ecf1; 
-            border-color: #d0d4da; 
-            color: #333; 
-        }
-        body.light .sell-sidebar .min-withdraw { color: #666; }
-        body.light .filter-sidebar { 
-            background: #f0f2f5; 
-            border-color: #d0d4da; 
-        }
-        body.light .filter-sidebar .filter-title { color: #333; }
-        body.light .filter-sidebar .filter-group label { color: #555; }
-        body.light .filter-sidebar .filter-group input { 
-            background: #e8ecf1; 
-            color: #333; 
-            border-color: #d0d4da; 
-        }
-        body.light .filter-sidebar .filter-group .price-inputs input { 
-            background: #e8ecf1; 
-            color: #333; 
-            border-color: #d0d4da; 
-        }
-        body.light .filter-sidebar .filter-group .checkbox-group label { color: #555; }
-        body.light .filter-reset-btn { 
-            color: #e74c3c; 
-            border-color: #e74c3c; 
-        }
-        body.light .filter-reset-btn:hover { 
-            background: #e74c3c; 
-            color: #fff; 
-        }
-        body.light .market-skin-card { 
-            background: #f0f2f5; 
-            border-color: #d0d4da; 
-        }
-        body.light .market-skin-card .weapon { color: #666; }
-        body.light .market-skin-card .exterior { color: #666; }
-        body.light .market-skin-card .name { color: #333; }
-        body.light .market-skin-card .price { color: #2ecc71; }
-        body.light .sell-skin-card { 
-            background: #f0f2f5; 
-            border-color: #d0d4da; 
-        }
-        body.light .sell-skin-card .skin-name { color: #333; }
-        body.light .sell-skin-card .skin-exterior { color: #666; }
-        body.light .sell-skin-card .skin-price { color: #2ecc71; }
-        body.light .profile-login-box { 
-            background: #f0f2f5; 
-            border-color: #d0d4da; 
-        }
-        body.light .profile-login-box h2 { color: #333; }
-        body.light .profile-login-box p { color: #666; }
-        body.light .profile-header { 
-            background: #f0f2f5; 
-            border-color: #d0d4da; 
-        }
-        body.light .profile-settings { 
-            background: #f0f2f5; 
-            border-color: #d0d4da; 
-        }
-        body.light .profile-settings .setting-row input { 
-            background: #e8ecf1; 
-            color: #333; 
-            border-color: #d0d4da; 
-        }
-        body.light .profile-history { 
-            background: #f0f2f5; 
-            border-color: #d0d4da; 
-        }
-        body.light .admin-panel { 
-            background: #f0f2f5; 
-            border-color: #d0d4da; 
-        }
-        body.light .admin-panel h2 { color: #2ecc71; }
-        body.light .admin-row input { 
-            background: #e8ecf1; 
-            color: #333; 
-            border-color: #d0d4da; 
-        }
-        body.light .admin-skin-item { 
-            background: #e8ecf1; 
-            border-color: #d0d4da; 
-        }
-        body.light .admin-skin-item .row input { 
-            background: #f0f2f5; 
-            color: #333; 
-            border-color: #d0d4da; 
-        }
-        body.light .admin-skin-item .row select { 
-            background: #f0f2f5; 
-            color: #333; 
-            border-color: #d0d4da; 
-        }
-        body.light .footer { 
-            background: #f0f2f5; 
-            border-top-color: #d0d4da; 
-        }
-        body.light .footer-grid .col a { color: #666; }
-        body.light .footer-grid .col a:hover { color: #2ecc71; }
-        body.light .footer-bottom { color: #999; border-top-color: #d0d4da; }
-        body.light .online-counter {
-            background: rgba(240, 242, 245, 0.9);
-            border-color: #2ecc71;
-        }
-        body.light .online-counter .label { color: #666; }
-        body.light .user-profile { 
-            background: #e8ecf1; 
-            border-color: #d0d4da; 
-        }
-        body.light .user-profile .username { color: #333; }
-        body.light .lang-switch { 
-            border-color: #d0d4da; 
-            color: #666; 
-        }
-        body.light .lang-switch:hover { border-color: #2ecc71; color: #2ecc71; }
-        body.light .lang-switch .active { color: #2ecc71; }
-        body.light .btn-outline { 
-            color: #555 !important; 
-            border-color: #d0d4da; 
-        }
-        body.light .btn-outline:hover { border-color: #2ecc71; color: #2ecc71 !important; }
-        body.light .profile-settings .setting-row label { color: #666; }
-        body.light .profile-settings .setting-row .toggle-btn { 
-            border-color: #d0d4da; 
-            color: #555; 
-        }
-        body.light .profile-settings .setting-row .toggle-btn.active { 
-            background: #2ecc71; 
-            border-color: #2ecc71; 
-            color: #0b0c10; 
-        }
-        body.light .market-skin-card .badge { 
-            background: rgba(46,204,113,0.12); 
-            color: #2ecc71; 
-            border-color: rgba(46,204,113,0.15); 
-        }
-        body.light .sell-empty h3 { color: #333; }
-        body.light .sell-empty p { color: #666; }
-        body.light .admin-users-panel { 
-            background: #f0f2f5; 
-            border-color: #d0d4da; 
-        }
-        body.light .admin-users-panel h2 { color: #2ecc71; }
-        body.light .admin-user-item { 
-            background: #e8ecf1; 
-            border-color: #d0d4da; 
-        }
-        body.light .admin-user-item .user-name { color: #333; }
-
         .wrapper { display: flex; flex-direction: column; min-height: 100vh; position: relative; z-index: 1; }
         .content { flex: 1; }
         .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
-
-        .online-counter {
-            position: fixed;
-            top: 70px;
-            left: 20px;
-            z-index: 99;
-            background: rgba(11, 12, 16, 0.85);
-            backdrop-filter: blur(10px);
-            border: 1px solid #2ecc71;
-            border-radius: 30px;
-            padding: 6px 16px 6px 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #e4e6eb;
-            box-shadow: 0 4px 20px rgba(46, 204, 113, 0.15);
-            transition: all 0.3s;
-        }
-        .online-counter .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #2ecc71;
-            animation: pulse-dot 1.5s ease-in-out infinite;
-            flex-shrink: 0;
-        }
-        @keyframes pulse-dot {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.3; transform: scale(0.7); }
-        }
-        .online-counter .count {
-            color: #2ecc71;
-            font-weight: 700;
-            font-size: 15px;
-        }
-        .online-counter .label {
-            color: #8a8d99;
-            font-weight: 400;
-        }
 
         .header { background: #111318; border-bottom: 1px solid #26282f; padding: 12px 0; position: sticky; top: 0; z-index: 100; }
         .header-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
@@ -281,19 +38,16 @@
         .btn:hover { background: #27ae60; transform: scale(1.02); }
         .btn-outline { background: transparent; color: #b2b4bb !important; border: 1px solid #3a3c46; padding: 7px 18px; border-radius: 6px; font-weight: 500; font-size: 13px; cursor: pointer; transition: 0.2s; }
         .btn-outline:hover { border-color: #2ecc71; color: #2ecc71 !important; }
-        .btn-telegram { background: #0088cc; color: #fff !important; border: 1px solid #006699; }
-        .btn-telegram:hover { background: #006699; }
         .btn-success { background: #2ecc71; color: #0b0c10 !important; }
         .btn-success:hover { background: #27ae60; }
         .btn-danger { background: #e74c3c; color: #fff !important; }
         .btn-danger:hover { background: #c0392b; }
-        .btn-sm { padding: 4px 14px; font-size: 12px; }
         .btn-steam { background: #171a21; color: #fff; border: 1px solid #66c0f4; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; transition: 0.2s; }
         .btn-steam:hover { background: #1b2838; border-color: #fff; }
 
         .user-profile { display: flex; align-items: center; gap: 10px; background: #1c1d23; padding: 4px 12px 4px 4px; border-radius: 30px; border: 1px solid #2c2e36; cursor: pointer; transition: 0.2s; }
         .user-profile:hover { border-color: #2ecc71; }
-        .user-profile .avatar { width: 32px; height: 32px; border-radius: 50%; background: #2ecc71; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #0b0c10; flex-shrink: 0; }
+        .user-profile .avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #0b0c10; flex-shrink: 0; background-size: cover; background-position: center; }
         .user-profile .username { font-size: 14px; font-weight: 500; color: #e4e6eb; }
         .user-profile .logout-btn { background: none; border: none; color: #8a8d99; cursor: pointer; font-size: 14px; padding: 0 4px; transition: 0.2s; }
         .user-profile .logout-btn:hover { color: #e74c3c; }
@@ -340,24 +94,8 @@
         .sell-content .top-bar .select-all { color: #8a8d99; font-size: 13px; cursor: pointer; }
         .sell-content .top-bar .select-all:hover { color: #2ecc71; }
 
-        .sell-skin-grid { 
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
-            gap: 12px;
-            min-height: 200px;
-        }
-        .sell-skin-card { 
-            background: #14161c; 
-            border: 1px solid #26282f; 
-            border-radius: 10px; 
-            padding: 14px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 8px; 
-            cursor: pointer; 
-            transition: 0.2s;
-            position: relative;
-        }
+        .sell-skin-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; min-height: 200px; }
+        .sell-skin-card { background: #14161c; border: 1px solid #26282f; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 8px; cursor: pointer; transition: 0.2s; position: relative; }
         .sell-skin-card:hover { border-color: #2ecc71; transform: translateY(-2px); }
         .sell-checkbox { position: absolute; top: 8px; right: 8px; width: 20px; height: 20px; border: 2px solid #2ecc71; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #0b0c10; font-weight: bold; }
         .sell-skin-card .skin-image { display: flex; align-items: center; justify-content: center; height: 60px; }
@@ -366,12 +104,7 @@
         .sell-skin-card .skin-exterior { font-size: 12px; color: #8a8d99; }
         .sell-skin-card .skin-price { color: #2ecc71; font-weight: 700; }
 
-        .sell-empty {
-            grid-column: 1/-1;
-            text-align: center;
-            padding: 60px 0;
-            color: #8a8d99;
-        }
+        .sell-empty { grid-column: 1/-1; text-align: center; padding: 60px 0; color: #8a8d99; }
         .sell-empty .icon { font-size: 48px; margin-bottom: 16px; }
         .sell-empty h3 { color: #e4e6eb; margin-bottom: 8px; }
 
@@ -431,7 +164,7 @@
         .profile-login-box p { color: #8a8d99; font-size: 16px; margin-bottom: 24px; }
 
         .profile-header { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px 32px; display: flex; align-items: center; gap: 24px; margin-bottom: 24px; flex-wrap: wrap; }
-        .profile-avatar { width: 72px; height: 72px; border-radius: 50%; background: #2ecc71; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; color: #0b0c10; flex-shrink: 0; }
+        .profile-avatar { width: 72px; height: 72px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; color: #0b0c10; flex-shrink: 0; background-size: cover; background-position: center; }
         .profile-info h2 { font-size: 24px; }
         .profile-info .stats { display: flex; gap: 24px; margin-top: 4px; flex-wrap: wrap; }
         .profile-info .stats .stat { color: #8a8d99; font-size: 14px; }
@@ -482,17 +215,11 @@
         .footer-bottom { text-align: center; margin-top: 32px; padding-top: 20px; border-top: 1px solid #1c1d23; color: #6a6d7a; font-size: 14px; }
 
         @media (max-width: 1200px) { .market-skin-grid { grid-template-columns: repeat(3, 1fr); } .sell-skin-grid { grid-template-columns: repeat(3, 1fr); } }
-        @media (max-width: 992px) { .sell-wrapper { flex-direction: column; } .sell-sidebar { width: 100%; min-width: unset; position: static; } .market-wrapper { flex-direction: column; } .filter-sidebar { width: 100%; min-width: unset; position: static; max-height: none; overflow-y: visible; } .market-skin-grid { grid-template-columns: repeat(2, 1fr); } .sell-skin-grid { grid-template-columns: repeat(2, 1fr); } .hero h1 { font-size: 32px; } .online-counter { top: auto; bottom: 80px; left: 20px; font-size: 12px; padding: 4px 12px 4px 10px; } }
-        @media (max-width: 600px) { .market-skin-grid { grid-template-columns: 1fr 1fr; } .sell-skin-grid { grid-template-columns: 1fr 1fr; } .hero h1 { font-size: 24px; } .hero-stats { gap: 20px; } .online-counter { bottom: 70px; left: 10px; font-size: 11px; padding: 4px 10px 4px 8px; } .online-counter .count { font-size: 13px; } }
+        @media (max-width: 992px) { .sell-wrapper { flex-direction: column; } .sell-sidebar { width: 100%; min-width: unset; position: static; } .market-wrapper { flex-direction: column; } .filter-sidebar { width: 100%; min-width: unset; position: static; max-height: none; overflow-y: visible; } .market-skin-grid { grid-template-columns: repeat(2, 1fr); } .sell-skin-grid { grid-template-columns: repeat(2, 1fr); } .hero h1 { font-size: 32px; } }
+        @media (max-width: 600px) { .market-skin-grid { grid-template-columns: 1fr 1fr; } .sell-skin-grid { grid-template-columns: 1fr 1fr; } .hero h1 { font-size: 24px; } .hero-stats { gap: 20px; } }
     </style>
 </head>
 <body>
-
-<div class="online-counter" id="onlineCounter">
-    <span class="dot"></span>
-    <span class="count" id="onlineCount">1</span>
-    <span class="label" data-key="online">онлайн</span>
-</div>
 
 <div class="rain-container" id="rainContainer"></div>
 
@@ -502,18 +229,12 @@
     <div class="container header-inner">
         <a href="#" class="logo" id="logoLink">EMERALD<span>Market</span></a>
         <nav class="nav">
-            <a class="active" data-page="hero" data-key="nav_home">Главная</a>
-            <a data-page="sell" data-key="nav_sell">Продать скины</a>
-            <a data-page="market" data-key="nav_buy">Купить скины</a>
-            <a data-page="profile" data-key="nav_profile">Профиль</a>
+            <a class="active" data-page="hero">Главная</a>
+            <a data-page="sell">Продать скины</a>
+            <a data-page="market">Купить скины</a>
+            <a data-page="profile">Профиль</a>
         </nav>
         <div class="header-actions" id="headerActions">
-            <div class="lang-switch" id="langSwitch">
-                <span class="active" id="langRu">RU</span>
-                <span class="sep">|</span>
-                <span id="langEn">EN</span>
-            </div>
-            <a href="#" class="btn-outline" id="currencyToggle">USD</a>
             <a href="/auth/steam" class="btn btn-steam" id="steamLoginBtn">Войти через Steam</a>
         </div>
     </div>
@@ -523,17 +244,17 @@
 
 <section class="hero page active" id="heroPage">
     <div class="container">
-        <h1 data-key="hero_title">Продать <span data-key="hero_title_span">скины CS2</span></h1>
-        <p data-key="hero_desc">Лучшие цены на скины. Быстрые выплаты. Мгновенные сделки.</p>
+        <h1>Продать <span>скины CS2</span></h1>
+        <p>Лучшие цены на скины. Быстрые выплаты. Мгновенные сделки.</p>
         <div class="hero-buttons">
-            <a href="#" class="btn btn-success" data-page="sell" data-key="hero_sell_btn">Продать скины</a>
-            <a href="#" class="btn btn-outline" data-page="market" data-key="hero_buy_btn">Купить скины</a>
+            <a href="#" class="btn btn-success" data-page="sell">Продать скины</a>
+            <a href="#" class="btn btn-outline" data-page="market">Купить скины</a>
         </div>
         <div class="hero-stats">
-            <div class="stat"><div class="num" id="usersCount">0</div><div class="label" data-key="stat_users">Пользователей</div></div>
-            <div class="stat"><div class="num" id="tradesCount">0</div><div class="label" data-key="stat_trades">Успешных обменов</div></div>
-            <div class="stat"><div class="num" id="paidAmount">$0</div><div class="label" data-key="stat_paid">Выплачено</div></div>
-            <div class="stat"><div class="num" id="skinsCount">0</div><div class="label" data-key="stat_skins">Скинов доступно</div></div>
+            <div class="stat"><div class="num" id="usersCount">0</div><div class="label">Пользователей</div></div>
+            <div class="stat"><div class="num" id="tradesCount">0</div><div class="label">Успешных обменов</div></div>
+            <div class="stat"><div class="num" id="paidAmount">$0</div><div class="label">Выплачено</div></div>
+            <div class="stat"><div class="num" id="skinsCount">0</div><div class="label">Скинов доступно</div></div>
         </div>
     </div>
 </section>
@@ -542,7 +263,6 @@
 <div class="page" id="aboutPage">
     <div class="container static-page">
         <h1>➡ ИНФОРМАЦИЯ ПО ЦЕНАМ ⬅</h1>
-        
         <h2>Условия выкупа</h2>
         <ul>
             <li>✅ Работаем 24/7. Выплачиваем мгновенно!</li>
@@ -555,9 +275,7 @@
             <li>❌ Не покупаем скины из новых коллекций!</li>
             <li>💵 Выплачиваем мгновенно! По СБП (в любой банк РФ) или на крипту.</li>
         </ul>
-        
         <p>➖</p>
-        
         <p>💬 Чат канала - <a href="https://t.me/+7243grpklsozMDEy" target="_blank">https://t.me/+7243grpklsozMDEy</a></p>
         <p>📖 Пост для отзывов - <a href="https://t.me/emerald_mrkt/14" target="_blank">https://t.me/emerald_mrkt/14</a></p>
         <p>❓ По всем вопросам обращаться в ЛИЧНЫЕ СООБЩЕНИЯ ГРУППЫ - <a href="https://t.me/emerald_mrkt?direct" target="_blank">https://t.me/emerald_mrkt?direct</a></p>
@@ -568,13 +286,10 @@
 <div class="page" id="contactsPage">
     <div class="container static-page">
         <h1>Контакты</h1>
-        
         <div class="qr-container">
             <img src="ССЫЛКА_НА_ТВОЮ_КАРТИНКУ_QR" alt="QR Code @EMERALD_MRKT">
         </div>
-        
         <p style="text-align:center; font-weight:700; font-size:20px; margin-bottom:30px;">@EMERALD_MRKT</p>
-        
         <p style="text-align:center; line-height:2;">
             <a href="https://t.me/emerald_mrkt?direct" target="_blank">ЛИЧНЫЕ СООБЩЕНИЯ ГРУППЫ - https://t.me/emerald_mrkt?direct</a><br><br>
             <a href="https://t.me/ikiawka" target="_blank">НАПИСАТЬ МНЕ ЛИЧНО - https://t.me/ikiawka</a>
@@ -588,16 +303,12 @@
         <h1>Как это работает</h1>
         <p>EMERALD Market — площадка для продажи скинов из CS2</p>
         <p>💡 Выплата по сделке производится через 8 дней с момента подтверждения обмена в Steam.</p>
-        
         <h2>Шаг 1</h2>
         <p>Авторизация через Steam. Авторизуйся через свой аккаунт в Steam на сайте EMERALD Market.</p>
-        
         <h2>Шаг 2</h2>
         <p>Выбор предметов. Открой свой инвентарь и выбери предметы для продажи.</p>
-        
         <h2>Шаг 3</h2>
         <p>Выбор способа получения денег. Выбери способ получения денег (USDT, карта).</p>
-        
         <h2>Шаг 4</h2>
         <p>Подтверждение сделки. Проверь данные и подтверди сделку.</p>
     </div>
@@ -613,38 +324,29 @@
 
 <div class="page" id="sellPage">
     <div class="container">
-        <h2 style="font-size:24px; font-weight:700; margin-bottom:4px;" data-key="sell_title">ПРОДАТЬ СКИНЫ</h2>
-        <p style="color:#8a8d99; margin-bottom:20px;" data-key="sell_desc">Продать скины CS2 за реальные деньги</p>
+        <h2 style="font-size:24px; font-weight:700; margin-bottom:4px;">ПРОДАТЬ СКИНЫ</h2>
+        <p style="color:#8a8d99; margin-bottom:20px;">Продать скины CS2 за реальные деньги</p>
         <div class="sell-wrapper">
             <div class="sell-sidebar">
-                <div class="title" data-key="sell_trade_url">Trade URL</div>
-                <div class="subtitle"><a href="https://steamcommunity.com/id/me/tradeoffers/privacy#trade_offer_access_url" target="_blank" data-key="sell_where">Где взять?</a></div>
-                <label class="trade-label" data-key="sell_enter_url">Введите ваш Trade URL</label>
-                <input class="trade-input" id="sellTradeUrl" placeholder="https://steamcommunity.com/tradeoffer/new/?pa..." onchange="saveTradeUrl()">
-                
+                <div class="title">Trade URL</div>
+                <div class="subtitle"><a href="https://steamcommunity.com/id/me/tradeoffers/privacy#trade_offer_access_url" target="_blank">Где взять?</a></div>
+                <label class="trade-label">Введите ваш Trade URL</label>
+                <input class="trade-input" id="sellTradeUrl" placeholder="https://steamcommunity.com/tradeoffer/new/?pa...">
                 <div class="vpn-warning">⚠️ ОБЯЗАТЕЛЬНО ВКЛЮЧИТЕ VPN ДЛЯ ПЕРЕНАПРАВЛЕНИЯ В ЛИЧНЫЕ СООБЩЕНИЯ</div>
-
-                <div class="min-withdraw" data-key="sell_closed">Выберите скины и отправьте заявку в Telegram!</div>
+                <div class="min-withdraw">Выберите скины и отправьте заявку в Telegram!</div>
             </div>
             <div class="sell-content">
                 <div class="top-bar">
-                    <span style="color:#8a8d99; font-size:13px;"><span data-key="sell_select">Выбрать</span>: <span class="select-all" id="selectAllSkins" data-key="sell_all">Все скины (0)</span></span>
-                    <span style="color:#8a8d99; font-size:13px;"><span data-key="sell_total">Итого</span>: <span id="sellTotalPrice">0 ₽</span></span>
+                    <span style="color:#8a8d99; font-size:13px;">Выбрать: <span class="select-all" id="selectAllSkins">Все скины (0)</span></span>
+                    <span style="color:#8a8d99; font-size:13px;">Итого: <span id="sellTotalPrice">0 ₽</span></span>
                 </div>
-                
-                <button class="btn btn-success" style="width:100%; margin-bottom:12px; padding:14px; font-size:16px;" onclick="loadSteamInventory()">
-                    🎒 Загрузить мой инвентарь из Steam
-                </button>
-
-                <button class="btn btn-success" style="width:100%; margin-bottom:20px; padding:14px; font-size:16px;" onclick="sellSelectedSkins()">
-                    🚀 Продать выбранные скины
-                </button>
-
+                <button class="btn btn-success" style="width:100%; margin-bottom:12px; padding:14px; font-size:16px;" onclick="loadSteamInventory()">🎒 Загрузить мой инвентарь из Steam</button>
+                <button class="btn btn-success" style="width:100%; margin-bottom:20px; padding:14px; font-size:16px;" onclick="sellSelectedSkins()">🚀 Продать выбранные скины</button>
                 <div class="sell-skin-grid" id="sellSkinGrid">
                     <div class="sell-empty">
                         <div class="icon">📦</div>
-                        <h3 data-key="sell_empty_title">Нет скинов для продажи</h3>
-                        <p data-key="sell_empty_desc">Введите Trade URL и нажмите "Загрузить инвентарь"</p>
+                        <h3>Нет скинов для продажи</h3>
+                        <p>Введите Trade URL и нажмите "Загрузить инвентарь"</p>
                     </div>
                 </div>
             </div>
@@ -657,29 +359,27 @@
         <div class="market-wrapper">
             <div class="filter-sidebar" id="filterSidebar">
                 <div class="filter-header" onclick="toggleFilter('refresh')">
-                    <span class="filter-title" data-key="filter_refresh">Обновить магазин</span>
+                    <span class="filter-title">Обновить магазин</span>
                     <span class="filter-toggle open" id="refreshToggle">▼</span>
                 </div>
                 <div class="filter-body" id="refreshBody">
                     <div class="filter-body-inner">
-                        <button class="btn btn-success" style="width:100%;" onclick="refreshMarket()" data-key="filter_refresh_btn"> Обновить</button>
+                        <button class="btn btn-success" style="width:100%;" onclick="refreshMarket()">Обновить</button>
                     </div>
                 </div>
                 <hr class="filter-divider">
-
                 <div class="filter-header" onclick="toggleFilter('search')">
-                    <span class="filter-title" data-key="filter_search">Поиск</span>
+                    <span class="filter-title">Поиск</span>
                     <span class="filter-toggle open" id="searchToggle">▼</span>
                 </div>
                 <div class="filter-body" id="searchBody">
                     <div class="filter-body-inner">
-                        <input type="text" id="marketSearch" placeholder="Поиск..." onfocus="this.placeholder=''" onblur="if(this.value==='')this.placeholder=' Поиск...'" oninput="renderMarketSkins()" style="width:100%; background:#1c1d23; border:1px solid #2c2e36; color:#e4e6eb; padding:8px 12px; border-radius:6px; font-size:13px; outline:none;">
+                        <input type="text" id="marketSearch" placeholder="Поиск..." oninput="renderMarketSkins()" style="width:100%; background:#1c1d23; border:1px solid #2c2e36; color:#e4e6eb; padding:8px 12px; border-radius:6px; font-size:13px; outline:none;">
                     </div>
                 </div>
                 <hr class="filter-divider">
-
                 <div class="filter-header" onclick="toggleFilter('price')">
-                    <span class="filter-title" data-key="filter_price"> Стоимость</span>
+                    <span class="filter-title">Стоимость</span>
                     <span class="filter-toggle open" id="priceToggle">▼</span>
                 </div>
                 <div class="filter-body" id="priceBody">
@@ -693,57 +393,54 @@
                     </div>
                 </div>
                 <hr class="filter-divider">
-
                 <div class="filter-header" onclick="toggleFilter('rarity')">
-                    <span class="filter-title" data-key="filter_rarity"> Раритетность</span>
+                    <span class="filter-title">Раритетность</span>
                     <span class="filter-toggle open" id="rarityToggle">▼</span>
                 </div>
                 <div class="filter-body" id="rarityBody">
                     <div class="filter-body-inner">
                         <div class="filter-group">
                             <div class="checkbox-group">
-                                <label><input type="checkbox" class="rarity-filter" value="covert" onchange="renderMarketSkins()" data-key="rarity_covert"> Тайное</label>
-                                <label><input type="checkbox" class="rarity-filter" value="classified" onchange="renderMarketSkins()" data-key="rarity_classified"> Засекреченное</label>
-                                <label><input type="checkbox" class="rarity-filter" value="restricted" onchange="renderMarketSkins()" data-key="rarity_restricted"> Ограниченное</label>
-                                <label><input type="checkbox" class="rarity-filter" value="mil-spec" onchange="renderMarketSkins()" data-key="rarity_mil"> Армейское</label>
-                                <label><input type="checkbox" class="rarity-filter" value="industrial" onchange="renderMarketSkins()" data-key="rarity_industrial"> Промышленное</label>
+                                <label><input type="checkbox" class="rarity-filter" value="covert" onchange="renderMarketSkins()"> Тайное</label>
+                                <label><input type="checkbox" class="rarity-filter" value="classified" onchange="renderMarketSkins()"> Засекреченное</label>
+                                <label><input type="checkbox" class="rarity-filter" value="restricted" onchange="renderMarketSkins()"> Ограниченное</label>
+                                <label><input type="checkbox" class="rarity-filter" value="mil-spec" onchange="renderMarketSkins()"> Армейское</label>
+                                <label><input type="checkbox" class="rarity-filter" value="industrial" onchange="renderMarketSkins()"> Промышленное</label>
                             </div>
                         </div>
                     </div>
                 </div>
                 <hr class="filter-divider">
-
                 <div class="filter-header" onclick="toggleFilter('wear')">
-                    <span class="filter-title" data-key="filter_wear"> Износ</span>
+                    <span class="filter-title">Износ</span>
                     <span class="filter-toggle open" id="wearToggle">▼</span>
                 </div>
                 <div class="filter-body" id="wearBody">
                     <div class="filter-body-inner">
                         <div class="filter-group">
                             <div class="checkbox-group">
-                                <label><input type="checkbox" class="wear-filter" value="Прямо с завода" onchange="renderMarketSkins()" data-key="wear_fn"> Прямо с завода</label>
-                                <label><input type="checkbox" class="wear-filter" value="Немного поношенное" onchange="renderMarketSkins()" data-key="wear_mw"> Немного поношенное</label>
-                                <label><input type="checkbox" class="wear-filter" value="После полевых испытаний" onchange="renderMarketSkins()" data-key="wear_ft"> После полевых испытаний</label>
-                                <label><input type="checkbox" class="wear-filter" value="Поношенное" onchange="renderMarketSkins()" data-key="wear_ww"> Поношенное</label>
-                                <label><input type="checkbox" class="wear-filter" value="Закалённое в боях" onchange="renderMarketSkins()" data-key="wear_bs"> Закалённое в боях</label>
+                                <label><input type="checkbox" class="wear-filter" value="Прямо с завода" onchange="renderMarketSkins()"> Прямо с завода</label>
+                                <label><input type="checkbox" class="wear-filter" value="Немного поношенное" onchange="renderMarketSkins()"> Немного поношенное</label>
+                                <label><input type="checkbox" class="wear-filter" value="После полевых испытаний" onchange="renderMarketSkins()"> После полевых испытаний</label>
+                                <label><input type="checkbox" class="wear-filter" value="Поношенное" onchange="renderMarketSkins()"> Поношенное</label>
+                                <label><input type="checkbox" class="wear-filter" value="Закалённое в боях" onchange="renderMarketSkins()"> Закалённое в боях</label>
                             </div>
                         </div>
                     </div>
                 </div>
                 <hr class="filter-divider">
-
-                <button class="filter-reset-btn" onclick="resetFilters()" data-key="filter_clear"> ОЧИСТИТЬ</button>
+                <button class="filter-reset-btn" onclick="resetFilters()">ОЧИСТИТЬ</button>
             </div>
             <div class="market-content">
                 <div class="top-bar">
-                    <h2 data-key="market_title">Ножи / Перчатки / Скины</h2>
+                    <h2>Ножи / Перчатки / Скины</h2>
                     <span id="marketCount">0 скинов</span>
                 </div>
                 <div class="market-skin-grid" id="marketSkinGrid">
                     <div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">
                         <div style="font-size:48px;margin-bottom:16px;">🎒</div>
-                        <h3 style="color:#e4e6eb;margin-bottom:8px;" data-key="market_empty_title">Ваш инвентарь пуст</h3>
-                        <p data-key="market_empty_desc">Добавьте скины в инвентарь через админ-панель</p>
+                        <h3 style="color:#e4e6eb;margin-bottom:8px;">Ваш инвентарь пуст</h3>
+                        <p>Добавьте скины в инвентарь через админ-панель</p>
                     </div>
                 </div>
             </div>
@@ -753,86 +450,47 @@
 
 <div class="page" id="profilePage">
     <div class="container">
-        <div id="profileLoginBox" style="display:none;">
+        <div id="profileLoginBox" style="display:block;">
             <div class="profile-login-box">
                 <div class="icon">🎮</div>
-                <h2 data-key="profile_login_title">Войдите через Steam</h2>
-                <p data-key="profile_login_desc">Чтобы получить доступ к этой странице</p>
+                <h2>Войдите через Steam</h2>
+                <p>Чтобы получить доступ к этой странице</p>
                 <a href="/auth/steam" class="btn btn-steam" style="margin-top:10px;">Войти через Steam</a>
             </div>
         </div>
         <div id="profileContent" style="display:none;">
             <div class="profile-header">
-                <div class="profile-avatar" id="profileAvatar">K</div>
+                <div class="profile-avatar" id="profileAvatar"></div>
                 <div class="profile-info">
                     <h2 id="profileName"></h2>
                     <div class="stats">
-                        <span class="stat"><span data-key="profile_balance">Баланс</span>: <strong id="profileBalance">0 ₽</strong></span>
-                        <span class="stat"><span data-key="profile_bought">Куплено на</span>: <strong id="profileBought">0 ₽</strong></span>
-                        <span class="stat"><span data-key="profile_sold">Продано на</span>: <strong id="profileSold">0 ₽</strong></span>
+                        <span class="stat"><span>Баланс</span>: <strong id="profileBalance">0 ₽</strong></span>
+                        <span class="stat"><span>Куплено на</span>: <strong id="profileBought">0 ₽</strong></span>
+                        <span class="stat"><span>Продано на</span>: <strong id="profileSold">0 ₽</strong></span>
                     </div>
                 </div>
             </div>
             <div class="profile-settings">
-                <h3 data-key="profile_settings"> Настройки</h3>
+                <h3>Настройки</h3>
                 <div class="setting-row">
-                    <label data-key="profile_trade_url">Trade URL</label>
-                    <input type="text" id="profileTradeUrl" placeholder="Введите ваш Trade URL" onchange="saveProfileTradeUrl()">
+                    <label>Trade URL</label>
+                    <input type="text" id="profileTradeUrl" placeholder="Введите ваш Trade URL">
                 </div>
                 <div class="setting-row">
-                    <label data-key="profile_theme">Тема</label>
-                    <button class="toggle-btn active" id="themeToggle" data-key="profile_dark">Тёмная</button>
-                    <button class="toggle-btn" id="themeToggleLight" data-key="profile_light">Светлая</button>
+                    <label>Тема</label>
+                    <button class="toggle-btn active" id="themeToggle">Тёмная</button>
+                    <button class="toggle-btn" id="themeToggleLight">Светлая</button>
                 </div>
                 <div class="setting-row">
-                    <label data-key="profile_animation">Анимация</label>
-                    <button class="toggle-btn active" id="rainToggle" data-key="profile_on">Вкл</button>
-                    <button class="toggle-btn" id="rainToggleOff" data-key="profile_off">Выкл</button>
+                    <label>Анимация</label>
+                    <button class="toggle-btn active" id="rainToggle">Вкл</button>
+                    <button class="toggle-btn" id="rainToggleOff">Выкл</button>
                 </div>
             </div>
             <div class="profile-history">
-                <h3 data-key="profile_history">История транзакций</h3>
-                <div class="empty-message" data-key="profile_empty">Не было совершенных транзакций</div>
+                <h3>История транзакций</h3>
+                <div class="empty-message">Не было совершенных транзакций</div>
             </div>
-        </div>
-    </div>
-</div>
-
-<div class="page" id="adminPage">
-    <div class="container">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
-            <h1 style="color:#2ecc71; font-size:28px;" data-key="admin_title"> Админ-панель</h1>
-            <div>
-                <button class="btn btn-danger" id="adminLogout" data-key="admin_logout"> Выйти</button>
-                <button class="btn btn-outline" id="adminBack" data-key="admin_back">← На сайт</button>
-            </div>
-        </div>
-        
-        <div class="admin-panel">
-            <h2 data-key="admin_currency"> Курс валют</h2>
-            <div class="admin-row">
-                <label data-key="admin_rate">USD/RUB:</label>
-                <input type="number" id="adminRate" value="86.83" step="0.01">
-                <button class="btn btn-sm btn-success" id="saveRateBtn" data-key="admin_save_rate">Сохранить курс</button>
-            </div>
-        </div>
-        
-        <div class="admin-panel">
-            <h2 data-key="admin_skins">Управление слотами скинов</h2>
-            <div id="adminSkinList"></div>
-            <button class="admin-add-btn" id="adminAddSkin" data-key="admin_add_skin">+ Добавить слот</button>
-            <div style="margin-top:12px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; border-top:1px solid #26282f; padding-top:12px;">
-                <button class="btn btn-danger" id="adminDeleteSkins" data-key="admin_delete"> Удалить слоты</button>
-                <input type="number" id="adminDeleteCount" placeholder="Кол-во" min="1" style="width:80px; background:#1c1d23; border:1px solid #26282f; color:#e4e6eb; padding:6px 10px; border-radius:4px;">
-                <span style="color:#8a8d99; font-size:13px;" data-key="admin_delete_last">(удалить последние N слотов)</span>
-            </div>
-            <button class="admin-save-btn" id="adminSaveAll" style="margin-top:12px;" data-key="admin_save"> Сохранить все</button>
-            <div class="admin-status" id="adminStatus"> Сохранено!</div>
-        </div>
-        
-        <div class="admin-users-panel">
-            <h2 data-key="admin_users"> 👤 Зарегистрированные пользователи</h2>
-            <div id="adminUsersList"></div>
         </div>
     </div>
 </div>
@@ -842,8 +500,8 @@
 <footer class="footer">
     <div class="container">
         <div class="footer-grid">
-            <div class="col"><h4>EMERALDMarket</h4><a data-page="about" data-key="footer_about">О нас</a><a data-page="contacts" data-key="footer_contacts">Контакты</a></div>
-            <div class="col"><h4 data-key="footer_help">Помощь</h4><a data-page="faq" data-key="footer_faq">FAQ</a><a data-page="policy" data-key="footer_policy">Гарантии и Политика</a></div>
+            <div class="col"><h4>EMERALDMarket</h4><a data-page="about">О нас</a><a data-page="contacts">Контакты</a></div>
+            <div class="col"><h4>Помощь</h4><a data-page="faq">FAQ</a><a data-page="policy">Гарантии и Политика</a></div>
         </div>
         <div class="footer-bottom">© 2025-2026 EMERALDMarket. Все права защищены.</div>
     </div>
@@ -852,272 +510,19 @@
 </div>
 
 <script>
-// ==========================================
-// ПЕРЕВОДЧИК RU|EN
-// ==========================================
-const translations = {
-    ru: {
-        online: 'онлайн',
-        nav_home: 'Главная',
-        nav_sell: 'Продать скины',
-        nav_buy: 'Купить скины',
-        nav_profile: 'Профиль',
-        login_btn: 'Войти через Steam',
-        hero_title: 'Продать',
-        hero_title_span: 'скины CS2',
-        hero_desc: 'Лучшие цены на скины. Быстрые выплаты. Мгновенные сделки.',
-        hero_sell_btn: 'Продать скины',
-        hero_buy_btn: 'Купить скины',
-        stat_users: 'Пользователей',
-        stat_trades: 'Успешных обменов',
-        stat_paid: 'Выплачено',
-        stat_skins: 'Скинов доступно',
-        sell_title: 'ПРОДАТЬ СКИНЫ',
-        sell_desc: 'Продать скины CS2 за реальные деньги',
-        sell_trade_url: 'Trade URL',
-        sell_where: 'Где взять?',
-        sell_enter_url: 'Введите ваш Trade URL',
-        sell_closed: 'Выберите скины и отправьте заявку в Telegram!',
-        sell_select: 'Выбрать',
-        sell_all: 'Все скины',
-        sell_clear: 'Снять все',
-        sell_total: 'Итого',
-        sell_empty_title: 'Нет скинов для продажи',
-        sell_empty_desc: 'Введите Trade URL и нажмите "Загрузить инвентарь"',
-        filter_refresh: 'Обновить магазин',
-        filter_refresh_btn: 'Обновить',
-        filter_search: 'Поиск',
-        filter_price: 'Стоимость',
-        filter_rarity: 'Раритетность',
-        rarity_covert: 'Тайное',
-        rarity_classified: 'Засекреченное',
-        rarity_restricted: 'Ограниченное',
-        rarity_mil: 'Армейское',
-        rarity_industrial: 'Промышленное',
-        filter_wear: 'Износ',
-        wear_fn: 'Прямо с завода',
-        wear_mw: 'Немного поношенное',
-        wear_ft: 'После полевых испытаний',
-        wear_ww: 'Поношенное',
-        wear_bs: 'Закалённое в боях',
-        filter_clear: 'ОЧИСТИТЬ',
-        market_title: 'Ножи / Перчатки / Скины',
-        market_empty_title: 'Ваш инвентарь пуст',
-        market_empty_desc: 'Добавьте скины в инвентарь через админ-панель',
-        profile_login_title: 'Войдите через Steam',
-        profile_login_desc: 'Чтобы получить доступ к этой странице',
-        profile_balance: 'Баланс',
-        profile_bought: 'Куплено на',
-        profile_sold: 'Продано на',
-        profile_settings: 'Настройки',
-        profile_trade_url: 'Trade URL',
-        profile_theme: 'Тема',
-        profile_dark: 'Тёмная',
-        profile_light: 'Светлая',
-        profile_animation: 'Анимация',
-        profile_on: 'Вкл',
-        profile_off: 'Выкл',
-        profile_history: 'История транзакций',
-        profile_empty: 'Не было совершенных транзакций',
-        admin_title: 'Админ-панель',
-        admin_logout: 'Выйти',
-        admin_back: '← На сайт',
-        admin_currency: 'Курс валют',
-        admin_rate: 'USD/RUB:',
-        admin_save_rate: 'Сохранить курс',
-        admin_skins: 'Управление слотами скинов',
-        admin_add_skin: '+ Добавить слот',
-        admin_delete: 'Удалить слоты',
-        admin_delete_last: '(удалить последние N слотов)',
-        admin_save: 'Сохранить все',
-        admin_users: 'Зарегистрированные пользователи',
-        footer_about: 'О нас',
-        footer_contacts: 'Контакты',
-        footer_help: 'Помощь',
-        footer_faq: 'FAQ',
-        footer_policy: 'Гарантии и Политика',
-        modal_cancel: 'Отмена',
-        modal_login: 'Войти',
-        modal_add_skin: 'Добавить слот',
-        modal_add: 'Добавить'
-    },
-    en: {
-        online: 'online',
-        nav_home: 'Home',
-        nav_sell: 'Sell Skins',
-        nav_buy: 'Buy Skins',
-        nav_profile: 'Profile',
-        login_btn: 'Login via Steam',
-        hero_title: 'Sell',
-        hero_title_span: 'CS2 skins',
-        hero_desc: 'Best prices for skins. Fast payouts. Instant trades.',
-        hero_sell_btn: 'Sell Skins',
-        hero_buy_btn: 'Buy Skins',
-        stat_users: 'Users',
-        stat_trades: 'Successful trades',
-        stat_paid: 'Paid out',
-        stat_skins: 'Skins available',
-        sell_title: 'SELL SKINS',
-        sell_desc: 'Sell CS2 skins for real money',
-        sell_trade_url: 'Trade URL',
-        sell_where: 'Where to get?',
-        sell_enter_url: 'Enter your Trade URL',
-        sell_closed: 'Select skins and send a request to Telegram!',
-        sell_select: 'Select',
-        sell_all: 'All skins',
-        sell_clear: 'Clear all',
-        sell_total: 'Total',
-        sell_empty_title: 'No skins for sale',
-        sell_empty_desc: 'Enter Trade URL and click "Load inventory"',
-        filter_refresh: 'Refresh store',
-        filter_refresh_btn: 'Refresh',
-        filter_search: 'Search',
-        filter_price: 'Price',
-        filter_rarity: 'Rarity',
-        rarity_covert: 'Covert',
-        rarity_classified: 'Classified',
-        rarity_restricted: 'Restricted',
-        rarity_mil: 'Mil-Spec',
-        rarity_industrial: 'Industrial',
-        filter_wear: 'Wear',
-        wear_fn: 'Factory New',
-        wear_mw: 'Minimal Wear',
-        wear_ft: 'Field-Tested',
-        wear_ww: 'Well-Worn',
-        wear_bs: 'Battle-Scarred',
-        filter_clear: 'CLEAR',
-        market_title: 'Knives / Gloves / Skins',
-        market_empty_title: 'Your inventory is empty',
-        market_empty_desc: 'Add skins to inventory via admin panel',
-        profile_login_title: 'Login via Steam',
-        profile_login_desc: 'To access this page',
-        profile_balance: 'Balance',
-        profile_bought: 'Bought',
-        profile_sold: 'Sold',
-        profile_settings: 'Settings',
-        profile_trade_url: 'Trade URL',
-        profile_theme: 'Theme',
-        profile_dark: 'Dark',
-        profile_light: 'Light',
-        profile_animation: 'Animation',
-        profile_on: 'On',
-        profile_off: 'Off',
-        profile_history: 'Transaction history',
-        profile_empty: 'No transactions yet',
-        admin_title: 'Admin Panel',
-        admin_logout: 'Logout',
-        admin_back: '← Back to site',
-        admin_currency: 'Currency rate',
-        admin_rate: 'USD/RUB:',
-        admin_save_rate: 'Save rate',
-        admin_skins: 'Skin slots management',
-        admin_add_skin: '+ Add slot',
-        admin_delete: 'Delete slots',
-        admin_delete_last: '(delete last N slots)',
-        admin_save: 'Save all',
-        admin_users: 'Registered users',
-        footer_about: 'About',
-        footer_contacts: 'Contacts',
-        footer_help: 'Help',
-        footer_faq: 'FAQ',
-        footer_policy: 'Guarantees & Policy',
-        modal_cancel: 'Cancel',
-        modal_login: 'Login',
-        modal_add_skin: 'Add slot',
-        modal_add: 'Add'
-    }
-};
+// ДАННЫЕ
+let appData = { skins: [], users: 0, trades: 0, paid: '$0', skinsCount: 0, exchangeRate: 86.83, currentCurrency: 'USD' };
+let currentUser = null;
+let userInventory = [];
+let selectedSteamSkins = [];
 
-let currentLang = 'ru';
-
-function setLanguage(lang) {
-    currentLang = lang;
-    document.documentElement.lang = lang === 'ru' ? 'ru' : 'en';
-    
-    document.querySelectorAll('[data-key]').forEach(el => {
-        const key = el.dataset.key;
-        if (translations[lang] && translations[lang][key] !== undefined) {
-            if (el.children.length === 0) {
-                el.textContent = translations[lang][key];
-            } else {
-                const textNode = el.childNodes[0];
-                if (textNode && textNode.nodeType === 3) {
-                    textNode.textContent = translations[lang][key];
-                }
-            }
-        }
-    });
-    
-    document.getElementById('langRu').className = lang === 'ru' ? 'active' : '';
-    document.getElementById('langEn').className = lang === 'en' ? 'active' : '';
-    
-    const searchPlaceholder = lang === 'ru' ? 'Поиск...' : 'Search...';
-    document.getElementById('marketSearch').placeholder = searchPlaceholder;
-    
-    localStorage.setItem('emeraldLang', lang);
-}
-
-document.getElementById('langSwitch').addEventListener('click', function(e) {
-    const target = e.target;
-    if (target.id === 'langRu' && currentLang !== 'ru') {
-        setLanguage('ru');
-    } else if (target.id === 'langEn' && currentLang !== 'en') {
-        setLanguage('en');
-    }
-});
-
-const savedLang = localStorage.getItem('emeraldLang');
-if (savedLang && translations[savedLang]) {
-    setLanguage(savedLang);
-} else {
-    setLanguage('ru');
-}
-
-// ==========================================
-// ОНЛАЙН - ВСЕГДА 1
-// ==========================================
-document.getElementById('onlineCount').textContent = '1';
-
-// ==========================================
-// ДОЖДИК
-// ==========================================
-function createRain() {
-    const container = document.getElementById('rainContainer');
-    container.innerHTML = '';
-    for (let i = 0; i < 80; i++) {
-        const drop = document.createElement('div');
-        drop.className = 'rain';
-        const speed = ['rain-slow', 'rain-medium', 'rain-fast'][Math.floor(Math.random() * 3)];
-        drop.classList.add(speed);
-        drop.style.left = Math.random() * 100 + '%';
-        drop.style.height = (10 + Math.random() * 30) + 'px';
-        drop.style.opacity = 0.2 + Math.random() * 0.5;
-        drop.style.animationDelay = Math.random() * 3 + 's';
-        drop.style.animationDuration = (1.2 + Math.random() * 2) + 's';
-        container.appendChild(drop);
-    }
-}
-let rainEnabled = true;
-createRain();
-
-function toggleRain(on) {
-    rainEnabled = on;
-    document.getElementById('rainContainer').style.display = on ? 'block' : 'none';
-}
-
-// ==========================================
-// ЛОГИКА STEAM АВТОРИЗАЦИИ
-// ==========================================
-let currentUser = null; // Текущий пользователь Steam
-
-// Получаем данные пользователя с сервера при загрузке
+// АВТОРИЗАЦИЯ STEAM
 async function fetchUser() {
     try {
         const response = await fetch('/api/user');
         const data = await response.json();
-        
         if (data.loggedIn) {
-            currentUser = data.user;
+            currentUser = { id: data.user.id, name: data.user.name, avatar: data.user.avatar };
             updateUserUI();
             renderProfile();
         } else {
@@ -1125,124 +530,148 @@ async function fetchUser() {
             updateUserUI();
             renderProfile();
         }
-    } catch (error) {
-        console.error('Ошибка при получении пользователя:', error);
-    }
+    } catch (error) { console.error(error); }
 }
 
-function logoutUser() {
-    window.location.href = '/logout';
-}
+function logoutUser() { window.location.href = '/logout'; }
 
 function updateUserUI() {
     const actions = document.getElementById('headerActions');
     if (currentUser) {
         actions.innerHTML = `
-            <div class="lang-switch" id="langSwitch">
-                <span class="active" id="langRu">RU</span>
-                <span class="sep">|</span>
-                <span id="langEn">EN</span>
-            </div>
             <div class="user-profile" onclick="navigateTo('profile')">
-                <div class="avatar" style="background-image:url('${currentUser.avatar}'); background-size:cover;">${currentUser.name.charAt(0).toUpperCase()}</div>
+                <div class="avatar" style="background-image:url('${currentUser.avatar}'); background-size:cover; background-position:center;">${currentUser.name.charAt(0).toUpperCase()}</div>
                 <span class="username">${currentUser.name}</span>
                 <button class="logout-btn" onclick="event.stopPropagation(); logoutUser()">✕</button>
             </div>
-            <a href="#" class="btn-outline" id="currencyToggle">${appData.currentCurrency}</a>
         `;
     } else {
-        actions.innerHTML = `
-            <div class="lang-switch" id="langSwitch">
-                <span class="active" id="langRu">RU</span>
-                <span class="sep">|</span>
-                <span id="langEn">EN</span>
-            </div>
-            <a href="#" class="btn-outline" id="currencyToggle">${appData.currentCurrency}</a>
-            <a href="/auth/steam" class="btn btn-steam" data-key="login_btn">${currentLang === 'ru' ? 'Войти через Steam' : 'Login via Steam'}</a>
-        `;
+        actions.innerHTML = `<a href="/auth/steam" class="btn btn-steam">Войти через Steam</a>`;
     }
-    document.getElementById('currencyToggle')?.addEventListener('click', toggleCurrency);
-    document.getElementById('langSwitch')?.addEventListener('click', function(e) {
-        const target = e.target;
-        if (target.id === 'langRu' && currentLang !== 'ru') {
-            setLanguage('ru');
-        } else if (target.id === 'langEn' && currentLang !== 'en') {
-            setLanguage('en');
-        }
-    });
 }
 
-// ==========================================
-// ДАННЫЕ (ОБЩИЕ ДЛЯ ВСЕХ)
-// ==========================================
-const STORAGE_KEY = 'emeraldData';
-const USERS_STORAGE_KEY = 'emeraldUsers';
+// НАВИГАЦИЯ
+function navigateTo(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById(page + 'Page');
+    if (target) target.classList.add('active');
+    document.querySelectorAll('.nav a, .footer a').forEach(a => a.classList.toggle('active', a.dataset.page === page));
+    if (page === 'sell') renderSellSkins();
+    else if (page === 'market') renderMarketSkins();
+    else if (page === 'profile') renderProfile();
+}
 
-let appData = {
-    skins: [],
-    users: 0,
-    trades: 0,
-    paid: '$0',
-    skinsCount: 0,
-    exchangeRate: 86.83,
-    currentCurrency: 'USD',
-    selectedSkins: [],
-    profile: { balance: '0 ₽', bought: '0 ₽', sold: '0 ₽', tradeUrl: '' },
-    theme: 'dark',
-    rainEnabled: true
-};
+// ПРОФИЛЬ
+function renderProfile() {
+    if (currentUser) {
+        document.getElementById('profileLoginBox').style.display = 'none';
+        document.getElementById('profileContent').style.display = 'block';
+        document.getElementById('profileName').textContent = currentUser.name;
+        if (currentUser.avatar) {
+            document.getElementById('profileAvatar').style.backgroundImage = `url('${currentUser.avatar}')`;
+            document.getElementById('profileAvatar').style.backgroundSize = 'cover';
+            document.getElementById('profileAvatar').style.backgroundPosition = 'center';
+            document.getElementById('profileAvatar').textContent = '';
+        } else {
+            document.getElementById('profileAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+        }
+    } else {
+        document.getElementById('profileLoginBox').style.display = 'block';
+        document.getElementById('profileContent').style.display = 'none';
+    }
+}
 
-let registeredUsers = {};
-
-function loadData() {
+// ПРОДАЖА
+async function loadSteamInventory() {
+    if (!currentUser) { alert('Пожалуйста, войдите через Steam!'); return; }
+    const grid = document.getElementById('sellSkinGrid');
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">⏳ Загружаем ваш инвентарь...</div>';
     try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) { 
-            const parsed = JSON.parse(saved); 
-            if (parsed.skins && parsed.skins.length > 0) {
-                appData.skins = parsed.skins;
-            }
-            Object.assign(appData, parsed);
-        }
-        const users = localStorage.getItem(USERS_STORAGE_KEY);
-        if (users) { registeredUsers = JSON.parse(users); }
-        if (appData.profile.tradeUrl) {
-            document.getElementById('sellTradeUrl').value = appData.profile.tradeUrl;
-            document.getElementById('profileTradeUrl').value = appData.profile.tradeUrl;
-        }
-        appData.skinsCount = appData.skins.length;
-        appData.users = Object.keys(registeredUsers).length;
-    } catch(e) {}
+        const response = await fetch('/api/get-inventory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+        const data = await response.json();
+        if (data.error) { alert(data.error); grid.innerHTML = '<div class="sell-empty"><div class="icon">📦</div><h3>Ошибка</h3><p>Проверьте, открыт ли ваш инвентарь.</p></div>'; return; }
+        userInventory = data.items;
+        if (userInventory.length === 0) { grid.innerHTML = '<div class="sell-empty"><div class="icon">📦</div><h3>Инвентарь пуст</h3><p>Убедитесь, что ваш инвентарь открыт для всех.</p></div>'; return; }
+        grid.innerHTML = userInventory.map((item, index) => `
+            <div class="sell-skin-card" onclick="toggleSteamSkinSelection(${index})">
+                <div class="sell-checkbox" id="checkbox-${index}"><span id="checkmark-${index}" style="display:none;">✓</span></div>
+                <div class="skin-image">${item.image ? `<img src="${item.image}">` : ''}</div>
+                <div class="skin-name">${item.name}</div>
+                <div class="skin-exterior">${item.type || ''}</div>
+                <div class="skin-price" style="color:#8a8d99; font-size:11px;">Ваш предмет</div>
+            </div>
+        `).join('');
+    } catch (error) { alert('Не удалось подключиться к серверу.'); }
 }
 
-function saveData() {
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
-        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(registeredUsers));
-        return true;
-    } catch(e) { return false; }
+function toggleSteamSkinSelection(index) {
+    const item = userInventory[index];
+    const idx = selectedSteamSkins.findIndex(id => id === item.assetid);
+    if (idx > -1) {
+        selectedSteamSkins.splice(idx, 1);
+        document.getElementById(`checkbox-${index}`).style.background = 'transparent';
+        document.getElementById(`checkmark-${index}`).style.display = 'none';
+    } else {
+        selectedSteamSkins.push(item.assetid);
+        document.getElementById(`checkbox-${index}`).style.background = '#2ecc71';
+        document.getElementById(`checkmark-${index}`).style.display = 'block';
+    }
 }
 
-// ==========================================
-// СОХРАНЕНИЕ TRADE URL
-// ==========================================
-function saveTradeUrl() {
-    const url = document.getElementById('sellTradeUrl').value;
-    appData.profile.tradeUrl = url;
-    document.getElementById('profileTradeUrl').value = url;
-    saveData();
+function sellSelectedSkins() {
+    if (!currentUser) { alert('Пожалуйста, войдите через Steam!'); return; }
+    if (selectedSteamSkins.length === 0) { alert('Выберите хотя бы один предмет из инвентаря!'); return; }
+    const skinNames = userInventory.filter(item => selectedSteamSkins.includes(item.assetid)).map(item => item.name).join(', ');
+    const message = `Привет! У меня есть скины: ${skinNames}.\nМой Steam ID: ${currentUser.id}\nТрейд-бана нет. Если ты согласен — жду твой трейд!`;
+    const encodedMessage = encodeURIComponent(message);
+    window.open(`https://t.me/emerald_mrkt?text=${encodedMessage}`, '_blank');
+    selectedSteamSkins = [];
+    userInventory = [];
 }
 
-function saveProfileTradeUrl() {
-    const url = document.getElementById('profileTradeUrl').value;
-    appData.profile.tradeUrl = url;
-    document.getElementById('sellTradeUrl').value = url;
-    saveData();
+// МАРКЕТ
+function refreshMarket() {
+    setTimeout(() => { renderMarketSkins(); }, 300);
 }
 
-// ==========================================
-// FILTERS TOGGLE
-// ==========================================
+function renderMarketSkins() {
+    let skins = [...appData.skins];
+    const search = document.getElementById('marketSearch').value.toLowerCase();
+    const priceMin = parseFloat(document.getElementById('priceMin').value) || 0;
+    const priceMax = parseFloat(document.getElementById('priceMax').value) || Infinity;
+    if (search) skins = skins.filter(s => s.name.toLowerCase().includes(search));
+    skins = skins.filter(s => s.price >= priceMin && s.price <= priceMax);
+    const rarityChecked = document.querySelectorAll('.rarity-filter:checked');
+    if (rarityChecked.length > 0) skins = skins.filter(s => Array.from(rarityChecked).map(cb => cb.value).includes(s.rarity));
+    const wearChecked = document.querySelectorAll('.wear-filter:checked');
+    if (wearChecked.length > 0) skins = skins.filter(s => Array.from(wearChecked).map(cb => cb.value).includes(s.exterior));
+    const grid = document.getElementById('marketSkinGrid');
+    if (skins.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;"><div style="font-size:48px;margin-bottom:16px;">🎒</div><h3 style="color:#e4e6eb;margin-bottom:8px;">Ваш инвентарь пуст</h3><p>Добавьте скины в инвентарь через админ-панель</p></div>';
+        return;
+    }
+    grid.innerHTML = skins.map(skin => `
+        <div class="market-skin-card">
+            <div class="badge">${skin.rarity || ''}</div>
+            <div class="image">${skin.imageUrl ? `<img src="${skin.imageUrl}">` : ''}</div>
+            <div class="weapon">${skin.weapon || ''}</div>
+            <div class="name">${skin.name}</div>
+            <div class="exterior">${skin.exterior || ''}</div>
+            <div class="price">$${skin.price.toFixed(2)}</div>
+            <button class="buy-btn" onclick="alert('Купить ${skin.name}?')">Купить</button>
+        </div>
+    `).join('');
+    document.getElementById('marketCount').textContent = skins.length + ' скинов';
+}
+
+function resetFilters() {
+    document.getElementById('priceMin').value = '';
+    document.getElementById('priceMax').value = '';
+    document.getElementById('marketSearch').value = '';
+    document.querySelectorAll('.rarity-filter, .wear-filter').forEach(cb => cb.checked = false);
+    renderMarketSkins();
+}
+
 function toggleFilter(name) {
     const body = document.getElementById(name + 'Body');
     const toggle = document.getElementById(name + 'Toggle');
@@ -1257,471 +686,52 @@ function toggleFilter(name) {
     }
 }
 
-// ==========================================
-// НАВИГАЦИЯ
-// ==========================================
-function navigateTo(page) {
-    if (page === 'hero') {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById('heroPage').classList.add('active');
-        document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
-        document.querySelector('.nav a[data-page="hero"]').classList.add('active');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        return;
-    }
-    
-    document.getElementById('heroPage').classList.remove('active');
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    const target = document.getElementById(page + 'Page');
-    if (target) target.classList.add('active');
-    document.querySelectorAll('.nav a').forEach(a => a.classList.toggle('active', a.dataset.page === page));
-    
-    if (page === 'sell') renderSellSkins();
-    else if (page === 'market') renderMarketSkins();
-    else if (page === 'profile') renderProfile();
-    else if (page === 'admin') { renderAdminSkins(); renderAdminUsers(); }
-    
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// ==========================================
-// ФОРМАТ ЦЕНЫ
-// ==========================================
-function formatPrice(price) {
-    if (appData.currentCurrency === 'RUB') {
-        return (price * appData.exchangeRate).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₽';
-    }
-    return price.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' $';
-}
-
-// ==========================================
-// ЛОГИКА ПРОДАЖИ (СТАРАЯ, НО С ДОСТУПОМ ЧЕРЕЗ СЕРВЕР)
-// ==========================================
-let userInventory = [];
-let selectedSteamSkins = [];
-
-async function loadSteamInventory() {
-    // Проверяем, авторизован ли пользователь
-    if (!currentUser) {
-        alert('Пожалуйста, войдите через Steam!');
-        window.location.href = '/auth/steam';
-        return;
-    }
-
-    const grid = document.getElementById('sellSkinGrid');
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">⏳ Загружаем ваш инвентарь...</div>';
-
-    try {
-        const response = await fetch('/api/get-inventory', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({}) // Сервер сам берет Steam ID из сессии
-        });
-
-        const data = await response.json();
-
-        if (data.error) {
-            alert(data.error);
-            grid.innerHTML = '<div class="sell-empty"><div class="icon">📦</div><h3>Ошибка</h3><p>Проверьте, открыт ли ваш инвентарь.</p></div>';
-            return;
-        }
-
-        userInventory = data.items;
-        if (userInventory.length === 0) {
-            grid.innerHTML = '<div class="sell-empty"><div class="icon">📦</div><h3>Инвентарь пуст</h3><p>Убедитесь, что ваш инвентарь открыт для всех.</p></div>';
-            return;
-        }
-
-        grid.innerHTML = userInventory.map((item, index) => `
-            <div class="sell-skin-card" onclick="toggleSteamSkinSelection(${index})">
-                <div class="sell-checkbox" id="checkbox-${index}">
-                    <span id="checkmark-${index}" style="display:none;">✓</span>
-                </div>
-                <div class="skin-image">${item.image ? `<img src="${item.image}">` : ''}</div>
-                <div class="skin-name">${item.name}</div>
-                <div class="skin-exterior">${item.type || ''}</div>
-                <div class="skin-price" style="color:#8a8d99; font-size:11px;">Ваш предмет</div>
-            </div>
-        `).join('');
-        
-    } catch (error) {
-        alert('Не удалось подключиться к серверу.');
-        console.error(error);
-    }
-}
-
-function toggleSteamSkinSelection(index) {
-    const item = userInventory[index];
-    const idx = selectedSteamSkins.findIndex(id => id === item.assetid);
-
-    if (idx > -1) {
-        selectedSteamSkins.splice(idx, 1);
-        document.getElementById(`checkbox-${index}`).style.background = 'transparent';
-        document.getElementById(`checkmark-${index}`).style.display = 'none';
-    } else {
-        selectedSteamSkins.push(item.assetid);
-        document.getElementById(`checkbox-${index}`).style.background = '#2ecc71';
-        document.getElementById(`checkmark-${index}`).style.display = 'block';
-    }
-}
-
-function sellSelectedSkins() {
-    // Проверяем, авторизован ли пользователь
-    if (!currentUser) {
-        alert('Пожалуйста, войдите через Steam!');
-        window.location.href = '/auth/steam';
-        return;
-    }
-
-    if (selectedSteamSkins.length === 0) {
-        alert('Выберите хотя бы один предмет из инвентаря!');
-        return;
-    }
-
-    const skinNames = userInventory
-        .filter(item => selectedSteamSkins.includes(item.assetid))
-        .map(item => item.name)
-        .join(', ');
-
-    const message = `Привет! У меня есть скины: ${skinNames}.\nМой Steam ID: ${currentUser.id}\nТрейд-бана нет. Если ты согласен — жду твой трейд!`;
-    const encodedMessage = encodeURIComponent(message);
-
-    window.open(`https://t.me/emerald_mrkt?text=${encodedMessage}`, '_blank');
-
-    selectedSteamSkins = [];
-    userInventory = [];
-}
-
-// ==========================================
-// MARKET PAGE
-// ==========================================
-function refreshMarket() {
-    const btn = document.querySelector('.refresh-btn');
-    if (btn) btn.classList.add('spinning');
-    setTimeout(() => {
-        renderMarketSkins();
-        if (btn) btn.classList.remove('spinning');
-    }, 300);
-}
-
-function renderMarketSkins() {
-    let skins = [...appData.skins];
-    const search = document.getElementById('marketSearch').value.toLowerCase();
-    const priceMin = parseFloat(document.getElementById('priceMin').value) || 0;
-    const priceMax = parseFloat(document.getElementById('priceMax').value) || Infinity;
-    
-    if (search) {
-        skins = skins.filter(s => s.name.toLowerCase().includes(search) || s.weapon.toLowerCase().includes(search));
-    }
-    skins = skins.filter(s => s.price >= priceMin && s.price <= priceMax);
-    
-    const rarityChecked = document.querySelectorAll('.rarity-filter:checked');
-    if (rarityChecked.length > 0) {
-        const rarities = Array.from(rarityChecked).map(cb => cb.value);
-        skins = skins.filter(s => rarities.includes(s.rarity));
-    }
-    
-    const wearChecked = document.querySelectorAll('.wear-filter:checked');
-    if (wearChecked.length > 0) {
-        const wears = Array.from(wearChecked).map(cb => cb.value);
-        skins = skins.filter(s => wears.includes(s.exterior));
-    }
-    
-    const grid = document.getElementById('marketSkinGrid');
-    if (skins.length === 0) {
-        grid.innerHTML = `
-            <div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">
-                <div style="font-size:48px;margin-bottom:16px;">🎒</div>
-                <h3 style="color:#e4e6eb;margin-bottom:8px;" data-key="market_empty_title">${currentLang === 'ru' ? 'Ваш инвентарь пуст' : 'Your inventory is empty'}</h3>
-                <p data-key="market_empty_desc">${currentLang === 'ru' ? 'Добавьте скины в инвентарь через админ-панель' : 'Add skins to inventory via admin panel'}</p>
-            </div>
-        `;
-        document.getElementById('marketCount').textContent = '0 ' + (currentLang === 'ru' ? 'скинов' : 'skins');
-        return;
-    }
-    
-    const displaySkins = skins.slice(0, 50);
-    grid.innerHTML = displaySkins.map(skin => `
-        <div class="market-skin-card">
-            <div class="badge">${skin.rarity || ''}</div>
-            <div class="image">${skin.imageUrl ? `<img src="${skin.imageUrl}" alt="${skin.name}">` : `<span style="color:#4a4d5a;font-size:12px;">${skin.weapon||'Скин'}</span>`}</div>
-            <div class="weapon">${skin.weapon || ''}</div>
-            <div class="name">${skin.name}</div>
-            <div class="exterior">${skin.exterior || ''}</div>
-            <div class="price">${formatPrice(skin.price)}</div>
-            <button class="buy-btn" onclick="alert('${currentLang === 'ru' ? 'Купить' : 'Buy'} ${skin.name} ${currentLang === 'ru' ? 'за' : 'for'} ${formatPrice(skin.price)}?')">${currentLang === 'ru' ? 'Купить' : 'Buy'}</button>
-        </div>
-    `).join('');
-    document.getElementById('marketCount').textContent = skins.length + ' ' + (currentLang === 'ru' ? 'скинов' : 'skins');
-}
-
-// ==========================================
-// PROFILE (Теперь для Steam)
-// ==========================================
-function renderProfile() {
-    if (currentUser) {
-        document.getElementById('profileLoginBox').style.display = 'none';
-        document.getElementById('profileContent').style.display = 'block';
-        document.getElementById('profileAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
-        document.getElementById('profileAvatar').style.backgroundImage = `url('${currentUser.avatar}')`;
-        document.getElementById('profileAvatar').style.backgroundSize = 'cover';
-        document.getElementById('profileName').textContent = currentUser.name;
-        document.getElementById('profileTradeUrl').value = appData.profile.tradeUrl || '';
-        applyTheme();
-        toggleRain(appData.rainEnabled);
-    } else {
-        document.getElementById('profileLoginBox').style.display = 'block';
-        document.getElementById('profileContent').style.display = 'none';
-    }
-}
-
-// ==========================================
-// THEME
-// ==========================================
-function applyTheme() {
-    if (appData.theme === 'light') {
-        document.body.classList.add('light');
-    } else {
-        document.body.classList.remove('light');
-    }
-}
-
-// ==========================================
-// ADMIN
-// ==========================================
-function renderAdminSkins() {
-    const container = document.getElementById('adminSkinList');
-    if (appData.skins.length === 0) {
-        container.innerHTML = '<div style="color:#8a8d99;padding:20px;text-align:center;">' + (currentLang === 'ru' ? 'Нет слотов' : 'No slots') + '</div>';
-    } else {
-        container.innerHTML = appData.skins.map((skin, index) => `
-            <div class="admin-skin-item" data-index="${index}">
-                <div class="row">
-                    <span style="color:#8a8d99;font-size:11px;min-width:30px;">#${skin.id}</span>
-                    <span style="min-width:20px;">${index+1}.</span>
-                    <input type="text" value="${skin.name}" style="flex:1;min-width:100px;" data-field="name" data-index="${index}">
-                    <input type="text" value="${skin.weapon||''}" style="width:70px;" data-field="weapon" data-index="${index}">
-                    <select data-field="exterior" data-index="${index}" style="width:100px;">
-                        ${['Прямо с завода','Немного поношенное','После полевых испытаний','Поношенное','Закалённое в боях'].map(o => `<option value="${o}" ${skin.exterior===o?'selected':''}>${o}</option>`).join('')}
-                    </select>
-                    <input type="number" value="${skin.price}" style="width:80px;" data-field="price" data-index="${index}" step="0.01">
-                    <select data-field="rarity" data-index="${index}" style="width:90px;">
-                        ${['covert','classified','restricted','mil-spec','industrial'].map(r => `<option value="${r}" ${skin.rarity===r?'selected':''}>${r}</option>`).join('')}
-                    </select>
-                    <input type="text" value="${skin.imageUrl||''}" style="width:80px;" placeholder="URL" data-field="imageUrl" data-index="${index}">
-                    <button class="remove-btn" onclick="removeAdminSkin(${index})">✕</button>
-                </div>
-            </div>
-        `).join('');
-    }
-    document.getElementById('adminRate').value = appData.exchangeRate;
-}
-
-function removeAdminSkin(index) {
-    if (confirm((currentLang === 'ru' ? 'Удалить слот "' : 'Delete slot "') + appData.skins[index]?.name + '"?')) {
-        appData.skins.splice(index, 1);
-        appData.skinsCount = appData.skins.length;
-        saveData();
-        renderAdminSkins();
-        renderMarketSkins();
-        renderSellSkins();
-        document.getElementById('skinsCount').textContent = appData.skinsCount.toLocaleString();
-    }
-}
-
-function saveAdminAll() {
-    document.querySelectorAll('#adminSkinList .admin-skin-item').forEach(item => {
-        const index = parseInt(item.dataset.index);
-        if (index >= 0 && index < appData.skins.length) {
-            const skin = appData.skins[index];
-            item.querySelectorAll('input[data-field], select[data-field]').forEach(input => {
-                const field = input.dataset.field;
-                if (field === 'price') skin[field] = parseFloat(input.value) || 0;
-                else if (field === 'name') skin[field] = input.value.trim() || skin.name;
-                else if (field === 'weapon') skin[field] = input.value.trim() || skin.weapon;
-                else if (field === 'exterior') skin[field] = input.value;
-                else if (field === 'rarity') skin[field] = input.value;
-                else if (field === 'imageUrl') skin[field] = input.value.trim();
-            });
-        }
-    });
-    appData.exchangeRate = parseFloat(document.getElementById('adminRate').value) || 86.83;
-    appData.skinsCount = appData.skins.length;
-    appData.users = Object.keys(registeredUsers).length;
-    saveData();
-    const status = document.getElementById('adminStatus');
-    status.textContent = '✅ ' + (currentLang === 'ru' ? 'Сохранено!' : 'Saved!');
-    status.classList.add('show');
-    setTimeout(() => status.classList.remove('show'), 3000);
-    document.getElementById('skinsCount').textContent = appData.skinsCount.toLocaleString();
-    document.getElementById('usersCount').textContent = appData.users.toLocaleString();
-    renderMarketSkins();
-    renderSellSkins();
-}
-
-function renderAdminUsers() {
-    const container = document.getElementById('adminUsersList');
-    const users = Object.keys(registeredUsers);
-    if (users.length === 0) {
-        container.innerHTML = '<div style="color:#8a8d99;padding:20px;text-align:center;">' + (currentLang === 'ru' ? 'Нет зарегистрированных пользователей' : 'No registered users') + '</div>';
-        return;
-    }
-    container.innerHTML = users.map(user => `
-        <div class="admin-user-item">
-            <span class="user-name">👤 ${user}</span>
-            <span class="user-date">${currentLang === 'ru' ? 'Зарегистрирован' : 'Registered'}: ${new Date().toLocaleDateString()}</span>
-        </div>
-    `).join('');
-}
-
-// ==========================================
 // ИНИЦИАЛИЗАЦИЯ
-// ==========================================
 document.addEventListener('DOMContentLoaded', function() {
-    loadData();
-    fetchUser(); // Загружаем Steam пользователя
-
+    fetchUser();
+    document.querySelectorAll('.nav a, .footer a, .hero-buttons a').forEach(el => {
+        el.addEventListener('click', function(e) {
+            e.preventDefault();
+            const page = this.dataset.page;
+            if (page) navigateTo(page);
+        });
+    });
     document.getElementById('logoLink').addEventListener('click', function(e) {
         e.preventDefault();
         navigateTo('hero');
     });
-
-    document.querySelectorAll('.nav a, [data-page]').forEach(el => {
-        el.addEventListener('click', function(e) {
-            e.preventDefault();
-            const page = this.dataset.page;
-            if (page === 'admin') {
-                if (!currentUser) {
-                    alert('Сначала войдите через Steam!');
-                    window.location.href = '/auth/steam';
-                    return;
-                }
-                navigateTo('admin');
-            } else if (page) {
-                navigateTo(page);
-            }
-        });
-    });
-
-    document.querySelectorAll('.hero-buttons .btn[data-page]').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            navigateTo(this.dataset.page);
-        });
-    });
-
-    document.getElementById('adminLogout').addEventListener('click', function() {
-        if (confirm(currentLang === 'ru' ? 'Выйти из админ-панели?' : 'Logout from admin?')) navigateTo('hero');
-    });
-    document.getElementById('adminBack').addEventListener('click', function() { navigateTo('hero'); });
-    document.getElementById('adminAddSkin').addEventListener('click', function() { document.getElementById('addSkinModal').classList.add('open'); });
-    document.getElementById('addSkinCancel').addEventListener('click', function() { document.getElementById('addSkinModal').classList.remove('open'); });
-    document.getElementById('addSkinConfirm').addEventListener('click', function() {
-        const name = document.getElementById('newSkinName').value.trim();
-        const weapon = document.getElementById('newSkinWeapon').value.trim();
-        const exterior = document.getElementById('newSkinExterior').value;
-        const price = parseFloat(document.getElementById('newSkinPrice').value);
-        const rarity = document.getElementById('newSkinRarity').value;
-        const imageUrl = document.getElementById('newSkinImage').value.trim();
-        if (!name || !price || price <= 0) { 
-            alert(currentLang === 'ru' ? 'Заполните название и цену' : 'Fill in name and price'); 
-            return; 
-        }
-        const maxId = appData.skins.reduce((max, s) => Math.max(max, s.id), 0);
-        const image = imageUrl || getSkinImage(name);
-        appData.skins.push({ 
-            id: maxId + 1, 
-            name, 
-            exterior, 
-            price, 
-            weapon: weapon || 'Unknown', 
-            rarity, 
-            imageUrl: image,
-            phase: '' 
-        });
-        appData.skinsCount = appData.skins.length;
-        saveData();
-        renderAdminSkins();
-        renderMarketSkins();
-        renderSellSkins();
-        document.getElementById('addSkinModal').classList.remove('open');
-        document.getElementById('newSkinName').value = '';
-        document.getElementById('newSkinWeapon').value = '';
-        document.getElementById('newSkinPrice').value = '';
-        document.getElementById('newSkinImage').value = '';
-        document.getElementById('skinsCount').textContent = appData.skinsCount.toLocaleString();
-    });
-    document.getElementById('adminDeleteSkins').addEventListener('click', function() {
-        const count = parseInt(document.getElementById('adminDeleteCount').value) || 1;
-        if (count <= 0) return;
-        if (confirm((currentLang === 'ru' ? 'Удалить последние ' : 'Delete last ') + count + (currentLang === 'ru' ? ' слотов?' : ' slots?'))) {
-            appData.skins.splice(-count);
-            appData.skinsCount = appData.skins.length;
-            saveData();
-            renderAdminSkins();
-            renderMarketSkins();
-            renderSellSkins();
-            document.getElementById('adminDeleteCount').value = '';
-            document.getElementById('skinsCount').textContent = appData.skinsCount.toLocaleString();
-        }
-    });
-    document.getElementById('adminSaveAll').addEventListener('click', saveAdminAll);
-    document.getElementById('saveRateBtn').addEventListener('click', function() {
-        const rate = parseFloat(document.getElementById('adminRate').value);
-        if (rate > 0) {
-            appData.exchangeRate = rate;
-            saveData();
-            const status = document.getElementById('adminStatus');
-            status.textContent = '✅ ' + (currentLang === 'ru' ? 'Сохранено!' : 'Saved!');
-            status.classList.add('show');
-            setTimeout(() => status.classList.remove('show'), 3000);
-            renderSellSkins();
-            renderMarketSkins();
-        }
-    });
-
     document.getElementById('themeToggle').addEventListener('click', function() {
-        appData.theme = 'dark';
-        saveData();
-        applyTheme();
+        document.body.classList.remove('light');
+        document.getElementById('themeToggle').classList.add('active');
+        document.getElementById('themeToggleLight').classList.remove('active');
     });
     document.getElementById('themeToggleLight').addEventListener('click', function() {
-        appData.theme = 'light';
-        saveData();
-        applyTheme();
+        document.body.classList.add('light');
+        document.getElementById('themeToggleLight').classList.add('active');
+        document.getElementById('themeToggle').classList.remove('active');
     });
-
     document.getElementById('rainToggle').addEventListener('click', function() {
-        appData.rainEnabled = true;
-        saveData();
-        toggleRain(true);
+        document.getElementById('rainContainer').style.display = 'block';
     });
     document.getElementById('rainToggleOff').addEventListener('click', function() {
-        appData.rainEnabled = false;
-        saveData();
-        toggleRain(false);
+        document.getElementById('rainContainer').style.display = 'none';
     });
-
-    document.querySelector('.refresh-btn')?.addEventListener('click', refreshMarket);
-
     navigateTo('hero');
-    renderSellSkins();
     renderMarketSkins();
-    renderProfile();
-    applyTheme();
-    toggleRain(appData.rainEnabled);
-
-    document.getElementById('usersCount').textContent = appData.users.toLocaleString();
-    document.getElementById('tradesCount').textContent = appData.trades.toLocaleString();
-    document.getElementById('paidAmount').textContent = appData.paid;
-    document.getElementById('skinsCount').textContent = appData.skinsCount.toLocaleString();
-
-    console.log('🟢 EMERALDMarket загружен!');
-    console.log('🎒 Слотов в инвентаре: ' + appData.skins.length);
-    console.log('🔐 Секретная комбинация: нажми 4 раза "A" на клавиатуре!');
-    console.log('🌐 Переключатель языка: RU|EN');
-    console.log('👤 Онлайн: 1 (только ты)');
-    console.log('📊 Данные хранятся в localStorage (общие для всех вкладок)');
+    
+    // Дождик
+    const container = document.getElementById('rainContainer');
+    for (let i = 0; i < 80; i++) {
+        const drop = document.createElement('div');
+        drop.className = 'rain';
+        const speed = ['rain-slow', 'rain-medium', 'rain-fast'][Math.floor(Math.random() * 3)];
+        drop.classList.add(speed);
+        drop.style.left = Math.random() * 100 + '%';
+        drop.style.height = (10 + Math.random() * 30) + 'px';
+        drop.style.animationDelay = Math.random() * 3 + 's';
+        drop.style.animationDuration = (1.2 + Math.random() * 2) + 's';
+        container.appendChild(drop);
+    }
 });
 </script>
 </body>
