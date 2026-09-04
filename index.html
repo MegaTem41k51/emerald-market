@@ -50,6 +50,8 @@
         .btn-outline:hover { border-color: #2ecc71; color: #2ecc71 !important; }
         .btn-success { background: #2ecc71; color: #0b0c10 !important; }
         .btn-steam { background: #171a21; color: #fff; border: 1px solid #66c0f4; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; }
+        .btn-danger { background: #e74c3c; color: #fff !important; }
+        .btn-danger:hover { background: #c0392b; }
 
         /* ПРОФИЛЬ В ШАПКЕ */
         .steam-user { display: flex; align-items: center; gap: 10px; background: #1c1d23; padding: 4px 12px 4px 4px; border-radius: 30px; border: 1px solid #2c2e36; cursor: pointer; }
@@ -130,6 +132,30 @@
         .market-skin-card .price { color: #2ecc71; font-weight: 700; font-size: 16px; margin-top: 6px; }
         .market-skin-card .buy-btn { margin-top: auto; width: 100%; padding: 6px 0; background: #2ecc71; border: none; border-radius: 4px; color: #0b0c10; font-weight: 600; font-size: 12px; cursor: pointer; }
 
+        /* АДМИНКА */
+        .admin-panel { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .admin-panel h2 { font-size: 20px; margin-bottom: 16px; color: #2ecc71; }
+        .admin-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+        .admin-row label { color: #8a8d99; font-size: 13px; min-width: 120px; }
+        .admin-row input, .admin-row select { flex: 1; min-width: 120px; background: #1c1d23; border: 1px solid #2c2e36; color: #e4e6eb; padding: 8px 12px; border-radius: 6px; font-size: 13px; outline: none; }
+        .admin-row input:focus, .admin-row select:focus { border-color: #2ecc71; }
+        .admin-skin-item { background: #1c1d23; border-radius: 8px; padding: 12px 16px; margin-bottom: 8px; border: 1px solid #26282f; }
+        .admin-skin-item .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .admin-skin-item .row input, .admin-skin-item .row select { background: #0b0c10; border: 1px solid #26282f; color: #e4e6eb; padding: 4px 8px; border-radius: 4px; font-size: 12px; outline: none; }
+        .admin-skin-item .row input:focus, .admin-skin-item .row select:focus { border-color: #2ecc71; }
+        .admin-skin-item .row .remove-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; padding: 0 4px; }
+        .admin-add-btn { background: #2ecc71; color: #0b0c10; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; }
+        .admin-add-btn:hover { background: #27ae60; }
+        .admin-save-btn { background: #2ecc71; color: #0b0c10; border: none; padding: 12px 32px; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 16px; }
+        .admin-save-btn:hover { background: #27ae60; }
+        .admin-status { color: #2ecc71; font-size: 14px; margin-top: 12px; display: none; }
+        .admin-status.show { display: block; }
+        .admin-users-panel { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .admin-users-panel h2 { font-size: 20px; margin-bottom: 16px; color: #2ecc71; }
+        .admin-user-item { background: #1c1d23; border-radius: 6px; padding: 8px 14px; margin-bottom: 6px; border: 1px solid #26282f; display: flex; justify-content: space-between; align-items: center; }
+        .admin-user-item .user-name { color: #e4e6eb; font-weight: 500; }
+        .admin-user-item .user-date { color: #8a8d99; font-size: 12px; }
+
         .profile-login-box { max-width: 500px; margin: 40px auto; background: #14161c; border: 1px solid #26282f; border-radius: 16px; padding: 48px 40px; text-align: center; }
         .profile-login-box .icon { font-size: 64px; margin-bottom: 16px; }
         .profile-login-box h2 { color: #e4e6eb; font-size: 24px; margin-bottom: 8px; }
@@ -168,7 +194,7 @@
 <!-- ОНЛАЙН СЧЕТЧИК -->
 <div id="onlineWidget" style="position: fixed; bottom: 20px; right: 20px; background: rgba(20, 22, 28, 0.9); border: 1px solid #2ecc71; border-radius: 12px; padding: 10px 16px; font-family: 'Montserrat', sans-serif; color: #e4e6eb; font-size: 13px; z-index: 9999; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 20px rgba(46, 204, 113, 0.2);">
     <div style="width: 10px; height: 10px; border-radius: 50%; background: #2ecc71; animation: pulse 1.5s infinite;"></div>
-    <span>Сейчас онлайн: <strong style="color:#2ecc71;" id="onlineCount">0</strong></span>
+    <span>Сейчас онлайн: <strong style="color:#2ecc71;" id="onlineCount">1</strong></span>
 </div>
 <style>
     @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.7); } }
@@ -431,6 +457,32 @@
     </div>
 </div>
 
+<!-- СТРАНИЦА АДМИНКИ -->
+<div class="page" id="adminPage">
+    <div class="container">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
+            <h1 style="color:#2ecc71; font-size:28px;">Админ-панель</h1>
+            <div>
+                <button class="btn btn-danger" id="adminLogout">Выйти</button>
+                <button class="btn btn-outline" id="adminBack">← На сайт</button>
+            </div>
+        </div>
+        
+        <div class="admin-panel">
+            <h2>Управление слотами скинов</h2>
+            <div id="adminSkinList"></div>
+            <button class="admin-add-btn" id="adminAddSkin">+ Добавить слот</button>
+            <div style="margin-top:12px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; border-top:1px solid #26282f; padding-top:12px;">
+                <button class="btn btn-danger" id="adminDeleteSkins">Удалить слоты</button>
+                <input type="number" id="adminDeleteCount" placeholder="Кол-во" min="1" style="width:80px; background:#1c1d23; border:1px solid #26282f; color:#e4e6eb; padding:6px 10px; border-radius:4px;">
+                <span style="color:#8a8d99; font-size:13px;">(удалить последние N слотов)</span>
+            </div>
+            <button class="admin-save-btn" id="adminSaveAll" style="margin-top:12px;">Сохранить все</button>
+            <div class="admin-status" id="adminStatus">Сохранено!</div>
+        </div>
+    </div>
+</div>
+
 </div>
 
 <footer class="footer">
@@ -446,10 +498,24 @@
 </div>
 
 <script>
+// ==========================================
+// ДАННЫЕ
+// ==========================================
 let currentUser = null;
 let userInventory = [];
 let selectedSteamSkins = [];
 
+// Массив скинов для покупки (демо-рынок)
+let marketData = [
+    { id: 1, name: 'AWP | Dragon Lore', weapon: 'AWP', exterior: 'Factory New', price: 3500, rarity: 'covert', imageUrl: '' },
+    { id: 2, name: 'AK-47 | Redline', weapon: 'AK-47', exterior: 'Field-Tested', price: 45, rarity: 'classified', imageUrl: '' },
+    { id: 3, name: 'Karambit | Fade', weapon: 'Knife', exterior: 'Factory New', price: 800, rarity: 'covert', imageUrl: '' },
+    { id: 4, name: 'M4A1-S | Printstream', weapon: 'M4A1-S', exterior: 'Factory New', price: 250, rarity: 'covert', imageUrl: '' },
+];
+
+// ==========================================
+// АВТОРИЗАЦИЯ STEAM
+// ==========================================
 async function fetchUser() {
     try {
         const response = await fetch('/api/user');
@@ -483,6 +549,81 @@ function updateUserUI() {
     }
 }
 
+// ==========================================
+// АДМИНКА (AAAA)
+// ==========================================
+let secretCode = '';
+document.addEventListener('keydown', function(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    secretCode += e.key;
+    if (secretCode.length > 4) secretCode = secretCode.slice(-4);
+    if (secretCode.toLowerCase() === 'aaaa') {
+        if (currentUser) {
+            navigateTo('admin');
+            renderAdminSkins();
+        } else {
+            alert('Сначала войдите через Steam!');
+        }
+        secretCode = '';
+    }
+});
+
+// Рендер админки
+function renderAdminSkins() {
+    const container = document.getElementById('adminSkinList');
+    container.innerHTML = marketData.map((skin, index) => `
+        <div class="admin-skin-item" data-index="${index}">
+            <div class="row">
+                <span style="color:#8a8d99;font-size:11px;min-width:30px;">#${skin.id}</span>
+                <span style="min-width:20px;">${index+1}.</span>
+                <input type="text" value="${skin.name}" style="flex:1;min-width:100px;" data-field="name" data-index="${index}">
+                <input type="text" value="${skin.weapon||''}" style="width:70px;" data-field="weapon" data-index="${index}">
+                <select data-field="exterior" data-index="${index}" style="width:100px;">
+                    ${['Прямо с завода','Немного поношенное','После полевых испытаний','Поношенное','Закалённое в боях'].map(o => `<option value="${o}" ${skin.exterior===o?'selected':''}>${o}</option>`).join('')}
+                </select>
+                <input type="number" value="${skin.price}" style="width:80px;" data-field="price" data-index="${index}" step="0.01">
+                <select data-field="rarity" data-index="${index}" style="width:90px;">
+                    ${['covert','classified','restricted','mil-spec','industrial'].map(r => `<option value="${r}" ${skin.rarity===r?'selected':''}>${r}</option>`).join('')}
+                </select>
+                <input type="text" value="${skin.imageUrl||''}" style="width:80px;" placeholder="URL" data-field="imageUrl" data-index="${index}">
+                <button class="remove-btn" onclick="removeAdminSkin(${index})">✕</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function removeAdminSkin(index) {
+    if (confirm('Удалить слот "' + marketData[index]?.name + '"?')) {
+        marketData.splice(index, 1);
+        renderAdminSkins();
+        renderMarketSkins();
+    }
+}
+
+function saveAdminAll() {
+    document.querySelectorAll('#adminSkinList .admin-skin-item').forEach(item => {
+        const index = parseInt(item.dataset.index);
+        if (index >= 0 && index < marketData.length) {
+            const skin = marketData[index];
+            item.querySelectorAll('input[data-field], select[data-field]').forEach(input => {
+                const field = input.dataset.field;
+                if (field === 'price') skin[field] = parseFloat(input.value) || 0;
+                else if (field === 'name') skin[field] = input.value.trim() || skin.name;
+                else if (field === 'weapon') skin[field] = input.value.trim() || skin.weapon;
+                else if (field === 'exterior') skin[field] = input.value;
+                else if (field === 'rarity') skin[field] = input.value;
+                else if (field === 'imageUrl') skin[field] = input.value.trim();
+            });
+        }
+    });
+    document.getElementById('adminStatus').classList.add('show');
+    setTimeout(() => document.getElementById('adminStatus').classList.remove('show'), 3000);
+    renderMarketSkins();
+}
+
+// ==========================================
+// НАВИГАЦИЯ
+// ==========================================
 function navigateTo(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const target = document.getElementById(page + 'Page');
@@ -491,11 +632,13 @@ function navigateTo(page) {
         if(a.dataset.page === page) a.classList.add('active');
         else a.classList.remove('active');
     });
-    if (page === 'sell') renderSellSkins();
-    else if (page === 'market') renderMarketSkins();
+    if (page === 'market') renderMarketSkins();
     else if (page === 'profile') renderProfile();
 }
 
+// ==========================================
+// ПРОФИЛЬ
+// ==========================================
 function renderProfile() {
     if (currentUser) {
         document.getElementById('profileLoginBox').style.display = 'none';
@@ -515,6 +658,9 @@ function renderProfile() {
     }
 }
 
+// ==========================================
+// ПРОДАЖА
+// ==========================================
 async function loadSteamInventory() {
     if (!currentUser) { alert('Пожалуйста, войдите через Steam!'); return; }
     const grid = document.getElementById('sellSkinGrid');
@@ -571,12 +717,27 @@ function sellSelectedSkins() {
     userInventory = [];
 }
 
+// ==========================================
+// РЫНОК
+// ==========================================
 function renderMarketSkins() {
-    let skins = [
-        { id: 1, name: 'AWP | Dragon Lore', weapon: 'AWP', exterior: 'Factory New', price: 3500, rarity: 'covert', imageUrl: '' },
-        { id: 2, name: 'AK-47 | Redline', weapon: 'AK-47', exterior: 'Field-Tested', price: 45, rarity: 'classified', imageUrl: '' }
-    ];
+    let skins = [...marketData];
+    const search = document.getElementById('marketSearch').value.toLowerCase();
+    const priceMin = parseFloat(document.getElementById('priceMin').value) || 0;
+    const priceMax = parseFloat(document.getElementById('priceMax').value) || Infinity;
+    if (search) skins = skins.filter(s => s.name.toLowerCase().includes(search) || s.weapon.toLowerCase().includes(search));
+    skins = skins.filter(s => s.price >= priceMin && s.price <= priceMax);
+    
+    const rarityChecked = document.querySelectorAll('.rarity-filter:checked');
+    if (rarityChecked.length > 0) skins = skins.filter(s => Array.from(rarityChecked).map(cb => cb.value).includes(s.rarity));
+    const wearChecked = document.querySelectorAll('.wear-filter:checked');
+    if (wearChecked.length > 0) skins = skins.filter(s => Array.from(wearChecked).map(cb => cb.value).includes(s.exterior));
+    
     const grid = document.getElementById('marketSkinGrid');
+    if (skins.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;"><div style="font-size:48px;margin-bottom:16px;">🎒</div><h3 style="color:#e4e6eb;margin-bottom:8px;">Ваш инвентарь пуст</h3><p>Добавьте скины в инвентарь через админ-панель</p></div>';
+        return;
+    }
     grid.innerHTML = skins.map(skin => `
         <div class="market-skin-card">
             <div class="image">${skin.imageUrl ? `<img src="${skin.imageUrl}">` : ''}</div>
@@ -612,6 +773,9 @@ function toggleFilter(name) {
     }
 }
 
+// ==========================================
+// ИНИЦИАЛИЗАЦИЯ
+// ==========================================
 document.addEventListener('DOMContentLoaded', function() {
     fetchUser();
     document.querySelectorAll('.nav a, .footer a, .hero-buttons a').forEach(el => {
@@ -625,9 +789,30 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         navigateTo('hero');
     });
+
+    // Админка
+    document.getElementById('adminBack').addEventListener('click', function() { navigateTo('hero'); });
+    document.getElementById('adminLogout').addEventListener('click', function() { navigateTo('hero'); });
+    document.getElementById('adminAddSkin').addEventListener('click', function() {
+        const maxId = marketData.reduce((max, s) => Math.max(max, s.id), 0);
+        marketData.push({ id: maxId + 1, name: 'Новый скин', weapon: 'AWP', exterior: 'Factory New', price: 100, rarity: 'covert', imageUrl: '' });
+        renderAdminSkins();
+    });
+    document.getElementById('adminDeleteSkins').addEventListener('click', function() {
+        const count = parseInt(document.getElementById('adminDeleteCount').value) || 1;
+        if (count <= 0) return;
+        marketData.splice(-count);
+        renderAdminSkins();
+        renderMarketSkins();
+    });
+    document.getElementById('adminSaveAll').addEventListener('click', saveAdminAll);
+
     navigateTo('hero');
     renderMarketSkins();
     
+    // ОНЛАЙН
+    document.getElementById('onlineCount').textContent = '1';
+
     const container = document.getElementById('rainContainer');
     for (let i = 0; i < 80; i++) {
         const drop = document.createElement('div');
@@ -641,19 +826,6 @@ document.addEventListener('DOMContentLoaded', function() {
         container.appendChild(drop);
     }
 });
-
-// СЧЕТЧИК ОНЛАЙНА ОТ МЕТРИКИ
-setInterval(() => {
-    try {
-        if (typeof ym === 'function') {
-            ym(112295525, 'getCounter', function(counter) {
-                if (counter && counter.params) {
-                    document.getElementById('onlineCount').textContent = counter.params.online || 0;
-                }
-            });
-        }
-    } catch (e) {}
-}, 5000);
 </script>
 </body>
 </html>
