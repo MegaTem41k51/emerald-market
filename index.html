@@ -23,7 +23,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; font-family: 'Montserrat', system-ui, sans-serif; background: #0b0c10; color: #e4e6eb; transition: background 0.3s, color 0.3s; overflow-x: hidden; }
         
-        /* ===== RAIN ANIMATION ===== */
         .rain-container {
             position: fixed;
             top: 0;
@@ -48,7 +47,6 @@
         .rain-medium { animation-duration: 2s; }
         .rain-fast { animation-duration: 1.2s; }
 
-        /* ===== СВЕТЛАЯ ТЕМА (бело-серая) ===== */
         body.light { 
             background: #e8ecf1; 
             color: #1a1a2e; 
@@ -220,12 +218,21 @@
         }
         body.light .sell-empty h3 { color: #333; }
         body.light .sell-empty p { color: #666; }
+        body.light .admin-users-panel { 
+            background: #f0f2f5; 
+            border-color: #d0d4da; 
+        }
+        body.light .admin-users-panel h2 { color: #2ecc71; }
+        body.light .admin-user-item { 
+            background: #e8ecf1; 
+            border-color: #d0d4da; 
+        }
+        body.light .admin-user-item .user-name { color: #333; }
 
         .wrapper { display: flex; flex-direction: column; min-height: 100vh; position: relative; z-index: 1; }
         .content { flex: 1; }
         .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
 
-        /* ===== ONLINE COUNTER ===== */
         .online-counter {
             position: fixed;
             top: 70px;
@@ -267,7 +274,6 @@
             font-weight: 400;
         }
 
-        /* ===== HEADER ===== */
         .header { background: #111318; border-bottom: 1px solid #26282f; padding: 12px 0; position: sticky; top: 0; z-index: 100; }
         .header-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
         .logo { font-size: 24px; font-weight: 800; color: #2ecc71; cursor: pointer; display: flex; align-items: center; gap: 10px; text-decoration: none; }
@@ -282,7 +288,6 @@
         .nav a.active { color: #2ecc71; border-bottom-color: #2ecc71; }
         .header-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 
-        /* ===== BUTTONS ===== */
         .btn { background: #2ecc71; color: #0b0c10 !important; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; border: none; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; }
         .btn:hover { background: #27ae60; transform: scale(1.02); }
         .btn-outline { background: transparent; color: #b2b4bb !important; border: 1px solid #3a3c46; padding: 7px 18px; border-radius: 6px; font-weight: 500; font-size: 13px; cursor: pointer; transition: 0.2s; }
@@ -302,7 +307,6 @@
         .user-profile .logout-btn { background: none; border: none; color: #8a8d99; cursor: pointer; font-size: 14px; padding: 0 4px; transition: 0.2s; }
         .user-profile .logout-btn:hover { color: #e74c3c; }
 
-        /* ===== HERO ===== */
         .hero { padding: 60px 0 40px; text-align: center; background: radial-gradient(ellipse at center, #14161c 0%, #0b0c10 100%); border-bottom: 1px solid #26282f; position: relative; z-index: 1; }
         .hero h1 { font-size: 48px; font-weight: 800; color: #2ecc71; margin-bottom: 12px; }
         .hero h1 span { color: #e4e6eb; }
@@ -314,11 +318,9 @@
         .hero-stats .stat .num { font-size: 28px; font-weight: 700; color: #2ecc71; }
         .hero-stats .stat .label { color: #8a8d99; font-size: 13px; }
 
-        /* ===== PAGES ===== */
         .page { display: none; padding: 30px 0 60px; position: relative; z-index: 1; }
         .page.active { display: block; }
 
-        /* ===== SELL PAGE ===== */
         .sell-wrapper { display: flex; gap: 30px; align-items: flex-start; }
         .sell-sidebar { width: 280px; min-width: 280px; background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 20px; position: sticky; top: 80px; }
         .sell-sidebar .title { font-size: 20px; font-weight: 700; color: #2ecc71; margin-bottom: 4px; }
@@ -349,7 +351,6 @@
         .sell-empty .icon { font-size: 48px; margin-bottom: 16px; }
         .sell-empty h3 { color: #e4e6eb; margin-bottom: 8px; }
 
-        /* ===== MARKET PAGE ===== */
         .market-wrapper { display: flex; gap: 24px; align-items: flex-start; }
         .filter-sidebar { width: 280px; min-width: 280px; background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 18px 16px; position: sticky; top: 80px; max-height: calc(100vh - 100px); overflow-y: auto; }
         .filter-sidebar::-webkit-scrollbar { width: 4px; }
@@ -400,7 +401,6 @@
         .market-skin-card .buy-btn { margin-top: auto; width: 100%; padding: 6px 0; background: #2ecc71; border: none; border-radius: 4px; color: #0b0c10; font-weight: 600; font-size: 12px; cursor: pointer; transition: 0.2s; }
         .market-skin-card .buy-btn:hover { background: #27ae60; }
 
-        /* ===== PROFILE ===== */
         .profile-login-box { max-width: 500px; margin: 40px auto; background: #14161c; border: 1px solid #26282f; border-radius: 16px; padding: 48px 40px; text-align: center; }
         .profile-login-box .icon { font-size: 64px; margin-bottom: 16px; }
         .profile-login-box h2 { color: #e4e6eb; font-size: 24px; margin-bottom: 8px; }
@@ -427,7 +427,6 @@
         .profile-history h3 { margin-bottom: 16px; font-size: 18px; text-align: left; }
         .profile-history .empty-message { color: #6a6d7a; font-size: 16px; padding: 30px 0; }
 
-        /* ===== ADMIN ===== */
         .admin-panel { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
         .admin-panel h2 { font-size: 20px; margin-bottom: 16px; color: #2ecc71; }
         .admin-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
@@ -451,7 +450,6 @@
         .admin-user-item .user-name { color: #e4e6eb; font-weight: 500; }
         .admin-user-item .user-date { color: #8a8d99; font-size: 12px; }
 
-        /* ===== MODAL ===== */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 500; align-items: center; justify-content: center; }
         .modal-overlay.open { display: flex; }
         .modal-content { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 32px; max-width: 400px; width: 90%; }
@@ -463,7 +461,6 @@
         .modal-content .modal-actions { display: flex; gap: 12px; margin-top: 12px; }
         .modal-content .modal-actions .btn { flex: 1; text-align: center; }
 
-        /* ===== FOOTER ===== */
         .footer { background: #101116; border-top: 1px solid #26282f; padding: 40px 0 24px; margin-top: auto; flex-shrink: 0; position: relative; z-index: 1; }
         .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 30px; }
         .footer-grid .col h4 { color: #e4e6eb; margin-bottom: 12px; font-size: 16px; }
@@ -478,14 +475,12 @@
 </head>
 <body>
 
-<!-- ===== ONLINE COUNTER ===== -->
 <div class="online-counter" id="onlineCounter">
     <span class="dot"></span>
     <span class="count" id="onlineCount">1</span>
     <span class="label" data-key="online">онлайн</span>
 </div>
 
-<!-- ===== RAIN CONTAINER ===== -->
 <div class="rain-container" id="rainContainer"></div>
 
 <div class="wrapper">
@@ -513,7 +508,6 @@
 
 <div class="content">
 
-<!-- ===== HERO ===== -->
 <section class="hero page active" id="heroPage">
     <div class="container">
         <h1 data-key="hero_title">Продать <span data-key="hero_title_span">скины CS2</span></h1>
@@ -523,15 +517,14 @@
             <a href="#" class="btn btn-outline" data-page="market" data-key="hero_buy_btn">Купить скины</a>
         </div>
         <div class="hero-stats">
-            <div class="stat"><div class="num" id="usersCount">518,043</div><div class="label" data-key="stat_users">Пользователей</div></div>
-            <div class="stat"><div class="num" id="tradesCount">4,875,875</div><div class="label" data-key="stat_trades">Успешных обменов</div></div>
-            <div class="stat"><div class="num" id="paidAmount">$13,704,974</div><div class="label" data-key="stat_paid">Выплачено</div></div>
+            <div class="stat"><div class="num" id="usersCount">0</div><div class="label" data-key="stat_users">Пользователей</div></div>
+            <div class="stat"><div class="num" id="tradesCount">0</div><div class="label" data-key="stat_trades">Успешных обменов</div></div>
+            <div class="stat"><div class="num" id="paidAmount">$0</div><div class="label" data-key="stat_paid">Выплачено</div></div>
             <div class="stat"><div class="num" id="skinsCount">0</div><div class="label" data-key="stat_skins">Скинов доступно</div></div>
         </div>
     </div>
 </section>
 
-<!-- ===== SELL PAGE ===== -->
 <div class="page" id="sellPage">
     <div class="container">
         <h2 style="font-size:24px; font-weight:700; margin-bottom:4px;" data-key="sell_title">ПРОДАТЬ СКИНЫ</h2>
@@ -554,7 +547,6 @@
                         <div class="icon">📦</div>
                         <h3 data-key="sell_empty_title">Нет скинов для продажи</h3>
                         <p data-key="sell_empty_desc">Добавьте скины в инвентарь через админ-панель</p>
-                        <button class="btn btn-success" onclick="navigateTo('admin')" style="margin-top:12px;" data-key="sell_empty_btn">Перейти в админку</button>
                     </div>
                 </div>
             </div>
@@ -562,7 +554,6 @@
     </div>
 </div>
 
-<!-- ===== MARKET PAGE ===== -->
 <div class="page" id="marketPage">
     <div class="container">
         <div class="market-wrapper">
@@ -655,7 +646,6 @@
                         <div style="font-size:48px;margin-bottom:16px;">🎒</div>
                         <h3 style="color:#e4e6eb;margin-bottom:8px;" data-key="market_empty_title">Ваш инвентарь пуст</h3>
                         <p data-key="market_empty_desc">Добавьте скины в инвентарь через админ-панель</p>
-                        <button class="btn btn-success" onclick="navigateTo('admin')" style="margin-top:12px;" data-key="market_empty_btn">Перейти в админку</button>
                     </div>
                 </div>
             </div>
@@ -663,7 +653,6 @@
     </div>
 </div>
 
-<!-- ===== PROFILE ===== -->
 <div class="page" id="profilePage">
     <div class="container">
         <div id="profileLoginBox" style="display:none;">
@@ -711,7 +700,6 @@
     </div>
 </div>
 
-<!-- ===== ADMIN ===== -->
 <div class="page" id="adminPage">
     <div class="container">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
@@ -722,7 +710,6 @@
             </div>
         </div>
         
-        <!-- Курс валют -->
         <div class="admin-panel">
             <h2 data-key="admin_currency"> Курс валют</h2>
             <div class="admin-row">
@@ -732,7 +719,6 @@
             </div>
         </div>
         
-        <!-- Управление слотами скинов -->
         <div class="admin-panel">
             <h2 data-key="admin_skins">Управление слотами скинов</h2>
             <div id="adminSkinList"></div>
@@ -746,7 +732,6 @@
             <div class="admin-status" id="adminStatus"> Сохранено!</div>
         </div>
         
-        <!-- Панель пользователей -->
         <div class="admin-users-panel">
             <h2 data-key="admin_users"> 👤 Зарегистрированные пользователи</h2>
             <div id="adminUsersList"></div>
@@ -769,7 +754,6 @@
 
 </div>
 
-<!-- ===== MODALS ===== -->
 <div class="modal-overlay" id="loginModal">
     <div class="modal-content">
         <h2 data-key="modal_login_title">Вход через Telegram</h2>
@@ -814,7 +798,7 @@
 
 <script>
 // ==========================================
-// ===== ПЕРЕВОДЧИК RU|EN =====
+// ПЕРЕВОДЧИК RU|EN
 // ==========================================
 const translations = {
     ru: {
@@ -845,7 +829,6 @@ const translations = {
         sell_total: 'Итого',
         sell_empty_title: 'Нет скинов для продажи',
         sell_empty_desc: 'Добавьте скины в инвентарь через админ-панель',
-        sell_empty_btn: 'Перейти в админку',
         filter_refresh: 'Обновить магазин',
         filter_refresh_btn: 'Обновить',
         filter_search: 'Поиск',
@@ -866,7 +849,6 @@ const translations = {
         market_title: 'Ножи / Перчатки / Скины',
         market_empty_title: 'Ваш инвентарь пуст',
         market_empty_desc: 'Добавьте скины в инвентарь через админ-панель',
-        market_empty_btn: 'Перейти в админку',
         profile_login_title: 'Авторизуйтесь',
         profile_login_desc: 'Чтобы получить доступ к этой странице',
         profile_balance: 'Баланс',
@@ -940,7 +922,6 @@ const translations = {
         sell_total: 'Total',
         sell_empty_title: 'No skins for sale',
         sell_empty_desc: 'Add skins to inventory via admin panel',
-        sell_empty_btn: 'Go to admin',
         filter_refresh: 'Refresh store',
         filter_refresh_btn: 'Refresh',
         filter_search: 'Search',
@@ -961,7 +942,6 @@ const translations = {
         market_title: 'Knives / Gloves / Skins',
         market_empty_title: 'Your inventory is empty',
         market_empty_desc: 'Add skins to inventory via admin panel',
-        market_empty_btn: 'Go to admin',
         profile_login_title: 'Login',
         profile_login_desc: 'To access this page',
         profile_balance: 'Balance',
@@ -1055,7 +1035,7 @@ if (savedLang && translations[savedLang]) {
 }
 
 // ==========================================
-// ===== ОНЛАЙН - ВСЕГДА 1 (ТОЛЬКО ТЫ) =====
+// ОНЛАЙН - ВСЕГДА 1
 // ==========================================
 document.getElementById('onlineCount').textContent = '1';
 
@@ -1087,7 +1067,7 @@ function toggleRain(on) {
 }
 
 // ==========================================
-// СЕКРЕТНАЯ КОМБИНАЦИЯ (ТОЛЬКО АДМИН)
+// СЕКРЕТНАЯ КОМБИНАЦИЯ - АДМИНКА (AAAA)
 // ==========================================
 let secretCode = '';
 let adminOpenCooldown = false;
@@ -1098,6 +1078,12 @@ document.addEventListener('keydown', function(e) {
     if (secretCode.toLowerCase() === 'aaaa' || secretCode.toLowerCase() === 'аааа') {
         if (!adminOpenCooldown) {
             adminOpenCooldown = true;
+            if (!appData.currentUser) {
+                alert(currentLang === 'ru' ? 'Сначала войдите через Telegram!' : 'Please login via Telegram first!');
+                secretCode = '';
+                adminOpenCooldown = false;
+                return;
+            }
             navigateTo('admin');
             secretCode = '';
             setTimeout(() => { adminOpenCooldown = false; }, 2000);
@@ -1106,7 +1092,7 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ==========================================
-// ===== КАРТИНКИ СКИНОВ =====
+// КАРТИНКИ СКИНОВ
 // ==========================================
 function getSkinImage(skinName) {
     const baseUrl = 'https://steamcommunity-a.akamaihd.net/economy/image/';
@@ -1159,16 +1145,16 @@ function getSkinImage(skinName) {
 }
 
 // ==========================================
-// ДАННЫЕ
+// ДАННЫЕ (ОБЩИЕ ДЛЯ ВСЕХ)
 // ==========================================
 const STORAGE_KEY = 'emeraldData';
 const USERS_STORAGE_KEY = 'emeraldUsers';
 
 let appData = {
     skins: [],
-    users: 518043,
-    trades: 4875875,
-    paid: '$13,704,974',
+    users: 0,
+    trades: 0,
+    paid: '$0',
     skinsCount: 0,
     exchangeRate: 86.83,
     currentCurrency: 'USD',
@@ -1198,6 +1184,7 @@ function loadData() {
             document.getElementById('profileTradeUrl').value = appData.profile.tradeUrl;
         }
         appData.skinsCount = appData.skins.length;
+        appData.users = Object.keys(registeredUsers).length;
     } catch(e) {}
 }
 
@@ -1278,7 +1265,7 @@ function formatPrice(price) {
 }
 
 // ==========================================
-// SELL PAGE - ПУСТО (НЕТ СКИНОВ ДЛЯ ПРОДАЖИ)
+// SELL PAGE - ПУСТО
 // ==========================================
 function renderSellSkins() {
     const grid = document.getElementById('sellSkinGrid');
@@ -1287,7 +1274,6 @@ function renderSellSkins() {
             <div class="icon">📦</div>
             <h3 data-key="sell_empty_title">${currentLang === 'ru' ? 'Нет скинов для продажи' : 'No skins for sale'}</h3>
             <p data-key="sell_empty_desc">${currentLang === 'ru' ? 'Добавьте скины в инвентарь через админ-панель' : 'Add skins to inventory via admin panel'}</p>
-            <button class="btn btn-success" onclick="navigateTo('admin')" style="margin-top:12px;" data-key="sell_empty_btn">${currentLang === 'ru' ? 'Перейти в админку' : 'Go to admin'}</button>
         </div>
     `;
     document.querySelector('#selectAllSkins').textContent = (currentLang === 'ru' ? 'Все скины' : 'All skins') + ' (0)';
@@ -1295,7 +1281,7 @@ function renderSellSkins() {
 }
 
 // ==========================================
-// MARKET PAGE - ТОЛЬКО СКИНЫ ИЗ ИНВЕНТАРЯ
+// MARKET PAGE
 // ==========================================
 function refreshMarket() {
     const btn = document.querySelector('.refresh-btn');
@@ -1336,7 +1322,6 @@ function renderMarketSkins() {
                 <div style="font-size:48px;margin-bottom:16px;">🎒</div>
                 <h3 style="color:#e4e6eb;margin-bottom:8px;" data-key="market_empty_title">${currentLang === 'ru' ? 'Ваш инвентарь пуст' : 'Your inventory is empty'}</h3>
                 <p data-key="market_empty_desc">${currentLang === 'ru' ? 'Добавьте скины в инвентарь через админ-панель' : 'Add skins to inventory via admin panel'}</p>
-                <button class="btn btn-success" onclick="navigateTo('admin')" style="margin-top:12px;" data-key="market_empty_btn">${currentLang === 'ru' ? 'Перейти в админку' : 'Go to admin'}</button>
             </div>
         `;
         document.getElementById('marketCount').textContent = '0 ' + (currentLang === 'ru' ? 'скинов' : 'skins');
@@ -1389,7 +1374,7 @@ function applyTheme() {
 }
 
 // ==========================================
-// ADMIN - УПРАВЛЕНИЕ СЛОТАМИ
+// ADMIN
 // ==========================================
 function renderAdminSkins() {
     const container = document.getElementById('adminSkinList');
@@ -1449,19 +1434,18 @@ function saveAdminAll() {
     });
     appData.exchangeRate = parseFloat(document.getElementById('adminRate').value) || 86.83;
     appData.skinsCount = appData.skins.length;
+    appData.users = Object.keys(registeredUsers).length;
     saveData();
     const status = document.getElementById('adminStatus');
     status.textContent = '✅ ' + (currentLang === 'ru' ? 'Сохранено!' : 'Saved!');
     status.classList.add('show');
     setTimeout(() => status.classList.remove('show'), 3000);
     document.getElementById('skinsCount').textContent = appData.skinsCount.toLocaleString();
+    document.getElementById('usersCount').textContent = appData.users.toLocaleString();
     renderMarketSkins();
     renderSellSkins();
 }
 
-// ==========================================
-// ADMIN - ПАНЕЛЬ ПОЛЬЗОВАТЕЛЕЙ
-// ==========================================
 function renderAdminUsers() {
     const container = document.getElementById('adminUsersList');
     const users = Object.keys(registeredUsers);
@@ -1510,10 +1494,12 @@ function handleLogin() {
     } else {
         if (confirm((currentLang === 'ru' ? 'Пользователь "' : 'User "') + login + '" ' + (currentLang === 'ru' ? 'не найден. Создать новый аккаунт?' : 'not found. Create new account?'))) {
             registeredUsers[login] = { password: password || 'default', registered: new Date().toISOString() };
+            appData.users = Object.keys(registeredUsers).length;
             appData.currentUser = login;
             saveData();
             closeLogin();
             updateUserUI();
+            document.getElementById('usersCount').textContent = appData.users.toLocaleString();
             if (document.getElementById('profilePage').classList.contains('active')) renderProfile();
             alert((currentLang === 'ru' ? 'Аккаунт создан! Добро пожаловать' : 'Account created! Welcome') + ', ' + login + '!');
         }
@@ -1741,8 +1727,8 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('🎒 Слотов в инвентаре: ' + appData.skins.length);
     console.log('🔐 Секретная комбинация: нажми 4 раза "A" на клавиатуре!');
     console.log('🌐 Переключатель языка: RU|EN');
-    console.log('📊 Яндекс.Метрика установлена');
     console.log('👤 Онлайн: 1 (только ты)');
+    console.log('📊 Данные хранятся в localStorage (общие для всех вкладок)');
 });
 </script>
 </body>
