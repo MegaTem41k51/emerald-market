@@ -16,8 +16,11 @@ const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
 
-app.use(session({
-    store: new FileStore(),
+pp.use(session({
+    store: new FileStore({
+        logErrors: false,  // Отключаем вывод ошибок в консоль
+        retries: 0         // Отключаем попытки повтора, чтобы не спамить
+    }),
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
