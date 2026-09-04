@@ -45,45 +45,30 @@ app.get('/logout', (req, res) => {
 });
 
 // ==========================================
-// СОХРАНЕНИЕ СКИНОВ НА СЕРВЕРЕ (для всех браузеров)
+// СОХРАНЕНИЕ СКИНОВ НА СЕРВЕРЕ
 // ==========================================
 const DB_FILE = path.join(__dirname, 'marketData.json');
 let marketData = [];
-
 function loadMarket() {
     try {
         if (fs.existsSync(DB_FILE)) {
             marketData = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
         } else {
-            // Стартовые скины
-            marketData = [
-                { id: 1, name: 'AWP | Dragon Lore', weapon: 'AWP', exterior: 'Factory New', price: 3500, rarity: 'covert', imageUrl: '' },
-                { id: 2, name: 'AK-47 | Redline', weapon: 'AK-47', exterior: 'Field-Tested', price: 45, rarity: 'classified', imageUrl: '' }
-            ];
+            marketData = [{ id: 1, name: 'AWP | Dragon Lore', weapon: 'AWP', exterior: 'Factory New', price: 3500, rarity: 'covert', imageUrl: '' }];
             saveMarket();
         }
     } catch(e) { marketData = []; }
 }
-
-function saveMarket() {
-    fs.writeFileSync(DB_FILE, JSON.stringify(marketData, null, 2));
-}
+function saveMarket() { fs.writeFileSync(DB_FILE, JSON.stringify(marketData, null, 2)); }
 loadMarket();
 
-// ПОЛУЧИТЬ СКИНЫ
-app.get('/api/market', (req, res) => {
-    res.json(marketData);
-});
-
-// ДОБАВИТЬ/ОБНОВИТЬ СКИНЫ (только для тебя, если ты вошел)
+app.get('/api/market', (req, res) => { res.json(marketData); });
 app.post('/api/market/save', (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Нет доступа' });
     marketData = req.body.skins;
     saveMarket();
     res.json({ success: true });
 });
-
-// КУПИТЬ СКИН (удаляем из рынка)
 app.post('/api/market/buy', (req, res) => {
     const skinId = req.body.id;
     marketData = marketData.filter(s => s.id !== skinId);
@@ -107,14 +92,17 @@ app.get('/api/user', (req, res) => {
 });
 
 // ==========================================
-// ИНВЕНТАРЬ (исправлено: count=300 + User-Agent)
+// ИНВЕНТАРЬ (увеличена задержка, чтобы Steam не банил)
 // ==========================================
 app.post('/api/get-inventory', async (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Пожалуйста, войдите через Steam' });
     const steamId = String(req.user.id);
 
     try {
-        const inventoryUrl = `https://steamcommunity.com/inventory/${steamId}/730/2?l=english&count=300`;
+        // Ждём 5 секунд, чтобы Steam не забанил за частые запросы
+        await new Promise(r => setTimeout(r, 5000));
+
+        const inventoryUrl = `https://steamcommunity.com/inventory/${steamId}/730/2?l=english&count=1000`;
         const inventoryResponse = await axios.get(inventoryUrl, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -144,7 +132,7 @@ app.post('/api/get-inventory', async (req, res) => {
 
         res.json({ success: true, items });
     } catch (error) {
-        res.status(500).json({ error: 'Не удалось получить инвентарь. Подожди 2 минуты и попробуй снова (Steam временно блокирует запросы).' });
+        res.status(500).json({ error: 'Не удалось получить инвентарь. Подожди 5 минут и попробуй снова (Steam временно блокирует запросы).' });
     }
 });
 
