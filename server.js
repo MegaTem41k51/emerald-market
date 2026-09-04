@@ -21,8 +21,7 @@ app.use(session({
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    // ВАЖНО: Убрали secure: true, чтобы куки сохранялись на HTTP и HTTPS
-    cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 * 7 } // 7 дней
+    cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 * 7 }
 }));
 
 app.use(passport.initialize());

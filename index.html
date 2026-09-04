@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EMERALDMarket</title>
     
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function(m,e,t,r,i,k,a){
+            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+            m[i].l=1*new Date();
+            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=112295525', 'ym');
+
+        ym(112295525, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/112295525" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; font-family: 'Montserrat', system-ui, sans-serif; background: #0b0c10; color: #e4e6eb; overflow-x: hidden; }
@@ -37,13 +51,12 @@
         .btn-success { background: #2ecc71; color: #0b0c10 !important; }
         .btn-steam { background: #171a21; color: #fff; border: 1px solid #66c0f4; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; }
 
-        /* ПРОФИЛЬ В ШАПКЕ (только то, что просил) */
+        /* ПРОФИЛЬ В ШАПКЕ */
         .steam-user { display: flex; align-items: center; gap: 10px; background: #1c1d23; padding: 4px 12px 4px 4px; border-radius: 30px; border: 1px solid #2c2e36; cursor: pointer; }
         .steam-user:hover { border-color: #2ecc71; }
         .steam-avatar { width: 32px; height: 32px; border-radius: 50%; background-size: cover; background-position: center; flex-shrink: 0; }
         .steam-name { font-size: 13px; font-weight: 500; color: #e4e6eb; }
         .steam-logout { background: none; border: none; color: #8a8d99; font-size: 14px; padding: 0 4px; }
-        /* ============================== */
 
         .hero { padding: 60px 0 40px; text-align: center; background: radial-gradient(ellipse at center, #14161c 0%, #0b0c10 100%); border-bottom: 1px solid #26282f; }
         .hero h1 { font-size: 48px; font-weight: 800; color: #2ecc71; margin-bottom: 12px; }
@@ -151,6 +164,15 @@
     </style>
 </head>
 <body>
+
+<!-- ОНЛАЙН СЧЕТЧИК -->
+<div id="onlineWidget" style="position: fixed; bottom: 20px; right: 20px; background: rgba(20, 22, 28, 0.9); border: 1px solid #2ecc71; border-radius: 12px; padding: 10px 16px; font-family: 'Montserrat', sans-serif; color: #e4e6eb; font-size: 13px; z-index: 9999; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 20px rgba(46, 204, 113, 0.2);">
+    <div style="width: 10px; height: 10px; border-radius: 50%; background: #2ecc71; animation: pulse 1.5s infinite;"></div>
+    <span>Сейчас онлайн: <strong style="color:#2ecc71;" id="onlineCount">0</strong></span>
+</div>
+<style>
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.7); } }
+</style>
 
 <div class="rain-container" id="rainContainer"></div>
 
@@ -532,10 +554,19 @@ function toggleSteamSkinSelection(index) {
 function sellSelectedSkins() {
     if (!currentUser) { alert('Пожалуйста, войдите через Steam!'); return; }
     if (selectedSteamSkins.length === 0) { alert('Выберите хотя бы один предмет из инвентаря!'); return; }
+    
     const skinNames = userInventory.filter(item => selectedSteamSkins.includes(item.assetid)).map(item => item.name).join(', ');
-    const message = `Привет! У меня есть скины: ${skinNames}.\nМой Steam ID: ${currentUser.id}\nТрейд-бана нет. Если ты согласен — жду твой трейд!`;
+    
+    // Логика: если 1 скин -> "СКИН", если 2+ -> "СКИНЫ"
+    let skinWord = 'СКИН';
+    if (selectedSteamSkins.length > 1) {
+        skinWord = 'СКИНЫ';
+    }
+    
+    const message = `Привет, у меня есть ${skinWord} ${skinNames}, хотел бы продать их, предложи цену а я подумаю))`;
     const encodedMessage = encodeURIComponent(message);
-    window.open(`https://t.me/ikiawka?text=${encodedMessage}`, '_blank');
+
+    window.open(`https://t.me/emerald_mrkt?text=${encodedMessage}`, '_blank');
     selectedSteamSkins = [];
     userInventory = [];
 }
@@ -610,6 +641,19 @@ document.addEventListener('DOMContentLoaded', function() {
         container.appendChild(drop);
     }
 });
+
+// СЧЕТЧИК ОНЛАЙНА ОТ МЕТРИКИ
+setInterval(() => {
+    try {
+        if (typeof ym === 'function') {
+            ym(112295525, 'getCounter', function(counter) {
+                if (counter && counter.params) {
+                    document.getElementById('onlineCount').textContent = counter.params.online || 0;
+                }
+            });
+        }
+    } catch (e) {}
+}, 5000);
 </script>
 </body>
 </html>
