@@ -9,7 +9,8 @@
     "axios": "^1.6.0",
     "body-parser": "^1.20.2",
     "express": "^4.18.2",
-    "https-proxy-agent": "^7.0.4",
-    "steam-inventory-api-ng": "^1.0.11"
+    "express-session": "^1.18.0",
+    "passport": "^0.7.0",
+    "passport-steam": "^1.0.20"
   }
 }
