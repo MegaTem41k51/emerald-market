@@ -535,7 +535,7 @@ function sellSelectedSkins() {
     const skinNames = userInventory.filter(item => selectedSteamSkins.includes(item.assetid)).map(item => item.name).join(', ');
     const message = `Привет! У меня есть скины: ${skinNames}.\nМой Steam ID: ${currentUser.id}\nТрейд-бана нет. Если ты согласен — жду твой трейд!`;
     const encodedMessage = encodeURIComponent(message);
-    window.open(`https://t.me/emerald_mrkt?text=${encodedMessage}`, '_blank');
+    window.open(`https://t.me/ikiawka?text=${encodedMessage}`, '_blank');
     selectedSteamSkins = [];
     userInventory = [];
 }
