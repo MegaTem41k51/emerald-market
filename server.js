@@ -10,10 +10,14 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Переменные окружения (обязательно добавь на Render)
+// ВАЖНО: Добавь эти переменные на Render (Environment):
+// BASE_URL = https://emerald-market-2.onrender.com
+// STEAM_API_KEY = твой_ключ
+// SESSION_SECRET = случайная_строка
+
 const STEAM_API_KEY = process.env.STEAM_API_KEY;
-const SESSION_SECRET = process.env.SESSION_SECRET || 'my_super_secret_key';
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+const SESSION_SECRET = process.env.SESSION_SECRET || 'secret';
+const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
@@ -22,7 +26,7 @@ app.use(session({
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: process.env.NODE_ENV === 'production' } // На Render нужен secure
+    cookie: { secure: process.env.NODE_ENV === 'production' }
 }));
 
 app.use(passport.initialize());
@@ -36,10 +40,10 @@ passport.use(new SteamStrategy({
     realm: BASE_URL,
     apiKey: STEAM_API_KEY
 }, (identifier, profile, done) => {
-    return done(null, profile); // profile содержит steamid, имя, аватарку
+    // В profile есть id, displayName и photos (аватарки)
+    return done(null, profile);
 }));
 
-// Файл для хранения привязанных пользователей
 const DB_FILE = path.join(__dirname, 'users.json');
 let users = {};
 if (fs.existsSync(DB_FILE)) {
@@ -47,15 +51,6 @@ if (fs.existsSync(DB_FILE)) {
 }
 function saveUsers() { fs.writeFileSync(DB_FILE, JSON.stringify(users, null, 2)); }
 
-function convertToSteamId64(steamId) {
-    if (/^\d{17}$/.test(steamId)) return steamId;
-    if (/^\d{1,10}$/.test(steamId)) return (BigInt(steamId) + 76561197960265728n).toString();
-    return null;
-}
-
-// ==========================================
-// 1. МАРШРУТЫ АВТОРИЗАЦИИ STEAM
-// ==========================================
 app.get('/auth/steam', passport.authenticate('steam', { failureRedirect: '/' }));
 app.get('/auth/steam/return', passport.authenticate('steam', { failureRedirect: '/' }), (req, res) => {
     res.redirect('/');
@@ -66,9 +61,10 @@ app.get('/logout', (req, res) => {
         res.redirect('/');
     });
 });
+
+// Эндпоинт, который возвращает данные Steam на сайт
 app.get('/api/user', (req, res) => {
     if (req.user) {
-        // Возвращаем данные пользователя Steam
         res.json({ 
             loggedIn: true, 
             user: { 
@@ -82,14 +78,11 @@ app.get('/api/user', (req, res) => {
     }
 });
 
-// ==========================================
-// 2. ПОЛУЧЕНИЕ ИНВЕНТАРЯ (теперь только для авторизованных)
-// ==========================================
 app.post('/api/get-inventory', async (req, res) => {
     if (!req.user) {
         return res.status(401).json({ error: 'Пожалуйста, войдите через Steam' });
     }
-    const steamId = String(req.user.id); // Берем ID из сессии, а не из ссылки!
+    const steamId = String(req.user.id);
 
     try {
         const inventoryUrl = `https://steamcommunity.com/inventory/${steamId}/730/2?l=english&count=1000`;
