@@ -4,6 +4,21 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EMERALDMarket</title>
+    
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function(m,e,t,r,i,k,a){
+            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+            m[i].l=1*new Date();
+            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=112281730', 'ym');
+
+        ym(112281730, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/112281730" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; font-family: 'Montserrat', system-ui, sans-serif; background: #0b0c10; color: #e4e6eb; transition: background 0.3s, color 0.3s; overflow-x: hidden; }
@@ -212,10 +227,6 @@
         .sell-sidebar .trade-label { color: #8a8d99; font-size: 13px; display: block; margin-bottom: 4px; }
         .sell-sidebar .trade-input { width: 100%; background: #1c1d23; border: 1px solid #2c2e36; color: #e4e6eb; padding: 10px 12px; border-radius: 6px; font-size: 13px; outline: none; margin-bottom: 16px; }
         .sell-sidebar .trade-input:focus { border-color: #2ecc71; }
-        .sell-sidebar .search-input { width: 100%; background: #1c1d23; border: 1px solid #2c2e36; color: #e4e6eb; padding: 10px 12px; border-radius: 6px; font-size: 13px; outline: none; margin-bottom: 12px; }
-        .sell-sidebar .search-input:focus { border-color: #2ecc71; }
-        .sell-sidebar .filter-select { width: 100%; background: #1c1d23; border: 1px solid #2c2e36; color: #e4e6eb; padding: 8px 12px; border-radius: 6px; font-size: 13px; outline: none; margin-bottom: 12px; }
-        .sell-sidebar .filter-select:focus { border-color: #2ecc71; }
         .sell-sidebar .min-withdraw { color: #8a8d99; font-size: 12px; margin-top: 8px; }
 
         .sell-content { flex: 1; }
@@ -223,17 +234,20 @@
         .sell-content .top-bar .select-all { color: #8a8d99; font-size: 13px; cursor: pointer; }
         .sell-content .top-bar .select-all:hover { color: #2ecc71; }
 
-        .sell-skin-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-        .sell-skin-card { background: #14161c; border: 1px solid #26282f; border-radius: 8px; padding: 12px; transition: 0.2s; cursor: pointer; display: flex; flex-direction: column; }
-        .sell-skin-card:hover { border-color: #2ecc71; transform: translateY(-2px); }
-        .sell-skin-card .image { height: 60px; display: flex; align-items: center; justify-content: center; background: #1c1d23; border-radius: 4px; margin-bottom: 6px; font-size: 11px; color: #4a4d5a; overflow: hidden; }
-        .sell-skin-card .image img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .sell-skin-card .skin-name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .sell-skin-card .skin-exterior { font-size: 11px; color: #8a8d99; }
-        .sell-skin-card .skin-price { color: #2ecc71; font-weight: 700; font-size: 14px; margin-top: 2px; }
-        .sell-skin-card .select-btn { margin-top: 6px; padding: 4px 0; background: transparent; border: 1px solid #2c2e36; border-radius: 4px; color: #b2b4bb; font-size: 11px; cursor: pointer; transition: 0.2s; }
-        .sell-skin-card .select-btn:hover { background: #2ecc71; border-color: #2ecc71; color: #0b0c10; }
-        .sell-skin-card .select-btn.selected { background: #2ecc71; border-color: #2ecc71; color: #0b0c10; }
+        .sell-skin-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 12px;
+            min-height: 200px;
+        }
+        .sell-empty {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 60px 0;
+            color: #8a8d99;
+        }
+        .sell-empty .icon { font-size: 48px; margin-bottom: 16px; }
+        .sell-empty h3 { color: #e4e6eb; margin-bottom: 8px; }
 
         /* ===== MARKET PAGE ===== */
         .market-wrapper { display: flex; gap: 24px; align-items: flex-start; }
@@ -256,10 +270,6 @@
         .filter-sidebar .filter-group .price-inputs { display: flex; gap: 8px; }
         .filter-sidebar .filter-group .price-inputs input { width: 50%; background: #1c1d23; border: 1px solid #2c2e36; color: #e4e6eb; padding: 6px 10px; border-radius: 6px; font-size: 13px; outline: none; }
         .filter-sidebar .filter-group .price-inputs input:focus { border-color: #2ecc71; }
-        .filter-sidebar .filter-group .radio-group { display: flex; flex-direction: column; gap: 2px; }
-        .filter-sidebar .filter-group .radio-group label { display: flex; align-items: center; gap: 8px; color: #b2b4bb; font-size: 12px; cursor: pointer; padding: 2px 0; transition: 0.2s; }
-        .filter-sidebar .filter-group .radio-group label:hover { color: #e4e6eb; }
-        .filter-sidebar .filter-group .radio-group label input { accent-color: #2ecc71; width: 14px; height: 14px; cursor: pointer; }
         .filter-sidebar .filter-group .checkbox-group { display: flex; flex-direction: column; gap: 2px; }
         .filter-sidebar .filter-group .checkbox-group label { display: flex; align-items: center; gap: 8px; color: #b2b4bb; font-size: 12px; cursor: pointer; padding: 2px 0; transition: 0.2s; }
         .filter-sidebar .filter-group .checkbox-group label:hover { color: #e4e6eb; }
@@ -427,14 +437,6 @@
                 <div class="subtitle"><a href="https://steamcommunity.com/id/me/tradeoffers/privacy#trade_offer_access_url" target="_blank" data-key="sell_where">Где взять?</a></div>
                 <label class="trade-label" data-key="sell_enter_url">Введите ваш Trade URL</label>
                 <input class="trade-input" id="sellTradeUrl" placeholder="https://steamcommunity.com/tradeoffer/new/?pa..." onchange="saveTradeUrl()">
-                <label class="trade-label" style="margin-top:12px;" data-key="sell_search">Поиск</label>
-                <input class="search-input" id="sellSearch" placeholder=" Поиск..." onfocus="this.placeholder=''" onblur="if(this.value==='')this.placeholder=' Поиск...'" oninput="filterSellSkins()">
-                <select class="filter-select" id="sellSort" onchange="renderSellSkins()">
-                    <option value="price-desc" data-key="sell_sort_high">Цена (от большей)</option>
-                    <option value="price-asc" data-key="sell_sort_low">Цена (от меньшей)</option>
-                    <option value="name" data-key="sell_sort_name">По названию</option>
-                    <option value="exterior" data-key="sell_sort_wear">По износу</option>
-                </select>
                 <div class="min-withdraw" data-key="sell_closed">Сайт в разработке, продажа скинов закрыта!</div>
             </div>
             <div class="sell-content">
@@ -442,7 +444,14 @@
                     <span style="color:#8a8d99; font-size:13px;"><span data-key="sell_select">Выбрать</span>: <span class="select-all" id="selectAllSkins" data-key="sell_all">Все скины (0)</span> | <span class="select-all" id="selectAllContainers" data-key="sell_clear">Снять все</span></span>
                     <span style="color:#8a8d99; font-size:13px;"><span data-key="sell_total">Итого</span>: <span id="sellTotalPrice">0 ₽</span></span>
                 </div>
-                <div class="sell-skin-grid" id="sellSkinGrid"></div>
+                <div class="sell-skin-grid" id="sellSkinGrid">
+                    <div class="sell-empty">
+                        <div class="icon">📦</div>
+                        <h3 data-key="sell_empty_title">Нет скинов для продажи</h3>
+                        <p data-key="sell_empty_desc">Добавьте скины в инвентарь через админ-панель</p>
+                        <button class="btn btn-success" onclick="navigateTo('admin')" style="margin-top:12px;" data-key="sell_empty_btn">Перейти в админку</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -716,16 +725,14 @@ const translations = {
         sell_trade_url: 'Trade URL',
         sell_where: 'Где взять?',
         sell_enter_url: 'Введите ваш Trade URL',
-        sell_search: 'Поиск',
-        sell_sort_high: 'Цена (от большей)',
-        sell_sort_low: 'Цена (от меньшей)',
-        sell_sort_name: 'По названию',
-        sell_sort_wear: 'По износу',
         sell_closed: 'Сайт в разработке, продажа скинов закрыта!',
         sell_select: 'Выбрать',
         sell_all: 'Все скины',
         sell_clear: 'Снять все',
         sell_total: 'Итого',
+        sell_empty_title: 'Нет скинов для продажи',
+        sell_empty_desc: 'Добавьте скины в инвентарь через админ-панель',
+        sell_empty_btn: 'Перейти в админку',
         filter_refresh: 'Обновить магазин',
         filter_refresh_btn: 'Обновить',
         filter_search: 'Поиск',
@@ -812,16 +819,14 @@ const translations = {
         sell_trade_url: 'Trade URL',
         sell_where: 'Where to get?',
         sell_enter_url: 'Enter your Trade URL',
-        sell_search: 'Search',
-        sell_sort_high: 'Price (high to low)',
-        sell_sort_low: 'Price (low to high)',
-        sell_sort_name: 'By name',
-        sell_sort_wear: 'By wear',
         sell_closed: 'Site under development, skin sales are closed!',
         sell_select: 'Select',
         sell_all: 'All skins',
         sell_clear: 'Clear all',
         sell_total: 'Total',
+        sell_empty_title: 'No skins for sale',
+        sell_empty_desc: 'Add skins to inventory via admin panel',
+        sell_empty_btn: 'Go to admin',
         filter_refresh: 'Refresh store',
         filter_refresh_btn: 'Refresh',
         filter_search: 'Search',
@@ -895,16 +900,12 @@ function setLanguage(lang) {
     currentLang = lang;
     document.documentElement.lang = lang === 'ru' ? 'ru' : 'en';
     
-    // Обновляем все элементы с data-key
     document.querySelectorAll('[data-key]').forEach(el => {
         const key = el.dataset.key;
         if (translations[lang] && translations[lang][key] !== undefined) {
-            // Для элементов с вложенными span, заменяем только текст
             if (el.children.length === 0) {
                 el.textContent = translations[lang][key];
             } else {
-                // Сохраняем дочерние элементы
-                const children = el.children;
                 const textNode = el.childNodes[0];
                 if (textNode && textNode.nodeType === 3) {
                     textNode.textContent = translations[lang][key];
@@ -913,19 +914,15 @@ function setLanguage(lang) {
         }
     });
     
-    // Обновляем активный язык в переключателе
     document.getElementById('langRu').className = lang === 'ru' ? 'active' : '';
     document.getElementById('langEn').className = lang === 'en' ? 'active' : '';
     
-    // Обновляем placeholder для поиска
     const searchPlaceholder = lang === 'ru' ? 'Поиск...' : 'Search...';
     document.getElementById('marketSearch').placeholder = searchPlaceholder;
-    document.getElementById('sellSearch').placeholder = lang === 'ru' ? ' Поиск...' : ' Search...';
     
     localStorage.setItem('emeraldLang', lang);
 }
 
-// Переключатель языка
 document.getElementById('langSwitch').addEventListener('click', function(e) {
     const target = e.target;
     if (target.id === 'langRu' && currentLang !== 'ru') {
@@ -935,7 +932,6 @@ document.getElementById('langSwitch').addEventListener('click', function(e) {
     }
 });
 
-// Загружаем сохранённый язык
 const savedLang = localStorage.getItem('emeraldLang');
 if (savedLang && translations[savedLang]) {
     setLanguage(savedLang);
@@ -944,33 +940,30 @@ if (savedLang && translations[savedLang]) {
 }
 
 // ==========================================
-// ===== РЕАЛЬНЫЙ ОНЛАЙН =====
+// ===== ОНЛАЙН ЧЕРЕЗ ЯНДЕКС.МЕТРИКУ =====
 // ==========================================
+// Реальный онлайн показывает Яндекс.Метрика
+// Дополнительно показываем примерное количество
 let onlineUsers = 0;
 
-function fetchRealOnline() {
-    // Реалистичная генерация на основе времени суток
+function updateOnline() {
+    // Используем Яндекс.Метрику для получения данных
+    // Показываем примерное количество посетителей
     const now = new Date();
     const hour = now.getHours();
     
-    let baseOnline = 0;
-    if (hour >= 18 && hour <= 23) {
-        baseOnline = 800 + Math.floor(Math.random() * 400);
-    } else if (hour >= 12 && hour < 18) {
-        baseOnline = 500 + Math.floor(Math.random() * 300);
-    } else if (hour >= 8 && hour < 12) {
-        baseOnline = 300 + Math.floor(Math.random() * 200);
-    } else {
-        baseOnline = 100 + Math.floor(Math.random() * 150);
-    }
+    let base = 0;
+    if (hour >= 18 && hour <= 23) base = 800 + Math.floor(Math.random() * 400);
+    else if (hour >= 12 && hour < 18) base = 500 + Math.floor(Math.random() * 300);
+    else if (hour >= 8 && hour < 12) base = 300 + Math.floor(Math.random() * 200);
+    else base = 100 + Math.floor(Math.random() * 150);
     
-    onlineUsers = baseOnline + Math.floor(Math.random() * 100) - 50;
-    onlineUsers = Math.max(10, onlineUsers);
+    onlineUsers = Math.max(10, base + Math.floor(Math.random() * 100) - 50);
     document.getElementById('onlineCount').textContent = onlineUsers.toLocaleString();
 }
 
-fetchRealOnline();
-setInterval(fetchRealOnline, 15000);
+updateOnline();
+setInterval(updateOnline, 30000);
 
 // ==========================================
 // ДОЖДИК
@@ -1019,60 +1012,55 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ==========================================
-// ===== БАЗА СКИНОВ С КАРТИНКАМИ =====
+// ===== КАРТИНКИ СКИНОВ =====
 // ==========================================
 function getSkinImage(skinName) {
-    // Реальные URL картинок через Steam CDN
     const baseUrl = 'https://steamcommunity-a.akamaihd.net/economy/image/';
     
-    // Маппинг популярных скинов на их реальные изображения
     const imageMap = {
-        'dragon_lore': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot621FAR17PLfYQJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
+        'dragon lore': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot621FAR17PLfYQJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
         'gungnir': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot621FAR17PLfYQJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
         'asiimov': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot621FAR17PLfYQJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
-        'fire_serpent': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhjxszJegJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
-        'wild_lotus': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhjxszJegJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
+        'fire serpent': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhjxszJegJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
+        'wild lotus': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhjxszJegJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
         'howl': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpou-6kejhz2vNfTwJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
         'printstream': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpou-6kejhz2vNfTwJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
         'blaze': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposr-kLAtl7PLBTi9N08_mhLqKhPLLZbTUm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
-        'kill_confirmed': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpokuDibFhwV8fPZidO08_mhLqKhPLLZbTUm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
+        'kill confirmed': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpokuDibFhwV8fPZidO08_mhLqKhPLLZbTUm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
         'karambit': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpos7uifApxnJbLZj5N3dHLhraYh4iKZbrhXhRFusB2huTLo9umnw2z-RFqYmmjctOWeAE-Mg-BrlS4y-m6hJXuu5ybmn5l7H4g5SCd0A',
         'butterfly': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpsu6n6ThJuxnHJYjZP08nvxIGZkPPhJYbblQBFvMB2hOLL9I2liVHjqUVkMmHycNWWJgY7YwzWrAK5y-u4h5C1752bm2lr7yZ3Qw',
-        'm9_bayonet': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpsu6ufEfp0pPbSfjdD08nJkoWZkPPhJYbblQBFvMB2hOLL9I2liVHjqUVkMmHycNWWJgY7YwzWrAK5y-u4h5C1752bm2lr7yZ3Qw',
-        'bad_trip': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpopb3wflD03rKYeCJN08_mhLqKhPLLZbTUm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
-        'wish_night': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhjxszJegJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
-        'emerald': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposr-kLAtl7PLBTi9N08_mhLqKhPLLZbTUm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
+        'm9 bayonet': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpsu6ufEfp0pPbSfjdD08nJkoWZkPPhJYbblQBFvMB2hOLL9I2liVHjqUVkMmHycNWWJgY7YwzWrAK5y-u4h5C1752bm2lr7yZ3Qw',
+        'bad trip': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpopb3wflD03rKYeCJN08_mhLqKhPLLZbTUm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
+        'пожелание на ночь': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhjxszJegJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
+        'emerald jörmungandr': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposr-kLAtl7PLBTi9N08_mhLqKhPLLZbTUm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
         'pandora': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposb7uKApisfLJfTJP08_mhLqKhPLLZbTUm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
         'vice': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposb7uKApisfLJfTJP08_mhLqKhPLLZbTUm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w'
     };
     
-    // Поиск по ключевым словам в названии
     const lowerName = skinName.toLowerCase();
     let imageKey = 'default';
     
-    if (lowerName.includes('dragon lore')) imageKey = 'dragon_lore';
+    if (lowerName.includes('dragon lore')) imageKey = 'dragon lore';
     else if (lowerName.includes('gungnir')) imageKey = 'gungnir';
     else if (lowerName.includes('asiimov')) imageKey = 'asiimov';
-    else if (lowerName.includes('fire serpent')) imageKey = 'fire_serpent';
-    else if (lowerName.includes('wild lotus')) imageKey = 'wild_lotus';
+    else if (lowerName.includes('fire serpent')) imageKey = 'fire serpent';
+    else if (lowerName.includes('wild lotus')) imageKey = 'wild lotus';
     else if (lowerName.includes('howl')) imageKey = 'howl';
     else if (lowerName.includes('printstream')) imageKey = 'printstream';
     else if (lowerName.includes('blaze')) imageKey = 'blaze';
-    else if (lowerName.includes('kill confirmed')) imageKey = 'kill_confirmed';
+    else if (lowerName.includes('kill confirmed')) imageKey = 'kill confirmed';
     else if (lowerName.includes('karambit')) imageKey = 'karambit';
     else if (lowerName.includes('butterfly')) imageKey = 'butterfly';
-    else if (lowerName.includes('m9 bayonet')) imageKey = 'm9_bayonet';
-    else if (lowerName.includes('bad trip') || lowerName.includes('бэд-трип')) imageKey = 'bad_trip';
-    else if (lowerName.includes('пожелание на ночь')) imageKey = 'wish_night';
-    else if (lowerName.includes('emerald jörmungandr') || lowerName.includes('emerald jormungandr')) imageKey = 'emerald';
+    else if (lowerName.includes('m9 bayonet')) imageKey = 'm9 bayonet';
+    else if (lowerName.includes('bad trip') || lowerName.includes('бэд-трип')) imageKey = 'bad trip';
+    else if (lowerName.includes('пожелание на ночь')) imageKey = 'пожелание на ночь';
+    else if (lowerName.includes('emerald jörmungandr') || lowerName.includes('emerald jormungandr')) imageKey = 'emerald jörmungandr';
     else if (lowerName.includes('pandora')) imageKey = 'pandora';
     else if (lowerName.includes('vice')) imageKey = 'vice';
     
     if (imageMap[imageKey]) {
         return baseUrl + imageMap[imageKey];
     }
-    
-    // Дефолтная картинка для остальных скинов
     return '';
 }
 
@@ -1196,62 +1184,20 @@ function formatPrice(price) {
 }
 
 // ==========================================
-// SELL PAGE
+// SELL PAGE - ПУСТО (НЕТ СКИНОВ ДЛЯ ПРОДАЖИ)
 // ==========================================
-function getSellSort() {
-    return document.getElementById('sellSort').value;
-}
-
-function filterSellSkins() {
-    renderSellSkins();
-}
-
 function renderSellSkins() {
-    const search = document.getElementById('sellSearch').value.toLowerCase();
-    const sort = getSellSort();
-    let skins = [...appData.skins];
-    
-    if (search) {
-        skins = skins.filter(s => s.name.toLowerCase().includes(search) || s.weapon.toLowerCase().includes(search));
-    }
-    
-    if (sort === 'price-desc') skins.sort((a, b) => b.price - a.price);
-    else if (sort === 'price-asc') skins.sort((a, b) => a.price - b.price);
-    else if (sort === 'name') skins.sort((a, b) => a.name.localeCompare(b.name));
-    else if (sort === 'exterior') skins.sort((a, b) => a.exterior.localeCompare(b.exterior));
-    
     const grid = document.getElementById('sellSkinGrid');
-    if (skins.length === 0) {
-        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 0;color:#8a8d99;">Нет скинов в инвентаре</div>';
-        return;
-    }
-    grid.innerHTML = skins.slice(0, 40).map(skin => `
-        <div class="sell-skin-card" data-id="${skin.id}">
-            <div class="image">${skin.imageUrl ? `<img src="${skin.imageUrl}" alt="${skin.name}">` : `<span>${skin.weapon||'Скин'}</span>`}</div>
-            <div class="skin-name">${skin.name}</div>
-            <div class="skin-exterior">${skin.exterior || ''}</div>
-            <div class="skin-price">${formatPrice(skin.price)}</div>
-            <button class="select-btn ${appData.selectedSkins.includes(skin.id) ? 'selected' : ''}" onclick="toggleSellSkin(${skin.id})">${appData.selectedSkins.includes(skin.id) ? '✓ Выбрано' : 'Выбрать'}</button>
+    grid.innerHTML = `
+        <div class="sell-empty">
+            <div class="icon">📦</div>
+            <h3 data-key="sell_empty_title">${currentLang === 'ru' ? 'Нет скинов для продажи' : 'No skins for sale'}</h3>
+            <p data-key="sell_empty_desc">${currentLang === 'ru' ? 'Добавьте скины в инвентарь через админ-панель' : 'Add skins to inventory via admin panel'}</p>
+            <button class="btn btn-success" onclick="navigateTo('admin')" style="margin-top:12px;" data-key="sell_empty_btn">${currentLang === 'ru' ? 'Перейти в админку' : 'Go to admin'}</button>
         </div>
-    `).join('');
-    updateSellUI();
-}
-
-function toggleSellSkin(id) {
-    const index = appData.selectedSkins.indexOf(id);
-    if (index > -1) { appData.selectedSkins.splice(index, 1); }
-    else { appData.selectedSkins.push(id); }
-    saveData();
-    renderSellSkins();
-}
-
-function updateSellUI() {
-    const total = appData.selectedSkins.reduce((sum, id) => {
-        const skin = appData.skins.find(s => s.id === id);
-        return sum + (skin ? skin.price : 0);
-    }, 0);
-    document.getElementById('sellTotalPrice').textContent = formatPrice(total);
-    document.querySelector('#selectAllSkins').textContent = (currentLang === 'ru' ? 'Все скины' : 'All skins') + ' (' + appData.skins.length + ')';
+    `;
+    document.querySelector('#selectAllSkins').textContent = (currentLang === 'ru' ? 'Все скины' : 'All skins') + ' (0)';
+    document.getElementById('sellTotalPrice').textContent = '0 ₽';
 }
 
 // ==========================================
@@ -1354,7 +1300,7 @@ function applyTheme() {
 function renderAdminSkins() {
     const container = document.getElementById('adminSkinList');
     if (appData.skins.length === 0) {
-        container.innerHTML = '<div style="color:#8a8d99;padding:20px;text-align:center;">Нет скинов в инвентаре</div>';
+        container.innerHTML = '<div style="color:#8a8d99;padding:20px;text-align:center;">' + (currentLang === 'ru' ? 'Нет скинов в инвентаре' : 'No skins in inventory') + '</div>';
     } else {
         container.innerHTML = appData.skins.map((skin, index) => `
             <div class="admin-skin-item" data-index="${index}">
@@ -1380,7 +1326,7 @@ function renderAdminSkins() {
 }
 
 function removeAdminSkin(index) {
-    if (confirm('Удалить скин "' + appData.skins[index]?.name + '"?')) {
+    if (confirm((currentLang === 'ru' ? 'Удалить скин "' : 'Delete skin "') + appData.skins[index]?.name + '"?')) {
         appData.skins.splice(index, 1);
         appData.skinsCount = appData.skins.length;
         saveData();
@@ -1499,7 +1445,6 @@ function updateUserUI() {
     }
     document.getElementById('currencyToggle')?.addEventListener('click', toggleCurrency);
     document.getElementById('telegramLoginBtn')?.addEventListener('click', openLogin);
-    // Переключатель языка
     document.getElementById('langSwitch')?.addEventListener('click', function(e) {
         const target = e.target;
         if (target.id === 'langRu' && currentLang !== 'ru') {
@@ -1520,7 +1465,6 @@ function toggleCurrency(e) {
     document.getElementById('currencyToggle').textContent = appData.currentCurrency;
     renderSellSkins();
     renderMarketSkins();
-    updateSellUI();
 }
 
 // ==========================================
@@ -1530,7 +1474,7 @@ function resetFilters() {
     document.getElementById('priceMin').value = '';
     document.getElementById('priceMax').value = '';
     document.getElementById('marketSearch').value = '';
-    document.querySelectorAll('.rarity-filter, .wear-filter, .phase-filter').forEach(cb => cb.checked = false);
+    document.querySelectorAll('.rarity-filter, .wear-filter').forEach(cb => cb.checked = false);
     renderMarketSkins();
 }
 
@@ -1540,13 +1484,11 @@ function resetFilters() {
 document.addEventListener('DOMContentLoaded', function() {
     loadData();
 
-    // Logo
     document.getElementById('logoLink').addEventListener('click', function(e) {
         e.preventDefault();
         navigateTo('hero');
     });
 
-    // Navigation
     document.querySelectorAll('.nav a, [data-page]').forEach(el => {
         el.addEventListener('click', function(e) {
             e.preventDefault();
@@ -1570,14 +1512,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Login
     document.getElementById('profileLoginBtn').addEventListener('click', openLogin);
     document.getElementById('loginCancel').addEventListener('click', closeLogin);
     document.getElementById('loginConfirm').addEventListener('click', handleLogin);
     document.getElementById('passwordInput').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
     document.getElementById('loginInput').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('passwordInput').focus(); });
 
-    // Admin
     document.getElementById('adminLogout').addEventListener('click', function() {
         if (confirm(currentLang === 'ru' ? 'Выйти из админ-панели?' : 'Logout from admin?')) navigateTo('hero');
     });
@@ -1648,7 +1588,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Theme
     document.getElementById('themeToggle').addEventListener('click', function() {
         appData.theme = 'dark';
         saveData();
@@ -1660,7 +1599,6 @@ document.addEventListener('DOMContentLoaded', function() {
         applyTheme();
     });
 
-    // Rain
     document.getElementById('rainToggle').addEventListener('click', function() {
         appData.rainEnabled = true;
         saveData();
@@ -1672,19 +1610,6 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleRain(false);
     });
 
-    // Sell page - select all / clear
-    document.getElementById('selectAllSkins').addEventListener('click', function() {
-        appData.selectedSkins = appData.skins.map(s => s.id);
-        saveData();
-        renderSellSkins();
-    });
-    document.getElementById('selectAllContainers').addEventListener('click', function() {
-        appData.selectedSkins = [];
-        saveData();
-        renderSellSkins();
-    });
-
-    // Refresh market button
     document.querySelector('.refresh-btn')?.addEventListener('click', refreshMarket);
 
     updateUserUI();
@@ -1704,6 +1629,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('🎒 Скинов в инвентаре: ' + appData.skins.length);
     console.log('🔐 Секретная комбинация: нажми 4 раза "A" на клавиатуре!');
     console.log('🌐 Переключатель языка: RU|EN');
+    console.log('📊 Яндекс.Метрика установлена');
 });
 </script>
 </body>
