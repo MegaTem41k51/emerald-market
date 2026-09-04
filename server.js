@@ -15,11 +15,8 @@ const PROXIES = [
     'http://qigocgbt:7sdfc9sdwkkv@31.59.20.176:6754'
 ];
 // ==========================================
-// 2. Если хотите использовать переменные окружения Render, оставьте пустым:
-// const PROXIES = process.env.PROXIES ? process.env.PROXIES.split(',') : [];
-// ==========================================
 
-const STEAM_API_KEY = process.env.STEAM_API_KEY; // Ключ из переменных окружения Render
+const STEAM_API_KEY = process.env.STEAM_API_KEY;
 
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
@@ -41,7 +38,6 @@ function convertToSteamId64(steamId) {
 // Функция для создания axios-клиента с прокси
 function createAxiosWithProxy() {
     if (PROXIES.length === 0) {
-        // Если прокси не указаны, работаем напрямую (может быть забанено)
         return axios.create({ timeout: 10000 });
     }
 
@@ -51,6 +47,18 @@ function createAxiosWithProxy() {
 
     return axios.create({ httpsAgent, timeout: 10000 });
 }
+
+// === ЭНДПОИНТ ДЛЯ ПРОВЕРКИ ПРОКСИ ===
+app.get('/test', async (req, res) => {
+    try {
+        const client = createAxiosWithProxy();
+        const response = await client.get('https://api.ipify.org?format=json');
+        res.json({ message: 'Прокси работает! Ваш IP:', ip: response.data.ip });
+    } catch (error) {
+        res.status(500).json({ message: 'Прокси НЕ работает', error: error.message });
+    }
+});
+// ======================================
 
 app.post('/api/bind-trade', async (req, res) => {
     const { tradeUrl, username } = req.body;
@@ -96,24 +104,19 @@ app.post('/api/get-inventory', async (req, res) => {
         const profileResponse = await client.get(profileUrl);
         if (!profileResponse.data.response.players[0]) return res.status(404).json({ error: 'Профиль не найден' });
 
-        // Используем steam-inventory-api-ng для получения инвентаря
+        // Используем библиотеку для инвентаря
         const options = {
             steamID: steamId,
             appID: '730',
             contextID: '2',
             method: 'new',
-            language: 'english'
+            language: 'english',
+            proxies: PROXIES
         };
-
-        // Пробуем использовать прокси через библиотеку, если они настроены
-        if (PROXIES.length > 0) {
-            options.proxies = PROXIES; // Библиотека сама ротирует прокси
-        }
 
         const inventory = new Inventory(options);
         const items = await inventory.get();
         
-        // Преобразуем полученные предметы в нужный формат
         const formattedItems = items.map(item => ({
             assetid: item.assetid,
             name: item.market_hash_name || item.name,
@@ -123,18 +126,8 @@ app.post('/api/get-inventory', async (req, res) => {
 
         res.json({ success: true, items: formattedItems });
     } catch (error) {
-        console.error('Ошибка при получении инвентаря:', error.message);
+        console.error('Ошибка при получении инвентаря:', error);
         res.status(500).json({ error: 'Не удалось получить инвентарь. Перезапустите сервер или проверьте настройки прокси.' });
-    }
-});
-
-app.get('/test', async (req, res) => {
-    try {
-        const client = createAxiosWithProxy();
-        const response = await client.get('https://api.ipify.org?format=json');
-        res.json({ message: 'Прокси работает! Ваш IP:', ip: response.data.ip });
-    } catch (error) {
-        res.status(500).json({ message: 'Прокси НЕ работает', error: error.message });
     }
 });
 
