@@ -7,7 +7,7 @@
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; font-family: 'Montserrat', system-ui, sans-serif; background: #0b0c10; color: #e4e6eb; transition: background 0.3s, color 0.3s; overflow-x: hidden; }
+        html, body { height: 100%; font-family: 'Montserrat', system-ui, sans-serif; background: #0b0c10; color: #e4e6eb; overflow-x: hidden; }
         
         .rain-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
         .rain { position: absolute; width: 2px; background: linear-gradient(to bottom, rgba(46,204,113,0.1), rgba(46,204,113,0.3)); animation: rainFall linear infinite; }
@@ -30,7 +30,7 @@
         .nav a.active { color: #2ecc71; border-bottom-color: #2ecc71; }
         .header-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 
-        .btn { background: #2ecc71; color: #0b0c10 !important; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; border: none; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+        .btn { background: #2ecc71; color: #0b0c10 !important; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; border: none; cursor: pointer; transition: 0.2s; }
         .btn:hover { background: #27ae60; transform: scale(1.02); }
         .btn-outline { background: transparent; color: #b2b4bb !important; border: 1px solid #3a3c46; padding: 7px 18px; border-radius: 6px; font-weight: 500; font-size: 13px; cursor: pointer; transition: 0.2s; }
         .btn-outline:hover { border-color: #2ecc71; color: #2ecc71 !important; }
@@ -38,56 +38,39 @@
         .btn-success:hover { background: #27ae60; }
         .btn-danger { background: #e74c3c; color: #fff !important; }
         .btn-danger:hover { background: #c0392b; }
+        .btn-steam { background: #171a21; color: #fff; border: 1px solid #66c0f4; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; }
 
         .user-profile { display: flex; align-items: center; gap: 10px; background: #1c1d23; padding: 4px 12px 4px 4px; border-radius: 30px; border: 1px solid #2c2e36; cursor: pointer; transition: 0.2s; }
         .user-profile:hover { border-color: #2ecc71; }
         .user-profile .avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #0b0c10; flex-shrink: 0; background-size: cover; background-position: center; }
         .user-profile .username { font-size: 14px; font-weight: 500; color: #e4e6eb; }
-        .user-profile .logout-btn { background: none; border: none; color: #8a8d99; cursor: pointer; font-size: 14px; padding: 0 4px; transition: 0.2s; }
+        .user-profile .logout-btn { background: none; border: none; color: #8a8d99; cursor: pointer; font-size: 14px; padding: 0 4px; }
         .user-profile .logout-btn:hover { color: #e74c3c; }
 
-        .hero { padding: 60px 0 40px; text-align: center; background: radial-gradient(ellipse at center, #14161c 0%, #0b0c10 100%); border-bottom: 1px solid #26282f; position: relative; z-index: 1; }
+        .hero { padding: 60px 0 40px; text-align: center; background: radial-gradient(ellipse at center, #14161c 0%, #0b0c10 100%); border-bottom: 1px solid #26282f; }
         .hero h1 { font-size: 48px; font-weight: 800; color: #2ecc71; margin-bottom: 12px; }
         .hero h1 span { color: #e4e6eb; }
         .hero p { color: #8a8d99; font-size: 18px; max-width: 600px; margin: 0 auto 24px; }
         .hero-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-        .hero-buttons .btn { padding: 12px 32px; font-size: 16px; }
-        .hero-stats { display: flex; gap: 40px; justify-content: center; margin-top: 32px; flex-wrap: wrap; }
+        .hero-stats { display: flex; gap: 40px; justify-content: center; margin-top: 32px; }
         .hero-stats .stat { text-align: center; }
         .hero-stats .stat .num { font-size: 28px; font-weight: 700; color: #2ecc71; }
         .hero-stats .stat .label { color: #8a8d99; font-size: 13px; }
 
-        .page { display: none; padding: 30px 0 60px; position: relative; z-index: 1; }
+        .page { display: none; padding: 30px 0 60px; }
         .page.active { display: block; }
-
-        .static-page { max-width: 800px; margin: 0 auto; }
-        .static-page h1 { font-size: 32px; color: #2ecc71; margin-bottom: 24px; }
-        .static-page h2 { font-size: 20px; color: #2ecc71; margin-top: 24px; margin-bottom: 12px; }
-        .static-page p { line-height: 1.7; color: #b2b4bb; margin-bottom: 12px; }
-        .static-page ul, .static-page ol { padding-left: 20px; margin-bottom: 16px; color: #b2b4bb; line-height: 1.7; }
-        .static-page a { color: #2ecc71; text-decoration: none; }
-        .static-page a:hover { text-decoration: underline; }
-        
-        .qr-container { text-align: center; margin: 20px 0; padding: 20px; background: #14161c; border: 1px solid #26282f; border-radius: 12px; }
-        .qr-container img { max-width: 300px; border-radius: 8px; }
-        .bold-warning { font-weight: 900; color: #e74c3c; font-size: 18px; text-align: center; margin: 20px 0; }
 
         .sell-wrapper { display: flex; gap: 30px; align-items: flex-start; }
         .sell-sidebar { width: 280px; min-width: 280px; background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 20px; position: sticky; top: 80px; }
         .sell-sidebar .title { font-size: 20px; font-weight: 700; color: #2ecc71; margin-bottom: 4px; }
         .sell-sidebar .subtitle { color: #8a8d99; font-size: 14px; margin-bottom: 16px; }
-        .sell-sidebar .subtitle a { color: #2ecc71; text-decoration: none; }
         .sell-sidebar .trade-label { color: #8a8d99; font-size: 13px; display: block; margin-bottom: 4px; }
         .sell-sidebar .trade-input { width: 100%; background: #1c1d23; border: 1px solid #2c2e36; color: #e4e6eb; padding: 10px 12px; border-radius: 6px; font-size: 13px; outline: none; margin-bottom: 16px; }
         .sell-sidebar .trade-input:focus { border-color: #2ecc71; }
-        .sell-sidebar .min-withdraw { color: #8a8d99; font-size: 12px; margin-top: 8px; line-height: 1.5; }
         .sell-sidebar .vpn-warning { color: #e74c3c; font-size: 12px; font-weight: 700; margin-bottom: 16px; }
 
         .sell-content { flex: 1; }
         .sell-content .top-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
-        .sell-content .top-bar .select-all { color: #8a8d99; font-size: 13px; cursor: pointer; }
-        .sell-content .top-bar .select-all:hover { color: #2ecc71; }
-
         .sell-skin-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; min-height: 200px; }
         .sell-skin-card { background: #14161c; border: 1px solid #26282f; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 8px; cursor: pointer; transition: 0.2s; position: relative; }
         .sell-skin-card:hover { border-color: #2ecc71; transform: translateY(-2px); }
@@ -103,64 +86,43 @@
         .sell-empty h3 { color: #e4e6eb; margin-bottom: 8px; }
 
         .market-wrapper { display: flex; gap: 24px; align-items: flex-start; }
-        .filter-sidebar { width: 280px; min-width: 280px; background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 18px 16px; position: sticky; top: 80px; max-height: calc(100vh - 100px); overflow-y: auto; }
-        .filter-sidebar::-webkit-scrollbar { width: 4px; }
-        .filter-sidebar::-webkit-scrollbar-track { background: #0b0c10; }
-        .filter-sidebar::-webkit-scrollbar-thumb { background: #2c2e36; border-radius: 4px; }
-        
-        .filter-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+        .filter-sidebar { width: 280px; min-width: 280px; background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 18px 16px; position: sticky; top: 80px; }
+        .filter-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .filter-header .filter-title { font-size: 16px; font-weight: 700; color: #e4e6eb; }
-        .filter-header .filter-toggle { color: #8a8d99; font-size: 18px; transition: 0.3s; }
-        .filter-header .filter-toggle.open { transform: rotate(180deg); }
-        .filter-body { overflow: hidden; max-height: 2000px; transition: max-height 0.4s ease, opacity 0.3s ease; opacity: 1; }
-        .filter-body.hidden { max-height: 0; opacity: 0; padding-top: 0; }
-        .filter-body-inner { padding-top: 12px; }
-
-        .filter-sidebar .filter-divider { border: none; border-top: 1px solid #26282f; margin: 10px 0; }
-        .filter-sidebar .filter-group { margin-bottom: 12px; }
-        .filter-sidebar .filter-group .group-label { font-size: 12px; font-weight: 600; color: #8a8d99; margin-bottom: 4px; display: block; }
-        .filter-sidebar .filter-group .price-inputs { display: flex; gap: 8px; }
-        .filter-sidebar .filter-group .price-inputs input { width: 50%; background: #1c1d23; border: 1px solid #2c2e36; color: #e4e6eb; padding: 6px 10px; border-radius: 6px; font-size: 13px; outline: none; }
-        .filter-sidebar .filter-group .price-inputs input:focus { border-color: #2ecc71; }
-        .filter-sidebar .filter-group .checkbox-group { display: flex; flex-direction: column; gap: 2px; }
-        .filter-sidebar .filter-group .checkbox-group label { display: flex; align-items: center; gap: 8px; color: #b2b4bb; font-size: 12px; cursor: pointer; padding: 2px 0; transition: 0.2s; }
-        .filter-sidebar .filter-group .checkbox-group label:hover { color: #e4e6eb; }
-        .filter-sidebar .filter-group .checkbox-group label input { accent-color: #2ecc71; width: 14px; height: 14px; cursor: pointer; }
-
-        .filter-reset-btn { width: 100%; background: transparent; border: 1px solid #e74c3c; color: #e74c3c; padding: 8px 0; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.2s; margin-top: 6px; }
-        .filter-reset-btn:hover { background: #e74c3c; color: #0b0c10; }
+        .filter-toggle { color: #8a8d99; font-size: 18px; }
+        .filter-body { overflow: hidden; max-height: 500px; transition: max-height 0.4s ease; }
+        .filter-body.hidden { max-height: 0; }
+        .filter-divider { border: none; border-top: 1px solid #26282f; margin: 10px 0; }
+        .filter-group { margin-bottom: 12px; }
+        .filter-group .price-inputs { display: flex; gap: 8px; }
+        .filter-group .price-inputs input { width: 50%; background: #1c1d23; border: 1px solid #2c2e36; color: #e4e6eb; padding: 6px 10px; border-radius: 6px; font-size: 13px; outline: none; }
+        .filter-group .checkbox-group { display: flex; flex-direction: column; gap: 2px; }
+        .filter-group .checkbox-group label { display: flex; align-items: center; gap: 8px; color: #b2b4bb; font-size: 12px; cursor: pointer; }
+        .filter-reset-btn { width: 100%; background: transparent; border: 1px solid #e74c3c; color: #e74c3c; padding: 8px 0; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; margin-top: 6px; }
 
         .market-content { flex: 1; }
         .market-content .top-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
         .market-content .top-bar h2 { font-size: 22px; font-weight: 700; }
-        .market-content .top-bar span { color: #8a8d99; font-size: 14px; }
-        .market-content .top-bar .refresh-btn { cursor: pointer; color: #2ecc71; font-size: 20px; transition: 0.3s; }
-        .market-content .top-bar .refresh-btn:hover { transform: rotate(180deg); }
-        .market-content .top-bar .refresh-btn.spinning { animation: spin 0.6s ease; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
         .market-skin-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-        .market-skin-card { background: #14161c; border: 1px solid #26282f; border-radius: 10px; padding: 14px; transition: 0.2s; cursor: pointer; position: relative; display: flex; flex-direction: column; }
-        .market-skin-card:hover { transform: translateY(-4px); border-color: #2ecc71; box-shadow: 0 8px 24px rgba(46,204,113,0.06); }
-        .market-skin-card .badge { position: absolute; top: 8px; right: 8px; background: rgba(46,204,113,0.12); color: #2ecc71; font-size: 9px; padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(46,204,113,0.15); font-weight: 600; text-transform: uppercase; }
-        .market-skin-card .image { background: #1c1d23; border-radius: 6px; height: 80px; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+        .market-skin-card { background: #14161c; border: 1px solid #26282f; border-radius: 10px; padding: 14px; transition: 0.2s; position: relative; display: flex; flex-direction: column; }
+        .market-skin-card:hover { transform: translateY(-4px); border-color: #2ecc71; }
+        .market-skin-card .image { background: #1c1d23; border-radius: 6px; height: 80px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .market-skin-card .image img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .market-skin-card .weapon { font-size: 11px; color: #8a8d99; margin-top: 6px; font-weight: 500; }
-        .market-skin-card .name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+        .market-skin-card .weapon { font-size: 11px; color: #8a8d99; margin-top: 6px; }
+        .market-skin-card .name { font-size: 13px; font-weight: 600; margin-top: 2px; }
         .market-skin-card .exterior { font-size: 11px; color: #8a8d99; margin-top: 2px; }
         .market-skin-card .price { color: #2ecc71; font-weight: 700; font-size: 16px; margin-top: 6px; }
-        .market-skin-card .buy-btn { margin-top: auto; width: 100%; padding: 6px 0; background: #2ecc71; border: none; border-radius: 4px; color: #0b0c10; font-weight: 600; font-size: 12px; cursor: pointer; transition: 0.2s; }
-        .market-skin-card .buy-btn:hover { background: #27ae60; }
+        .market-skin-card .buy-btn { margin-top: auto; width: 100%; padding: 6px 0; background: #2ecc71; border: none; border-radius: 4px; color: #0b0c10; font-weight: 600; font-size: 12px; cursor: pointer; }
 
         .profile-login-box { max-width: 500px; margin: 40px auto; background: #14161c; border: 1px solid #26282f; border-radius: 16px; padding: 48px 40px; text-align: center; }
         .profile-login-box .icon { font-size: 64px; margin-bottom: 16px; }
         .profile-login-box h2 { color: #e4e6eb; font-size: 24px; margin-bottom: 8px; }
         .profile-login-box p { color: #8a8d99; font-size: 16px; margin-bottom: 24px; }
 
-        .profile-header { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px 32px; display: flex; align-items: center; gap: 24px; margin-bottom: 24px; flex-wrap: wrap; }
+        .profile-header { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px 32px; display: flex; align-items: center; gap: 24px; margin-bottom: 24px; }
         .profile-avatar { width: 72px; height: 72px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; color: #0b0c10; flex-shrink: 0; background-size: cover; background-position: center; }
         .profile-info h2 { font-size: 24px; }
-        .profile-info .stats { display: flex; gap: 24px; margin-top: 4px; flex-wrap: wrap; }
+        .profile-info .stats { display: flex; gap: 24px; margin-top: 4px; }
         .profile-info .stats .stat { color: #8a8d99; font-size: 14px; }
         .profile-info .stats .stat strong { color: #2ecc71; }
 
@@ -168,26 +130,22 @@
         .profile-settings h3 { margin-bottom: 16px; font-size: 18px; }
         .profile-settings .setting-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
         .profile-settings .setting-row label { color: #8a8d99; font-size: 13px; min-width: 100px; }
-        .profile-settings .setting-row input[type="text"] { flex: 1; background: #1c1d23; border: 1px solid #2c2e36; color: #e4e6eb; padding: 8px 12px; border-radius: 6px; font-size: 13px; min-width: 200px; outline: none; }
-        .profile-settings .setting-row input[type="text"]:focus { border-color: #2ecc71; }
-        .profile-settings .setting-row .toggle-btn { padding: 6px 16px; border-radius: 6px; border: 1px solid #2c2e36; background: transparent; color: #b2b4bb; cursor: pointer; font-size: 12px; transition: 0.2s; }
+        .profile-settings .setting-row input[type="text"] { flex: 1; background: #1c1d23; border: 1px solid #2c2e36; color: #e4e6eb; padding: 8px 12px; border-radius: 6px; font-size: 13px; outline: none; }
+        .profile-settings .setting-row .toggle-btn { padding: 6px 16px; border-radius: 6px; border: 1px solid #2c2e36; background: transparent; color: #b2b4bb; cursor: pointer; font-size: 12px; }
         .profile-settings .setting-row .toggle-btn.active { background: #2ecc71; border-color: #2ecc71; color: #0b0c10; }
-        .profile-settings .setting-row .toggle-btn:hover { border-color: #2ecc71; color: #2ecc71; }
 
         .profile-history { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px; text-align: center; }
         .profile-history h3 { margin-bottom: 16px; font-size: 18px; text-align: left; }
         .profile-history .empty-message { color: #6a6d7a; font-size: 16px; padding: 30px 0; }
 
-        .footer { background: #101116; border-top: 1px solid #26282f; padding: 40px 0 24px; margin-top: auto; flex-shrink: 0; position: relative; z-index: 1; }
+        .footer { background: #101116; border-top: 1px solid #26282f; padding: 40px 0 24px; margin-top: auto; }
         .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 30px; }
         .footer-grid .col h4 { color: #e4e6eb; margin-bottom: 12px; font-size: 16px; }
-        .footer-grid .col a { display: block; color: #8a8d99; font-size: 14px; padding: 4px 0; cursor: pointer; transition: 0.2s; }
+        .footer-grid .col a { display: block; color: #8a8d99; font-size: 14px; padding: 4px 0; cursor: pointer; }
         .footer-grid .col a:hover { color: #2ecc71; }
         .footer-bottom { text-align: center; margin-top: 32px; padding-top: 20px; border-top: 1px solid #1c1d23; color: #6a6d7a; font-size: 14px; }
 
-        @media (max-width: 1200px) { .market-skin-grid { grid-template-columns: repeat(3, 1fr); } .sell-skin-grid { grid-template-columns: repeat(3, 1fr); } }
-        @media (max-width: 992px) { .sell-wrapper { flex-direction: column; } .sell-sidebar { width: 100%; min-width: unset; position: static; } .market-wrapper { flex-direction: column; } .filter-sidebar { width: 100%; min-width: unset; position: static; max-height: none; overflow-y: visible; } .market-skin-grid { grid-template-columns: repeat(2, 1fr); } .sell-skin-grid { grid-template-columns: repeat(2, 1fr); } .hero h1 { font-size: 32px; } }
-        @media (max-width: 600px) { .market-skin-grid { grid-template-columns: 1fr 1fr; } .sell-skin-grid { grid-template-columns: 1fr 1fr; } .hero h1 { font-size: 24px; } .hero-stats { gap: 20px; } }
+        @media (max-width: 992px) { .sell-wrapper { flex-direction: column; } .sell-sidebar { width: 100%; min-width: unset; position: static; } .market-wrapper { flex-direction: column; } .filter-sidebar { width: 100%; min-width: unset; position: static; } .market-skin-grid { grid-template-columns: repeat(2, 1fr); } .sell-skin-grid { grid-template-columns: repeat(2, 1fr); } }
     </style>
 </head>
 <body>
@@ -241,7 +199,7 @@
                 <label class="trade-label">Введите ваш Trade URL</label>
                 <input class="trade-input" id="sellTradeUrl" placeholder="https://steamcommunity.com/tradeoffer/new/?pa...">
                 <div class="vpn-warning">⚠️ ОБЯЗАТЕЛЬНО ВКЛЮЧИТЕ VPN ДЛЯ ПЕРЕНАПРАВЛЕНИЯ В ЛИЧНЫЕ СООБЩЕНИЯ</div>
-                <div class="min-withdraw">Выберите скины и отправьте заявку в Telegram!</div>
+                <div class="min-withdraw" style="color:#8a8d99; font-size:12px;">Выберите скины и отправьте заявку в Telegram!</div>
             </div>
             <div class="sell-content">
                 <div class="top-bar">
@@ -266,16 +224,6 @@
     <div class="container">
         <div class="market-wrapper">
             <div class="filter-sidebar" id="filterSidebar">
-                <div class="filter-header" onclick="toggleFilter('refresh')">
-                    <span class="filter-title">Обновить магазин</span>
-                    <span class="filter-toggle open" id="refreshToggle">▼</span>
-                </div>
-                <div class="filter-body" id="refreshBody">
-                    <div class="filter-body-inner">
-                        <button class="btn btn-success" style="width:100%;" onclick="refreshMarket()">Обновить</button>
-                    </div>
-                </div>
-                <hr class="filter-divider">
                 <div class="filter-header" onclick="toggleFilter('search')">
                     <span class="filter-title">Поиск</span>
                     <span class="filter-toggle open" id="searchToggle">▼</span>
@@ -418,13 +366,10 @@
 </div>
 
 <script>
-// ДАННЫЕ
-let appData = { skins: [], users: 0, trades: 0, paid: '$0', skinsCount: 0, exchangeRate: 86.83, currentCurrency: 'USD' };
 let currentUser = null;
 let userInventory = [];
 let selectedSteamSkins = [];
 
-// АВТОРИЗАЦИЯ STEAM
 async function fetchUser() {
     try {
         const response = await fetch('/api/user');
@@ -458,7 +403,6 @@ function updateUserUI() {
     }
 }
 
-// НАВИГАЦИЯ
 function navigateTo(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const target = document.getElementById(page + 'Page');
@@ -472,7 +416,6 @@ function navigateTo(page) {
     else if (page === 'profile') renderProfile();
 }
 
-// ПРОФИЛЬ
 function renderProfile() {
     if (currentUser) {
         document.getElementById('profileLoginBox').style.display = 'none';
@@ -492,7 +435,6 @@ function renderProfile() {
     }
 }
 
-// ПРОДАЖА
 async function loadSteamInventory() {
     if (!currentUser) { alert('Пожалуйста, войдите через Steam!'); return; }
     const grid = document.getElementById('sellSkinGrid');
@@ -540,32 +482,18 @@ function sellSelectedSkins() {
     userInventory = [];
 }
 
-// МАРКЕТ
-function refreshMarket() { setTimeout(() => { renderMarketSkins(); }, 300); }
-
 function renderMarketSkins() {
-    let skins = [...appData.skins];
-    const search = document.getElementById('marketSearch').value.toLowerCase();
-    const priceMin = parseFloat(document.getElementById('priceMin').value) || 0;
-    const priceMax = parseFloat(document.getElementById('priceMax').value) || Infinity;
-    if (search) skins = skins.filter(s => s.name.toLowerCase().includes(search));
-    skins = skins.filter(s => s.price >= priceMin && s.price <= priceMax);
-    const rarityChecked = document.querySelectorAll('.rarity-filter:checked');
-    if (rarityChecked.length > 0) skins = skins.filter(s => Array.from(rarityChecked).map(cb => cb.value).includes(s.rarity));
-    const wearChecked = document.querySelectorAll('.wear-filter:checked');
-    if (wearChecked.length > 0) skins = skins.filter(s => Array.from(wearChecked).map(cb => cb.value).includes(s.exterior));
+    let skins = [
+        { id: 1, name: 'AWP | Dragon Lore', weapon: 'AWP', exterior: 'Factory New', price: 3500, rarity: 'covert', imageUrl: 'https://community.akamai.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot621FAR17PLfYQJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w' },
+        { id: 2, name: 'AK-47 | Redline', weapon: 'AK-47', exterior: 'Field-Tested', price: 45, rarity: 'classified', imageUrl: '' }
+    ];
     const grid = document.getElementById('marketSkinGrid');
-    if (skins.length === 0) {
-        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;"><div style="font-size:48px;margin-bottom:16px;">🎒</div><h3 style="color:#e4e6eb;margin-bottom:8px;">Ваш инвентарь пуст</h3><p>Добавьте скины в инвентарь через админ-панель</p></div>';
-        return;
-    }
     grid.innerHTML = skins.map(skin => `
         <div class="market-skin-card">
-            <div class="badge">${skin.rarity || ''}</div>
             <div class="image">${skin.imageUrl ? `<img src="${skin.imageUrl}">` : ''}</div>
-            <div class="weapon">${skin.weapon || ''}</div>
+            <div class="weapon">${skin.weapon}</div>
             <div class="name">${skin.name}</div>
-            <div class="exterior">${skin.exterior || ''}</div>
+            <div class="exterior">${skin.exterior}</div>
             <div class="price">$${skin.price.toFixed(2)}</div>
             <button class="buy-btn" onclick="alert('Купить ${skin.name}?')">Купить</button>
         </div>
@@ -595,7 +523,6 @@ function toggleFilter(name) {
     }
 }
 
-// ИНИЦИАЛИЗАЦИЯ
 document.addEventListener('DOMContentLoaded', function() {
     fetchUser();
     document.querySelectorAll('.nav a, .footer a, .hero-buttons a').forEach(el => {
@@ -608,6 +535,22 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('logoLink').addEventListener('click', function(e) {
         e.preventDefault();
         navigateTo('hero');
+    });
+    document.getElementById('themeToggle').addEventListener('click', function() {
+        document.body.classList.remove('light');
+        document.getElementById('themeToggle').classList.add('active');
+        document.getElementById('themeToggleLight').classList.remove('active');
+    });
+    document.getElementById('themeToggleLight').addEventListener('click', function() {
+        document.body.classList.add('light');
+        document.getElementById('themeToggleLight').classList.add('active');
+        document.getElementById('themeToggle').classList.remove('active');
+    });
+    document.getElementById('rainToggle').addEventListener('click', function() {
+        document.getElementById('rainContainer').style.display = 'block';
+    });
+    document.getElementById('rainToggleOff').addEventListener('click', function() {
+        document.getElementById('rainContainer').style.display = 'none';
     });
     navigateTo('hero');
     renderMarketSkins();
