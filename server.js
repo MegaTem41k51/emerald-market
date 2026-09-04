@@ -8,7 +8,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 const PROXIES = [
-    'http://qigocgbt:7sdfc9sdwkkv@31.59.20.176:6754'
+    'http://qigocgbt:7sdfc9sdwkkv@185.49.165.64:6754'
 ];
 
 const STEAM_API_KEY = process.env.STEAM_API_KEY;
@@ -100,7 +100,7 @@ app.post('/api/get-inventory', async (req, res) => {
         await new Promise(r => setTimeout(r, 3000));
 
         // 3. Получаем инвентарь через ТОТ ЖЕ прокси (axios)
-        const inventoryUrl = `https://steamcommunity.com/inventory/${steamId}/730/2?l=english&count=2000`;
+        const inventoryUrl = `https://steamcommunity.com/inventory/${steamId}/730/2?l=english&count=500`;
         const inventoryResponse = await client.get(inventoryUrl, {
             headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' }
         });
