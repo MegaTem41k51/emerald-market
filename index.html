@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EmErAlD MaRkEt</title>
+    <title>EMERALDMarket</title>
     
     <!-- Yandex.Metrika counter -->
     <script type="text/javascript">
@@ -169,17 +169,6 @@
         body.light .footer-grid .col a { color: #666; }
         body.light .footer-grid .col a:hover { color: #2ecc71; }
         body.light .footer-bottom { color: #999; border-top-color: #d0d4da; }
-        body.light .modal-content { 
-            background: #f0f2f5; 
-            border-color: #d0d4da; 
-        }
-        body.light .modal-content h2 { color: #2ecc71; }
-        body.light .modal-content input { 
-            background: #e8ecf1; 
-            color: #333; 
-            border-color: #d0d4da; 
-        }
-        body.light .modal-content .error { color: #e74c3c; }
         body.light .online-counter {
             background: rgba(240, 242, 245, 0.9);
             border-color: #2ecc71;
@@ -299,6 +288,8 @@
         .btn-danger { background: #e74c3c; color: #fff !important; }
         .btn-danger:hover { background: #c0392b; }
         .btn-sm { padding: 4px 14px; font-size: 12px; }
+        .btn-steam { background: #171a21; color: #fff; border: 1px solid #66c0f4; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; transition: 0.2s; }
+        .btn-steam:hover { background: #1b2838; border-color: #fff; }
 
         .user-profile { display: flex; align-items: center; gap: 10px; background: #1c1d23; padding: 4px 12px 4px 4px; border-radius: 30px; border: 1px solid #2c2e36; cursor: pointer; transition: 0.2s; }
         .user-profile:hover { border-color: #2ecc71; }
@@ -483,17 +474,6 @@
         .admin-user-item .user-name { color: #e4e6eb; font-weight: 500; }
         .admin-user-item .user-date { color: #8a8d99; font-size: 12px; }
 
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 500; align-items: center; justify-content: center; }
-        .modal-overlay.open { display: flex; }
-        .modal-content { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 32px; max-width: 400px; width: 90%; }
-        .modal-content h2 { color: #2ecc71; margin-bottom: 16px; }
-        .modal-content input { width: 100%; padding: 10px 14px; background: #1c1d23; border: 1px solid #26282f; color: #e4e6eb; border-radius: 6px; margin-bottom: 12px; font-size: 16px; outline: none; }
-        .modal-content input:focus { border-color: #2ecc71; }
-        .modal-content .error { color: #e74c3c; font-size: 14px; margin-bottom: 10px; display: none; }
-        .modal-content .error.show { display: block; }
-        .modal-content .modal-actions { display: flex; gap: 12px; margin-top: 12px; }
-        .modal-content .modal-actions .btn { flex: 1; text-align: center; }
-
         .footer { background: #101116; border-top: 1px solid #26282f; padding: 40px 0 24px; margin-top: auto; flex-shrink: 0; position: relative; z-index: 1; }
         .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 30px; }
         .footer-grid .col h4 { color: #e4e6eb; margin-bottom: 12px; font-size: 16px; }
@@ -534,7 +514,7 @@
                 <span id="langEn">EN</span>
             </div>
             <a href="#" class="btn-outline" id="currencyToggle">USD</a>
-            <a href="#" class="btn btn-telegram" id="telegramLoginBtn" data-key="login_btn">Войти через Telegram</a>
+            <a href="/auth/steam" class="btn btn-steam" id="steamLoginBtn">Войти через Steam</a>
         </div>
     </div>
 </header>
@@ -652,7 +632,6 @@
                     <span style="color:#8a8d99; font-size:13px;"><span data-key="sell_total">Итого</span>: <span id="sellTotalPrice">0 ₽</span></span>
                 </div>
                 
-                <!-- КНОПКА ЗАГРУЗКИ ИНВЕНТАРЯ -->
                 <button class="btn btn-success" style="width:100%; margin-bottom:12px; padding:14px; font-size:16px;" onclick="loadSteamInventory()">
                     🎒 Загрузить мой инвентарь из Steam
                 </button>
@@ -776,17 +755,17 @@
     <div class="container">
         <div id="profileLoginBox" style="display:none;">
             <div class="profile-login-box">
-                <div class="icon"></div>
-                <h2 data-key="profile_login_title">Авторизуйтесь</h2>
+                <div class="icon">🎮</div>
+                <h2 data-key="profile_login_title">Войдите через Steam</h2>
                 <p data-key="profile_login_desc">Чтобы получить доступ к этой странице</p>
-                <button class="btn btn-telegram" id="profileLoginBtn" data-key="login_btn">Войти через Telegram</button>
+                <a href="/auth/steam" class="btn btn-steam" style="margin-top:10px;">Войти через Steam</a>
             </div>
         </div>
         <div id="profileContent" style="display:none;">
             <div class="profile-header">
                 <div class="profile-avatar" id="profileAvatar">K</div>
                 <div class="profile-info">
-                    <h2 id="profileName">какашка</h2>
+                    <h2 id="profileName"></h2>
                     <div class="stats">
                         <span class="stat"><span data-key="profile_balance">Баланс</span>: <strong id="profileBalance">0 ₽</strong></span>
                         <span class="stat"><span data-key="profile_bought">Куплено на</span>: <strong id="profileBought">0 ₽</strong></span>
@@ -872,48 +851,6 @@
 
 </div>
 
-<div class="modal-overlay" id="loginModal">
-    <div class="modal-content">
-        <h2 data-key="modal_login_title">Вход через Telegram</h2>
-        <p style="color:#8a8d99; margin-bottom:12px;" data-key="modal_login_desc">Введите логин и пароль</p>
-        <div class="error" id="loginError" data-key="modal_login_error"> Неверный логин или пароль</div>
-        <input type="text" id="loginInput" placeholder="Telegram логин..." autofocus>
-        <input type="password" id="passwordInput" placeholder="Пароль...">
-        <div class="modal-actions">
-            <button class="btn-outline" id="loginCancel" data-key="modal_cancel">Отмена</button>
-            <button class="btn btn-telegram" id="loginConfirm" data-key="modal_login">Войти</button>
-        </div>
-    </div>
-</div>
-
-<div class="modal-overlay" id="addSkinModal">
-    <div class="modal-content" style="max-width:450px;">
-        <h2 data-key="modal_add_skin"> Добавить слот</h2>
-        <input type="text" id="newSkinName" placeholder="Название (AWP | Dragon Lore)">
-        <input type="text" id="newSkinWeapon" placeholder="Оружие (AWP)">
-        <select id="newSkinExterior" style="width:100%; padding:10px 14px; background:#1c1d23; border:1px solid #26282f; color:#e4e6eb; border-radius:6px; margin-bottom:12px;">
-            <option value="Прямо с завода">Прямо с завода</option>
-            <option value="Немного поношенное">Немного поношенное</option>
-            <option value="После полевых испытаний">После полевых испытаний</option>
-            <option value="Поношенное">Поношенное</option>
-            <option value="Закалённое в боях">Закалённое в боях</option>
-        </select>
-        <input type="number" id="newSkinPrice" placeholder="Цена (USD)" step="0.01" min="0">
-        <select id="newSkinRarity" style="width:100%; padding:10px 14px; background:#1c1d23; border:1px solid #26282f; color:#e4e6eb; border-radius:6px; margin-bottom:12px;">
-            <option value="covert">Тайное</option>
-            <option value="classified">Засекреченное</option>
-            <option value="restricted">Ограниченное</option>
-            <option value="mil-spec">Армейское</option>
-            <option value="industrial">Промышленное</option>
-        </select>
-        <input type="text" id="newSkinImage" placeholder="URL картинки (опционально)">
-        <div class="modal-actions">
-            <button class="btn-outline" id="addSkinCancel" data-key="modal_cancel">Отмена</button>
-            <button class="btn btn-success" id="addSkinConfirm" data-key="modal_add"> Добавить</button>
-        </div>
-    </div>
-</div>
-
 <script>
 // ==========================================
 // ПЕРЕВОДЧИК RU|EN
@@ -925,7 +862,7 @@ const translations = {
         nav_sell: 'Продать скины',
         nav_buy: 'Купить скины',
         nav_profile: 'Профиль',
-        login_btn: 'Войти через Telegram',
+        login_btn: 'Войти через Steam',
         hero_title: 'Продать',
         hero_title_span: 'скины CS2',
         hero_desc: 'Лучшие цены на скины. Быстрые выплаты. Мгновенные сделки.',
@@ -940,7 +877,7 @@ const translations = {
         sell_trade_url: 'Trade URL',
         sell_where: 'Где взять?',
         sell_enter_url: 'Введите ваш Trade URL',
-        sell_closed: 'Введите Trade URL и нажмите "Загрузить инвентарь"',
+        sell_closed: 'Выберите скины и отправьте заявку в Telegram!',
         sell_select: 'Выбрать',
         sell_all: 'Все скины',
         sell_clear: 'Снять все',
@@ -967,7 +904,7 @@ const translations = {
         market_title: 'Ножи / Перчатки / Скины',
         market_empty_title: 'Ваш инвентарь пуст',
         market_empty_desc: 'Добавьте скины в инвентарь через админ-панель',
-        profile_login_title: 'Авторизуйтесь',
+        profile_login_title: 'Войдите через Steam',
         profile_login_desc: 'Чтобы получить доступ к этой странице',
         profile_balance: 'Баланс',
         profile_bought: 'Куплено на',
@@ -999,9 +936,6 @@ const translations = {
         footer_help: 'Помощь',
         footer_faq: 'FAQ',
         footer_policy: 'Гарантии и Политика',
-        modal_login_title: 'Вход через Telegram',
-        modal_login_desc: 'Введите логин и пароль',
-        modal_login_error: 'Неверный логин или пароль',
         modal_cancel: 'Отмена',
         modal_login: 'Войти',
         modal_add_skin: 'Добавить слот',
@@ -1013,7 +947,7 @@ const translations = {
         nav_sell: 'Sell Skins',
         nav_buy: 'Buy Skins',
         nav_profile: 'Profile',
-        login_btn: 'Login via Telegram',
+        login_btn: 'Login via Steam',
         hero_title: 'Sell',
         hero_title_span: 'CS2 skins',
         hero_desc: 'Best prices for skins. Fast payouts. Instant trades.',
@@ -1028,7 +962,7 @@ const translations = {
         sell_trade_url: 'Trade URL',
         sell_where: 'Where to get?',
         sell_enter_url: 'Enter your Trade URL',
-        sell_closed: 'Enter Trade URL and click "Load inventory"',
+        sell_closed: 'Select skins and send a request to Telegram!',
         sell_select: 'Select',
         sell_all: 'All skins',
         sell_clear: 'Clear all',
@@ -1055,7 +989,7 @@ const translations = {
         market_title: 'Knives / Gloves / Skins',
         market_empty_title: 'Your inventory is empty',
         market_empty_desc: 'Add skins to inventory via admin panel',
-        profile_login_title: 'Login',
+        profile_login_title: 'Login via Steam',
         profile_login_desc: 'To access this page',
         profile_balance: 'Balance',
         profile_bought: 'Bought',
@@ -1087,9 +1021,6 @@ const translations = {
         footer_help: 'Help',
         footer_faq: 'FAQ',
         footer_policy: 'Guarantees & Policy',
-        modal_login_title: 'Login via Telegram',
-        modal_login_desc: 'Enter login and password',
-        modal_login_error: 'Invalid login or password',
         modal_cancel: 'Cancel',
         modal_login: 'Login',
         modal_add_skin: 'Add slot',
@@ -1175,29 +1106,71 @@ function toggleRain(on) {
 }
 
 // ==========================================
-// СЕКРЕТНАЯ КОМБИНАЦИЯ - АДМИНКА (AAAA)
+// ЛОГИКА STEAM АВТОРИЗАЦИИ
 // ==========================================
-let secretCode = '';
-let adminOpenCooldown = false;
-document.addEventListener('keydown', function(e) {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
-    secretCode += e.key;
-    if (secretCode.length > 4) secretCode = secretCode.slice(-4);
-    if (secretCode.toLowerCase() === 'aaaa' || secretCode.toLowerCase() === 'аааа') {
-        if (!adminOpenCooldown) {
-            adminOpenCooldown = true;
-            if (!appData.currentUser) {
-                alert(currentLang === 'ru' ? 'Сначала войдите через Telegram!' : 'Please login via Telegram first!');
-                secretCode = '';
-                adminOpenCooldown = false;
-                return;
-            }
-            navigateTo('admin');
-            secretCode = '';
-            setTimeout(() => { adminOpenCooldown = false; }, 2000);
+let currentUser = null; // Текущий пользователь Steam
+
+// Получаем данные пользователя с сервера при загрузке
+async function fetchUser() {
+    try {
+        const response = await fetch('/api/user');
+        const data = await response.json();
+        
+        if (data.loggedIn) {
+            currentUser = data.user;
+            updateUserUI();
+            renderProfile();
+        } else {
+            currentUser = null;
+            updateUserUI();
+            renderProfile();
         }
+    } catch (error) {
+        console.error('Ошибка при получении пользователя:', error);
     }
-});
+}
+
+function logoutUser() {
+    window.location.href = '/logout';
+}
+
+function updateUserUI() {
+    const actions = document.getElementById('headerActions');
+    if (currentUser) {
+        actions.innerHTML = `
+            <div class="lang-switch" id="langSwitch">
+                <span class="active" id="langRu">RU</span>
+                <span class="sep">|</span>
+                <span id="langEn">EN</span>
+            </div>
+            <div class="user-profile" onclick="navigateTo('profile')">
+                <div class="avatar" style="background-image:url('${currentUser.avatar}'); background-size:cover;">${currentUser.name.charAt(0).toUpperCase()}</div>
+                <span class="username">${currentUser.name}</span>
+                <button class="logout-btn" onclick="event.stopPropagation(); logoutUser()">✕</button>
+            </div>
+            <a href="#" class="btn-outline" id="currencyToggle">${appData.currentCurrency}</a>
+        `;
+    } else {
+        actions.innerHTML = `
+            <div class="lang-switch" id="langSwitch">
+                <span class="active" id="langRu">RU</span>
+                <span class="sep">|</span>
+                <span id="langEn">EN</span>
+            </div>
+            <a href="#" class="btn-outline" id="currencyToggle">${appData.currentCurrency}</a>
+            <a href="/auth/steam" class="btn btn-steam" data-key="login_btn">${currentLang === 'ru' ? 'Войти через Steam' : 'Login via Steam'}</a>
+        `;
+    }
+    document.getElementById('currencyToggle')?.addEventListener('click', toggleCurrency);
+    document.getElementById('langSwitch')?.addEventListener('click', function(e) {
+        const target = e.target;
+        if (target.id === 'langRu' && currentLang !== 'ru') {
+            setLanguage('ru');
+        } else if (target.id === 'langEn' && currentLang !== 'en') {
+            setLanguage('en');
+        }
+    });
+}
 
 // ==========================================
 // ДАННЫЕ (ОБЩИЕ ДЛЯ ВСЕХ)
@@ -1213,7 +1186,6 @@ let appData = {
     skinsCount: 0,
     exchangeRate: 86.83,
     currentCurrency: 'USD',
-    currentUser: null,
     selectedSkins: [],
     profile: { balance: '0 ₽', bought: '0 ₽', sold: '0 ₽', tradeUrl: '' },
     theme: 'dark',
@@ -1323,41 +1295,40 @@ function formatPrice(price) {
 }
 
 // ==========================================
-// ЛОГИКА ПРОДАЖИ ЧЕРЕЗ STEAM (ИНВЕНТАРЬ)
+// ЛОГИКА ПРОДАЖИ (СТАРАЯ, НО С ДОСТУПОМ ЧЕРЕЗ СЕРВЕР)
 // ==========================================
 let userInventory = [];
 let selectedSteamSkins = [];
 
 async function loadSteamInventory() {
-    const tradeUrl = document.getElementById('sellTradeUrl').value.trim();
-
-    if (!tradeUrl) {
-        alert('Введите вашу Trade URL!');
+    // Проверяем, авторизован ли пользователь
+    if (!currentUser) {
+        alert('Пожалуйста, войдите через Steam!');
+        window.location.href = '/auth/steam';
         return;
     }
 
     const grid = document.getElementById('sellSkinGrid');
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">⏳ Загружаем ваш инвентарь из Steam...</div>';
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">⏳ Загружаем ваш инвентарь...</div>';
 
     try {
         const response = await fetch('/api/get-inventory', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ tradeUrl })
+            body: JSON.stringify({}) // Сервер сам берет Steam ID из сессии
         });
 
         const data = await response.json();
 
         if (data.error) {
-            alert('Ошибка: ' + data.error);
-            grid.innerHTML = '<div class="sell-empty"><div class="icon">📦</div><h3>Инвентарь не найден</h3><p>Проверьте ссылку или откройте инвентарь в Steam.</p></div>';
+            alert(data.error);
+            grid.innerHTML = '<div class="sell-empty"><div class="icon">📦</div><h3>Ошибка</h3><p>Проверьте, открыт ли ваш инвентарь.</p></div>';
             return;
         }
 
         userInventory = data.items;
-
         if (userInventory.length === 0) {
-            grid.innerHTML = '<div class="sell-empty"><div class="icon">📦</div><h3>Инвентарь пуст или скрыт</h3><p>Убедитесь, что ваш инвентарь открыт для всех в настройках Steam.</p></div>';
+            grid.innerHTML = '<div class="sell-empty"><div class="icon">📦</div><h3>Инвентарь пуст</h3><p>Убедитесь, что ваш инвентарь открыт для всех.</p></div>';
             return;
         }
 
@@ -1395,15 +1366,15 @@ function toggleSteamSkinSelection(index) {
 }
 
 function sellSelectedSkins() {
-    const tradeUrl = document.getElementById('sellTradeUrl').value.trim();
-    
-    if (selectedSteamSkins.length === 0) {
-        alert('Выберите хотя бы один предмет из инвентаря!');
+    // Проверяем, авторизован ли пользователь
+    if (!currentUser) {
+        alert('Пожалуйста, войдите через Steam!');
+        window.location.href = '/auth/steam';
         return;
     }
-    
-    if (!tradeUrl) {
-        alert('Введите вашу Trade URL!');
+
+    if (selectedSteamSkins.length === 0) {
+        alert('Выберите хотя бы один предмет из инвентаря!');
         return;
     }
 
@@ -1412,7 +1383,7 @@ function sellSelectedSkins() {
         .map(item => item.name)
         .join(', ');
 
-    const message = `Привет! У меня есть скины: ${skinNames}.\nТрейд-бана нет. Если ты согласен — жду твой трейд!`;
+    const message = `Привет! У меня есть скины: ${skinNames}.\nМой Steam ID: ${currentUser.id}\nТрейд-бана нет. Если ты согласен — жду твой трейд!`;
     const encodedMessage = encodeURIComponent(message);
 
     window.open(`https://t.me/emerald_mrkt?text=${encodedMessage}`, '_blank');
@@ -1485,22 +1456,23 @@ function renderMarketSkins() {
 }
 
 // ==========================================
-// PROFILE
+// PROFILE (Теперь для Steam)
 // ==========================================
 function renderProfile() {
-    const isLoggedIn = appData.currentUser !== null;
-    document.getElementById('profileLoginBox').style.display = isLoggedIn ? 'none' : 'block';
-    document.getElementById('profileContent').style.display = isLoggedIn ? 'block' : 'none';
-    if (!isLoggedIn) return;
-    const user = appData.currentUser;
-    document.getElementById('profileAvatar').textContent = user.charAt(0).toUpperCase();
-    document.getElementById('profileName').textContent = user;
-    document.getElementById('profileBalance').textContent = '0 ₽';
-    document.getElementById('profileBought').textContent = '0 ₽';
-    document.getElementById('profileSold').textContent = '0 ₽';
-    document.getElementById('profileTradeUrl').value = appData.profile.tradeUrl || '';
-    applyTheme();
-    toggleRain(appData.rainEnabled);
+    if (currentUser) {
+        document.getElementById('profileLoginBox').style.display = 'none';
+        document.getElementById('profileContent').style.display = 'block';
+        document.getElementById('profileAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+        document.getElementById('profileAvatar').style.backgroundImage = `url('${currentUser.avatar}')`;
+        document.getElementById('profileAvatar').style.backgroundSize = 'cover';
+        document.getElementById('profileName').textContent = currentUser.name;
+        document.getElementById('profileTradeUrl').value = appData.profile.tradeUrl || '';
+        applyTheme();
+        toggleRain(appData.rainEnabled);
+    } else {
+        document.getElementById('profileLoginBox').style.display = 'block';
+        document.getElementById('profileContent').style.display = 'none';
+    }
 }
 
 // ==========================================
@@ -1603,125 +1575,11 @@ function renderAdminUsers() {
 }
 
 // ==========================================
-// АВТОРИЗАЦИЯ
-// ==========================================
-function openLogin() {
-    document.getElementById('loginModal').classList.add('open');
-    document.getElementById('loginError').classList.remove('show');
-    document.getElementById('loginInput').value = '';
-    document.getElementById('passwordInput').value = '';
-    document.getElementById('loginInput').focus();
-}
-
-function closeLogin() {
-    document.getElementById('loginModal').classList.remove('open');
-}
-
-function handleLogin() {
-    const login = document.getElementById('loginInput').value.trim();
-    const password = document.getElementById('passwordInput').value.trim();
-    if (!login) {
-        document.getElementById('loginError').textContent = '❌ ' + (currentLang === 'ru' ? 'Введите логин' : 'Enter login');
-        document.getElementById('loginError').classList.add('show');
-        return;
-    }
-    if (registeredUsers[login]) {
-        appData.currentUser = login;
-        saveData();
-        closeLogin();
-        updateUserUI();
-        if (document.getElementById('profilePage').classList.contains('active')) renderProfile();
-        alert((currentLang === 'ru' ? 'Добро пожаловать' : 'Welcome') + ', ' + login + '!');
-    } else {
-        if (confirm((currentLang === 'ru' ? 'Пользователь "' : 'User "') + login + '" ' + (currentLang === 'ru' ? 'не найден. Создать новый аккаунт?' : 'not found. Create new account?'))) {
-            registeredUsers[login] = { password: password || 'default', registered: new Date().toISOString() };
-            appData.users = Object.keys(registeredUsers).length;
-            appData.currentUser = login;
-            saveData();
-            closeLogin();
-            updateUserUI();
-            document.getElementById('usersCount').textContent = appData.users.toLocaleString();
-            if (document.getElementById('profilePage').classList.contains('active')) renderProfile();
-            alert((currentLang === 'ru' ? 'Аккаунт создан! Добро пожаловать' : 'Account created! Welcome') + ', ' + login + '!');
-        }
-    }
-}
-
-function logoutUser() {
-    appData.currentUser = null;
-    saveData();
-    updateUserUI();
-    if (document.getElementById('profilePage').classList.contains('active')) renderProfile();
-    if (document.getElementById('adminPage').classList.contains('active')) navigateTo('hero');
-}
-
-function updateUserUI() {
-    const actions = document.getElementById('headerActions');
-    if (appData.currentUser) {
-        actions.innerHTML = `
-            <div class="lang-switch" id="langSwitch">
-                <span class="active" id="langRu">RU</span>
-                <span class="sep">|</span>
-                <span id="langEn">EN</span>
-            </div>
-            <div class="user-profile" onclick="navigateTo('profile')">
-                <div class="avatar">${appData.currentUser.charAt(0).toUpperCase()}</div>
-                <span class="username">${appData.currentUser}</span>
-                <button class="logout-btn" onclick="event.stopPropagation(); logoutUser()">✕</button>
-            </div>
-            <a href="#" class="btn-outline" id="currencyToggle">${appData.currentCurrency}</a>
-        `;
-    } else {
-        actions.innerHTML = `
-            <div class="lang-switch" id="langSwitch">
-                <span class="active" id="langRu">RU</span>
-                <span class="sep">|</span>
-                <span id="langEn">EN</span>
-            </div>
-            <a href="#" class="btn-outline" id="currencyToggle">${appData.currentCurrency}</a>
-            <a href="#" class="btn btn-telegram" id="telegramLoginBtn" data-key="login_btn">${currentLang === 'ru' ? 'Войти через Telegram' : 'Login via Telegram'}</a>
-        `;
-    }
-    document.getElementById('currencyToggle')?.addEventListener('click', toggleCurrency);
-    document.getElementById('telegramLoginBtn')?.addEventListener('click', openLogin);
-    document.getElementById('langSwitch')?.addEventListener('click', function(e) {
-        const target = e.target;
-        if (target.id === 'langRu' && currentLang !== 'ru') {
-            setLanguage('ru');
-        } else if (target.id === 'langEn' && currentLang !== 'en') {
-            setLanguage('en');
-        }
-    });
-}
-
-// ==========================================
-// ВАЛЮТА
-// ==========================================
-function toggleCurrency(e) {
-    e.preventDefault();
-    appData.currentCurrency = appData.currentCurrency === 'USD' ? 'RUB' : 'USD';
-    saveData();
-    document.getElementById('currencyToggle').textContent = appData.currentCurrency;
-    renderSellSkins();
-    renderMarketSkins();
-}
-
-// ==========================================
-// RESET FILTERS
-// ==========================================
-function resetFilters() {
-    document.getElementById('priceMin').value = '';
-    document.getElementById('priceMax').value = '';
-    document.getElementById('marketSearch').value = '';
-    document.querySelectorAll('.rarity-filter, .wear-filter').forEach(cb => cb.checked = false);
-    renderMarketSkins();
-}
-
-// ==========================================
 // ИНИЦИАЛИЗАЦИЯ
 // ==========================================
 document.addEventListener('DOMContentLoaded', function() {
     loadData();
+    fetchUser(); // Загружаем Steam пользователя
 
     document.getElementById('logoLink').addEventListener('click', function(e) {
         e.preventDefault();
@@ -1733,8 +1591,9 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const page = this.dataset.page;
             if (page === 'admin') {
-                if (!appData.currentUser) {
-                    alert(currentLang === 'ru' ? 'Сначала войдите через Telegram!' : 'Please login via Telegram first!');
+                if (!currentUser) {
+                    alert('Сначала войдите через Steam!');
+                    window.location.href = '/auth/steam';
                     return;
                 }
                 navigateTo('admin');
@@ -1750,12 +1609,6 @@ document.addEventListener('DOMContentLoaded', function() {
             navigateTo(this.dataset.page);
         });
     });
-
-    document.getElementById('profileLoginBtn').addEventListener('click', openLogin);
-    document.getElementById('loginCancel').addEventListener('click', closeLogin);
-    document.getElementById('loginConfirm').addEventListener('click', handleLogin);
-    document.getElementById('passwordInput').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
-    document.getElementById('loginInput').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('passwordInput').focus(); });
 
     document.getElementById('adminLogout').addEventListener('click', function() {
         if (confirm(currentLang === 'ru' ? 'Выйти из админ-панели?' : 'Logout from admin?')) navigateTo('hero');
@@ -1851,7 +1704,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.querySelector('.refresh-btn')?.addEventListener('click', refreshMarket);
 
-    updateUserUI();
     navigateTo('hero');
     renderSellSkins();
     renderMarketSkins();
@@ -1863,7 +1715,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('tradesCount').textContent = appData.trades.toLocaleString();
     document.getElementById('paidAmount').textContent = appData.paid;
     document.getElementById('skinsCount').textContent = appData.skinsCount.toLocaleString();
-Ф
+
     console.log('🟢 EMERALDMarket загружен!');
     console.log('🎒 Слотов в инвентаре: ' + appData.skins.length);
     console.log('🔐 Секретная комбинация: нажми 4 раза "A" на клавиатуре!');
@@ -1873,4 +1725,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 </body>
-</html> 
+</html>
