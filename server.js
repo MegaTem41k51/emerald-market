@@ -94,8 +94,13 @@ app.post('/api/get-inventory', async (req, res) => {
         }
 
         // 2. Получаем ВСЕ предметы из инвентаря (CS2 appid=730, contextid=2)
-        const inventoryUrl = `https://steamcommunity.com/inventory/${steamId}/730/2?l=english&count=2000`;
-        const inventoryResponse = await axios.get(inventoryUrl);
+        // ИСПРАВЛЕНИЕ: Снижаем count до 1000 и добавляем User-Agent
+        const inventoryUrl = `https://steamcommunity.com/inventory/${steamId}/730/2?l=english&count=1000`;
+        const inventoryResponse = await axios.get(inventoryUrl, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            }
+        });
         
         const inventory = inventoryResponse.data;
         
