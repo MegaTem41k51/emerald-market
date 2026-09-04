@@ -7,13 +7,12 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ЗАМЕНИ ЭТО НА ТВОЙ КЛЮЧ ИЗ STEAM!
-const STEAM_API_KEY = 1D1E17D22BC69F0134219BBD500F9F76;
+// Обязательно создай переменную окружения STEAM_API_KEY на Render!
+const STEAM_API_KEY = process.env.STEAM_API_KEY;
 
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
 
-// Файл для хранения пользователей
 const DB_FILE = path.join(__dirname, 'users.json');
 let users = {};
 if (fs.existsSync(DB_FILE)) {
@@ -22,14 +21,12 @@ if (fs.existsSync(DB_FILE)) {
 
 function saveUsers() { fs.writeFileSync(DB_FILE, JSON.stringify(users, null, 2)); }
 
-// Конвертация ID
 function convertToSteamId64(steamId) {
     if (/^\d{17}$/.test(steamId)) return steamId;
     if (/^\d{1,10}$/.test(steamId)) return (BigInt(steamId) + 76561197960265728n).toString();
     return null;
 }
 
-// Привязка трейд-ссылки
 app.post('/api/bind-trade', async (req, res) => {
     const { tradeUrl, username } = req.body;
     if (!tradeUrl || !tradeUrl.includes('partner=')) return res.status(400).json({ error: 'Неверный формат Trade URL' });
@@ -55,7 +52,6 @@ app.post('/api/bind-trade', async (req, res) => {
     }
 });
 
-// Получение инвентаря
 app.post('/api/get-inventory', async (req, res) => {
     const { tradeUrl } = req.body;
 
@@ -67,14 +63,14 @@ app.post('/api/get-inventory', async (req, res) => {
     if (!steamId) return res.status(400).json({ error: 'Некорректный Steam ID' });
 
     try {
-        // Проверяем аккаунт
         const profileUrl = `https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${STEAM_API_KEY}&steamids=${steamId}`;
         const profileResponse = await axios.get(profileUrl);
         if (!profileResponse.data.response.players[0]) return res.status(404).json({ error: 'Профиль не найден' });
 
-        // ПРОБУЕМ ПОЛУЧИТЬ ИНВЕНТАРЬ ЧЕРЕЗ API С ЗАДЕРЖКОЙ
-        await new Promise(r => setTimeout(r, 2000)); // Ждём 2 секунды
-        const inventoryUrl = `https://steamcommunity.com/inventory/${steamId}/730/2?l=english&count=300`;
+        // ВАЖНО: Ждем 4.5 секунды, чтобы Steam не забанил IP
+        await new Promise(r => setTimeout(r, 4500));
+
+        const inventoryUrl = `https://steamcommunity.com/inventory/${steamId}/730/2?l=english&count=2000`;
         const inventoryResponse = await axios.get(inventoryUrl, {
             headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' }
         });
@@ -97,22 +93,7 @@ app.post('/api/get-inventory', async (req, res) => {
         res.json({ success: true, items });
     } catch (error) {
         console.error(error);
-        // Если Steam все еще банит API, используем резервный вариант (HTML)
-        try {
-            const pageUrl = `https://steamcommunity.com/profiles/${steamId}/inventory`;
-            const pageResponse = await axios.get(pageUrl, {
-                headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' }
-            });
-            // Проверяем, что страница загрузилась (это значит, что IP не в бане)
-            if (pageResponse.status === 200) {
-                // Если API забанен, но HTML загружается, просто возвращаем пустой список
-                // (Для реального парсинга нужен Cheerio, но это спасет от падения)
-                return res.status(200).json({ success: true, items: [], warning: 'API Steam временно недоступен, попробуйте через минуту.' });
-            }
-        } catch (pageError) {
-            console.error('HTML тоже заблокирован:', pageError.status);
-        }
-        res.status(500).json({ error: 'Не удалось получить инвентарь. Слишком много запросов! Перезапусти сервер и подожди 10 минут.' });
+        res.status(500).json({ error: 'Не удалось получить инвентарь. Перезапусти сервер и подожди 15 минут.' });
     }
 });
 
