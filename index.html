@@ -169,17 +169,6 @@
         body.light .footer-grid .col a { color: #666; }
         body.light .footer-grid .col a:hover { color: #2ecc71; }
         body.light .footer-bottom { color: #999; border-top-color: #d0d4da; }
-        body.light .modal-content { 
-            background: #f0f2f5; 
-            border-color: #d0d4da; 
-        }
-        body.light .modal-content h2 { color: #2ecc71; }
-        body.light .modal-content input { 
-            background: #e8ecf1; 
-            color: #333; 
-            border-color: #d0d4da; 
-        }
-        body.light .modal-content .error { color: #e74c3c; }
         body.light .online-counter {
             background: rgba(240, 242, 245, 0.9);
             border-color: #2ecc71;
@@ -304,7 +293,7 @@
 
         .user-profile { display: flex; align-items: center; gap: 10px; background: #1c1d23; padding: 4px 12px 4px 4px; border-radius: 30px; border: 1px solid #2c2e36; cursor: pointer; transition: 0.2s; }
         .user-profile:hover { border-color: #2ecc71; }
-        .user-profile .avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #0b0c10; flex-shrink: 0; background-size: cover; background-position: center; }
+        .user-profile .avatar { width: 32px; height: 32px; border-radius: 50%; background: #2ecc71; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #0b0c10; flex-shrink: 0; }
         .user-profile .username { font-size: 14px; font-weight: 500; color: #e4e6eb; }
         .user-profile .logout-btn { background: none; border: none; color: #8a8d99; cursor: pointer; font-size: 14px; padding: 0 4px; transition: 0.2s; }
         .user-profile .logout-btn:hover { color: #e74c3c; }
@@ -442,7 +431,7 @@
         .profile-login-box p { color: #8a8d99; font-size: 16px; margin-bottom: 24px; }
 
         .profile-header { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px 32px; display: flex; align-items: center; gap: 24px; margin-bottom: 24px; flex-wrap: wrap; }
-        .profile-avatar { width: 72px; height: 72px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; color: #0b0c10; flex-shrink: 0; background-size: cover; background-position: center; }
+        .profile-avatar { width: 72px; height: 72px; border-radius: 50%; background: #2ecc71; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; color: #0b0c10; flex-shrink: 0; }
         .profile-info h2 { font-size: 24px; }
         .profile-info .stats { display: flex; gap: 24px; margin-top: 4px; flex-wrap: wrap; }
         .profile-info .stats .stat { color: #8a8d99; font-size: 14px; }
@@ -1117,21 +1106,18 @@ function toggleRain(on) {
 }
 
 // ==========================================
-// ЛОГИКА STEAM АВТОРИЗАЦИИ (НИК + АВАТАРКА)
+// ЛОГИКА STEAM АВТОРИЗАЦИИ
 // ==========================================
-let currentUser = null;
+let currentUser = null; // Текущий пользователь Steam
 
+// Получаем данные пользователя с сервера при загрузке
 async function fetchUser() {
     try {
         const response = await fetch('/api/user');
         const data = await response.json();
         
         if (data.loggedIn) {
-            currentUser = {
-                id: data.user.id,
-                name: data.user.name,
-                avatar: data.user.avatar
-            };
+            currentUser = data.user;
             updateUserUI();
             renderProfile();
         } else {
@@ -1158,7 +1144,7 @@ function updateUserUI() {
                 <span id="langEn">EN</span>
             </div>
             <div class="user-profile" onclick="navigateTo('profile')">
-                <div class="avatar" style="background-image:url('${currentUser.avatar}'); background-size:cover; background-position:center;">${currentUser.name.charAt(0).toUpperCase()}</div>
+                <div class="avatar" style="background-image:url('${currentUser.avatar}'); background-size:cover;">${currentUser.name.charAt(0).toUpperCase()}</div>
                 <span class="username">${currentUser.name}</span>
                 <button class="logout-btn" onclick="event.stopPropagation(); logoutUser()">✕</button>
             </div>
@@ -1309,12 +1295,13 @@ function formatPrice(price) {
 }
 
 // ==========================================
-// ЛОГИКА ПРОДАЖИ
+// ЛОГИКА ПРОДАЖИ (СТАРАЯ, НО С ДОСТУПОМ ЧЕРЕЗ СЕРВЕР)
 // ==========================================
 let userInventory = [];
 let selectedSteamSkins = [];
 
 async function loadSteamInventory() {
+    // Проверяем, авторизован ли пользователь
     if (!currentUser) {
         alert('Пожалуйста, войдите через Steam!');
         window.location.href = '/auth/steam';
@@ -1328,7 +1315,7 @@ async function loadSteamInventory() {
         const response = await fetch('/api/get-inventory', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({})
+            body: JSON.stringify({}) // Сервер сам берет Steam ID из сессии
         });
 
         const data = await response.json();
@@ -1379,6 +1366,7 @@ function toggleSteamSkinSelection(index) {
 }
 
 function sellSelectedSkins() {
+    // Проверяем, авторизован ли пользователь
     if (!currentUser) {
         alert('Пожалуйста, войдите через Steam!');
         window.location.href = '/auth/steam';
@@ -1468,24 +1456,16 @@ function renderMarketSkins() {
 }
 
 // ==========================================
-// PROFILE (с Steam ником и аватаркой)
+// PROFILE (Теперь для Steam)
 // ==========================================
 function renderProfile() {
     if (currentUser) {
         document.getElementById('profileLoginBox').style.display = 'none';
         document.getElementById('profileContent').style.display = 'block';
-        
+        document.getElementById('profileAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+        document.getElementById('profileAvatar').style.backgroundImage = `url('${currentUser.avatar}')`;
+        document.getElementById('profileAvatar').style.backgroundSize = 'cover';
         document.getElementById('profileName').textContent = currentUser.name;
-        
-        if (currentUser.avatar) {
-            document.getElementById('profileAvatar').style.backgroundImage = `url('${currentUser.avatar}')`;
-            document.getElementById('profileAvatar').style.backgroundSize = 'cover';
-            document.getElementById('profileAvatar').style.backgroundPosition = 'center';
-            document.getElementById('profileAvatar').textContent = '';
-        } else {
-            document.getElementById('profileAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
-        }
-
         document.getElementById('profileTradeUrl').value = appData.profile.tradeUrl || '';
         applyTheme();
         toggleRain(appData.rainEnabled);
@@ -1599,7 +1579,7 @@ function renderAdminUsers() {
 // ==========================================
 document.addEventListener('DOMContentLoaded', function() {
     loadData();
-    fetchUser();
+    fetchUser(); // Загружаем Steam пользователя
 
     document.getElementById('logoLink').addEventListener('click', function(e) {
         e.preventDefault();
