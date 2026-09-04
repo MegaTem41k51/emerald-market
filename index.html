@@ -321,6 +321,19 @@
         .page { display: none; padding: 30px 0 60px; position: relative; z-index: 1; }
         .page.active { display: block; }
 
+        /* Стили для новых страниц */
+        .static-page { max-width: 800px; margin: 0 auto; }
+        .static-page h1 { font-size: 32px; color: #2ecc71; margin-bottom: 24px; }
+        .static-page h2 { font-size: 20px; color: #2ecc71; margin-top: 24px; margin-bottom: 12px; }
+        .static-page p { line-height: 1.7; color: #b2b4bb; margin-bottom: 12px; }
+        .static-page ul, .static-page ol { padding-left: 20px; margin-bottom: 16px; color: #b2b4bb; line-height: 1.7; }
+        .static-page a { color: #2ecc71; text-decoration: none; }
+        .static-page a:hover { text-decoration: underline; }
+        
+        .qr-container { text-align: center; margin: 20px 0; padding: 20px; background: #14161c; border: 1px solid #26282f; border-radius: 12px; }
+        .qr-container img { max-width: 300px; border-radius: 8px; }
+        .bold-warning { font-weight: 900; color: #e74c3c; font-size: 18px; text-align: center; margin: 20px 0; }
+
         .sell-wrapper { display: flex; gap: 30px; align-items: flex-start; }
         .sell-sidebar { width: 280px; min-width: 280px; background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 20px; position: sticky; top: 80px; }
         .sell-sidebar .title { font-size: 20px; font-weight: 700; color: #2ecc71; margin-bottom: 4px; }
@@ -329,14 +342,14 @@
         .sell-sidebar .trade-label { color: #8a8d99; font-size: 13px; display: block; margin-bottom: 4px; }
         .sell-sidebar .trade-input { width: 100%; background: #1c1d23; border: 1px solid #2c2e36; color: #e4e6eb; padding: 10px 12px; border-radius: 6px; font-size: 13px; outline: none; margin-bottom: 16px; }
         .sell-sidebar .trade-input:focus { border-color: #2ecc71; }
-        .sell-sidebar .min-withdraw { color: #8a8d99; font-size: 12px; margin-top: 8px; }
+        .sell-sidebar .min-withdraw { color: #8a8d99; font-size: 12px; margin-top: 8px; line-height: 1.5; }
+        .sell-sidebar .vpn-warning { color: #e74c3c; font-size: 12px; font-weight: 700; margin-bottom: 16px; }
 
         .sell-content { flex: 1; }
         .sell-content .top-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
         .sell-content .top-bar .select-all { color: #8a8d99; font-size: 13px; cursor: pointer; }
         .sell-content .top-bar .select-all:hover { color: #2ecc71; }
 
-        /* Стили для карточек продажи (с чекбоксами) */
         .sell-skin-grid { 
             display: grid; 
             grid-template-columns: repeat(4, 1fr); 
@@ -546,6 +559,80 @@
     </div>
 </section>
 
+<!-- СТРАНИЦА О НАС -->
+<div class="page" id="aboutPage">
+    <div class="container static-page">
+        <h1>➡ ИНФОРМАЦИЯ ПО ЦЕНАМ ⬅</h1>
+        
+        <h2>Условия выкупа</h2>
+        <ul>
+            <li>✅ Работаем 24/7. Выплачиваем мгновенно!</li>
+            <li>✅ Ликвидные скины от 1к до 20к - 80% от автобая csmarket (больше 50 продаж на маркете за неделю)</li>
+            <li>✅ Ликвидные скины от 20к до 50к - 77% от автобая csmarket (больше 30 продаж в неделю)</li>
+            <li>✅ Ликвидные скины до 1000 рублей - 75% от автобая csmarket (больше 50 продаж на маркете за неделю)</li>
+            <li>✅ Если ваш скин в трейд бане - то минус 1.5% от автобая csmarket за каждый день бана</li>
+            <li>✅ Кейсы - 80% от автобая csmarket</li>
+            <li>✔ Все остальные скины - обсуждаются индивидуально!</li>
+            <li>❌ Не покупаем скины из новых коллекций!</li>
+            <li>💵 Выплачиваем мгновенно! По СБП (в любой банк РФ) или на крипту.</li>
+        </ul>
+        
+        <p>➖</p>
+        
+        <p>💬 Чат канала - <a href="https://t.me/+7243grpklsozMDEy" target="_blank">https://t.me/+7243grpklsozMDEy</a></p>
+        <p>📖 Пост для отзывов - <a href="https://t.me/emerald_mrkt/14" target="_blank">https://t.me/emerald_mrkt/14</a></p>
+        <p>❓ По всем вопросам обращаться в ЛИЧНЫЕ СООБЩЕНИЯ ГРУППЫ - <a href="https://t.me/emerald_mrkt?direct" target="_blank">https://t.me/emerald_mrkt?direct</a></p>
+    </div>
+</div>
+
+<!-- СТРАНИЦА КОНТАКТЫ -->
+<div class="page" id="contactsPage">
+    <div class="container static-page">
+        <h1>Контакты</h1>
+        
+        <!-- ТУТ ВСТАВЬ ССЫЛКУ НА СВОЮ КАРТИНКУ С QR-КОДОМ В src="" -->
+        <div class="qr-container">
+            <img src="https://ibb.co/G3pz6B2F" alt="QR Code @EMERALD_MRKT">
+        </div>
+        
+        <p style="text-align:center; font-weight:700; font-size:20px; margin-bottom:30px;">@EMERALD_MRKT</p>
+        
+        <p style="text-align:center; line-height:2;">
+            <a href="https://t.me/emerald_mrkt?direct" target="_blank">ЛИЧНЫЕ СООБЩЕНИЯ ГРУППЫ - https://t.me/emerald_mrkt?direct</a><br><br>
+            <a href="https://t.me/ikiawka" target="_blank">НАПИСАТЬ МНЕ ЛИЧНО - https://t.me/ikiawka</a>
+        </p>
+    </div>
+</div>
+
+<!-- СТРАНИЦА FAQ -->
+<div class="page" id="faqPage">
+    <div class="container static-page">
+        <h1>Как это работает</h1>
+        <p>EMERALD Market — площадка для продажи скинов из CS2</p>
+        <p>💡 Выплата по сделке производится через 8 дней с момента подтверждения обмена в Steam.</p>
+        
+        <h2>Шаг 1</h2>
+        <p>Авторизация через Steam. Авторизуйся через свой аккаунт в Steam на сайте EMERALD Market.</p>
+        
+        <h2>Шаг 2</h2>
+        <p>Выбор предметов. Открой свой инвентарь и выбери предметы для продажи.</p>
+        
+        <h2>Шаг 3</h2>
+        <p>Выбор способа получения денег. Выбери способ получения денег (USDT, карта).</p>
+        
+        <h2>Шаг 4</h2>
+        <p>Подтверждение сделки. Проверь данные и подтверди сделку.</p>
+    </div>
+</div>
+
+<!-- СТРАНИЦА ГАРАНТИИ / ПОЛИТИКА -->
+<div class="page" id="policyPage">
+    <div class="container static-page">
+        <h1>Гарантии и Политика</h1>
+        <div class="bold-warning">В РАЗРАБОТКЕ</div>
+    </div>
+</div>
+
 <div class="page" id="sellPage">
     <div class="container">
         <h2 style="font-size:24px; font-weight:700; margin-bottom:4px;" data-key="sell_title">ПРОДАТЬ СКИНЫ</h2>
@@ -556,6 +643,12 @@
                 <div class="subtitle"><a href="https://steamcommunity.com/id/me/tradeoffers/privacy#trade_offer_access_url" target="_blank" data-key="sell_where">Где взять?</a></div>
                 <label class="trade-label" data-key="sell_enter_url">Введите ваш Trade URL</label>
                 <input class="trade-input" id="sellTradeUrl" placeholder="https://steamcommunity.com/tradeoffer/new/?pa..." onchange="saveTradeUrl()">
+                
+                <!-- НАДПИСЬ ПРО VPN -->
+                <div class="vpn-warning" style="color:#e74c3c; font-weight:700; font-size:12px; margin-bottom:16px;">
+                    ⚠️ ОБЯЗАТЕЛЬНО ВКЛЮЧИТЕ VPN ДЛЯ ПЕРЕНАПРАВЛЕНИЯ В ЛИЧНЫЕ СООБЩЕНИЯ
+                </div>
+
                 <div class="min-withdraw" data-key="sell_closed">Выберите скины и отправьте заявку в Telegram!</div>
             </div>
             <div class="sell-content">
@@ -564,7 +657,6 @@
                     <span style="color:#8a8d99; font-size:13px;"><span data-key="sell_total">Итого</span>: <span id="sellTotalPrice">0 ₽</span></span>
                 </div>
                 
-                <!-- КНОПКА ПРОДАЖИ В TELEGRAM -->
                 <button class="btn btn-success" style="width:100%; margin-bottom:20px; padding:14px; font-size:16px;" onclick="sellSelectedSkins()">
                     🚀 Продать выбранные скины
                 </button>
@@ -771,9 +863,8 @@
 <footer class="footer">
     <div class="container">
         <div class="footer-grid">
-            <div class="col"><h4>EMERALDMarket</h4><a data-key="footer_about">О нас</a><a data-key="footer_contacts">Контакты</a></div>
-            <div class="col"><h4 data-key="footer_catalog">Каталог</h4><a data-page="market" data-key="footer_knives">Ножи</a><a data-page="market" data-key="footer_gloves">Перчатки</a><a data-page="market" data-key="footer_stickers">Стикеры</a></div>
-            <div class="col"><h4 data-key="footer_help">Помощь</h4><a data-key="footer_faq">FAQ</a><a data-key="footer_guarantees">Гарантии</a><a data-key="footer_policy">Политика</a></div>
+            <div class="col"><h4>EMERALDMarket</h4><a data-page="about" data-key="footer_about">О нас</a><a data-page="contacts" data-key="footer_contacts">Контакты</a></div>
+            <div class="col"><h4 data-key="footer_help">Помощь</h4><a data-page="faq" data-key="footer_faq">FAQ</a><a data-page="policy" data-key="footer_policy">Гарантии и Политика</a></div>
         </div>
         <div class="footer-bottom">© 2025-2026 EMERALDMarket. Все права защищены.</div>
     </div>
@@ -905,14 +996,9 @@ const translations = {
         admin_users: 'Зарегистрированные пользователи',
         footer_about: 'О нас',
         footer_contacts: 'Контакты',
-        footer_catalog: 'Каталог',
-        footer_knives: 'Ножи',
-        footer_gloves: 'Перчатки',
-        footer_stickers: 'Стикеры',
         footer_help: 'Помощь',
         footer_faq: 'FAQ',
-        footer_guarantees: 'Гарантии',
-        footer_policy: 'Политика',
+        footer_policy: 'Гарантии и Политика',
         modal_login_title: 'Вход через Telegram',
         modal_login_desc: 'Введите логин и пароль',
         modal_login_error: 'Неверный логин или пароль',
@@ -998,14 +1084,9 @@ const translations = {
         admin_users: 'Registered users',
         footer_about: 'About',
         footer_contacts: 'Contacts',
-        footer_catalog: 'Catalog',
-        footer_knives: 'Knives',
-        footer_gloves: 'Gloves',
-        footer_stickers: 'Stickers',
         footer_help: 'Help',
         footer_faq: 'FAQ',
-        footer_guarantees: 'Guarantees',
-        footer_policy: 'Policy',
+        footer_policy: 'Guarantees & Policy',
         modal_login_title: 'Login via Telegram',
         modal_login_desc: 'Enter login and password',
         modal_login_error: 'Invalid login or password',
@@ -1258,7 +1339,7 @@ function toggleFilter(name) {
 }
 
 // ==========================================
-// НАВИГАЦИЯ
+// НАВИГАЦИЯ (ОБНОВЛЕНА ДЛЯ НОВЫХ СТРАНИЦ)
 // ==========================================
 function navigateTo(page) {
     if (page === 'hero') {
@@ -1269,15 +1350,18 @@ function navigateTo(page) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
     }
+    
     document.getElementById('heroPage').classList.remove('active');
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const target = document.getElementById(page + 'Page');
     if (target) target.classList.add('active');
     document.querySelectorAll('.nav a').forEach(a => a.classList.toggle('active', a.dataset.page === page));
+    
     if (page === 'sell') renderSellSkins();
     else if (page === 'market') renderMarketSkins();
     else if (page === 'profile') renderProfile();
     else if (page === 'admin') { renderAdminSkins(); renderAdminUsers(); }
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1296,7 +1380,6 @@ function formatPrice(price) {
 // ==========================================
 let selectedSkinsForSale = [];
 
-// Функция для отображения скинов на странице "Продать" (с чекбоксами)
 function renderSellSkins() {
     const grid = document.getElementById('sellSkinGrid');
     
@@ -1326,7 +1409,6 @@ function renderSellSkins() {
     document.getElementById('selectAllSkins').textContent = (currentLang === 'ru' ? 'Выбрано' : 'Selected') + ` (${selectedSkinsForSale.length})`;
 }
 
-// Функция выбора скина
 function toggleSkinSelection(index) {
     const skin = appData.skins[index];
     const idxInArray = selectedSkinsForSale.findIndex(s => s.id === skin.id);
@@ -1343,7 +1425,6 @@ function toggleSkinSelection(index) {
     renderSellSkins();
 }
 
-// Функция "Продать выбранное"
 function sellSelectedSkins() {
     const tradeUrl = document.getElementById('sellTradeUrl').value.trim();
 
@@ -1361,10 +1442,12 @@ function sellSelectedSkins() {
     saveData();
 
     const skinNames = selectedSkinsForSale.map(s => s.name).join(', ');
-    const message = `Привет! У меня есть скины: ${skinNames}.\nМой Trade URL: ${tradeUrl}\nТрейд-бана нет. Я предлагаю свою стоимость, а ты свою. Давай договариваться!`;
+    
+    // ОБНОВЛЕННЫЙ ТЕКСТ СООБЩЕНИЯ (БЕЗ ТВОЕГО ТРЕЙДА)
+    const message = `Привет! У меня есть скины: ${skinNames}.\nТрейд-бана нет. Я предлагаю свою стоимость, а ты свою. Давай договариваться! Если ты согласен — жду твой трейд!`;
     const encodedMessage = encodeURIComponent(message);
 
-    window.open(`https://t.me/ikiawka?text=${encodedMessage}`, '_blank');
+    window.open(`https://t.me/emerald_mrkt?text=${encodedMessage}`, '_blank');
     
     selectedSkinsForSale = [];
     renderSellSkins();
