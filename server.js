@@ -128,4 +128,14 @@ app.post('/api/get-inventory', async (req, res) => {
     }
 });
 
+app.get('/test', async (req, res) => {
+    try {
+        const client = createAxiosWithProxy();
+        const response = await client.get('https://api.ipify.org?format=json');
+        res.json({ message: 'Прокси работает! Ваш IP:', ip: response.data.ip });
+    } catch (error) {
+        res.status(500).json({ message: 'Прокси НЕ работает', error: error.message });
+    }
+});
+
 app.listen(PORT, () => { console.log(`✅ Сервер запущен на порту ${PORT}`); });
