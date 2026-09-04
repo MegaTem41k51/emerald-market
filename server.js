@@ -1,16 +1,16 @@
 const express = require('express');
 const session = require('express-session');
+const FileStore = require('session-file-store')(session);
 const passport = require('passport');
 const SteamStrategy = require('passport-steam').Strategy;
 const axios = require('axios');
 const bodyParser = require('body-parser');
-const fs = require('fs');
 const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ВАЖНО: Добавь эти переменные на Render (Environment):
+// ВАЖНО: Добавь на Render в Environment:
 // BASE_URL = https://emerald-market-2.onrender.com
 // STEAM_API_KEY = твой_ключ
 // SESSION_SECRET = случайная_строка
@@ -22,7 +22,9 @@ const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
 
+// Храним сессии в файле, чтобы они не пропадали
 app.use(session({
+    store: new FileStore(),
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
@@ -40,16 +42,8 @@ passport.use(new SteamStrategy({
     realm: BASE_URL,
     apiKey: STEAM_API_KEY
 }, (identifier, profile, done) => {
-    // В profile есть id, displayName и photos (аватарки)
     return done(null, profile);
 }));
-
-const DB_FILE = path.join(__dirname, 'users.json');
-let users = {};
-if (fs.existsSync(DB_FILE)) {
-    users = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
-}
-function saveUsers() { fs.writeFileSync(DB_FILE, JSON.stringify(users, null, 2)); }
 
 app.get('/auth/steam', passport.authenticate('steam', { failureRedirect: '/' }));
 app.get('/auth/steam/return', passport.authenticate('steam', { failureRedirect: '/' }), (req, res) => {
@@ -62,7 +56,6 @@ app.get('/logout', (req, res) => {
     });
 });
 
-// Эндпоинт, который возвращает данные Steam на сайт
 app.get('/api/user', (req, res) => {
     if (req.user) {
         res.json({ 
