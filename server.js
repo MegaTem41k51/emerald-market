@@ -1,22 +1,80 @@
 const express = require('express');
+const session = require('express-session');
+const FileStore = require('session-file-store')(session);
+const passport = require('passport');
+const SteamStrategy = require('passport-steam').Strategy;
 const axios = require('axios');
 const bodyParser = require('body-parser');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// КРИТИЧЕСКИ ВАЖНО: Проверь, что эти переменные есть на Render!
+const STEAM_API_KEY = process.env.STEAM_API_KEY;
+const SESSION_SECRET = process.env.SESSION_SECRET || 'my_secret_123';
+const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
+
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
 
+// Сохраняем сессии в файл, чтобы не пропадали после перезапуска
+app.use(session({
+    store: new FileStore(),
+    secret: SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: process.env.NODE_ENV === 'production', maxAge: 1000 * 60 * 60 * 24 * 7 } // 7 дней
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser((user, done) => done(null, user));
+passport.deserializeUser((obj, done) => done(null, obj));
+
+passport.use(new SteamStrategy({
+    returnURL: `${BASE_URL}/auth/steam/return`,
+    realm: BASE_URL,
+    apiKey: STEAM_API_KEY
+}, (identifier, profile, done) => {
+    return done(null, profile);
+}));
+
+// МАРШРУТЫ АВТОРИЗАЦИИ
+app.get('/auth/steam', passport.authenticate('steam', { failureRedirect: '/' }));
+app.get('/auth/steam/return', passport.authenticate('steam', { failureRedirect: '/' }), (req, res) => {
+    res.redirect('/');
+});
+app.get('/logout', (req, res) => {
+    req.logout((err) => {
+        if (err) return next(err);
+        res.redirect('/');
+    });
+});
+
+// Эндпоинт, который возвращает Steam данные (ник + аватарка)
+app.get('/api/user', (req, res) => {
+    if (req.user) {
+        res.json({ 
+            loggedIn: true, 
+            user: { 
+                id: String(req.user.id), 
+                name: req.user.displayName, 
+                avatar: req.user.photos && req.user.photos[2] ? req.user.photos[2].value : ''
+            } 
+        });
+    } else {
+        res.json({ loggedIn: false });
+    }
+});
+
+// Получение инвентаря (только для авторизованных)
 app.post('/api/get-inventory', async (req, res) => {
-    const { tradeUrl } = req.body;
-
-    const partnerMatch = tradeUrl.match(/partner=(\d+)/);
-    if (!partnerMatch) return res.status(400).json({ error: 'Неверный формат Trade URL' });
-
-    const rawId = partnerMatch[1];
-    // Конвертация в SteamID64
-    const steamId = (BigInt(rawId) + 76561197960265728n).toString();
+    if (!req.user) {
+        return res.status(401).json({ error: 'Пожалуйста, войдите через Steam' });
+    }
+    const steamId = String(req.user.id);
 
     try {
         const inventoryUrl = `https://steamcommunity.com/inventory/${steamId}/730/2?l=english&count=1000`;
@@ -49,8 +107,8 @@ app.post('/api/get-inventory', async (req, res) => {
 
         res.json({ success: true, items });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Не удалось получить инвентарь. Проверьте, открыт ли он.' });
+        console.error('Ошибка при получении инвентаря:', error.message);
+        res.status(500).json({ error: 'Не удалось получить инвентарь. Проверьте, открыт ли ваш инвентарь.' });
     }
 });
 
