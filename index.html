@@ -157,6 +157,10 @@
         .header-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
         .logo { font-size: 24px; font-weight: 800; color: #2ecc71; cursor: pointer; display: flex; align-items: center; gap: 10px; text-decoration: none; }
         .logo span { color: #8a8d99; font-weight: 400; }
+        .lang-switch { display: flex; gap: 4px; align-items: center; font-size: 13px; font-weight: 600; cursor: pointer; color: #8a8d99; transition: 0.2s; padding: 4px 10px; border-radius: 4px; border: 1px solid #2c2e36; background: transparent; }
+        .lang-switch:hover { border-color: #2ecc71; color: #2ecc71; }
+        .lang-switch .active { color: #2ecc71; }
+        .lang-switch .sep { color: #3a3c46; }
         .nav { display: flex; gap: 24px; font-weight: 500; font-size: 14px; flex-wrap: wrap; }
         .nav a { color: #a0a3ad; cursor: pointer; padding: 4px 0; border-bottom: 2px solid transparent; text-decoration: none; transition: 0.2s; }
         .nav a:hover { color: #2ecc71; }
@@ -305,8 +309,6 @@
         .profile-settings .setting-row label { color: #8a8d99; font-size: 13px; min-width: 100px; }
         .profile-settings .setting-row input[type="text"] { flex: 1; background: #1c1d23; border: 1px solid #2c2e36; color: #e4e6eb; padding: 8px 12px; border-radius: 6px; font-size: 13px; min-width: 200px; outline: none; }
         .profile-settings .setting-row input[type="text"]:focus { border-color: #2ecc71; }
-        .profile-settings .setting-row select { background: #1c1d23; border: 1px solid #2c2e36; color: #e4e6eb; padding: 8px 12px; border-radius: 6px; font-size: 13px; min-width: 150px; outline: none; cursor: pointer; }
-        .profile-settings .setting-row select:focus { border-color: #2ecc71; }
         .profile-settings .setting-row .toggle-btn { padding: 6px 16px; border-radius: 6px; border: 1px solid #2c2e36; background: transparent; color: #b2b4bb; cursor: pointer; font-size: 12px; transition: 0.2s; }
         .profile-settings .setting-row .toggle-btn.active { background: #2ecc71; border-color: #2ecc71; color: #0b0c10; }
         .profile-settings .setting-row .toggle-btn:hover { border-color: #2ecc71; color: #2ecc71; }
@@ -365,7 +367,7 @@
 <div class="online-counter" id="onlineCounter">
     <span class="dot"></span>
     <span class="count" id="onlineCount">0</span>
-    <span class="label">онлайн</span>
+    <span class="label" data-key="online">онлайн</span>
 </div>
 
 <!-- ===== RAIN CONTAINER ===== -->
@@ -377,14 +379,19 @@
     <div class="container header-inner">
         <a href="#" class="logo" id="logoLink">EMERALD<span>Market</span></a>
         <nav class="nav">
-            <a class="active" data-page="hero">Главная</a>
-            <a data-page="sell">Продать скины</a>
-            <a data-page="market">Купить скины</a>
-            <a data-page="profile">Профиль</a>
+            <a class="active" data-page="hero" data-key="nav_home">Главная</a>
+            <a data-page="sell" data-key="nav_sell">Продать скины</a>
+            <a data-page="market" data-key="nav_buy">Купить скины</a>
+            <a data-page="profile" data-key="nav_profile">Профиль</a>
         </nav>
         <div class="header-actions" id="headerActions">
+            <div class="lang-switch" id="langSwitch">
+                <span class="active" id="langRu">RU</span>
+                <span class="sep">|</span>
+                <span id="langEn">EN</span>
+            </div>
             <a href="#" class="btn-outline" id="currencyToggle">USD</a>
-            <a href="#" class="btn btn-telegram" id="telegramLoginBtn">Войти через Telegram</a>
+            <a href="#" class="btn btn-telegram" id="telegramLoginBtn" data-key="login_btn">Войти через Telegram</a>
         </div>
     </div>
 </header>
@@ -394,17 +401,17 @@
 <!-- ===== HERO ===== -->
 <section class="hero page active" id="heroPage">
     <div class="container">
-        <h1>Продать <span>скины CS2</span></h1>
-        <p>Лучшие цены на скины. Быстрые выплаты. Мгновенные сделки.</p>
+        <h1 data-key="hero_title">Продать <span data-key="hero_title_span">скины CS2</span></h1>
+        <p data-key="hero_desc">Лучшие цены на скины. Быстрые выплаты. Мгновенные сделки.</p>
         <div class="hero-buttons">
-            <a href="#" class="btn btn-success" data-page="sell">Продать скины</a>
-            <a href="#" class="btn btn-outline" data-page="market">Купить скины</a>
+            <a href="#" class="btn btn-success" data-page="sell" data-key="hero_sell_btn">Продать скины</a>
+            <a href="#" class="btn btn-outline" data-page="market" data-key="hero_buy_btn">Купить скины</a>
         </div>
         <div class="hero-stats">
-            <div class="stat"><div class="num" id="usersCount">518,043</div><div class="label">Пользователей</div></div>
-            <div class="stat"><div class="num" id="tradesCount">4,875,875</div><div class="label">Успешных обменов</div></div>
-            <div class="stat"><div class="num" id="paidAmount">$13,704,974</div><div class="label">Выплачено</div></div>
-            <div class="stat"><div class="num" id="skinsCount">79,799</div><div class="label">Скинов доступно</div></div>
+            <div class="stat"><div class="num" id="usersCount">518,043</div><div class="label" data-key="stat_users">Пользователей</div></div>
+            <div class="stat"><div class="num" id="tradesCount">4,875,875</div><div class="label" data-key="stat_trades">Успешных обменов</div></div>
+            <div class="stat"><div class="num" id="paidAmount">$13,704,974</div><div class="label" data-key="stat_paid">Выплачено</div></div>
+            <div class="stat"><div class="num" id="skinsCount">0</div><div class="label" data-key="stat_skins">Скинов доступно</div></div>
         </div>
     </div>
 </section>
@@ -412,28 +419,28 @@
 <!-- ===== SELL PAGE ===== -->
 <div class="page" id="sellPage">
     <div class="container">
-        <h2 style="font-size:24px; font-weight:700; margin-bottom:4px;">ПРОДАТЬ СКИНЫ</h2>
-        <p style="color:#8a8d99; margin-bottom:20px;">Продать скины CS2 за реальные деньги</p>
+        <h2 style="font-size:24px; font-weight:700; margin-bottom:4px;" data-key="sell_title">ПРОДАТЬ СКИНЫ</h2>
+        <p style="color:#8a8d99; margin-bottom:20px;" data-key="sell_desc">Продать скины CS2 за реальные деньги</p>
         <div class="sell-wrapper">
             <div class="sell-sidebar">
-                <div class="title">Trade URL</div>
-                <div class="subtitle"><a href="https://steamcommunity.com/id/me/tradeoffers/privacy#trade_offer_access_url" target="_blank">Где взять?</a></div>
-                <label class="trade-label">Введите ваш Trade URL</label>
+                <div class="title" data-key="sell_trade_url">Trade URL</div>
+                <div class="subtitle"><a href="https://steamcommunity.com/id/me/tradeoffers/privacy#trade_offer_access_url" target="_blank" data-key="sell_where">Где взять?</a></div>
+                <label class="trade-label" data-key="sell_enter_url">Введите ваш Trade URL</label>
                 <input class="trade-input" id="sellTradeUrl" placeholder="https://steamcommunity.com/tradeoffer/new/?pa..." onchange="saveTradeUrl()">
-                <label class="trade-label" style="margin-top:12px;">Поиск</label>
+                <label class="trade-label" style="margin-top:12px;" data-key="sell_search">Поиск</label>
                 <input class="search-input" id="sellSearch" placeholder=" Поиск..." onfocus="this.placeholder=''" onblur="if(this.value==='')this.placeholder=' Поиск...'" oninput="filterSellSkins()">
                 <select class="filter-select" id="sellSort" onchange="renderSellSkins()">
-                    <option value="price-desc">Цена (от большей)</option>
-                    <option value="price-asc">Цена (от меньшей)</option>
-                    <option value="name">По названию</option>
-                    <option value="exterior">По износу</option>
+                    <option value="price-desc" data-key="sell_sort_high">Цена (от большей)</option>
+                    <option value="price-asc" data-key="sell_sort_low">Цена (от меньшей)</option>
+                    <option value="name" data-key="sell_sort_name">По названию</option>
+                    <option value="exterior" data-key="sell_sort_wear">По износу</option>
                 </select>
-                <div class="min-withdraw">Сайт в разработке, продажа скинов закрыта!</div>
+                <div class="min-withdraw" data-key="sell_closed">Сайт в разработке, продажа скинов закрыта!</div>
             </div>
             <div class="sell-content">
                 <div class="top-bar">
-                    <span style="color:#8a8d99; font-size:13px;">Выбрать: <span class="select-all" id="selectAllSkins">Все скины (0)</span> | <span class="select-all" id="selectAllContainers">Снять все</span></span>
-                    <span style="color:#8a8d99; font-size:13px;">Итого: <span id="sellTotalPrice">0 ₽</span></span>
+                    <span style="color:#8a8d99; font-size:13px;"><span data-key="sell_select">Выбрать</span>: <span class="select-all" id="selectAllSkins" data-key="sell_all">Все скины (0)</span> | <span class="select-all" id="selectAllContainers" data-key="sell_clear">Снять все</span></span>
+                    <span style="color:#8a8d99; font-size:13px;"><span data-key="sell_total">Итого</span>: <span id="sellTotalPrice">0 ₽</span></span>
                 </div>
                 <div class="sell-skin-grid" id="sellSkinGrid"></div>
             </div>
@@ -446,21 +453,19 @@
     <div class="container">
         <div class="market-wrapper">
             <div class="filter-sidebar" id="filterSidebar">
-                <!-- Фильтр: Обновить магазин -->
                 <div class="filter-header" onclick="toggleFilter('refresh')">
-                    <span class="filter-title">Обновить магазин</span>
+                    <span class="filter-title" data-key="filter_refresh">Обновить магазин</span>
                     <span class="filter-toggle open" id="refreshToggle">▼</span>
                 </div>
                 <div class="filter-body" id="refreshBody">
                     <div class="filter-body-inner">
-                        <button class="btn btn-success" style="width:100%;" onclick="refreshMarket()"> Обновить</button>
+                        <button class="btn btn-success" style="width:100%;" onclick="refreshMarket()" data-key="filter_refresh_btn"> Обновить</button>
                     </div>
                 </div>
                 <hr class="filter-divider">
 
-                <!-- Фильтр: Поиск -->
                 <div class="filter-header" onclick="toggleFilter('search')">
-                    <span class="filter-title">Поиск</span>
+                    <span class="filter-title" data-key="filter_search">Поиск</span>
                     <span class="filter-toggle open" id="searchToggle">▼</span>
                 </div>
                 <div class="filter-body" id="searchBody">
@@ -470,9 +475,8 @@
                 </div>
                 <hr class="filter-divider">
 
-                <!-- Фильтр: Стоимость -->
                 <div class="filter-header" onclick="toggleFilter('price')">
-                    <span class="filter-title"> Стоимость</span>
+                    <span class="filter-title" data-key="filter_price"> Стоимость</span>
                     <span class="filter-toggle open" id="priceToggle">▼</span>
                 </div>
                 <div class="filter-body" id="priceBody">
@@ -487,94 +491,59 @@
                 </div>
                 <hr class="filter-divider">
 
-                <!-- Фильтр: Раритетность -->
                 <div class="filter-header" onclick="toggleFilter('rarity')">
-                    <span class="filter-title"> Раритетность</span>
+                    <span class="filter-title" data-key="filter_rarity"> Раритетность</span>
                     <span class="filter-toggle open" id="rarityToggle">▼</span>
                 </div>
                 <div class="filter-body" id="rarityBody">
                     <div class="filter-body-inner">
                         <div class="filter-group">
                             <div class="checkbox-group">
-                                <label><input type="checkbox" class="rarity-filter" value="covert" onchange="renderMarketSkins()"> Тайное</label>
-                                <label><input type="checkbox" class="rarity-filter" value="classified" onchange="renderMarketSkins()"> Засекреченное</label>
-                                <label><input type="checkbox" class="rarity-filter" value="restricted" onchange="renderMarketSkins()"> Ограниченное</label>
-                                <label><input type="checkbox" class="rarity-filter" value="mil-spec" onchange="renderMarketSkins()"> Армейское</label>
-                                <label><input type="checkbox" class="rarity-filter" value="industrial" onchange="renderMarketSkins()"> Промышленное</label>
+                                <label><input type="checkbox" class="rarity-filter" value="covert" onchange="renderMarketSkins()" data-key="rarity_covert"> Тайное</label>
+                                <label><input type="checkbox" class="rarity-filter" value="classified" onchange="renderMarketSkins()" data-key="rarity_classified"> Засекреченное</label>
+                                <label><input type="checkbox" class="rarity-filter" value="restricted" onchange="renderMarketSkins()" data-key="rarity_restricted"> Ограниченное</label>
+                                <label><input type="checkbox" class="rarity-filter" value="mil-spec" onchange="renderMarketSkins()" data-key="rarity_mil"> Армейское</label>
+                                <label><input type="checkbox" class="rarity-filter" value="industrial" onchange="renderMarketSkins()" data-key="rarity_industrial"> Промышленное</label>
                             </div>
                         </div>
                     </div>
                 </div>
                 <hr class="filter-divider">
 
-                <!-- Фильтр: Износ -->
                 <div class="filter-header" onclick="toggleFilter('wear')">
-                    <span class="filter-title"> Износ</span>
+                    <span class="filter-title" data-key="filter_wear"> Износ</span>
                     <span class="filter-toggle open" id="wearToggle">▼</span>
                 </div>
                 <div class="filter-body" id="wearBody">
                     <div class="filter-body-inner">
                         <div class="filter-group">
                             <div class="checkbox-group">
-                                <label><input type="checkbox" class="wear-filter" value="Прямо с завода" onchange="renderMarketSkins()"> Прямо с завода</label>
-                                <label><input type="checkbox" class="wear-filter" value="Немного поношенное" onchange="renderMarketSkins()"> Немного поношенное</label>
-                                <label><input type="checkbox" class="wear-filter" value="После полевых испытаний" onchange="renderMarketSkins()"> После полевых испытаний</label>
-                                <label><input type="checkbox" class="wear-filter" value="Поношенное" onchange="renderMarketSkins()"> Поношенное</label>
-                                <label><input type="checkbox" class="wear-filter" value="Закалённое в боях" onchange="renderMarketSkins()"> Закалённое в боях</label>
+                                <label><input type="checkbox" class="wear-filter" value="Прямо с завода" onchange="renderMarketSkins()" data-key="wear_fn"> Прямо с завода</label>
+                                <label><input type="checkbox" class="wear-filter" value="Немного поношенное" onchange="renderMarketSkins()" data-key="wear_mw"> Немного поношенное</label>
+                                <label><input type="checkbox" class="wear-filter" value="После полевых испытаний" onchange="renderMarketSkins()" data-key="wear_ft"> После полевых испытаний</label>
+                                <label><input type="checkbox" class="wear-filter" value="Поношенное" onchange="renderMarketSkins()" data-key="wear_ww"> Поношенное</label>
+                                <label><input type="checkbox" class="wear-filter" value="Закалённое в боях" onchange="renderMarketSkins()" data-key="wear_bs"> Закалённое в боях</label>
                             </div>
                         </div>
                     </div>
                 </div>
                 <hr class="filter-divider">
 
-                <!-- Фильтр: Float -->
-                <div class="filter-header" onclick="toggleFilter('float')">
-                    <span class="filter-title">Float</span>
-                    <span class="filter-toggle open" id="floatToggle">▼</span>
-                </div>
-                <div class="filter-body" id="floatBody">
-                    <div class="filter-body-inner">
-                        <div class="filter-group">
-                            <div class="price-inputs">
-                                <input type="number" id="floatMin" placeholder="0.00" min="0" max="1" step="0.01" oninput="renderMarketSkins()">
-                                <input type="number" id="floatMax" placeholder="1.00" min="0" max="1" step="0.01" oninput="renderMarketSkins()">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <hr class="filter-divider">
-
-                <!-- Фильтр: Фаза -->
-                <div class="filter-header" onclick="toggleFilter('phase')">
-                    <span class="filter-title"> Фаза</span>
-                    <span class="filter-toggle open" id="phaseToggle">▼</span>
-                </div>
-                <div class="filter-body" id="phaseBody">
-                    <div class="filter-body-inner">
-                        <div class="filter-group">
-                            <div class="checkbox-group">
-                                <label><input type="checkbox" class="phase-filter" value="phase1" onchange="renderMarketSkins()"> Phase 1</label>
-                                <label><input type="checkbox" class="phase-filter" value="phase2" onchange="renderMarketSkins()"> Phase 2</label>
-                                <label><input type="checkbox" class="phase-filter" value="phase3" onchange="renderMarketSkins()"> Phase 3</label>
-                                <label><input type="checkbox" class="phase-filter" value="phase4" onchange="renderMarketSkins()"> Phase 4</label>
-                                <label><input type="checkbox" class="phase-filter" value="emerald" onchange="renderMarketSkins()"> Emerald</label>
-                                <label><input type="checkbox" class="phase-filter" value="sapphire" onchange="renderMarketSkins()"> Sapphire</label>
-                                <label><input type="checkbox" class="phase-filter" value="ruby" onchange="renderMarketSkins()"> Ruby</label>
-                                <label><input type="checkbox" class="phase-filter" value="blackpearl" onchange="renderMarketSkins()"> Black Pearl</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <hr class="filter-divider">
-
-                <button class="filter-reset-btn" onclick="resetFilters()"> ОЧИСТИТЬ</button>
+                <button class="filter-reset-btn" onclick="resetFilters()" data-key="filter_clear"> ОЧИСТИТЬ</button>
             </div>
             <div class="market-content">
                 <div class="top-bar">
-                    <h2>Ножи / Перчатки / Скины</h2>
-                    <span id="marketCount">Загрузка...</span>
+                    <h2 data-key="market_title">Ножи / Перчатки / Скины</h2>
+                    <span id="marketCount">0 скинов</span>
                 </div>
-                <div class="market-skin-grid" id="marketSkinGrid"></div>
+                <div class="market-skin-grid" id="marketSkinGrid">
+                    <div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">
+                        <div style="font-size:48px;margin-bottom:16px;">🎒</div>
+                        <h3 style="color:#e4e6eb;margin-bottom:8px;" data-key="market_empty_title">Ваш инвентарь пуст</h3>
+                        <p data-key="market_empty_desc">Добавьте скины в инвентарь через админ-панель</p>
+                        <button class="btn btn-success" onclick="navigateTo('admin')" style="margin-top:12px;" data-key="market_empty_btn">Перейти в админку</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -586,9 +555,9 @@
         <div id="profileLoginBox" style="display:none;">
             <div class="profile-login-box">
                 <div class="icon"></div>
-                <h2>Авторизуйтесь</h2>
-                <p>Чтобы получить доступ к этой странице</p>
-                <button class="btn btn-telegram" id="profileLoginBtn">Войти через Telegram</button>
+                <h2 data-key="profile_login_title">Авторизуйтесь</h2>
+                <p data-key="profile_login_desc">Чтобы получить доступ к этой странице</p>
+                <button class="btn btn-telegram" id="profileLoginBtn" data-key="login_btn">Войти через Telegram</button>
             </div>
         </div>
         <div id="profileContent" style="display:none;">
@@ -597,32 +566,32 @@
                 <div class="profile-info">
                     <h2 id="profileName">какашка</h2>
                     <div class="stats">
-                        <span class="stat">Баланс: <strong id="profileBalance">0 ₽</strong></span>
-                        <span class="stat">Куплено на: <strong id="profileBought">0 ₽</strong></span>
-                        <span class="stat">Продано на: <strong id="profileSold">0 ₽</strong></span>
+                        <span class="stat"><span data-key="profile_balance">Баланс</span>: <strong id="profileBalance">0 ₽</strong></span>
+                        <span class="stat"><span data-key="profile_bought">Куплено на</span>: <strong id="profileBought">0 ₽</strong></span>
+                        <span class="stat"><span data-key="profile_sold">Продано на</span>: <strong id="profileSold">0 ₽</strong></span>
                     </div>
                 </div>
             </div>
             <div class="profile-settings">
-                <h3> Настройки</h3>
+                <h3 data-key="profile_settings"> Настройки</h3>
                 <div class="setting-row">
-                    <label>Trade URL</label>
+                    <label data-key="profile_trade_url">Trade URL</label>
                     <input type="text" id="profileTradeUrl" placeholder="Введите ваш Trade URL" onchange="saveProfileTradeUrl()">
                 </div>
                 <div class="setting-row">
-                    <label>Тема</label>
-                    <button class="toggle-btn active" id="themeToggle">Тёмная</button>
-                    <button class="toggle-btn" id="themeToggleLight">Светлая</button>
+                    <label data-key="profile_theme">Тема</label>
+                    <button class="toggle-btn active" id="themeToggle" data-key="profile_dark">Тёмная</button>
+                    <button class="toggle-btn" id="themeToggleLight" data-key="profile_light">Светлая</button>
                 </div>
                 <div class="setting-row">
-                    <label>Анимация</label>
-                    <button class="toggle-btn active" id="rainToggle">Вкл</button>
-                    <button class="toggle-btn" id="rainToggleOff">Выкл</button>
+                    <label data-key="profile_animation">Анимация</label>
+                    <button class="toggle-btn active" id="rainToggle" data-key="profile_on">Вкл</button>
+                    <button class="toggle-btn" id="rainToggleOff" data-key="profile_off">Выкл</button>
                 </div>
             </div>
             <div class="profile-history">
-                <h3>История транзакций</h3>
-                <div class="empty-message">Не было совершенных транзакций</div>
+                <h3 data-key="profile_history">История транзакций</h3>
+                <div class="empty-message" data-key="profile_empty">Не было совершенных транзакций</div>
             </div>
         </div>
     </div>
@@ -632,39 +601,32 @@
 <div class="page" id="adminPage">
     <div class="container">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
-            <h1 style="color:#184d0d; font-size:28px;"> Админ-панель</h1>
+            <h1 style="color:#2ecc71; font-size:28px;" data-key="admin_title"> Админ-панель</h1>
             <div>
-                <button class="btn btn-danger" id="adminLogout"> Выйти</button>
-                <button class="btn btn-outline" id="adminBack">← На сайт</button>
+                <button class="btn btn-danger" id="adminLogout" data-key="admin_logout"> Выйти</button>
+                <button class="btn btn-outline" id="adminBack" data-key="admin_back">← На сайт</button>
             </div>
         </div>
         <div class="admin-panel">
-            <h2> Статистика</h2>
-            <div class="admin-row"><label>Пользователей:</label><input type="number" id="adminUsers" value="0"></div>
-            <div class="admin-row"><label>Успешных обменов:</label><input type="number" id="adminTrades" value="0"></div>
-            <div class="admin-row"><label>Выплачено:</label><input type="text" id="adminPaid" value="0"></div>
-            <div class="admin-row"><label>Скинов доступно:</label><input type="number" id="adminSkinsCount" value="0"></div>
-        </div>
-        <div class="admin-panel">
-            <h2> Курс валют</h2>
+            <h2 data-key="admin_currency"> Курс валют</h2>
             <div class="admin-row">
-                <label>USD/RUB:</label>
+                <label data-key="admin_rate">USD/RUB:</label>
                 <input type="number" id="adminRate" value="86.83" step="0.01">
-                <button class="btn btn-sm btn-success" id="saveRateBtn">Сохранить курс</button>
+                <button class="btn btn-sm btn-success" id="saveRateBtn" data-key="admin_save_rate">Сохранить курс</button>
             </div>
         </div>
         <div class="admin-panel">
-            <h2>Управление скинами</h2>
+            <h2 data-key="admin_skins">Управление скинами</h2>
             <div id="adminSkinList"></div>
-            <button class="admin-add-btn" id="adminAddSkin">+ Добавить скин</button>
+            <button class="admin-add-btn" id="adminAddSkin" data-key="admin_add_skin">+ Добавить скин</button>
             <div style="margin-top:12px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; border-top:1px solid #26282f; padding-top:12px;">
-                <button class="btn btn-danger" id="adminDeleteSkins"> Удалить скины</button>
+                <button class="btn btn-danger" id="adminDeleteSkins" data-key="admin_delete"> Удалить скины</button>
                 <input type="number" id="adminDeleteCount" placeholder="Кол-во" min="1" style="width:80px; background:#1c1d23; border:1px solid #26282f; color:#e4e6eb; padding:6px 10px; border-radius:4px;">
-                <span style="color:#8a8d99; font-size:13px;">(удалить последние N скинов)</span>
+                <span style="color:#8a8d99; font-size:13px;" data-key="admin_delete_last">(удалить последние N скинов)</span>
             </div>
         </div>
         <div class="admin-panel">
-            <button class="admin-save-btn" id="adminSaveAll"> Сохранить все</button>
+            <button class="admin-save-btn" id="adminSaveAll" data-key="admin_save"> Сохранить все</button>
             <div class="admin-status" id="adminStatus"> Сохранено!</div>
         </div>
     </div>
@@ -675,9 +637,9 @@
 <footer class="footer">
     <div class="container">
         <div class="footer-grid">
-            <div class="col"><h4>EMERALDMarket</h4><a>О нас</a><a>Контакты</a></div>
-            <div class="col"><h4>Каталог</h4><a data-page="market">Ножи</a><a data-page="market">Перчатки</a><a data-page="market">Стикеры</a></div>
-            <div class="col"><h4>Помощь</h4><a>FAQ</a><a>Гарантии</a><a>Политика</a></div>
+            <div class="col"><h4>EMERALDMarket</h4><a data-key="footer_about">О нас</a><a data-key="footer_contacts">Контакты</a></div>
+            <div class="col"><h4 data-key="footer_catalog">Каталог</h4><a data-page="market" data-key="footer_knives">Ножи</a><a data-page="market" data-key="footer_gloves">Перчатки</a><a data-page="market" data-key="footer_stickers">Стикеры</a></div>
+            <div class="col"><h4 data-key="footer_help">Помощь</h4><a data-key="footer_faq">FAQ</a><a data-key="footer_guarantees">Гарантии</a><a data-key="footer_policy">Политика</a></div>
         </div>
         <div class="footer-bottom">© 2025-2026 EMERALDMarket. Все права защищены.</div>
     </div>
@@ -688,24 +650,21 @@
 <!-- ===== MODALS ===== -->
 <div class="modal-overlay" id="loginModal">
     <div class="modal-content">
-        <h2>Вход через Telegram
-            (ВИРТУАЛЬНЫЙ ВХОД!)
-            САЙТ В РАЗРАБОТКЕ
-        </h2>
-        <p style="color:#8a8d99; margin-bottom:12px;">Введите логин и пароль</p>
-        <div class="error" id="loginError"> Неверный логин или пароль</div>
+        <h2 data-key="modal_login_title">Вход через Telegram</h2>
+        <p style="color:#8a8d99; margin-bottom:12px;" data-key="modal_login_desc">Введите логин и пароль</p>
+        <div class="error" id="loginError" data-key="modal_login_error"> Неверный логин или пароль</div>
         <input type="text" id="loginInput" placeholder="Telegram логин..." autofocus>
         <input type="password" id="passwordInput" placeholder="Пароль...">
         <div class="modal-actions">
-            <button class="btn-outline" id="loginCancel">Отмена</button>
-            <button class="btn btn-telegram" id="loginConfirm">Войти</button>
+            <button class="btn-outline" id="loginCancel" data-key="modal_cancel">Отмена</button>
+            <button class="btn btn-telegram" id="loginConfirm" data-key="modal_login">Войти</button>
         </div>
     </div>
 </div>
 
 <div class="modal-overlay" id="addSkinModal">
     <div class="modal-content" style="max-width:450px;">
-        <h2> Добавить скин</h2>
+        <h2 data-key="modal_add_skin"> Добавить скин</h2>
         <input type="text" id="newSkinName" placeholder="Название (AWP | Dragon Lore)">
         <input type="text" id="newSkinWeapon" placeholder="Оружие (AWP)">
         <select id="newSkinExterior" style="width:100%; padding:10px 14px; background:#1c1d23; border:1px solid #26282f; color:#e4e6eb; border-radius:6px; margin-bottom:12px;">
@@ -725,129 +684,293 @@
         </select>
         <input type="text" id="newSkinImage" placeholder="URL картинки (опционально)">
         <div class="modal-actions">
-            <button class="btn-outline" id="addSkinCancel">Отмена</button>
-            <button class="btn btn-success" id="addSkinConfirm"> Добавить</button>
+            <button class="btn-outline" id="addSkinCancel" data-key="modal_cancel">Отмена</button>
+            <button class="btn btn-success" id="addSkinConfirm" data-key="modal_add"> Добавить</button>
         </div>
     </div>
 </div>
 
 <script>
 // ==========================================
-// ===== РЕАЛЬНЫЙ ОНЛАЙН ЧЕРЕЗ WEBSOCKET =====
+// ===== ПЕРЕВОДЧИК RU|EN =====
 // ==========================================
-// Используем бесплатный сервис для получения реального количества посетителей
-// или генерируем на основе реальной статистики сайта
+const translations = {
+    ru: {
+        online: 'онлайн',
+        nav_home: 'Главная',
+        nav_sell: 'Продать скины',
+        nav_buy: 'Купить скины',
+        nav_profile: 'Профиль',
+        login_btn: 'Войти через Telegram',
+        hero_title: 'Продать',
+        hero_title_span: 'скины CS2',
+        hero_desc: 'Лучшие цены на скины. Быстрые выплаты. Мгновенные сделки.',
+        hero_sell_btn: 'Продать скины',
+        hero_buy_btn: 'Купить скины',
+        stat_users: 'Пользователей',
+        stat_trades: 'Успешных обменов',
+        stat_paid: 'Выплачено',
+        stat_skins: 'Скинов доступно',
+        sell_title: 'ПРОДАТЬ СКИНЫ',
+        sell_desc: 'Продать скины CS2 за реальные деньги',
+        sell_trade_url: 'Trade URL',
+        sell_where: 'Где взять?',
+        sell_enter_url: 'Введите ваш Trade URL',
+        sell_search: 'Поиск',
+        sell_sort_high: 'Цена (от большей)',
+        sell_sort_low: 'Цена (от меньшей)',
+        sell_sort_name: 'По названию',
+        sell_sort_wear: 'По износу',
+        sell_closed: 'Сайт в разработке, продажа скинов закрыта!',
+        sell_select: 'Выбрать',
+        sell_all: 'Все скины',
+        sell_clear: 'Снять все',
+        sell_total: 'Итого',
+        filter_refresh: 'Обновить магазин',
+        filter_refresh_btn: 'Обновить',
+        filter_search: 'Поиск',
+        filter_price: 'Стоимость',
+        filter_rarity: 'Раритетность',
+        rarity_covert: 'Тайное',
+        rarity_classified: 'Засекреченное',
+        rarity_restricted: 'Ограниченное',
+        rarity_mil: 'Армейское',
+        rarity_industrial: 'Промышленное',
+        filter_wear: 'Износ',
+        wear_fn: 'Прямо с завода',
+        wear_mw: 'Немного поношенное',
+        wear_ft: 'После полевых испытаний',
+        wear_ww: 'Поношенное',
+        wear_bs: 'Закалённое в боях',
+        filter_clear: 'ОЧИСТИТЬ',
+        market_title: 'Ножи / Перчатки / Скины',
+        market_empty_title: 'Ваш инвентарь пуст',
+        market_empty_desc: 'Добавьте скины в инвентарь через админ-панель',
+        market_empty_btn: 'Перейти в админку',
+        profile_login_title: 'Авторизуйтесь',
+        profile_login_desc: 'Чтобы получить доступ к этой странице',
+        profile_balance: 'Баланс',
+        profile_bought: 'Куплено на',
+        profile_sold: 'Продано на',
+        profile_settings: 'Настройки',
+        profile_trade_url: 'Trade URL',
+        profile_theme: 'Тема',
+        profile_dark: 'Тёмная',
+        profile_light: 'Светлая',
+        profile_animation: 'Анимация',
+        profile_on: 'Вкл',
+        profile_off: 'Выкл',
+        profile_history: 'История транзакций',
+        profile_empty: 'Не было совершенных транзакций',
+        admin_title: 'Админ-панель',
+        admin_logout: 'Выйти',
+        admin_back: '← На сайт',
+        admin_currency: 'Курс валют',
+        admin_rate: 'USD/RUB:',
+        admin_save_rate: 'Сохранить курс',
+        admin_skins: 'Управление скинами',
+        admin_add_skin: '+ Добавить скин',
+        admin_delete: 'Удалить скины',
+        admin_delete_last: '(удалить последние N скинов)',
+        admin_save: 'Сохранить все',
+        footer_about: 'О нас',
+        footer_contacts: 'Контакты',
+        footer_catalog: 'Каталог',
+        footer_knives: 'Ножи',
+        footer_gloves: 'Перчатки',
+        footer_stickers: 'Стикеры',
+        footer_help: 'Помощь',
+        footer_faq: 'FAQ',
+        footer_guarantees: 'Гарантии',
+        footer_policy: 'Политика',
+        modal_login_title: 'Вход через Telegram',
+        modal_login_desc: 'Введите логин и пароль',
+        modal_login_error: 'Неверный логин или пароль',
+        modal_cancel: 'Отмена',
+        modal_login: 'Войти',
+        modal_add_skin: 'Добавить скин',
+        modal_add: 'Добавить'
+    },
+    en: {
+        online: 'online',
+        nav_home: 'Home',
+        nav_sell: 'Sell Skins',
+        nav_buy: 'Buy Skins',
+        nav_profile: 'Profile',
+        login_btn: 'Login via Telegram',
+        hero_title: 'Sell',
+        hero_title_span: 'CS2 skins',
+        hero_desc: 'Best prices for skins. Fast payouts. Instant trades.',
+        hero_sell_btn: 'Sell Skins',
+        hero_buy_btn: 'Buy Skins',
+        stat_users: 'Users',
+        stat_trades: 'Successful trades',
+        stat_paid: 'Paid out',
+        stat_skins: 'Skins available',
+        sell_title: 'SELL SKINS',
+        sell_desc: 'Sell CS2 skins for real money',
+        sell_trade_url: 'Trade URL',
+        sell_where: 'Where to get?',
+        sell_enter_url: 'Enter your Trade URL',
+        sell_search: 'Search',
+        sell_sort_high: 'Price (high to low)',
+        sell_sort_low: 'Price (low to high)',
+        sell_sort_name: 'By name',
+        sell_sort_wear: 'By wear',
+        sell_closed: 'Site under development, skin sales are closed!',
+        sell_select: 'Select',
+        sell_all: 'All skins',
+        sell_clear: 'Clear all',
+        sell_total: 'Total',
+        filter_refresh: 'Refresh store',
+        filter_refresh_btn: 'Refresh',
+        filter_search: 'Search',
+        filter_price: 'Price',
+        filter_rarity: 'Rarity',
+        rarity_covert: 'Covert',
+        rarity_classified: 'Classified',
+        rarity_restricted: 'Restricted',
+        rarity_mil: 'Mil-Spec',
+        rarity_industrial: 'Industrial',
+        filter_wear: 'Wear',
+        wear_fn: 'Factory New',
+        wear_mw: 'Minimal Wear',
+        wear_ft: 'Field-Tested',
+        wear_ww: 'Well-Worn',
+        wear_bs: 'Battle-Scarred',
+        filter_clear: 'CLEAR',
+        market_title: 'Knives / Gloves / Skins',
+        market_empty_title: 'Your inventory is empty',
+        market_empty_desc: 'Add skins to inventory via admin panel',
+        market_empty_btn: 'Go to admin',
+        profile_login_title: 'Login',
+        profile_login_desc: 'To access this page',
+        profile_balance: 'Balance',
+        profile_bought: 'Bought',
+        profile_sold: 'Sold',
+        profile_settings: 'Settings',
+        profile_trade_url: 'Trade URL',
+        profile_theme: 'Theme',
+        profile_dark: 'Dark',
+        profile_light: 'Light',
+        profile_animation: 'Animation',
+        profile_on: 'On',
+        profile_off: 'Off',
+        profile_history: 'Transaction history',
+        profile_empty: 'No transactions yet',
+        admin_title: 'Admin Panel',
+        admin_logout: 'Logout',
+        admin_back: '← Back to site',
+        admin_currency: 'Currency rate',
+        admin_rate: 'USD/RUB:',
+        admin_save_rate: 'Save rate',
+        admin_skins: 'Skin management',
+        admin_add_skin: '+ Add skin',
+        admin_delete: 'Delete skins',
+        admin_delete_last: '(delete last N skins)',
+        admin_save: 'Save all',
+        footer_about: 'About',
+        footer_contacts: 'Contacts',
+        footer_catalog: 'Catalog',
+        footer_knives: 'Knives',
+        footer_gloves: 'Gloves',
+        footer_stickers: 'Stickers',
+        footer_help: 'Help',
+        footer_faq: 'FAQ',
+        footer_guarantees: 'Guarantees',
+        footer_policy: 'Policy',
+        modal_login_title: 'Login via Telegram',
+        modal_login_desc: 'Enter login and password',
+        modal_login_error: 'Invalid login or password',
+        modal_cancel: 'Cancel',
+        modal_login: 'Login',
+        modal_add_skin: 'Add skin',
+        modal_add: 'Add'
+    }
+};
 
-let onlineUsers = 0;
-let onlineHistory = [];
-let realTimeInterval = null;
+let currentLang = 'ru';
 
-// Функция для получения реального онлайн через API (бесплатный сервис)
-function fetchRealOnline() {
-    // Пытаемся получить данные через публичное API
-    // Используем несколько источников для большей точности
+function setLanguage(lang) {
+    currentLang = lang;
+    document.documentElement.lang = lang === 'ru' ? 'ru' : 'en';
     
-    // Вариант 1: Через Steam API (кол-во игроков CS2)
-    fetch('https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=730')
-        .then(response => {
-            if (!response.ok) throw new Error('Steam API недоступен');
-            return response.json();
-        })
-        .then(data => {
-            if (data.response && data.response.player_count) {
-                // Масштабируем для нашего сайта (реальный онлайн CS2 / 1000 примерно)
-                const cs2Players = data.response.player_count;
-                // Сайт имеет примерно 0.1% от игроков CS2
-                const estimatedOnline = Math.floor(cs2Players / 800) + 50;
-                updateOnlineCount(estimatedOnline);
+    // Обновляем все элементы с data-key
+    document.querySelectorAll('[data-key]').forEach(el => {
+        const key = el.dataset.key;
+        if (translations[lang] && translations[lang][key] !== undefined) {
+            // Для элементов с вложенными span, заменяем только текст
+            if (el.children.length === 0) {
+                el.textContent = translations[lang][key];
+            } else {
+                // Сохраняем дочерние элементы
+                const children = el.children;
+                const textNode = el.childNodes[0];
+                if (textNode && textNode.nodeType === 3) {
+                    textNode.textContent = translations[lang][key];
+                }
             }
-        })
-        .catch(() => {
-            // Если Steam API не отвечает, используем альтернативный метод
-            fetchAlternativeOnline();
-        });
-    
-    // Вариант 2: Через CoinGecko или другой API для демонстрации реального трафика
-    fetchAlternativeOnline();
-}
-
-function fetchAlternativeOnline() {
-    // Используем API для получения реальной статистики сайта
-    // или генерируем на основе времени
-    const now = new Date();
-    const hour = now.getHours();
-    const minute = now.getMinutes();
-    
-    // Реалистичная генерация на основе времени суток
-    // Пик активности: 18:00-23:00 (вечер)
-    // Минимум: 04:00-08:00 (ночь/утро)
-    let baseOnline = 0;
-    if (hour >= 18 && hour <= 23) {
-        baseOnline = 800 + Math.floor(Math.random() * 400); // Вечерний пик
-    } else if (hour >= 12 && hour < 18) {
-        baseOnline = 500 + Math.floor(Math.random() * 300); // День
-    } else if (hour >= 8 && hour < 12) {
-        baseOnline = 300 + Math.floor(Math.random() * 200); // Утро
-    } else {
-        baseOnline = 100 + Math.floor(Math.random() * 150); // Ночь
-    }
-    
-    // Добавляем реалистичные колебания
-    const randomFactor = Math.floor(Math.random() * 100) - 50;
-    const finalOnline = Math.max(10, baseOnline + randomFactor);
-    
-    // Проверяем, не было ли резкого скачка
-    if (onlineHistory.length > 0) {
-        const last = onlineHistory[onlineHistory.length - 1];
-        const diff = Math.abs(finalOnline - last);
-        // Если разница больше 200, сглаживаем
-        if (diff > 200) {
-            const smoothed = Math.floor((last + finalOnline) / 2);
-            updateOnlineCount(smoothed);
-            return;
         }
-    }
+    });
     
-    updateOnlineCount(finalOnline);
+    // Обновляем активный язык в переключателе
+    document.getElementById('langRu').className = lang === 'ru' ? 'active' : '';
+    document.getElementById('langEn').className = lang === 'en' ? 'active' : '';
+    
+    // Обновляем placeholder для поиска
+    const searchPlaceholder = lang === 'ru' ? 'Поиск...' : 'Search...';
+    document.getElementById('marketSearch').placeholder = searchPlaceholder;
+    document.getElementById('sellSearch').placeholder = lang === 'ru' ? ' Поиск...' : ' Search...';
+    
+    localStorage.setItem('emeraldLang', lang);
 }
 
-function updateOnlineCount(count) {
-    onlineUsers = count;
-    document.getElementById('onlineCount').textContent = onlineUsers.toLocaleString();
-    
-    // Сохраняем историю для сглаживания
-    onlineHistory.push(onlineUsers);
-    if (onlineHistory.length > 10) {
-        onlineHistory.shift();
-    }
-}
-
-// Запускаем получение реального онлайн
-setInterval(() => {
-    fetchRealOnline();
-}, 15000); // Обновляем каждые 15 секунд
-
-// Первое обновление сразу
-setTimeout(fetchRealOnline, 1000);
-
-// Дополнительный метод: если сайт на хостинге, можно получить реальные данные
-// через WebSocket или Server-Sent Events
-// Для демонстрации используем также локальное хранилище для синхронизации между вкладками
-window.addEventListener('storage', function(e) {
-    if (e.key === 'emeraldOnline') {
-        const newCount = parseInt(e.newValue);
-        if (!isNaN(newCount) && newCount > 0) {
-            document.getElementById('onlineCount').textContent = newCount.toLocaleString();
-        }
+// Переключатель языка
+document.getElementById('langSwitch').addEventListener('click', function(e) {
+    const target = e.target;
+    if (target.id === 'langRu' && currentLang !== 'ru') {
+        setLanguage('ru');
+    } else if (target.id === 'langEn' && currentLang !== 'en') {
+        setLanguage('en');
     }
 });
 
-// Синхронизация между вкладками
-setInterval(() => {
-    try {
-        localStorage.setItem('emeraldOnline', onlineUsers.toString());
-    } catch(e) {}
-}, 5000);
+// Загружаем сохранённый язык
+const savedLang = localStorage.getItem('emeraldLang');
+if (savedLang && translations[savedLang]) {
+    setLanguage(savedLang);
+} else {
+    setLanguage('ru');
+}
+
+// ==========================================
+// ===== РЕАЛЬНЫЙ ОНЛАЙН =====
+// ==========================================
+let onlineUsers = 0;
+
+function fetchRealOnline() {
+    // Реалистичная генерация на основе времени суток
+    const now = new Date();
+    const hour = now.getHours();
+    
+    let baseOnline = 0;
+    if (hour >= 18 && hour <= 23) {
+        baseOnline = 800 + Math.floor(Math.random() * 400);
+    } else if (hour >= 12 && hour < 18) {
+        baseOnline = 500 + Math.floor(Math.random() * 300);
+    } else if (hour >= 8 && hour < 12) {
+        baseOnline = 300 + Math.floor(Math.random() * 200);
+    } else {
+        baseOnline = 100 + Math.floor(Math.random() * 150);
+    }
+    
+    onlineUsers = baseOnline + Math.floor(Math.random() * 100) - 50;
+    onlineUsers = Math.max(10, onlineUsers);
+    document.getElementById('onlineCount').textContent = onlineUsers.toLocaleString();
+}
+
+fetchRealOnline();
+setInterval(fetchRealOnline, 15000);
 
 // ==========================================
 // ДОЖДИК
@@ -877,7 +1000,7 @@ function toggleRain(on) {
 }
 
 // ==========================================
-// СЕКРЕТНАЯ КОМБИНАЦИЯ: НАЖМИ 4 РАЗА "A"
+// СЕКРЕТНАЯ КОМБИНАЦИЯ
 // ==========================================
 let secretCode = '';
 let adminOpenCooldown = false;
@@ -896,13 +1019,13 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ==========================================
-// ПОЛНАЯ БАЗА СКИНОВ CS2 (ВСЕ СКИНЫ + КАРТИНКИ)
+// ===== БАЗА СКИНОВ С КАРТИНКАМИ =====
 // ==========================================
-// Генерация картинок через Steam CDN с реальными изображениями
-function getSkinImage(itemId) {
-    // Используем реальные URL картинок из Steam
+function getSkinImage(skinName) {
+    // Реальные URL картинок через Steam CDN
     const baseUrl = 'https://steamcommunity-a.akamaihd.net/economy/image/';
-    // Маппинг популярных скинов на их реальные ID в Steam
+    
+    // Маппинг популярных скинов на их реальные изображения
     const imageMap = {
         'dragon_lore': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot621FAR17PLfYQJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
         'gungnir': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot621FAR17PLfYQJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
@@ -913,327 +1036,44 @@ function getSkinImage(itemId) {
         'printstream': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpou-6kejhz2vNfTwJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
         'blaze': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposr-kLAtl7PLBTi9N08_mhLqKhPLLZbTUm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
         'kill_confirmed': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpokuDibFhwV8fPZidO08_mhLqKhPLLZbTUm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
-        'karambit_doppler': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpos7uifApxnJbLZj5N3dHLhraYh4iKZbrhXhRFusB2huTLo9umnw2z-RFqYmmjctOWeAE-Mg-BrlS4y-m6hJXuu5ybmn5l7H4g5SCd0A',
-        'butterfly_fade': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpsu6n6ThJuxnHJYjZP08nvxIGZkPPhJYbblQBFvMB2hOLL9I2liVHjqUVkMmHycNWWJgY7YwzWrAK5y-u4h5C1752bm2lr7yZ3Qw',
-        'm9_bayonet_sapphire': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpsu6ufEfp0pPbSfjdD08nJkoWZkPPhJYbblQBFvMB2hOLL9I2liVHjqUVkMmHycNWWJgY7YwzWrAK5y-u4h5C1752bm2lr7yZ3Qw',
+        'karambit': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpos7uifApxnJbLZj5N3dHLhraYh4iKZbrhXhRFusB2huTLo9umnw2z-RFqYmmjctOWeAE-Mg-BrlS4y-m6hJXuu5ybmn5l7H4g5SCd0A',
+        'butterfly': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpsu6n6ThJuxnHJYjZP08nvxIGZkPPhJYbblQBFvMB2hOLL9I2liVHjqUVkMmHycNWWJgY7YwzWrAK5y-u4h5C1752bm2lr7yZ3Qw',
+        'm9_bayonet': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpsu6ufEfp0pPbSfjdD08nJkoWZkPPhJYbblQBFvMB2hOLL9I2liVHjqUVkMmHycNWWJgY7YwzWrAK5y-u4h5C1752bm2lr7yZ3Qw',
         'bad_trip': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpopb3wflD03rKYeCJN08_mhLqKhPLLZbTUm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
         'wish_night': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhjxszJegJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
-        'emerald_jormungandr': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposr-kLAtl7PLBTi9N08_mhLqKhPLLZbTUm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
-        'pandora_box': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposb7uKApisfLJfTJP08_mhLqKhPLLZbTUm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
+        'emerald': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposr-kLAtl7PLBTi9N08_mhLqKhPLLZbTUm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
+        'pandora': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposb7uKApisfLJfTJP08_mhLqKhPLLZbTUm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
         'vice': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposb7uKApisfLJfTJP08_mhLqKhPLLZbTUm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w'
     };
     
-    // Если есть в мапе - возвращаем, иначе генерируем
-    if (imageMap[itemId]) {
-        return baseUrl + imageMap[itemId];
+    // Поиск по ключевым словам в названии
+    const lowerName = skinName.toLowerCase();
+    let imageKey = 'default';
+    
+    if (lowerName.includes('dragon lore')) imageKey = 'dragon_lore';
+    else if (lowerName.includes('gungnir')) imageKey = 'gungnir';
+    else if (lowerName.includes('asiimov')) imageKey = 'asiimov';
+    else if (lowerName.includes('fire serpent')) imageKey = 'fire_serpent';
+    else if (lowerName.includes('wild lotus')) imageKey = 'wild_lotus';
+    else if (lowerName.includes('howl')) imageKey = 'howl';
+    else if (lowerName.includes('printstream')) imageKey = 'printstream';
+    else if (lowerName.includes('blaze')) imageKey = 'blaze';
+    else if (lowerName.includes('kill confirmed')) imageKey = 'kill_confirmed';
+    else if (lowerName.includes('karambit')) imageKey = 'karambit';
+    else if (lowerName.includes('butterfly')) imageKey = 'butterfly';
+    else if (lowerName.includes('m9 bayonet')) imageKey = 'm9_bayonet';
+    else if (lowerName.includes('bad trip') || lowerName.includes('бэд-трип')) imageKey = 'bad_trip';
+    else if (lowerName.includes('пожелание на ночь')) imageKey = 'wish_night';
+    else if (lowerName.includes('emerald jörmungandr') || lowerName.includes('emerald jormungandr')) imageKey = 'emerald';
+    else if (lowerName.includes('pandora')) imageKey = 'pandora';
+    else if (lowerName.includes('vice')) imageKey = 'vice';
+    
+    if (imageMap[imageKey]) {
+        return baseUrl + imageMap[imageKey];
     }
     
-    // Дефолтная картинка
+    // Дефолтная картинка для остальных скинов
     return '';
-}
-
-// Функция для генерации полной базы скинов CS2
-function generateAllSkins() {
-    const allSkins = [];
-    let id = 1;
-    
-    // ===== ВИНТОВКИ (Rifles) =====
-    const rifles = [
-        // AK-47
-        { name: 'AK-47 | Fire Serpent', weapon: 'AK-47', rarity: 'covert', imageId: 'fire_serpent' },
-        { name: 'AK-47 | Wild Lotus', weapon: 'AK-47', rarity: 'covert', imageId: 'wild_lotus' },
-        { name: 'AK-47 | Gold Arabesque', weapon: 'AK-47', rarity: 'covert', imageId: 'wild_lotus' },
-        { name: 'AK-47 | Пожелание на ночь', weapon: 'AK-47', rarity: 'covert', imageId: 'wish_night' },
-        { name: 'AK-47 | Bloodsport', weapon: 'AK-47', rarity: 'classified', imageId: 'fire_serpent' },
-        { name: 'AK-47 | Redline', weapon: 'AK-47', rarity: 'classified', imageId: 'fire_serpent' },
-        { name: 'AK-47 | Fuel Injector', weapon: 'AK-47', rarity: 'covert', imageId: 'fire_serpent' },
-        { name: 'AK-47 | Empress', weapon: 'AK-47', rarity: 'classified', imageId: 'fire_serpent' },
-        { name: 'AK-47 | Neon Rider', weapon: 'AK-47', rarity: 'classified', imageId: 'fire_serpent' },
-        { name: 'AK-47 | Legion of Anubis', weapon: 'AK-47', rarity: 'classified', imageId: 'fire_serpent' },
-        { name: 'AK-47 | Head Shot', weapon: 'AK-47', rarity: 'restricted', imageId: 'fire_serpent' },
-        { name: 'AK-47 | Phantom Disruptor', weapon: 'AK-47', rarity: 'restricted', imageId: 'fire_serpent' },
-        
-        // AWP
-        { name: 'AWP | Dragon Lore', weapon: 'AWP', rarity: 'covert', imageId: 'dragon_lore' },
-        { name: 'AWP | Gungnir', weapon: 'AWP', rarity: 'covert', imageId: 'gungnir' },
-        { name: 'AWP | Asiimov', weapon: 'AWP', rarity: 'covert', imageId: 'asiimov' },
-        { name: 'AWP | Medusa', weapon: 'AWP', rarity: 'covert', imageId: 'dragon_lore' },
-        { name: 'AWP | Desert Hydra', weapon: 'AWP', rarity: 'covert', imageId: 'dragon_lore' },
-        { name: 'AWP | Lightning Strike', weapon: 'AWP', rarity: 'classified', imageId: 'asiimov' },
-        { name: 'AWP | Redline', weapon: 'AWP', rarity: 'classified', imageId: 'asiimov' },
-        { name: 'AWP | Hyper Beast', weapon: 'AWP', rarity: 'covert', imageId: 'asiimov' },
-        { name: 'AWP | Chromatic Aberration', weapon: 'AWP', rarity: 'classified', imageId: 'asiimov' },
-        { name: 'AWP | Silk Tiger', weapon: 'AWP', rarity: 'restricted', imageId: 'asiimov' },
-        { name: 'AWP | Atheris', weapon: 'AWP', rarity: 'restricted', imageId: 'asiimov' },
-        
-        // M4A4
-        { name: 'M4A4 | Howl', weapon: 'M4A4', rarity: 'covert', imageId: 'howl' },
-        { name: 'M4A4 | Poseidon', weapon: 'M4A4', rarity: 'covert', imageId: 'howl' },
-        { name: 'M4A4 | Asiimov', weapon: 'M4A4', rarity: 'covert', imageId: 'howl' },
-        { name: 'M4A4 | Emperor', weapon: 'M4A4', rarity: 'classified', imageId: 'howl' },
-        { name: 'M4A4 | Desolate Space', weapon: 'M4A4', rarity: 'classified', imageId: 'howl' },
-        { name: 'M4A4 | Eye of Horus', weapon: 'M4A4', rarity: 'covert', imageId: 'howl' },
-        { name: 'M4A4 | Tooth Fairy', weapon: 'M4A4', rarity: 'restricted', imageId: 'howl' },
-        
-        // M4A1-S
-        { name: 'M4A1-S | Printstream', weapon: 'M4A1-S', rarity: 'classified', imageId: 'printstream' },
-        { name: 'M4A1-S | Icarus Fell', weapon: 'M4A1-S', rarity: 'covert', imageId: 'printstream' },
-        { name: 'M4A1-S | Decimator', weapon: 'M4A1-S', rarity: 'restricted', imageId: 'printstream' },
-        { name: 'M4A1-S | Emphorosaur-S', weapon: 'M4A1-S', rarity: 'classified', imageId: 'printstream' },
-        { name: 'M4A1-S | Guardian', weapon: 'M4A1-S', rarity: 'restricted', imageId: 'printstream' },
-        
-        // FAMAS
-        { name: 'FAMAS | Бэд-трип', weapon: 'FAMAS', rarity: 'covert', imageId: 'bad_trip' },
-        { name: 'FAMAS | Ranger', weapon: 'FAMAS', rarity: 'classified', imageId: 'bad_trip' },
-        { name: 'FAMAS | Commemoration', weapon: 'FAMAS', rarity: 'restricted', imageId: 'bad_trip' },
-        
-        // Galil AR
-        { name: 'Galil AR | Chromatic Aberration', weapon: 'Galil AR', rarity: 'covert', imageId: 'fire_serpent' },
-        { name: 'Galil AR | Aqua Terrace', weapon: 'Galil AR', rarity: 'classified', imageId: 'fire_serpent' },
-        
-        // SSG 08
-        { name: 'SSG 08 | Death Strike', weapon: 'SSG 08', rarity: 'restricted', imageId: 'asiimov' },
-        { name: 'SSG 08 | Dragon Fire', weapon: 'SSG 08', rarity: 'covert', imageId: 'asiimov' },
-        
-        // SCAR-20
-        { name: 'SCAR-20 | Emerald', weapon: 'SCAR-20', rarity: 'restricted', imageId: 'asiimov' },
-        { name: 'SCAR-20 | Splash Jam', weapon: 'SCAR-20', rarity: 'classified', imageId: 'asiimov' },
-    ];
-    
-    // ===== ПИСТОЛЕТЫ (Pistols) =====
-    const pistols = [
-        // Desert Eagle
-        { name: 'Desert Eagle | Blaze', weapon: 'Desert Eagle', rarity: 'covert', imageId: 'blaze' },
-        { name: 'Desert Eagle | Emerald Jörmungandr', weapon: 'Desert Eagle', rarity: 'covert', imageId: 'emerald_jormungandr' },
-        { name: 'Desert Eagle | Golden Koi', weapon: 'Desert Eagle', rarity: 'classified', imageId: 'blaze' },
-        { name: 'Desert Eagle | Hand Cannon', weapon: 'Desert Eagle', rarity: 'covert', imageId: 'blaze' },
-        { name: 'Desert Eagle | Nightmare', weapon: 'Desert Eagle', rarity: 'classified', imageId: 'blaze' },
-        { name: 'Desert Eagle | Printstream', weapon: 'Desert Eagle', rarity: 'classified', imageId: 'blaze' },
-        { name: 'Desert Eagle | Sunset Storm', weapon: 'Desert Eagle', rarity: 'covert', imageId: 'blaze' },
-        { name: 'Desert Eagle | Crimson Web', weapon: 'Desert Eagle', rarity: 'classified', imageId: 'blaze' },
-        
-        // USP-S
-        { name: 'USP-S | Kill Confirmed', weapon: 'USP-S', rarity: 'classified', imageId: 'kill_confirmed' },
-        { name: 'USP-S | Printstream', weapon: 'USP-S', rarity: 'classified', imageId: 'kill_confirmed' },
-        { name: 'USP-S | Neo-Noir', weapon: 'USP-S', rarity: 'covert', imageId: 'kill_confirmed' },
-        { name: 'USP-S | Cortex', weapon: 'USP-S', rarity: 'classified', imageId: 'kill_confirmed' },
-        { name: 'USP-S | Overgrowth', weapon: 'USP-S', rarity: 'restricted', imageId: 'kill_confirmed' },
-        
-        // Glock-18
-        { name: 'Glock-18 | Fade', weapon: 'Glock-18', rarity: 'classified', imageId: 'kill_confirmed' },
-        { name: 'Glock-18 | Water Elemental', weapon: 'Glock-18', rarity: 'classified', imageId: 'kill_confirmed' },
-        { name: 'Glock-18 | Pink DDPAT', weapon: 'Glock-18', rarity: 'classified', imageId: 'kill_confirmed' },
-        { name: 'Glock-18 | Bullet Queen', weapon: 'Glock-18', rarity: 'covert', imageId: 'kill_confirmed' },
-        { name: 'Glock-18 | Vogue', weapon: 'Glock-18', rarity: 'classified', imageId: 'kill_confirmed' },
-        
-        // P250
-        { name: 'P250 | Nuclear Threat', weapon: 'P250', rarity: 'covert', imageId: 'kill_confirmed' },
-        { name: 'P250 | Modern Hunter', weapon: 'P250', rarity: 'classified', imageId: 'kill_confirmed' },
-        { name: 'P250 | Splash', weapon: 'P250', rarity: 'restricted', imageId: 'kill_confirmed' },
-        
-        // Five-SeveN
-        { name: 'Five-SeveN | Case Hardened', weapon: 'Five-SeveN', rarity: 'classified', imageId: 'kill_confirmed' },
-        { name: 'Five-SeveN | Urban Hazard', weapon: 'Five-SeveN', rarity: 'covert', imageId: 'kill_confirmed' },
-        
-        // CZ75-Auto
-        { name: 'CZ75-Auto | The Fuschia Is Now', weapon: 'CZ75-Auto', rarity: 'classified', imageId: 'kill_confirmed' },
-        { name: 'CZ75-Auto | Emerald', weapon: 'CZ75-Auto', rarity: 'covert', imageId: 'kill_confirmed' },
-    ];
-    
-    // ===== НОЖИ (Knives) =====
-    const knives = [
-        // Karambit
-        { name: '★ Karambit | Doppler Ruby', weapon: 'Karambit', rarity: 'covert', imageId: 'karambit_doppler', phase: 'ruby' },
-        { name: '★ Karambit | Doppler Sapphire', weapon: 'Karambit', rarity: 'covert', imageId: 'karambit_doppler', phase: 'sapphire' },
-        { name: '★ Karambit | Doppler Emerald', weapon: 'Karambit', rarity: 'covert', imageId: 'karambit_doppler', phase: 'emerald' },
-        { name: '★ Karambit | Doppler Phase 1', weapon: 'Karambit', rarity: 'covert', imageId: 'karambit_doppler', phase: 'phase1' },
-        { name: '★ Karambit | Doppler Phase 2', weapon: 'Karambit', rarity: 'covert', imageId: 'karambit_doppler', phase: 'phase2' },
-        { name: '★ Karambit | Doppler Phase 3', weapon: 'Karambit', rarity: 'covert', imageId: 'karambit_doppler', phase: 'phase3' },
-        { name: '★ Karambit | Doppler Phase 4', weapon: 'Karambit', rarity: 'covert', imageId: 'karambit_doppler', phase: 'phase4' },
-        { name: '★ Karambit | Fade', weapon: 'Karambit', rarity: 'covert', imageId: 'karambit_doppler' },
-        { name: '★ Karambit | Tiger Tooth', weapon: 'Karambit', rarity: 'covert', imageId: 'karambit_doppler' },
-        { name: '★ Karambit | Marble Fade', weapon: 'Karambit', rarity: 'covert', imageId: 'karambit_doppler' },
-        { name: '★ Karambit | Crimson Web', weapon: 'Karambit', rarity: 'covert', imageId: 'karambit_doppler' },
-        { name: '★ Karambit | Slaughter', weapon: 'Karambit', rarity: 'covert', imageId: 'karambit_doppler' },
-        { name: '★ Karambit | Stained', weapon: 'Karambit', rarity: 'covert', imageId: 'karambit_doppler' },
-        
-        // Butterfly Knife
-        { name: '★ Butterfly Knife | Fade', weapon: 'Butterfly Knife', rarity: 'covert', imageId: 'butterfly_fade' },
-        { name: '★ Butterfly Knife | Doppler Phase 1', weapon: 'Butterfly Knife', rarity: 'covert', imageId: 'butterfly_fade', phase: 'phase1' },
-        { name: '★ Butterfly Knife | Doppler Phase 2', weapon: 'Butterfly Knife', rarity: 'covert', imageId: 'butterfly_fade', phase: 'phase2' },
-        { name: '★ Butterfly Knife | Doppler Phase 3', weapon: 'Butterfly Knife', rarity: 'covert', imageId: 'butterfly_fade', phase: 'phase3' },
-        { name: '★ Butterfly Knife | Doppler Phase 4', weapon: 'Butterfly Knife', rarity: 'covert', imageId: 'butterfly_fade', phase: 'phase4' },
-        { name: '★ Butterfly Knife | Tiger Tooth', weapon: 'Butterfly Knife', rarity: 'covert', imageId: 'butterfly_fade' },
-        { name: '★ Butterfly Knife | Marble Fade', weapon: 'Butterfly Knife', rarity: 'covert', imageId: 'butterfly_fade' },
-        { name: '★ Butterfly Knife | Crimson Web', weapon: 'Butterfly Knife', rarity: 'covert', imageId: 'butterfly_fade' },
-        { name: '★ Butterfly Knife | Slaughter', weapon: 'Butterfly Knife', rarity: 'covert', imageId: 'butterfly_fade' },
-        { name: '★ Butterfly Knife | Stained', weapon: 'Butterfly Knife', rarity: 'covert', imageId: 'butterfly_fade' },
-        
-        // M9 Bayonet
-        { name: '★ M9 Bayonet | Doppler Sapphire', weapon: 'M9 Bayonet', rarity: 'covert', imageId: 'm9_bayonet_sapphire', phase: 'sapphire' },
-        { name: '★ M9 Bayonet | Doppler Ruby', weapon: 'M9 Bayonet', rarity: 'covert', imageId: 'm9_bayonet_sapphire', phase: 'ruby' },
-        { name: '★ M9 Bayonet | Doppler Emerald', weapon: 'M9 Bayonet', rarity: 'covert', imageId: 'm9_bayonet_sapphire', phase: 'emerald' },
-        { name: '★ M9 Bayonet | Doppler Phase 1', weapon: 'M9 Bayonet', rarity: 'covert', imageId: 'm9_bayonet_sapphire', phase: 'phase1' },
-        { name: '★ M9 Bayonet | Doppler Phase 2', weapon: 'M9 Bayonet', rarity: 'covert', imageId: 'm9_bayonet_sapphire', phase: 'phase2' },
-        { name: '★ M9 Bayonet | Doppler Phase 3', weapon: 'M9 Bayonet', rarity: 'covert', imageId: 'm9_bayonet_sapphire', phase: 'phase3' },
-        { name: '★ M9 Bayonet | Doppler Phase 4', weapon: 'M9 Bayonet', rarity: 'covert', imageId: 'm9_bayonet_sapphire', phase: 'phase4' },
-        { name: '★ M9 Bayonet | Fade', weapon: 'M9 Bayonet', rarity: 'covert', imageId: 'm9_bayonet_sapphire' },
-        { name: '★ M9 Bayonet | Tiger Tooth', weapon: 'M9 Bayonet', rarity: 'covert', imageId: 'm9_bayonet_sapphire' },
-        { name: '★ M9 Bayonet | Marble Fade', weapon: 'M9 Bayonet', rarity: 'covert', imageId: 'm9_bayonet_sapphire' },
-        
-        // Talon Knife
-        { name: '★ Talon Knife | Fade', weapon: 'Talon Knife', rarity: 'covert', imageId: 'karambit_doppler' },
-        { name: '★ Talon Knife | Doppler Phase 1', weapon: 'Talon Knife', rarity: 'covert', imageId: 'karambit_doppler', phase: 'phase1' },
-        { name: '★ Talon Knife | Doppler Phase 2', weapon: 'Talon Knife', rarity: 'covert', imageId: 'karambit_doppler', phase: 'phase2' },
-        { name: '★ Talon Knife | Doppler Phase 3', weapon: 'Talon Knife', rarity: 'covert', imageId: 'karambit_doppler', phase: 'phase3' },
-        { name: '★ Talon Knife | Doppler Phase 4', weapon: 'Talon Knife', rarity: 'covert', imageId: 'karambit_doppler', phase: 'phase4' },
-        
-        // Stiletto Knife
-        { name: '★ Stiletto Knife | Doppler Phase 1', weapon: 'Stiletto Knife', rarity: 'covert', imageId: 'karambit_doppler', phase: 'phase1' },
-        { name: '★ Stiletto Knife | Doppler Phase 2', weapon: 'Stiletto Knife', rarity: 'covert', imageId: 'karambit_doppler', phase: 'phase2' },
-        { name: '★ Stiletto Knife | Doppler Phase 3', weapon: 'Stiletto Knife', rarity: 'covert', imageId: 'karambit_doppler', phase: 'phase3' },
-        { name: '★ Stiletto Knife | Doppler Phase 4', weapon: 'Stiletto Knife', rarity: 'covert', imageId: 'karambit_doppler', phase: 'phase4' },
-        
-        // Flip Knife
-        { name: '★ Flip Knife | Fade', weapon: 'Flip Knife', rarity: 'covert', imageId: 'karambit_doppler' },
-        { name: '★ Flip Knife | Doppler Phase 1', weapon: 'Flip Knife', rarity: 'covert', imageId: 'karambit_doppler', phase: 'phase1' },
-        { name: '★ Flip Knife | Doppler Phase 2', weapon: 'Flip Knife', rarity: 'covert', imageId: 'karambit_doppler', phase: 'phase2' },
-        
-        // Gut Knife
-        { name: '★ Gut Knife | Doppler Phase 1', weapon: 'Gut Knife', rarity: 'covert', imageId: 'karambit_doppler', phase: 'phase1' },
-        { name: '★ Gut Knife | Doppler Phase 2', weapon: 'Gut Knife', rarity: 'covert', imageId: 'karambit_doppler', phase: 'phase2' },
-        
-        // Shadow Daggers
-        { name: '★ Shadow Daggers | Emerald', weapon: 'Shadow Daggers', rarity: 'covert', imageId: 'karambit_doppler', phase: 'emerald' },
-        { name: '★ Shadow Daggers | Ruby', weapon: 'Shadow Daggers', rarity: 'covert', imageId: 'karambit_doppler', phase: 'ruby' },
-        { name: '★ Shadow Daggers | Sapphire', weapon: 'Shadow Daggers', rarity: 'covert', imageId: 'karambit_doppler', phase: 'sapphire' },
-        
-        // Bayonet
-        { name: '★ Bayonet | Doppler Phase 1', weapon: 'Bayonet', rarity: 'covert', imageId: 'karambit_doppler', phase: 'phase1' },
-        { name: '★ Bayonet | Doppler Phase 2', weapon: 'Bayonet', rarity: 'covert', imageId: 'karambit_doppler', phase: 'phase2' },
-        { name: '★ Bayonet | Doppler Phase 3', weapon: 'Bayonet', rarity: 'covert', imageId: 'karambit_doppler', phase: 'phase3' },
-        { name: '★ Bayonet | Doppler Phase 4', weapon: 'Bayonet', rarity: 'covert', imageId: 'karambit_doppler', phase: 'phase4' },
-        
-        // Ursus Knife
-        { name: '★ Ursus Knife | Fade', weapon: 'Ursus Knife', rarity: 'covert', imageId: 'karambit_doppler' },
-        { name: '★ Ursus Knife | Doppler Phase 1', weapon: 'Ursus Knife', rarity: 'covert', imageId: 'karambit_doppler', phase: 'phase1' },
-        { name: '★ Ursus Knife | Doppler Phase 2', weapon: 'Ursus Knife', rarity: 'covert', imageId: 'karambit_doppler', phase: 'phase2' },
-        
-        // Nomad Knife
-        { name: '★ Nomad Knife | Fade', weapon: 'Nomad Knife', rarity: 'covert', imageId: 'karambit_doppler' },
-        { name: '★ Nomad Knife | Doppler Phase 1', weapon: 'Nomad Knife', rarity: 'covert', imageId: 'karambit_doppler', phase: 'phase1' },
-        { name: '★ Nomad Knife | Doppler Phase 2', weapon: 'Nomad Knife', rarity: 'covert', imageId: 'karambit_doppler', phase: 'phase2' },
-    ];
-    
-    // ===== ПЕРЧАТКИ (Gloves) =====
-    const gloves = [
-        { name: '★ Sport Gloves | Pandora\'s Box', weapon: 'Sport Gloves', rarity: 'covert', imageId: 'pandora_box' },
-        { name: '★ Sport Gloves | Vice', weapon: 'Sport Gloves', rarity: 'covert', imageId: 'vice' },
-        { name: '★ Sport Gloves | Amphibious', weapon: 'Sport Gloves', rarity: 'covert', imageId: 'vice' },
-        { name: '★ Sport Gloves | Slingshot', weapon: 'Sport Gloves', rarity: 'covert', imageId: 'vice' },
-        { name: '★ Sport Gloves | Superconductor', weapon: 'Sport Gloves', rarity: 'covert', imageId: 'vice' },
-        { name: '★ Sport Gloves | Arid', weapon: 'Sport Gloves', rarity: 'covert', imageId: 'vice' },
-        { name: '★ Sport Gloves | Scarlet Shamagh', weapon: 'Sport Gloves', rarity: 'covert', imageId: 'vice' },
-        
-        { name: '★ Driver Gloves | King Snake', weapon: 'Driver Gloves', rarity: 'covert', imageId: 'vice' },
-        { name: '★ Driver Gloves | Crimson Weave', weapon: 'Driver Gloves', rarity: 'covert', imageId: 'vice' },
-        { name: '★ Driver Gloves | Imperial Plaid', weapon: 'Driver Gloves', rarity: 'covert', imageId: 'vice' },
-        
-        { name: '★ Moto Gloves | Spearmint', weapon: 'Moto Gloves', rarity: 'covert', imageId: 'vice' },
-        { name: '★ Moto Gloves | Polygon', weapon: 'Moto Gloves', rarity: 'covert', imageId: 'vice' },
-        { name: '★ Moto Gloves | Smoke Out', weapon: 'Moto Gloves', rarity: 'covert', imageId: 'vice' },
-        
-        { name: '★ Hand Wraps | Slaughter', weapon: 'Hand Wraps', rarity: 'covert', imageId: 'vice' },
-        { name: '★ Hand Wraps | Desert Shamagh', weapon: 'Hand Wraps', rarity: 'covert', imageId: 'vice' },
-        { name: '★ Hand Wraps | Overprint', weapon: 'Hand Wraps', rarity: 'covert', imageId: 'vice' },
-        
-        { name: '★ Specialist Gloves | Crimson Web', weapon: 'Specialist Gloves', rarity: 'covert', imageId: 'vice' },
-        { name: '★ Specialist Gloves | Emerald Web', weapon: 'Specialist Gloves', rarity: 'covert', imageId: 'vice' },
-        { name: '★ Specialist Gloves | Fade', weapon: 'Specialist Gloves', rarity: 'covert', imageId: 'vice' },
-    ];
-    
-    // ===== СТИКЕРЫ (Stickers) =====
-    const stickers = [
-        { name: '✨ Sticker | Cloud9 | Katowice 2015', weapon: 'Sticker', rarity: 'covert', imageId: 'karambit_doppler' },
-        { name: '✨ Sticker | Titan | Katowice 2015', weapon: 'Sticker', rarity: 'covert', imageId: 'karambit_doppler' },
-        { name: '✨ Sticker | Vox Eminor | Katowice 2015', weapon: 'Sticker', rarity: 'covert', imageId: 'karambit_doppler' },
-        { name: '✨ Sticker | Natus Vincere | Katowice 2015', weapon: 'Sticker', rarity: 'covert', imageId: 'karambit_doppler' },
-        { name: '✨ Sticker | Virtus.pro | Katowice 2015', weapon: 'Sticker', rarity: 'covert', imageId: 'karambit_doppler' },
-        { name: '✨ Sticker | Fnatic | Katowice 2015', weapon: 'Sticker', rarity: 'covert', imageId: 'karambit_doppler' },
-        { name: '✨ Sticker | Ninjas in Pyjamas | Katowice 2015', weapon: 'Sticker', rarity: 'covert', imageId: 'karambit_doppler' },
-        { name: '✨ Sticker | Team EnVyUs | Katowice 2015', weapon: 'Sticker', rarity: 'covert', imageId: 'karambit_doppler' },
-    ];
-    
-    // Все категории с ценами (рандомные реалистичные цены)
-    const allItems = [...rifles, ...pistols, ...knives, ...gloves, ...stickers];
-    const exteriors = ['Прямо с завода', 'Немного поношенное', 'После полевых испытаний', 'Поношенное', 'Закалённое в боях'];
-    
-    // Генерируем каждый скин с разными износами
-    allItems.forEach((item, index) => {
-        // Базовая цена зависит от редкости
-        let basePrice = 0;
-        const rarityMultiplier = {
-            'covert': 800 + Math.random() * 4000,
-            'classified': 100 + Math.random() * 600,
-            'restricted': 20 + Math.random() * 100,
-            'mil-spec': 5 + Math.random() * 30,
-            'industrial': 1 + Math.random() * 10
-        };
-        basePrice = rarityMultiplier[item.rarity] || 50;
-        
-        // Для ножей цены выше
-        if (item.weapon.includes('Knife') || item.weapon.includes('Karambit') || item.weapon.includes('M9')) {
-            basePrice = 300 + Math.random() * 2500;
-        }
-        // Для перчаток
-        if (item.weapon.includes('Gloves')) {
-            basePrice = 500 + Math.random() * 3000;
-        }
-        // Для стикеров
-        if (item.weapon === 'Sticker') {
-            basePrice = 50 + Math.random() * 1500;
-        }
-        
-        // Генерируем все 5 износов для каждого скина
-        exteriors.forEach((exterior, extIndex) => {
-            const floatMap = {
-                'Прямо с завода': 0.01 + Math.random() * 0.06,
-                'Немного поношенное': 0.07 + Math.random() * 0.08,
-                'После полевых испытаний': 0.15 + Math.random() * 0.15,
-                'Поношенное': 0.35 + Math.random() * 0.25,
-                'Закалённое в боях': 0.45 + Math.random() * 0.45
-            };
-            
-            // Цена зависит от износа
-            let priceMultiplier = 1;
-            if (exterior === 'Прямо с завода') priceMultiplier = 1.4 - Math.random() * 0.2;
-            else if (exterior === 'Немного поношенное') priceMultiplier = 1.0 - Math.random() * 0.1;
-            else if (exterior === 'После полевых испытаний') priceMultiplier = 0.75 - Math.random() * 0.1;
-            else if (exterior === 'Поношенное') priceMultiplier = 0.5 - Math.random() * 0.1;
-            else if (exterior === 'Закалённое в боях') priceMultiplier = 0.35 - Math.random() * 0.1;
-            
-            const finalPrice = Math.round((basePrice * priceMultiplier) * 100) / 100;
-            
-            // Уникальное имя для картинки
-            const imageName = item.imageId || 'default';
-            
-            allSkins.push({
-                id: id++,
-                name: item.name,
-                exterior: exterior,
-                price: Math.max(0.5, finalPrice),
-                weapon: item.weapon,
-                rarity: item.rarity,
-                imageUrl: getSkinImage(imageName),
-                float: floatMap[exterior],
-                phase: item.phase || '',
-                hasStatTrak: Math.random() > 0.8,
-                isSouvenir: Math.random() > 0.95
-            });
-        });
-    });
-    
-    return allSkins;
 }
 
 // ==========================================
@@ -1243,7 +1083,7 @@ const STORAGE_KEY = 'emeraldData';
 const USERS_STORAGE_KEY = 'emeraldUsers';
 
 let appData = {
-    skins: generateAllSkins(),
+    skins: [],
     users: 518043,
     trades: 4875875,
     paid: '$13,704,974',
@@ -1257,16 +1097,13 @@ let appData = {
     rainEnabled: true
 };
 
-// Обновляем количество скинов
-appData.skinsCount = appData.skins.length;
-
 let registeredUsers = {};
 
 function loadData() {
     try {
         const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) { const parsed = JSON.parse(saved); 
-            // Сохраняем сгенерированные скины, если они есть в сохранённых
+        if (saved) { 
+            const parsed = JSON.parse(saved); 
             if (parsed.skins && parsed.skins.length > 0) {
                 appData.skins = parsed.skins;
             }
@@ -1384,6 +1221,10 @@ function renderSellSkins() {
     else if (sort === 'exterior') skins.sort((a, b) => a.exterior.localeCompare(b.exterior));
     
     const grid = document.getElementById('sellSkinGrid');
+    if (skins.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 0;color:#8a8d99;">Нет скинов в инвентаре</div>';
+        return;
+    }
     grid.innerHTML = skins.slice(0, 40).map(skin => `
         <div class="sell-skin-card" data-id="${skin.id}">
             <div class="image">${skin.imageUrl ? `<img src="${skin.imageUrl}" alt="${skin.name}">` : `<span>${skin.weapon||'Скин'}</span>`}</div>
@@ -1410,11 +1251,11 @@ function updateSellUI() {
         return sum + (skin ? skin.price : 0);
     }, 0);
     document.getElementById('sellTotalPrice').textContent = formatPrice(total);
-    document.querySelector('#selectAllSkins').textContent = 'Все скины (' + appData.skins.length + ')';
+    document.querySelector('#selectAllSkins').textContent = (currentLang === 'ru' ? 'Все скины' : 'All skins') + ' (' + appData.skins.length + ')';
 }
 
 // ==========================================
-// MARKET PAGE
+// MARKET PAGE - ТОЛЬКО СКИНЫ ИЗ ИНВЕНТАРЯ
 // ==========================================
 function refreshMarket() {
     const btn = document.querySelector('.refresh-btn');
@@ -1430,14 +1271,11 @@ function renderMarketSkins() {
     const search = document.getElementById('marketSearch').value.toLowerCase();
     const priceMin = parseFloat(document.getElementById('priceMin').value) || 0;
     const priceMax = parseFloat(document.getElementById('priceMax').value) || Infinity;
-    const floatMin = parseFloat(document.getElementById('floatMin').value) || 0;
-    const floatMax = parseFloat(document.getElementById('floatMax').value) || 1;
     
     if (search) {
         skins = skins.filter(s => s.name.toLowerCase().includes(search) || s.weapon.toLowerCase().includes(search));
     }
     skins = skins.filter(s => s.price >= priceMin && s.price <= priceMax);
-    skins = skins.filter(s => (s.float || 0) >= floatMin && (s.float || 0) <= floatMax);
     
     const rarityChecked = document.querySelectorAll('.rarity-filter:checked');
     if (rarityChecked.length > 0) {
@@ -1451,32 +1289,33 @@ function renderMarketSkins() {
         skins = skins.filter(s => wears.includes(s.exterior));
     }
     
-    const phaseChecked = document.querySelectorAll('.phase-filter:checked');
-    if (phaseChecked.length > 0) {
-        const phases = Array.from(phaseChecked).map(cb => cb.value);
-        skins = skins.filter(s => phases.includes(s.phase || ''));
-    }
-    
     const grid = document.getElementById('marketSkinGrid');
     if (skins.length === 0) {
-        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 0;color:#8a8d99;"> Ничего не найдено</div>';
-        document.getElementById('marketCount').textContent = '0 скинов';
+        grid.innerHTML = `
+            <div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">
+                <div style="font-size:48px;margin-bottom:16px;">🎒</div>
+                <h3 style="color:#e4e6eb;margin-bottom:8px;" data-key="market_empty_title">${currentLang === 'ru' ? 'Ваш инвентарь пуст' : 'Your inventory is empty'}</h3>
+                <p data-key="market_empty_desc">${currentLang === 'ru' ? 'Добавьте скины в инвентарь через админ-панель' : 'Add skins to inventory via admin panel'}</p>
+                <button class="btn btn-success" onclick="navigateTo('admin')" style="margin-top:12px;" data-key="market_empty_btn">${currentLang === 'ru' ? 'Перейти в админку' : 'Go to admin'}</button>
+            </div>
+        `;
+        document.getElementById('marketCount').textContent = '0 ' + (currentLang === 'ru' ? 'скинов' : 'skins');
         return;
     }
-    // Показываем по 40 скинов для производительности
-    const displaySkins = skins.slice(0, 40);
+    
+    const displaySkins = skins.slice(0, 50);
     grid.innerHTML = displaySkins.map(skin => `
         <div class="market-skin-card">
             <div class="badge">${skin.rarity || ''}</div>
             <div class="image">${skin.imageUrl ? `<img src="${skin.imageUrl}" alt="${skin.name}">` : `<span style="color:#4a4d5a;font-size:12px;">${skin.weapon||'Скин'}</span>`}</div>
             <div class="weapon">${skin.weapon || ''}</div>
             <div class="name">${skin.name}</div>
-            <div class="exterior">${skin.exterior || ''} ${skin.float ? '• FN / ' + skin.float.toFixed(4) : ''}</div>
+            <div class="exterior">${skin.exterior || ''}</div>
             <div class="price">${formatPrice(skin.price)}</div>
-            <button class="buy-btn" onclick="alert('Купить ${skin.name} за ${formatPrice(skin.price)}?')">Купить</button>
+            <button class="buy-btn" onclick="alert('${currentLang === 'ru' ? 'Купить' : 'Buy'} ${skin.name} ${currentLang === 'ru' ? 'за' : 'for'} ${formatPrice(skin.price)}?')">${currentLang === 'ru' ? 'Купить' : 'Buy'}</button>
         </div>
     `).join('');
-    document.getElementById('marketCount').textContent = skins.length + ' скинов';
+    document.getElementById('marketCount').textContent = skins.length + ' ' + (currentLang === 'ru' ? 'скинов' : 'skins');
 }
 
 // ==========================================
@@ -1514,39 +1353,41 @@ function applyTheme() {
 // ==========================================
 function renderAdminSkins() {
     const container = document.getElementById('adminSkinList');
-    container.innerHTML = appData.skins.slice(0, 30).map((skin, index) => `
-        <div class="admin-skin-item" data-index="${index}">
-            <div class="row">
-                <span style="color:#8a8d99;font-size:11px;min-width:30px;">#${skin.id}</span>
-                <span style="min-width:20px;">${index+1}.</span>
-                <input type="text" value="${skin.name}" style="flex:1;min-width:100px;" data-field="name" data-index="${index}">
-                <input type="text" value="${skin.weapon||''}" style="width:70px;" data-field="weapon" data-index="${index}">
-                <select data-field="exterior" data-index="${index}" style="width:100px;">
-                    ${['Прямо с завода','Немного поношенное','После полевых испытаний','Поношенное','Закалённое в боях'].map(o => `<option value="${o}" ${skin.exterior===o?'selected':''}>${o}</option>`).join('')}
-                </select>
-                <input type="number" value="${skin.price}" style="width:80px;" data-field="price" data-index="${index}" step="0.01">
-                <select data-field="rarity" data-index="${index}" style="width:90px;">
-                    ${['covert','classified','restricted','mil-spec','industrial'].map(r => `<option value="${r}" ${skin.rarity===r?'selected':''}>${r}</option>`).join('')}
-                </select>
-                <input type="text" value="${skin.imageUrl||''}" style="width:80px;" placeholder="URL" data-field="imageUrl" data-index="${index}">
-                <input type="text" value="${skin.phase||''}" style="width:70px;" placeholder="Фаза" data-field="phase" data-index="${index}">
-                <input type="number" value="${skin.float||0}" style="width:60px;" step="0.0001" placeholder="Float" data-field="float" data-index="${index}">
-                <button class="remove-btn" onclick="removeAdminSkin(${index})">✕</button>
+    if (appData.skins.length === 0) {
+        container.innerHTML = '<div style="color:#8a8d99;padding:20px;text-align:center;">Нет скинов в инвентаре</div>';
+    } else {
+        container.innerHTML = appData.skins.map((skin, index) => `
+            <div class="admin-skin-item" data-index="${index}">
+                <div class="row">
+                    <span style="color:#8a8d99;font-size:11px;min-width:30px;">#${skin.id}</span>
+                    <span style="min-width:20px;">${index+1}.</span>
+                    <input type="text" value="${skin.name}" style="flex:1;min-width:100px;" data-field="name" data-index="${index}">
+                    <input type="text" value="${skin.weapon||''}" style="width:70px;" data-field="weapon" data-index="${index}">
+                    <select data-field="exterior" data-index="${index}" style="width:100px;">
+                        ${['Прямо с завода','Немного поношенное','После полевых испытаний','Поношенное','Закалённое в боях'].map(o => `<option value="${o}" ${skin.exterior===o?'selected':''}>${o}</option>`).join('')}
+                    </select>
+                    <input type="number" value="${skin.price}" style="width:80px;" data-field="price" data-index="${index}" step="0.01">
+                    <select data-field="rarity" data-index="${index}" style="width:90px;">
+                        ${['covert','classified','restricted','mil-spec','industrial'].map(r => `<option value="${r}" ${skin.rarity===r?'selected':''}>${r}</option>`).join('')}
+                    </select>
+                    <input type="text" value="${skin.imageUrl||''}" style="width:80px;" placeholder="URL" data-field="imageUrl" data-index="${index}">
+                    <button class="remove-btn" onclick="removeAdminSkin(${index})">✕</button>
+                </div>
             </div>
-        </div>
-    `).join('');
-    document.getElementById('adminUsers').value = appData.users;
-    document.getElementById('adminTrades').value = appData.trades;
-    document.getElementById('adminPaid').value = appData.paid;
-    document.getElementById('adminSkinsCount').value = appData.skins.length;
+        `).join('');
+    }
     document.getElementById('adminRate').value = appData.exchangeRate;
 }
 
 function removeAdminSkin(index) {
     if (confirm('Удалить скин "' + appData.skins[index]?.name + '"?')) {
         appData.skins.splice(index, 1);
+        appData.skinsCount = appData.skins.length;
         saveData();
         renderAdminSkins();
+        renderMarketSkins();
+        renderSellSkins();
+        document.getElementById('skinsCount').textContent = appData.skinsCount.toLocaleString();
     }
 }
 
@@ -1563,25 +1404,19 @@ function saveAdminAll() {
                 else if (field === 'exterior') skin[field] = input.value;
                 else if (field === 'rarity') skin[field] = input.value;
                 else if (field === 'imageUrl') skin[field] = input.value.trim();
-                else if (field === 'phase') skin[field] = input.value.trim();
-                else if (field === 'float') skin[field] = parseFloat(input.value) || 0;
             });
         }
     });
-    appData.users = parseInt(document.getElementById('adminUsers').value) || 0;
-    appData.trades = parseInt(document.getElementById('adminTrades').value) || 0;
-    appData.paid = document.getElementById('adminPaid').value || '$0';
-    appData.skinsCount = appData.skins.length;
     appData.exchangeRate = parseFloat(document.getElementById('adminRate').value) || 86.83;
+    appData.skinsCount = appData.skins.length;
     saveData();
     const status = document.getElementById('adminStatus');
-    status.textContent = ' Сохранено!';
+    status.textContent = '✅ ' + (currentLang === 'ru' ? 'Сохранено!' : 'Saved!');
     status.classList.add('show');
     setTimeout(() => status.classList.remove('show'), 3000);
-    document.getElementById('usersCount').textContent = appData.users.toLocaleString();
-    document.getElementById('tradesCount').textContent = appData.trades.toLocaleString();
-    document.getElementById('paidAmount').textContent = appData.paid;
     document.getElementById('skinsCount').textContent = appData.skinsCount.toLocaleString();
+    renderMarketSkins();
+    renderSellSkins();
 }
 
 // ==========================================
@@ -1603,7 +1438,7 @@ function handleLogin() {
     const login = document.getElementById('loginInput').value.trim();
     const password = document.getElementById('passwordInput').value.trim();
     if (!login) {
-        document.getElementById('loginError').textContent = ' Введите логин';
+        document.getElementById('loginError').textContent = '❌ ' + (currentLang === 'ru' ? 'Введите логин' : 'Enter login');
         document.getElementById('loginError').classList.add('show');
         return;
     }
@@ -1613,16 +1448,16 @@ function handleLogin() {
         closeLogin();
         updateUserUI();
         if (document.getElementById('profilePage').classList.contains('active')) renderProfile();
-        alert(' Добро пожаловать, ' + login + '!');
+        alert((currentLang === 'ru' ? 'Добро пожаловать' : 'Welcome') + ', ' + login + '!');
     } else {
-        if (confirm('Пользователь "' + login + '" не найден. Создать новый аккаунт?')) {
+        if (confirm((currentLang === 'ru' ? 'Пользователь "' : 'User "') + login + '" ' + (currentLang === 'ru' ? 'не найден. Создать новый аккаунт?' : 'not found. Create new account?'))) {
             registeredUsers[login] = { password: password || 'default' };
             appData.currentUser = login;
             saveData();
             closeLogin();
             updateUserUI();
             if (document.getElementById('profilePage').classList.contains('active')) renderProfile();
-            alert(' Аккаунт создан! Добро пожаловать, ' + login + '!');
+            alert((currentLang === 'ru' ? 'Аккаунт создан! Добро пожаловать' : 'Account created! Welcome') + ', ' + login + '!');
         }
     }
 }
@@ -1639,6 +1474,11 @@ function updateUserUI() {
     const actions = document.getElementById('headerActions');
     if (appData.currentUser) {
         actions.innerHTML = `
+            <div class="lang-switch" id="langSwitch">
+                <span class="active" id="langRu">RU</span>
+                <span class="sep">|</span>
+                <span id="langEn">EN</span>
+            </div>
             <div class="user-profile" onclick="navigateTo('profile')">
                 <div class="avatar">${appData.currentUser.charAt(0).toUpperCase()}</div>
                 <span class="username">${appData.currentUser}</span>
@@ -1648,12 +1488,26 @@ function updateUserUI() {
         `;
     } else {
         actions.innerHTML = `
+            <div class="lang-switch" id="langSwitch">
+                <span class="active" id="langRu">RU</span>
+                <span class="sep">|</span>
+                <span id="langEn">EN</span>
+            </div>
             <a href="#" class="btn-outline" id="currencyToggle">${appData.currentCurrency}</a>
-            <a href="#" class="btn btn-telegram" id="telegramLoginBtn">Войти через Telegram</a>
+            <a href="#" class="btn btn-telegram" id="telegramLoginBtn" data-key="login_btn">${currentLang === 'ru' ? 'Войти через Telegram' : 'Login via Telegram'}</a>
         `;
     }
     document.getElementById('currencyToggle')?.addEventListener('click', toggleCurrency);
     document.getElementById('telegramLoginBtn')?.addEventListener('click', openLogin);
+    // Переключатель языка
+    document.getElementById('langSwitch')?.addEventListener('click', function(e) {
+        const target = e.target;
+        if (target.id === 'langRu' && currentLang !== 'ru') {
+            setLanguage('ru');
+        } else if (target.id === 'langEn' && currentLang !== 'en') {
+            setLanguage('en');
+        }
+    });
 }
 
 // ==========================================
@@ -1675,8 +1529,6 @@ function toggleCurrency(e) {
 function resetFilters() {
     document.getElementById('priceMin').value = '';
     document.getElementById('priceMax').value = '';
-    document.getElementById('floatMin').value = '';
-    document.getElementById('floatMax').value = '';
     document.getElementById('marketSearch').value = '';
     document.querySelectorAll('.rarity-filter, .wear-filter, .phase-filter').forEach(cb => cb.checked = false);
     renderMarketSkins();
@@ -1701,7 +1553,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const page = this.dataset.page;
             if (page === 'admin') {
                 if (!appData.currentUser) {
-                    alert(' Сначала войдите через Telegram!');
+                    alert(currentLang === 'ru' ? 'Сначала войдите через Telegram!' : 'Please login via Telegram first!');
                     return;
                 }
                 navigateTo('admin');
@@ -1727,7 +1579,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Admin
     document.getElementById('adminLogout').addEventListener('click', function() {
-        if (confirm('Выйти из админ-панели?')) navigateTo('hero');
+        if (confirm(currentLang === 'ru' ? 'Выйти из админ-панели?' : 'Logout from admin?')) navigateTo('hero');
     });
     document.getElementById('adminBack').addEventListener('click', function() { navigateTo('hero'); });
     document.getElementById('adminAddSkin').addEventListener('click', function() { document.getElementById('addSkinModal').classList.add('open'); });
@@ -1739,25 +1591,46 @@ document.addEventListener('DOMContentLoaded', function() {
         const price = parseFloat(document.getElementById('newSkinPrice').value);
         const rarity = document.getElementById('newSkinRarity').value;
         const imageUrl = document.getElementById('newSkinImage').value.trim();
-        if (!name || !price || price <= 0) { alert('Заполните название и цену'); return; }
+        if (!name || !price || price <= 0) { 
+            alert(currentLang === 'ru' ? 'Заполните название и цену' : 'Fill in name and price'); 
+            return; 
+        }
         const maxId = appData.skins.reduce((max, s) => Math.max(max, s.id), 0);
-        appData.skins.push({ id: maxId + 1, name, exterior, price, weapon: weapon || 'Unknown', rarity, imageUrl: imageUrl || '', phase: '', float: 0 });
+        const image = imageUrl || getSkinImage(name);
+        appData.skins.push({ 
+            id: maxId + 1, 
+            name, 
+            exterior, 
+            price, 
+            weapon: weapon || 'Unknown', 
+            rarity, 
+            imageUrl: image,
+            phase: '' 
+        });
+        appData.skinsCount = appData.skins.length;
         saveData();
         renderAdminSkins();
+        renderMarketSkins();
+        renderSellSkins();
         document.getElementById('addSkinModal').classList.remove('open');
         document.getElementById('newSkinName').value = '';
         document.getElementById('newSkinWeapon').value = '';
         document.getElementById('newSkinPrice').value = '';
         document.getElementById('newSkinImage').value = '';
+        document.getElementById('skinsCount').textContent = appData.skinsCount.toLocaleString();
     });
     document.getElementById('adminDeleteSkins').addEventListener('click', function() {
         const count = parseInt(document.getElementById('adminDeleteCount').value) || 1;
         if (count <= 0) return;
-        if (confirm('Удалить последние ' + count + ' скинов?')) {
+        if (confirm((currentLang === 'ru' ? 'Удалить последние ' : 'Delete last ') + count + (currentLang === 'ru' ? ' скинов?' : ' skins?'))) {
             appData.skins.splice(-count);
+            appData.skinsCount = appData.skins.length;
             saveData();
             renderAdminSkins();
+            renderMarketSkins();
+            renderSellSkins();
             document.getElementById('adminDeleteCount').value = '';
+            document.getElementById('skinsCount').textContent = appData.skinsCount.toLocaleString();
         }
     });
     document.getElementById('adminSaveAll').addEventListener('click', saveAdminAll);
@@ -1767,16 +1640,13 @@ document.addEventListener('DOMContentLoaded', function() {
             appData.exchangeRate = rate;
             saveData();
             const status = document.getElementById('adminStatus');
-            status.textContent = ' Сохранено!';
+            status.textContent = '✅ ' + (currentLang === 'ru' ? 'Сохранено!' : 'Saved!');
             status.classList.add('show');
             setTimeout(() => status.classList.remove('show'), 3000);
             renderSellSkins();
             renderMarketSkins();
         }
     });
-
-    // Profile settings
-    document.getElementById('saveTradeUrl')?.addEventListener('click', saveProfileTradeUrl);
 
     // Theme
     document.getElementById('themeToggle').addEventListener('click', function() {
@@ -1830,10 +1700,10 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('paidAmount').textContent = appData.paid;
     document.getElementById('skinsCount').textContent = appData.skinsCount.toLocaleString();
 
-    console.log(' EMERALDMarket загружен!');
-    console.log(' Всего скинов: ' + appData.skins.length);
-    console.log(' Секретная комбинация: нажми 4 раза "A" на клавиатуре!');
-    console.log(' Реальный онлайн обновляется каждые 15 секунд!');
+    console.log('🟢 EMERALDMarket загружен!');
+    console.log('🎒 Скинов в инвентаре: ' + appData.skins.length);
+    console.log('🔐 Секретная комбинация: нажми 4 раза "A" на клавиатуре!');
+    console.log('🌐 Переключатель языка: RU|EN');
 });
 </script>
 </body>
