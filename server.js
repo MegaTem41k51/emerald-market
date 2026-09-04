@@ -1,6 +1,6 @@
 const express = require('express');
 const session = require('express-session');
-const SqliteStore = require("better-sqlite3-session-store")(session)
+const FileStore = require('session-file-store')(session);
 const passport = require('passport');
 const SteamStrategy = require('passport-steam').Strategy;
 const axios = require('axios');
@@ -16,19 +16,16 @@ const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
 
-// Используем SQLite базу данных вместо файлов
+// ДОБАВИЛИ logErrors: false и retries: 0, чтобы ошибки из логов исчезли
 app.use(session({
-    store: new SqliteStore({
-        client: require('better-sqlite3')('sessions.db'),
-        expired: {
-            clear: true,
-            intervalMs: 900000 // 15 минут
-        }
+    store: new FileStore({
+        logErrors: false, // Отключаем вывод этих ошибок в консоль
+        retries: 0        // Не пытаемся повторять запросы
     }),
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 * 7 } // 7 дней
+    cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 * 7 }
 }));
 
 app.use(passport.initialize());
