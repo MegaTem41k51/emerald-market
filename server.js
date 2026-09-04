@@ -11,13 +11,10 @@ const PORT = process.env.PORT || 3000;
 // ==========================================
 // НАСТРОЙКИ ПРОКСИ
 // ==========================================
-// 1. Настройте ваши прокси в формате строки:
-// HTTP/SOCKS5: http://username:password@host:port
-// SOCKS5:      socks5://username:password@host:port
 const PROXIES = [
-    'http://ipv4.webshare.io/',
     'http://qigocgbt:7sdfc9sdwkkv@31.59.20.176:6754'
 ];
+// ==========================================
 // 2. Если хотите использовать переменные окружения Render, оставьте пустым:
 // const PROXIES = process.env.PROXIES ? process.env.PROXIES.split(',') : [];
 // ==========================================
