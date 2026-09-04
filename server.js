@@ -3,18 +3,13 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
-const Inventory = require('steam-inventory-api-ng');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ==========================================
-// НАСТРОЙКИ ПРОКСИ
-// ==========================================
 const PROXIES = [
     'http://qigocgbt:7sdfc9sdwkkv@31.59.20.176:6754'
 ];
-// ==========================================
 
 const STEAM_API_KEY = process.env.STEAM_API_KEY;
 
@@ -35,20 +30,18 @@ function convertToSteamId64(steamId) {
     return null;
 }
 
-// Функция для создания axios-клиента с прокси
+// Функция, которая ДЕЙСТВИТЕЛЬНО работает с прокси
 function createAxiosWithProxy() {
     if (PROXIES.length === 0) {
-        return axios.create({ timeout: 10000 });
+        return axios.create({ timeout: 15000 });
     }
-
-    const proxyUrl = PROXIES[Math.floor(Math.random() * PROXIES.length)];
+    const proxyUrl = PROXIES[0]; // Берем наш рабочий прокси
     const { HttpsProxyAgent } = require('https-proxy-agent');
     const httpsAgent = new HttpsProxyAgent(proxyUrl);
-
-    return axios.create({ httpsAgent, timeout: 10000 });
+    return axios.create({ httpsAgent, timeout: 15000 });
 }
 
-// === ЭНДПОИНТ ДЛЯ ПРОВЕРКИ ПРОКСИ ===
+// ТЕСТ ПРОКСИ (оставляем для проверки)
 app.get('/test', async (req, res) => {
     try {
         const client = createAxiosWithProxy();
@@ -58,7 +51,6 @@ app.get('/test', async (req, res) => {
         res.status(500).json({ message: 'Прокси НЕ работает', error: error.message });
     }
 });
-// ======================================
 
 app.post('/api/bind-trade', async (req, res) => {
     const { tradeUrl, username } = req.body;
@@ -98,36 +90,40 @@ app.post('/api/get-inventory', async (req, res) => {
     if (!steamId) return res.status(400).json({ error: 'Некорректный Steam ID' });
 
     try {
+        // 1. Проверяем профиль через прокси
         const client = createAxiosWithProxy();
-        
         const profileUrl = `https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${STEAM_API_KEY}&steamids=${steamId}`;
         const profileResponse = await client.get(profileUrl);
         if (!profileResponse.data.response.players[0]) return res.status(404).json({ error: 'Профиль не найден' });
 
-        // Используем библиотеку для инвентаря
-        const options = {
-            steamID: steamId,
-            appID: '730',
-            contextID: '2',
-            method: 'new',
-            language: 'english',
-            proxies: PROXIES
-        };
+        // 2. Задержка 3 секунды, чтобы Steam не начал банить прокси за частые запросы
+        await new Promise(r => setTimeout(r, 3000));
 
-        const inventory = new Inventory(options);
-        const items = await inventory.get();
+        // 3. Получаем инвентарь через ТОТ ЖЕ прокси (axios)
+        const inventoryUrl = `https://steamcommunity.com/inventory/${steamId}/730/2?l=english&count=2000`;
+        const inventoryResponse = await client.get(inventoryUrl, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' }
+        });
         
-        const formattedItems = items.map(item => ({
-            assetid: item.assetid,
-            name: item.market_hash_name || item.name,
-            image: item.icon_url ? `https://community.akamai.steamstatic.com/economy/image/${item.icon_url}` : '',
-            type: item.type || ''
-        }));
+        const inventory = inventoryResponse.data;
+        if (!inventory.assets || inventory.assets.length === 0) return res.status(200).json({ success: true, items: [] });
 
-        res.json({ success: true, items: formattedItems });
+        const items = [];
+        const descriptions = {};
+        inventory.descriptions.forEach(desc => { descriptions[`${desc.classid}_${desc.instanceid}`] = desc; });
+
+        inventory.assets.forEach(asset => {
+            const key = `${asset.classid}_${asset.instanceid}`;
+            const desc = descriptions[key];
+            if (desc) {
+                items.push({ assetid: asset.assetid, name: desc.market_hash_name || desc.name, image: desc.icon_url ? `https://community.akamai.steamstatic.com/economy/image/${desc.icon_url}` : '', type: desc.type || '' });
+            }
+        });
+
+        res.json({ success: true, items });
     } catch (error) {
-        console.error('Ошибка при получении инвентаря:', error);
-        res.status(500).json({ error: 'Не удалось получить инвентарь. Перезапустите сервер или проверьте настройки прокси.' });
+        console.error('Ошибка при получении инвентаря:', error.message);
+        res.status(500).json({ error: 'Не удалось получить инвентарь. Проверьте, работает ли прокси и не заблокирован ли Steam.' });
     }
 });
 
