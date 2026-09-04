@@ -37,29 +37,13 @@
         .btn-success { background: #2ecc71; color: #0b0c10 !important; }
         .btn-steam { background: #171a21; color: #fff; border: 1px solid #66c0f4; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; }
 
-        /* ===== НОВАЯ ШАПКА: ПРОФИЛЬ ===== */
-        .header-user { position: relative; display: flex; align-items: center; gap: 12px; }
-        .user-button { display: flex; align-items: center; gap: 10px; background: #1c1d23; border: 1px solid #2c2e36; border-radius: 30px; padding: 4px 12px 4px 4px; cursor: pointer; transition: 0.2s; }
-        .user-button:hover { border-color: #2ecc71; }
-        .user-avatar { width: 32px; height: 32px; border-radius: 50%; background-size: cover; background-position: center; flex-shrink: 0; }
-        .user-balance { font-size: 13px; font-weight: 700; color: #2ecc71; }
-        .user-chevron { color: #8a8d99; font-size: 12px; transition: transform 0.2s; }
-        .user-button.open .user-chevron { transform: rotate(180deg); }
-
-        /* ВЫПАДАЮЩЕЕ МЕНЮ */
-        .user-dropdown { display: none; position: absolute; top: 45px; right: 0; background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 8px; width: 200px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 200; }
-        .user-dropdown.open { display: flex; flex-direction: column; }
-        .dropdown-item { display: flex; align-items: center; gap: 10px; color: #b2b4bb; font-size: 13px; padding: 10px 12px; border-radius: 8px; cursor: pointer; text-decoration: none; transition: 0.2s; }
-        .dropdown-item:hover { background: #1c1d23; color: #fff; }
-        .dropdown-item.logout { color: #e74c3c; }
-        .dropdown-item.logout:hover { background: rgba(231, 76, 60, 0.1); }
-
-        /* КОРЗИНА */
-        .cart-icon { position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .cart-icon svg { width: 24px; height: 24px; fill: #e4e6eb; transition: 0.2s; }
-        .cart-icon:hover svg { fill: #2ecc71; }
-        .cart-count { position: absolute; top: -8px; right: -8px; background: #2ecc71; color: #0b0c10; font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 10px; }
-        /* ================================ */
+        /* ======== ПРОФИЛЬ В ШАПКЕ ======== */
+        .steam-user { display: flex; align-items: center; gap: 10px; background: #1c1d23; padding: 4px 12px 4px 4px; border-radius: 30px; border: 1px solid #2c2e36; cursor: pointer; }
+        .steam-user:hover { border-color: #2ecc71; }
+        .steam-avatar { width: 32px; height: 32px; border-radius: 50%; background-size: cover; background-position: center; flex-shrink: 0; }
+        .steam-name { font-size: 13px; font-weight: 500; color: #e4e6eb; }
+        .steam-logout { background: none; border: none; color: #8a8d99; font-size: 14px; padding: 0 4px; }
+        /* ================================== */
 
         .hero { padding: 60px 0 40px; text-align: center; background: radial-gradient(ellipse at center, #14161c 0%, #0b0c10 100%); border-bottom: 1px solid #26282f; }
         .hero h1 { font-size: 48px; font-weight: 800; color: #2ecc71; margin-bottom: 12px; }
@@ -163,7 +147,7 @@
         .footer-grid .col a:hover { color: #2ecc71; }
         .footer-bottom { text-align: center; margin-top: 32px; padding-top: 20px; border-top: 1px solid #1c1d23; color: #6a6d7a; font-size: 14px; }
 
-        @media (max-width: 992px) { .sell-wrapper { flex-direction: column; } .sell-sidebar { width: 100%; min-width: unset; position: static; } .market-wrapper { flex-direction: column; } .filter-sidebar { width: 100%; min-width: unset; position: static; } .market-skin-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 992px) { .sell-wrapper { flex-direction: column; } .sell-sidebar { width: 100%; min-width: unset; position: static; } .market-wrapper { flex-direction: column; } .filter-sidebar { width: 100%; min-width: unset; position: static; } .market-skin-grid { grid-template-columns: repeat(2, 1fr); } .sell-skin-grid { grid-template-columns: repeat(2, 1fr); } }
     </style>
 </head>
 <body>
@@ -182,7 +166,7 @@
             <a data-page="profile">Профиль</a>
         </nav>
         <div class="header-actions" id="headerActions">
-            <!-- ДО ВХОДА -->
+            <!-- До входа -->
             <a href="/auth/steam" class="btn btn-steam">Войти через Steam</a>
         </div>
     </div>
@@ -444,7 +428,6 @@
 let currentUser = null;
 let userInventory = [];
 let selectedSteamSkins = [];
-let cartItems = [];
 
 async function fetchUser() {
     try {
@@ -468,34 +451,15 @@ function updateUserUI() {
     const actions = document.getElementById('headerActions');
     if (currentUser) {
         actions.innerHTML = `
-        <div class="header-user">
-            <div class="user-button" onclick="toggleDropdown()">
-                <div class="user-avatar" style="background-image:url('${currentUser.avatar}');"></div>
-                <span class="user-balance">${currentUser.name}</span>
-                <span class="user-chevron">▼</span>
+            <div class="steam-user">
+                <div class="steam-avatar" style="background-image:url('${currentUser.avatar}');"></div>
+                <span class="steam-name">${currentUser.name}</span>
+                <button class="steam-logout" onclick="event.stopPropagation(); logoutUser()">✕</button>
             </div>
-            <div class="user-dropdown" id="userDropdown">
-                <a href="#" class="dropdown-item" onclick="navigateTo('profile')">👤 Профиль</a>
-                <a href="#" class="dropdown-item">💸 Вывод</a>
-                <a href="#" class="dropdown-item">➕ Пополнение</a>
-                <a href="/logout" class="dropdown-item logout">✖ Выход</a>
-            </div>
-            <div class="cart-icon" onclick="alert('Корзина пока пуста')">
-                <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
-                <span class="cart-count" id="cartCount">0</span>
-            </div>
-        </div>
         `;
     } else {
         actions.innerHTML = `<a href="/auth/steam" class="btn btn-steam">Войти через Steam</a>`;
     }
-}
-
-function toggleDropdown() {
-    const dropdown = document.getElementById('userDropdown');
-    const btn = document.querySelector('.user-button');
-    dropdown.classList.toggle('open');
-    btn.classList.toggle('open');
 }
 
 function navigateTo(page) {
@@ -509,9 +473,6 @@ function navigateTo(page) {
     if (page === 'sell') renderSellSkins();
     else if (page === 'market') renderMarketSkins();
     else if (page === 'profile') renderProfile();
-    // Закрываем дропдаун
-    const dropdown = document.getElementById('userDropdown');
-    if (dropdown) dropdown.classList.remove('open');
 }
 
 function renderProfile() {
@@ -587,22 +548,16 @@ function renderMarketSkins() {
     ];
     const grid = document.getElementById('marketSkinGrid');
     grid.innerHTML = skins.map(skin => `
-        <div class="market-skin-card" onclick="addToCart(${skin.id})">
+        <div class="market-skin-card">
             <div class="image">${skin.imageUrl ? `<img src="${skin.imageUrl}">` : ''}</div>
             <div class="weapon">${skin.weapon}</div>
             <div class="name">${skin.name}</div>
             <div class="exterior">${skin.exterior}</div>
             <div class="price">$${skin.price.toFixed(2)}</div>
-            <button class="buy-btn" onclick="event.stopPropagation(); addToCart(${skin.id})">В корзину</button>
+            <button class="buy-btn" onclick="alert('Купить ${skin.name}?')">Купить</button>
         </div>
     `).join('');
     document.getElementById('marketCount').textContent = skins.length + ' скинов';
-}
-
-function addToCart(id) {
-    if (!cartItems.includes(id)) cartItems.push(id);
-    document.getElementById('cartCount').textContent = cartItems.length;
-    alert('Скин добавлен в корзину!');
 }
 
 function resetFilters() {
