@@ -16,7 +16,6 @@ const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
 
-// Храним сессии в файле - они НЕ пропадут
 app.use(session({
     store: new FileStore(),
     secret: SESSION_SECRET,
@@ -37,7 +36,6 @@ passport.use(new SteamStrategy({
     apiKey: STEAM_API_KEY
 }, (identifier, profile, done) => done(null, profile)));
 
-// МАРШРУТЫ АВТОРИЗАЦИИ
 app.get('/auth/steam', passport.authenticate('steam', { failureRedirect: '/' }));
 app.get('/auth/steam/return', passport.authenticate('steam', { failureRedirect: '/' }), (req, res) => res.redirect('/'));
 app.get('/logout', (req, res) => {

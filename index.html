@@ -7,7 +7,7 @@
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; font-family: 'Montserrat', system-ui, sans-serif; background: #0b0c10; color: #e4e6eb; overflow-x: hidden; }
+        html, body { height: 100%; font-family: 'Montserrat', system-ui, sans-serif; background: #0b0c10; color: #e4e6eb; transition: background 0.3s, color 0.3s; overflow-x: hidden; }
         
         .rain-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
         .rain { position: absolute; width: 2px; background: linear-gradient(to bottom, rgba(46,204,113,0.1), rgba(46,204,113,0.3)); animation: rainFall linear infinite; }
@@ -30,7 +30,7 @@
         .nav a.active { color: #2ecc71; border-bottom-color: #2ecc71; }
         .header-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 
-        .btn { background: #2ecc71; color: #0b0c10 !important; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; border: none; cursor: pointer; transition: 0.2s; }
+        .btn { background: #2ecc71; color: #0b0c10 !important; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; border: none; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; }
         .btn:hover { background: #27ae60; transform: scale(1.02); }
         .btn-outline { background: transparent; color: #b2b4bb !important; border: 1px solid #3a3c46; padding: 7px 18px; border-radius: 6px; font-weight: 500; font-size: 13px; cursor: pointer; transition: 0.2s; }
         .btn-outline:hover { border-color: #2ecc71; color: #2ecc71 !important; }
@@ -38,39 +38,57 @@
         .btn-success:hover { background: #27ae60; }
         .btn-danger { background: #e74c3c; color: #fff !important; }
         .btn-danger:hover { background: #c0392b; }
-        .btn-steam { background: #171a21; color: #fff; border: 1px solid #66c0f4; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; }
+        .btn-steam { background: #171a21; color: #fff; border: 1px solid #66c0f4; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; transition: 0.2s; }
+        .btn-steam:hover { background: #1b2838; border-color: #fff; }
 
         .user-profile { display: flex; align-items: center; gap: 10px; background: #1c1d23; padding: 4px 12px 4px 4px; border-radius: 30px; border: 1px solid #2c2e36; cursor: pointer; transition: 0.2s; }
         .user-profile:hover { border-color: #2ecc71; }
         .user-profile .avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #0b0c10; flex-shrink: 0; background-size: cover; background-position: center; }
         .user-profile .username { font-size: 14px; font-weight: 500; color: #e4e6eb; }
-        .user-profile .logout-btn { background: none; border: none; color: #8a8d99; cursor: pointer; font-size: 14px; padding: 0 4px; }
+        .user-profile .logout-btn { background: none; border: none; color: #8a8d99; cursor: pointer; font-size: 14px; padding: 0 4px; transition: 0.2s; }
         .user-profile .logout-btn:hover { color: #e74c3c; }
 
-        .hero { padding: 60px 0 40px; text-align: center; background: radial-gradient(ellipse at center, #14161c 0%, #0b0c10 100%); border-bottom: 1px solid #26282f; }
+        .hero { padding: 60px 0 40px; text-align: center; background: radial-gradient(ellipse at center, #14161c 0%, #0b0c10 100%); border-bottom: 1px solid #26282f; position: relative; z-index: 1; }
         .hero h1 { font-size: 48px; font-weight: 800; color: #2ecc71; margin-bottom: 12px; }
         .hero h1 span { color: #e4e6eb; }
         .hero p { color: #8a8d99; font-size: 18px; max-width: 600px; margin: 0 auto 24px; }
         .hero-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-        .hero-stats { display: flex; gap: 40px; justify-content: center; margin-top: 32px; }
+        .hero-buttons .btn { padding: 12px 32px; font-size: 16px; }
+        .hero-stats { display: flex; gap: 40px; justify-content: center; margin-top: 32px; flex-wrap: wrap; }
         .hero-stats .stat { text-align: center; }
         .hero-stats .stat .num { font-size: 28px; font-weight: 700; color: #2ecc71; }
         .hero-stats .stat .label { color: #8a8d99; font-size: 13px; }
 
-        .page { display: none; padding: 30px 0 60px; }
+        .page { display: none; padding: 30px 0 60px; position: relative; z-index: 1; }
         .page.active { display: block; }
+
+        .static-page { max-width: 800px; margin: 0 auto; }
+        .static-page h1 { font-size: 32px; color: #2ecc71; margin-bottom: 24px; }
+        .static-page h2 { font-size: 20px; color: #2ecc71; margin-top: 24px; margin-bottom: 12px; }
+        .static-page p { line-height: 1.7; color: #b2b4bb; margin-bottom: 12px; }
+        .static-page a { color: #2ecc71; text-decoration: none; }
+        .static-page a:hover { text-decoration: underline; }
+        
+        .qr-container { text-align: center; margin: 20px 0; padding: 20px; background: #14161c; border: 1px solid #26282f; border-radius: 12px; }
+        .qr-container img { max-width: 300px; border-radius: 8px; }
+        .bold-warning { font-weight: 900; color: #e74c3c; font-size: 18px; text-align: center; margin: 20px 0; }
 
         .sell-wrapper { display: flex; gap: 30px; align-items: flex-start; }
         .sell-sidebar { width: 280px; min-width: 280px; background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 20px; position: sticky; top: 80px; }
         .sell-sidebar .title { font-size: 20px; font-weight: 700; color: #2ecc71; margin-bottom: 4px; }
         .sell-sidebar .subtitle { color: #8a8d99; font-size: 14px; margin-bottom: 16px; }
+        .sell-sidebar .subtitle a { color: #2ecc71; text-decoration: none; }
         .sell-sidebar .trade-label { color: #8a8d99; font-size: 13px; display: block; margin-bottom: 4px; }
         .sell-sidebar .trade-input { width: 100%; background: #1c1d23; border: 1px solid #2c2e36; color: #e4e6eb; padding: 10px 12px; border-radius: 6px; font-size: 13px; outline: none; margin-bottom: 16px; }
         .sell-sidebar .trade-input:focus { border-color: #2ecc71; }
+        .sell-sidebar .min-withdraw { color: #8a8d99; font-size: 12px; margin-top: 8px; }
         .sell-sidebar .vpn-warning { color: #e74c3c; font-size: 12px; font-weight: 700; margin-bottom: 16px; }
 
         .sell-content { flex: 1; }
         .sell-content .top-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+        .sell-content .top-bar .select-all { color: #8a8d99; font-size: 13px; cursor: pointer; }
+        .sell-content .top-bar .select-all:hover { color: #2ecc71; }
+
         .sell-skin-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; min-height: 200px; }
         .sell-skin-card { background: #14161c; border: 1px solid #26282f; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 8px; cursor: pointer; transition: 0.2s; position: relative; }
         .sell-skin-card:hover { border-color: #2ecc71; transform: translateY(-2px); }
@@ -86,23 +104,34 @@
         .sell-empty h3 { color: #e4e6eb; margin-bottom: 8px; }
 
         .market-wrapper { display: flex; gap: 24px; align-items: flex-start; }
-        .filter-sidebar { width: 280px; min-width: 280px; background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 18px 16px; position: sticky; top: 80px; }
+        .filter-sidebar { width: 280px; min-width: 280px; background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 18px 16px; position: sticky; top: 80px; max-height: calc(100vh - 100px); overflow-y: auto; }
+        .filter-sidebar::-webkit-scrollbar { width: 4px; }
+        .filter-sidebar::-webkit-scrollbar-track { background: #0b0c10; }
+        .filter-sidebar::-webkit-scrollbar-thumb { background: #2c2e36; border-radius: 4px; }
+        
         .filter-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .filter-header .filter-title { font-size: 16px; font-weight: 700; color: #e4e6eb; }
-        .filter-toggle { color: #8a8d99; font-size: 18px; }
+        .filter-header .filter-toggle { color: #8a8d99; font-size: 18px; transition: 0.3s; }
+        .filter-header .filter-toggle.open { transform: rotate(180deg); }
         .filter-body { overflow: hidden; max-height: 500px; transition: max-height 0.4s ease; }
         .filter-body.hidden { max-height: 0; }
-        .filter-divider { border: none; border-top: 1px solid #26282f; margin: 10px 0; }
-        .filter-group { margin-bottom: 12px; }
-        .filter-group .price-inputs { display: flex; gap: 8px; }
-        .filter-group .price-inputs input { width: 50%; background: #1c1d23; border: 1px solid #2c2e36; color: #e4e6eb; padding: 6px 10px; border-radius: 6px; font-size: 13px; outline: none; }
-        .filter-group .checkbox-group { display: flex; flex-direction: column; gap: 2px; }
-        .filter-group .checkbox-group label { display: flex; align-items: center; gap: 8px; color: #b2b4bb; font-size: 12px; cursor: pointer; }
+        .filter-body-inner { padding-top: 12px; }
+
+        .filter-sidebar .filter-divider { border: none; border-top: 1px solid #26282f; margin: 10px 0; }
+        .filter-sidebar .filter-group { margin-bottom: 12px; }
+        .filter-sidebar .filter-group .price-inputs { display: flex; gap: 8px; }
+        .filter-sidebar .filter-group .price-inputs input { width: 50%; background: #1c1d23; border: 1px solid #2c2e36; color: #e4e6eb; padding: 6px 10px; border-radius: 6px; font-size: 13px; outline: none; }
+        .filter-sidebar .filter-group .checkbox-group { display: flex; flex-direction: column; gap: 2px; }
+        .filter-sidebar .filter-group .checkbox-group label { display: flex; align-items: center; gap: 8px; color: #b2b4bb; font-size: 12px; cursor: pointer; }
+
         .filter-reset-btn { width: 100%; background: transparent; border: 1px solid #e74c3c; color: #e74c3c; padding: 8px 0; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; margin-top: 6px; }
 
         .market-content { flex: 1; }
         .market-content .top-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
         .market-content .top-bar h2 { font-size: 22px; font-weight: 700; }
+        .market-content .top-bar span { color: #8a8d99; font-size: 14px; }
+        .market-content .top-bar .refresh-btn { cursor: pointer; color: #2ecc71; font-size: 20px; }
+
         .market-skin-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
         .market-skin-card { background: #14161c; border: 1px solid #26282f; border-radius: 10px; padding: 14px; transition: 0.2s; position: relative; display: flex; flex-direction: column; }
         .market-skin-card:hover { transform: translateY(-4px); border-color: #2ecc71; }
@@ -188,6 +217,65 @@
     </div>
 </section>
 
+<div class="page" id="aboutPage">
+    <div class="container static-page">
+        <h1>➡ ИНФОРМАЦИЯ ПО ЦЕНАМ ⬅</h1>
+        <h2>Условия выкупа</h2>
+        <ul>
+            <li>✅ Работаем 24/7. Выплачиваем мгновенно!</li>
+            <li>✅ Ликвидные скины от 1к до 20к - 80% от автобая csmarket (больше 50 продаж на маркете за неделю)</li>
+            <li>✅ Ликвидные скины от 20к до 50к - 77% от автобая csmarket (больше 30 продаж в неделю)</li>
+            <li>✅ Ликвидные скины до 1000 рублей - 75% от автобая csmarket (больше 50 продаж на маркете за неделю)</li>
+            <li>✅ Если ваш скин в трейд бане - то минус 1.5% от автобая csmarket за каждый день бана</li>
+            <li>✅ Кейсы - 80% от автобая csmarket</li>
+            <li>✔ Все остальные скины - обсуждаются индивидуально!</li>
+            <li>❌ Не покупаем скины из новых коллекций!</li>
+            <li>💵 Выплачиваем мгновенно! По СБП (в любой банк РФ) или на крипту.</li>
+        </ul>
+        <p>➖</p>
+        <p>💬 Чат канала - <a href="https://t.me/+7243grpklsozMDEy" target="_blank">https://t.me/+7243grpklsozMDEy</a></p>
+        <p>📖 Пост для отзывов - <a href="https://t.me/emerald_mrkt/14" target="_blank">https://t.me/emerald_mrkt/14</a></p>
+        <p>❓ По всем вопросам обращаться в ЛИЧНЫЕ СООБЩЕНИЯ ГРУППЫ - <a href="https://t.me/emerald_mrkt?direct" target="_blank">https://t.me/emerald_mrkt?direct</a></p>
+    </div>
+</div>
+
+<div class="page" id="contactsPage">
+    <div class="container static-page">
+        <h1>Контакты</h1>
+        <div class="qr-container">
+            <img src="https://i.imgur.com/ОСТАВЬ_ССЫЛКУ_QR_ТУТ.png" alt="QR Code @EMERALD_MRKT" style="max-width:300px;">
+        </div>
+        <p style="text-align:center; font-weight:700; font-size:20px; margin-bottom:30px;">@EMERALD_MRKT</p>
+        <p style="text-align:center; line-height:2;">
+            <a href="https://t.me/emerald_mrkt?direct" target="_blank">ЛИЧНЫЕ СООБЩЕНИЯ ГРУППЫ - https://t.me/emerald_mrkt?direct</a><br><br>
+            <a href="https://t.me/ikiawka" target="_blank">НАПИСАТЬ МНЕ ЛИЧНО - https://t.me/ikiawka</a>
+        </p>
+    </div>
+</div>
+
+<div class="page" id="faqPage">
+    <div class="container static-page">
+        <h1>Как это работает</h1>
+        <p>EMERALD Market — площадка для продажи скинов из CS2</p>
+        <p>💡 Выплата по сделке производится через 8 дней с момента подтверждения обмена в Steam.</p>
+        <h2>Шаг 1</h2>
+        <p>Авторизация через Steam. Авторизуйся через свой аккаунт в Steam на сайте EMERALD Market.</p>
+        <h2>Шаг 2</h2>
+        <p>Выбор предметов. Открой свой инвентарь и выбери предметы для продажи.</p>
+        <h2>Шаг 3</h2>
+        <p>Выбор способа получения денег. Выбери способ получения денег (USDT, карта).</p>
+        <h2>Шаг 4</h2>
+        <p>Подтверждение сделки. Проверь данные и подтверди сделку.</p>
+    </div>
+</div>
+
+<div class="page" id="policyPage">
+    <div class="container static-page">
+        <h1>Гарантии и Политика</h1>
+        <div class="bold-warning">В РАЗРАБОТКЕ</div>
+    </div>
+</div>
+
 <div class="page" id="sellPage">
     <div class="container">
         <h2 style="font-size:24px; font-weight:700; margin-bottom:4px;">ПРОДАТЬ СКИНЫ</h2>
@@ -199,7 +287,7 @@
                 <label class="trade-label">Введите ваш Trade URL</label>
                 <input class="trade-input" id="sellTradeUrl" placeholder="https://steamcommunity.com/tradeoffer/new/?pa...">
                 <div class="vpn-warning">⚠️ ОБЯЗАТЕЛЬНО ВКЛЮЧИТЕ VPN ДЛЯ ПЕРЕНАПРАВЛЕНИЯ В ЛИЧНЫЕ СООБЩЕНИЯ</div>
-                <div class="min-withdraw" style="color:#8a8d99; font-size:12px;">Выберите скины и отправьте заявку в Telegram!</div>
+                <div class="min-withdraw">Выберите скины и отправьте заявку в Telegram!</div>
             </div>
             <div class="sell-content">
                 <div class="top-bar">
@@ -484,7 +572,7 @@ function sellSelectedSkins() {
 
 function renderMarketSkins() {
     let skins = [
-        { id: 1, name: 'AWP | Dragon Lore', weapon: 'AWP', exterior: 'Factory New', price: 3500, rarity: 'covert', imageUrl: 'https://community.akamai.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot621FAR17PLfYQJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w' },
+        { id: 1, name: 'AWP | Dragon Lore', weapon: 'AWP', exterior: 'Factory New', price: 3500, rarity: 'covert', imageUrl: '' },
         { id: 2, name: 'AK-47 | Redline', weapon: 'AK-47', exterior: 'Field-Tested', price: 45, rarity: 'classified', imageUrl: '' }
     ];
     const grid = document.getElementById('marketSkinGrid');
