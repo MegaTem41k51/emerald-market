@@ -321,7 +321,6 @@
         .page { display: none; padding: 30px 0 60px; position: relative; z-index: 1; }
         .page.active { display: block; }
 
-        /* Стили для новых страниц */
         .static-page { max-width: 800px; margin: 0 auto; }
         .static-page h1 { font-size: 32px; color: #2ecc71; margin-bottom: 24px; }
         .static-page h2 { font-size: 20px; color: #2ecc71; margin-top: 24px; margin-bottom: 12px; }
@@ -590,7 +589,9 @@
     <div class="container static-page">
         <h1>Контакты</h1>
         
-        
+        <div class="qr-container">
+            <img src="ССЫЛКА_НА_ТВОЮ_КАРТИНКУ_QR" alt="QR Code @EMERALD_MRKT">
+        </div>
         
         <p style="text-align:center; font-weight:700; font-size:20px; margin-bottom:30px;">@EMERALD_MRKT</p>
         
@@ -641,10 +642,7 @@
                 <label class="trade-label" data-key="sell_enter_url">Введите ваш Trade URL</label>
                 <input class="trade-input" id="sellTradeUrl" placeholder="https://steamcommunity.com/tradeoffer/new/?pa..." onchange="saveTradeUrl()">
                 
-                <!-- НАДПИСЬ ПРО VPN -->
-                <div class="vpn-warning" style="color:#e74c3c; font-weight:700; font-size:12px; margin-bottom:16px;">
-                    ⚠️ ОБЯЗАТЕЛЬНО ВКЛЮЧИТЕ VPN ДЛЯ ПЕРЕНАПРАВЛЕНИЯ В ЛИЧНЫЕ СООБЩЕНИЯ
-                </div>
+                <div class="vpn-warning">⚠️ ОБЯЗАТЕЛЬНО ВКЛЮЧИТЕ VPN ДЛЯ ПЕРЕНАПРАВЛЕНИЯ В ЛИЧНЫЕ СООБЩЕНИЯ</div>
 
                 <div class="min-withdraw" data-key="sell_closed">Выберите скины и отправьте заявку в Telegram!</div>
             </div>
@@ -654,6 +652,11 @@
                     <span style="color:#8a8d99; font-size:13px;"><span data-key="sell_total">Итого</span>: <span id="sellTotalPrice">0 ₽</span></span>
                 </div>
                 
+                <!-- КНОПКА ЗАГРУЗКИ ИНВЕНТАРЯ -->
+                <button class="btn btn-success" style="width:100%; margin-bottom:12px; padding:14px; font-size:16px;" onclick="loadSteamInventory()">
+                    🎒 Загрузить мой инвентарь из Steam
+                </button>
+
                 <button class="btn btn-success" style="width:100%; margin-bottom:20px; padding:14px; font-size:16px;" onclick="sellSelectedSkins()">
                     🚀 Продать выбранные скины
                 </button>
@@ -662,7 +665,7 @@
                     <div class="sell-empty">
                         <div class="icon">📦</div>
                         <h3 data-key="sell_empty_title">Нет скинов для продажи</h3>
-                        <p data-key="sell_empty_desc">Добавьте скины в инвентарь через админ-панель</p>
+                        <p data-key="sell_empty_desc">Введите Trade URL и нажмите "Загрузить инвентарь"</p>
                     </div>
                 </div>
             </div>
@@ -937,13 +940,13 @@ const translations = {
         sell_trade_url: 'Trade URL',
         sell_where: 'Где взять?',
         sell_enter_url: 'Введите ваш Trade URL',
-        sell_closed: 'Выберите скины и отправьте заявку в Telegram!',
+        sell_closed: 'Введите Trade URL и нажмите "Загрузить инвентарь"',
         sell_select: 'Выбрать',
         sell_all: 'Все скины',
         sell_clear: 'Снять все',
         sell_total: 'Итого',
         sell_empty_title: 'Нет скинов для продажи',
-        sell_empty_desc: 'Добавьте скины в инвентарь через админ-панель',
+        sell_empty_desc: 'Введите Trade URL и нажмите "Загрузить инвентарь"',
         filter_refresh: 'Обновить магазин',
         filter_refresh_btn: 'Обновить',
         filter_search: 'Поиск',
@@ -1025,13 +1028,13 @@ const translations = {
         sell_trade_url: 'Trade URL',
         sell_where: 'Where to get?',
         sell_enter_url: 'Enter your Trade URL',
-        sell_closed: 'Select skins and send a request to Telegram!',
+        sell_closed: 'Enter Trade URL and click "Load inventory"',
         sell_select: 'Select',
         sell_all: 'All skins',
         sell_clear: 'Clear all',
         sell_total: 'Total',
         sell_empty_title: 'No skins for sale',
-        sell_empty_desc: 'Add skins to inventory via admin panel',
+        sell_empty_desc: 'Enter Trade URL and click "Load inventory"',
         filter_refresh: 'Refresh store',
         filter_refresh_btn: 'Refresh',
         filter_search: 'Search',
@@ -1197,59 +1200,6 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ==========================================
-// КАРТИНКИ СКИНОВ
-// ==========================================
-function getSkinImage(skinName) {
-    const baseUrl = 'https://steamcommunity-a.akamaihd.net/economy/image/';
-    
-    const imageMap = {
-        'dragon lore': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot621FAR17PLfYQJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
-        'gungnir': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot621FAR17PLfYQJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
-        'asiimov': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot621FAR17PLfYQJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
-        'fire serpent': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhjxszJegJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
-        'wild lotus': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhjxszJegJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
-        'howl': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpou-6kejhz2vNfTwJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
-        'printstream': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpou-6kejhz2vNfTwJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
-        'blaze': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposr-kLAtl7PLBTi9N08_mhLqKhPLLZbTUm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
-        'kill confirmed': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpokuDibFhwV8fPZidO08_mhLqKhPLLZbTUm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
-        'karambit': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpos7uifApxnJbLZj5N3dHLhraYh4iKZbrhXhRFusB2huTLo9umnw2z-RFqYmmjctOWeAE-Mg-BrlS4y-m6hJXuu5ybmn5l7H4g5SCd0A',
-        'butterfly': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpsu6n6ThJuxnHJYjZP08nvxIGZkPPhJYbblQBFvMB2hOLL9I2liVHjqUVkMmHycNWWJgY7YwzWrAK5y-u4h5C1752bm2lr7yZ3Qw',
-        'm9 bayonet': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpsu6ufEfp0pPbSfjdD08nJkoWZkPPhJYbblQBFvMB2hOLL9I2liVHjqUVkMmHycNWWJgY7YwzWrAK5y-u4h5C1752bm2lr7yZ3Qw',
-        'bad trip': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpopb3wflD03rKYeCJN08_mhLqKhPLLZbTUm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
-        'пожелание на ночь': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhjxszJegJM5d2wm5m0kfD9JqPEm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
-        'emerald jörmungandr': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposr-kLAtl7PLBTi9N08_mhLqKhPLLZbTUm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
-        'pandora': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposb7uKApisfLJfTJP08_mhLqKhPLLZbTUm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w',
-        'vice': '-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposb7uKApisfLJfTJP08_mhLqKhPLLZbTUm3F03KAB3MLH_omt2g2_8VJqMGiIcI6XJgI2NgmD-Fm4m7nq15K47c6bm3Zm7HJ1t3w'
-    };
-    
-    const lowerName = skinName.toLowerCase();
-    let imageKey = 'default';
-    
-    if (lowerName.includes('dragon lore')) imageKey = 'dragon lore';
-    else if (lowerName.includes('gungnir')) imageKey = 'gungnir';
-    else if (lowerName.includes('asiimov')) imageKey = 'asiimov';
-    else if (lowerName.includes('fire serpent')) imageKey = 'fire serpent';
-    else if (lowerName.includes('wild lotus')) imageKey = 'wild lotus';
-    else if (lowerName.includes('howl')) imageKey = 'howl';
-    else if (lowerName.includes('printstream')) imageKey = 'printstream';
-    else if (lowerName.includes('blaze')) imageKey = 'blaze';
-    else if (lowerName.includes('kill confirmed')) imageKey = 'kill confirmed';
-    else if (lowerName.includes('karambit')) imageKey = 'karambit';
-    else if (lowerName.includes('butterfly')) imageKey = 'butterfly';
-    else if (lowerName.includes('m9 bayonet')) imageKey = 'm9 bayonet';
-    else if (lowerName.includes('bad trip') || lowerName.includes('бэд-трип')) imageKey = 'bad trip';
-    else if (lowerName.includes('пожелание на ночь')) imageKey = 'пожелание на ночь';
-    else if (lowerName.includes('emerald jörmungandr') || lowerName.includes('emerald jormungandr')) imageKey = 'emerald jörmungandr';
-    else if (lowerName.includes('pandora')) imageKey = 'pandora';
-    else if (lowerName.includes('vice')) imageKey = 'vice';
-    
-    if (imageMap[imageKey]) {
-        return baseUrl + imageMap[imageKey];
-    }
-    return '';
-}
-
-// ==========================================
 // ДАННЫЕ (ОБЩИЕ ДЛЯ ВСЕХ)
 // ==========================================
 const STORAGE_KEY = 'emeraldData';
@@ -1336,7 +1286,7 @@ function toggleFilter(name) {
 }
 
 // ==========================================
-// НАВИГАЦИЯ (ОБНОВЛЕНА ДЛЯ НОВЫХ СТРАНИЦ)
+// НАВИГАЦИЯ
 // ==========================================
 function navigateTo(page) {
     if (page === 'hero') {
@@ -1373,99 +1323,102 @@ function formatPrice(price) {
 }
 
 // ==========================================
-// ЛОГИКА ПРОДАЖИ ЧЕРЕЗ TELEGRAM
+// ЛОГИКА ПРОДАЖИ ЧЕРЕЗ STEAM (ИНВЕНТАРЬ)
 // ==========================================
-let selectedSkinsForSale = [];
+let userInventory = [];
+let selectedSteamSkins = [];
 
-function renderSellSkins() {
-    const grid = document.getElementById('sellSkinGrid');
-    
-    if (appData.skins.length === 0) {
-        grid.innerHTML = `
-            <div class="sell-empty">
-                <div class="icon">📦</div>
-                <h3>${currentLang === 'ru' ? 'Нет скинов для продажи' : 'No skins for sale'}</h3>
-                <p>${currentLang === 'ru' ? 'Добавьте скины в инвентарь через админ-панель' : 'Add skins to inventory via admin panel'}</p>
-            </div>
-        `;
-        return;
-    }
-
-    grid.innerHTML = appData.skins.map((skin, index) => `
-        <div class="sell-skin-card" onclick="toggleSkinSelection(${index})">
-            <div class="sell-checkbox" id="checkbox-${index}">
-                <span id="checkmark-${index}" style="display:none;">✓</span>
-            </div>
-            <div class="skin-image">${skin.imageUrl ? `<img src="${skin.imageUrl}" alt="${skin.name}">` : `<span style="color:#4a4d5a;font-size:12px;">${skin.weapon||'Скин'}</span>`}</div>
-            <div class="skin-name">${skin.name}</div>
-            <div class="skin-exterior">${skin.exterior || ''}</div>
-            <div class="skin-price">${formatPrice(skin.price)}</div>
-        </div>
-    `).join('');
-    
-    document.getElementById('selectAllSkins').textContent = (currentLang === 'ru' ? 'Выбрано' : 'Selected') + ` (${selectedSkinsForSale.length})`;
-}
-
-function toggleSkinSelection(index) {
-    const skin = appData.skins[index];
-    const idxInArray = selectedSkinsForSale.findIndex(s => s.id === skin.id);
-
-    if (idxInArray > -1) {
-        selectedSkinsForSale.splice(idxInArray, 1);
-        document.getElementById(`checkbox-${index}`).style.background = 'transparent';
-        document.getElementById(`checkmark-${index}`).style.display = 'none';
-    } else {
-        selectedSkinsForSale.push(skin);
-        document.getElementById(`checkbox-${index}`).style.background = '#2ecc71';
-        document.getElementById(`checkmark-${index}`).style.display = 'block';
-    }
-    renderSellSkins();
-}
-
-function sellSelectedSkins() {
+async function loadSteamInventory() {
     const tradeUrl = document.getElementById('sellTradeUrl').value.trim();
-    const username = appData.currentUser || 'Гость';
-
-    if (selectedSkinsForSale.length === 0) {
-        alert('Выберите хотя бы один скин!');
-        return;
-    }
 
     if (!tradeUrl) {
         alert('Введите вашу Trade URL!');
         return;
     }
 
-    // 1. Отправляем ссылку на сервер для проверки и привязки
-    fetch('/api/bind-trade', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tradeUrl, username })
-    })
-    .then(response => response.json())
-    .then(data => {
+    const grid = document.getElementById('sellSkinGrid');
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">⏳ Загружаем ваш инвентарь из Steam...</div>';
+
+    try {
+        const response = await fetch('/api/get-inventory', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tradeUrl })
+        });
+
+        const data = await response.json();
+
         if (data.error) {
             alert('Ошибка: ' + data.error);
+            grid.innerHTML = '<div class="sell-empty"><div class="icon">📦</div><h3>Инвентарь не найден</h3><p>Проверьте ссылку или откройте инвентарь в Steam.</p></div>';
             return;
         }
 
-        console.log('Привязка успешна! Steam аккаунт:', data.player.name);
+        userInventory = data.items;
 
-        // 2. Формируем сообщение для Telegram
-        const skinNames = selectedSkinsForSale.map(s => s.name).join(', ');
-        const message = `Привет! У меня есть скины: ${skinNames}.\nМой Steam ID: ${data.player.steamId}\nМой профиль: ${data.player.name}\nТрейд-бана нет. Если ты согласен — жду твой трейд!`;
-        const encodedMessage = encodeURIComponent(message);
+        if (userInventory.length === 0) {
+            grid.innerHTML = '<div class="sell-empty"><div class="icon">📦</div><h3>Инвентарь пуст или скрыт</h3><p>Убедитесь, что ваш инвентарь открыт для всех в настройках Steam.</p></div>';
+            return;
+        }
+
+        grid.innerHTML = userInventory.map((item, index) => `
+            <div class="sell-skin-card" onclick="toggleSteamSkinSelection(${index})">
+                <div class="sell-checkbox" id="checkbox-${index}">
+                    <span id="checkmark-${index}" style="display:none;">✓</span>
+                </div>
+                <div class="skin-image">${item.image ? `<img src="${item.image}">` : ''}</div>
+                <div class="skin-name">${item.name}</div>
+                <div class="skin-exterior">${item.type || ''}</div>
+                <div class="skin-price" style="color:#8a8d99; font-size:11px;">Ваш предмет</div>
+            </div>
+        `).join('');
         
-        // 3. Перекидываем в Telegram
-        window.open(`https://t.me/emerald_mrkt?text=${encodedMessage}`, '_blank');
-        
-        selectedSkinsForSale = [];
-        renderSellSkins();
-    })
-    .catch(err => {
-        alert('Ошибка подключения к серверу. Проверь, что сервер запущен на Render!');
-        console.error(err);
-    });
+    } catch (error) {
+        alert('Не удалось подключиться к серверу.');
+        console.error(error);
+    }
+}
+
+function toggleSteamSkinSelection(index) {
+    const item = userInventory[index];
+    const idx = selectedSteamSkins.findIndex(id => id === item.assetid);
+
+    if (idx > -1) {
+        selectedSteamSkins.splice(idx, 1);
+        document.getElementById(`checkbox-${index}`).style.background = 'transparent';
+        document.getElementById(`checkmark-${index}`).style.display = 'none';
+    } else {
+        selectedSteamSkins.push(item.assetid);
+        document.getElementById(`checkbox-${index}`).style.background = '#2ecc71';
+        document.getElementById(`checkmark-${index}`).style.display = 'block';
+    }
+}
+
+function sellSelectedSkins() {
+    const tradeUrl = document.getElementById('sellTradeUrl').value.trim();
+    
+    if (selectedSteamSkins.length === 0) {
+        alert('Выберите хотя бы один предмет из инвентаря!');
+        return;
+    }
+    
+    if (!tradeUrl) {
+        alert('Введите вашу Trade URL!');
+        return;
+    }
+
+    const skinNames = userInventory
+        .filter(item => selectedSteamSkins.includes(item.assetid))
+        .map(item => item.name)
+        .join(', ');
+
+    const message = `Привет! У меня есть скины: ${skinNames}.\nТрейд-бана нет. Если ты согласен — жду твой трейд!`;
+    const encodedMessage = encodeURIComponent(message);
+
+    window.open(`https://t.me/emerald_mrkt?text=${encodedMessage}`, '_blank');
+
+    selectedSteamSkins = [];
+    userInventory = [];
 }
 
 // ==========================================
@@ -1920,4 +1873,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 </body>
-</html>
+</html> 
