@@ -37,13 +37,13 @@
         .btn-success { background: #2ecc71; color: #0b0c10 !important; }
         .btn-steam { background: #171a21; color: #fff; border: 1px solid #66c0f4; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; }
 
-        /* ======== ПРОФИЛЬ В ШАПКЕ ======== */
+        /* ПРОФИЛЬ В ШАПКЕ (только то, что просил) */
         .steam-user { display: flex; align-items: center; gap: 10px; background: #1c1d23; padding: 4px 12px 4px 4px; border-radius: 30px; border: 1px solid #2c2e36; cursor: pointer; }
         .steam-user:hover { border-color: #2ecc71; }
         .steam-avatar { width: 32px; height: 32px; border-radius: 50%; background-size: cover; background-position: center; flex-shrink: 0; }
         .steam-name { font-size: 13px; font-weight: 500; color: #e4e6eb; }
         .steam-logout { background: none; border: none; color: #8a8d99; font-size: 14px; padding: 0 4px; }
-        /* ================================== */
+        /* ============================== */
 
         .hero { padding: 60px 0 40px; text-align: center; background: radial-gradient(ellipse at center, #14161c 0%, #0b0c10 100%); border-bottom: 1px solid #26282f; }
         .hero h1 { font-size: 48px; font-weight: 800; color: #2ecc71; margin-bottom: 12px; }
@@ -166,7 +166,6 @@
             <a data-page="profile">Профиль</a>
         </nav>
         <div class="header-actions" id="headerActions">
-            <!-- До входа -->
             <a href="/auth/steam" class="btn btn-steam">Войти через Steam</a>
         </div>
     </div>
@@ -451,7 +450,7 @@ function updateUserUI() {
     const actions = document.getElementById('headerActions');
     if (currentUser) {
         actions.innerHTML = `
-            <div class="steam-user">
+            <div class="steam-user" style="cursor:pointer;" onclick="navigateTo('profile')">
                 <div class="steam-avatar" style="background-image:url('${currentUser.avatar}');"></div>
                 <span class="steam-name">${currentUser.name}</span>
                 <button class="steam-logout" onclick="event.stopPropagation(); logoutUser()">✕</button>

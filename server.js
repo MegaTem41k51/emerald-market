@@ -9,6 +9,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Обязательно добавь эти переменные на Render!
 const STEAM_API_KEY = process.env.STEAM_API_KEY;
 const SESSION_SECRET = process.env.SESSION_SECRET || 'secret123';
 const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
@@ -16,6 +17,7 @@ const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
 
+// Сохраняем сессии в файл
 app.use(session({
     store: new FileStore(),
     secret: SESSION_SECRET,
@@ -42,6 +44,7 @@ app.get('/logout', (req, res) => {
     req.logout(() => res.redirect('/'));
 });
 
+// ОТДАЁМ ДАННЫЕ ДЛЯ ШАПКИ
 app.get('/api/user', (req, res) => {
     if (req.user) {
         res.json({ 
