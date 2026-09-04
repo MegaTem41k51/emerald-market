@@ -3,12 +3,26 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
+const Inventory = require('steam-inventory-api-ng');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Обязательно создай переменную окружения STEAM_API_KEY на Render!
-const STEAM_API_KEY = process.env.STEAM_API_KEY;
+// ==========================================
+// НАСТРОЙКИ ПРОКСИ
+// ==========================================
+// 1. Настройте ваши прокси в формате строки:
+// HTTP/SOCKS5: http://username:password@host:port
+// SOCKS5:      socks5://username:password@host:port
+const PROXIES = [
+    'http://ipv4.webshare.io/',
+    'http://qigocgbt:7sdfc9sdwkkv@31.59.20.176:6754'
+];
+// 2. Если хотите использовать переменные окружения Render, оставьте пустым:
+// const PROXIES = process.env.PROXIES ? process.env.PROXIES.split(',') : [];
+// ==========================================
+
+const STEAM_API_KEY = process.env.STEAM_API_KEY; // Ключ из переменных окружения Render
 
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
@@ -27,6 +41,20 @@ function convertToSteamId64(steamId) {
     return null;
 }
 
+// Функция для создания axios-клиента с прокси
+function createAxiosWithProxy() {
+    if (PROXIES.length === 0) {
+        // Если прокси не указаны, работаем напрямую (может быть забанено)
+        return axios.create({ timeout: 10000 });
+    }
+
+    const proxyUrl = PROXIES[Math.floor(Math.random() * PROXIES.length)];
+    const { HttpsProxyAgent } = require('https-proxy-agent');
+    const httpsAgent = new HttpsProxyAgent(proxyUrl);
+
+    return axios.create({ httpsAgent, timeout: 10000 });
+}
+
 app.post('/api/bind-trade', async (req, res) => {
     const { tradeUrl, username } = req.body;
     if (!tradeUrl || !tradeUrl.includes('partner=')) return res.status(400).json({ error: 'Неверный формат Trade URL' });
@@ -39,8 +67,9 @@ app.post('/api/bind-trade', async (req, res) => {
     if (!steamId) return res.status(400).json({ error: 'Некорректный Steam ID в ссылке' });
 
     try {
+        const client = createAxiosWithProxy();
         const apiUrl = `https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${STEAM_API_KEY}&steamids=${steamId}`;
-        const response = await axios.get(apiUrl);
+        const response = await client.get(apiUrl);
         const player = response.data.response.players[0];
         if (!player) return res.status(404).json({ error: 'Профиль не найден. Проверьте, что ссылка ведет на реальный аккаунт!' });
 
@@ -48,6 +77,7 @@ app.post('/api/bind-trade', async (req, res) => {
         saveUsers();
         res.json({ success: true, player: { name: player.personaname, avatar: player.avatarfull, steamId } });
     } catch (error) {
+        console.error('Ошибка при привязке:', error.message);
         res.status(500).json({ error: 'Ошибка при проверке Steam. Проверьте API ключ!' });
     }
 });
@@ -63,37 +93,41 @@ app.post('/api/get-inventory', async (req, res) => {
     if (!steamId) return res.status(400).json({ error: 'Некорректный Steam ID' });
 
     try {
+        const client = createAxiosWithProxy();
+        
         const profileUrl = `https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${STEAM_API_KEY}&steamids=${steamId}`;
-        const profileResponse = await axios.get(profileUrl);
+        const profileResponse = await client.get(profileUrl);
         if (!profileResponse.data.response.players[0]) return res.status(404).json({ error: 'Профиль не найден' });
 
-        // ВАЖНО: Ждем 4.5 секунды, чтобы Steam не забанил IP
-        await new Promise(r => setTimeout(r, 4500));
+        // Используем steam-inventory-api-ng для получения инвентаря
+        const options = {
+            steamID: steamId,
+            appID: '730',
+            contextID: '2',
+            method: 'new',
+            language: 'english'
+        };
 
-        const inventoryUrl = `https://steamcommunity.com/inventory/${steamId}/730/2?l=english&count=2000`;
-        const inventoryResponse = await axios.get(inventoryUrl, {
-            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' }
-        });
+        // Пробуем использовать прокси через библиотеку, если они настроены
+        if (PROXIES.length > 0) {
+            options.proxies = PROXIES; // Библиотека сама ротирует прокси
+        }
+
+        const inventory = new Inventory(options);
+        const items = await inventory.get();
         
-        const inventory = inventoryResponse.data;
-        if (!inventory.assets || inventory.assets.length === 0) return res.status(200).json({ success: true, items: [] });
+        // Преобразуем полученные предметы в нужный формат
+        const formattedItems = items.map(item => ({
+            assetid: item.assetid,
+            name: item.market_hash_name || item.name,
+            image: item.icon_url ? `https://community.akamai.steamstatic.com/economy/image/${item.icon_url}` : '',
+            type: item.type || ''
+        }));
 
-        const items = [];
-        const descriptions = {};
-        inventory.descriptions.forEach(desc => { descriptions[`${desc.classid}_${desc.instanceid}`] = desc; });
-
-        inventory.assets.forEach(asset => {
-            const key = `${asset.classid}_${asset.instanceid}`;
-            const desc = descriptions[key];
-            if (desc) {
-                items.push({ assetid: asset.assetid, name: desc.market_hash_name || desc.name, image: desc.icon_url ? `https://community.akamai.steamstatic.com/economy/image/${desc.icon_url}` : '', type: desc.type || '' });
-            }
-        });
-
-        res.json({ success: true, items });
+        res.json({ success: true, items: formattedItems });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Не удалось получить инвентарь. Перезапусти сервер и подожди 15 минут.' });
+        console.error('Ошибка при получении инвентаря:', error.message);
+        res.status(500).json({ error: 'Не удалось получить инвентарь. Перезапустите сервер или проверьте настройки прокси.' });
     }
 });
 
