@@ -235,7 +235,7 @@
             <a data-page="profile">Профиль</a>
         </nav>
         <div class="header-actions" id="headerActions">
-            <a href="/auth/steam" class="btn btn-steam" id="steamLoginBtn">Войти через Steam</a>
+            <a href="/auth/steam" class="btn btn-steam">Войти через Steam</a>
         </div>
     </div>
 </header>
@@ -258,68 +258,6 @@
         </div>
     </div>
 </section>
-
-<!-- СТРАНИЦА О НАС -->
-<div class="page" id="aboutPage">
-    <div class="container static-page">
-        <h1>➡ ИНФОРМАЦИЯ ПО ЦЕНАМ ⬅</h1>
-        <h2>Условия выкупа</h2>
-        <ul>
-            <li>✅ Работаем 24/7. Выплачиваем мгновенно!</li>
-            <li>✅ Ликвидные скины от 1к до 20к - 80% от автобая csmarket (больше 50 продаж на маркете за неделю)</li>
-            <li>✅ Ликвидные скины от 20к до 50к - 77% от автобая csmarket (больше 30 продаж в неделю)</li>
-            <li>✅ Ликвидные скины до 1000 рублей - 75% от автобая csmarket (больше 50 продаж на маркете за неделю)</li>
-            <li>✅ Если ваш скин в трейд бане - то минус 1.5% от автобая csmarket за каждый день бана</li>
-            <li>✅ Кейсы - 80% от автобая csmarket</li>
-            <li>✔ Все остальные скины - обсуждаются индивидуально!</li>
-            <li>❌ Не покупаем скины из новых коллекций!</li>
-            <li>💵 Выплачиваем мгновенно! По СБП (в любой банк РФ) или на крипту.</li>
-        </ul>
-        <p>➖</p>
-        <p>💬 Чат канала - <a href="https://t.me/+7243grpklsozMDEy" target="_blank">https://t.me/+7243grpklsozMDEy</a></p>
-        <p>📖 Пост для отзывов - <a href="https://t.me/emerald_mrkt/14" target="_blank">https://t.me/emerald_mrkt/14</a></p>
-        <p>❓ По всем вопросам обращаться в ЛИЧНЫЕ СООБЩЕНИЯ ГРУППЫ - <a href="https://t.me/emerald_mrkt?direct" target="_blank">https://t.me/emerald_mrkt?direct</a></p>
-    </div>
-</div>
-
-<!-- СТРАНИЦА КОНТАКТЫ -->
-<div class="page" id="contactsPage">
-    <div class="container static-page">
-        <h1>Контакты</h1>
-        
-        </div>
-        <p style="text-align:center; font-weight:700; font-size:20px; margin-bottom:30px;">@EMERALD_MRKT</p>
-        <p style="text-align:center; line-height:2;">
-            <a href="https://t.me/emerald_mrkt?direct" target="_blank">ЛИЧНЫЕ СООБЩЕНИЯ ГРУППЫ - https://t.me/emerald_mrkt?direct</a><br><br>
-            <a href="https://t.me/ikiawka" target="_blank">НАПИСАТЬ МНЕ ЛИЧНО - https://t.me/ikiawka</a>
-        </p>
-    </div>
-</div>
-
-<!-- СТРАНИЦА FAQ -->
-<div class="page" id="faqPage">
-    <div class="container static-page">
-        <h1>Как это работает</h1>
-        <p>EMERALD Market — площадка для продажи скинов из CS2</p>
-        <p>💡 Выплата по сделке производится через 8 дней с момента подтверждения обмена в Steam.</p>
-        <h2>Шаг 1</h2>
-        <p>Авторизация через Steam. Авторизуйся через свой аккаунт в Steam на сайте EMERALD Market.</p>
-        <h2>Шаг 2</h2>
-        <p>Выбор предметов. Открой свой инвентарь и выбери предметы для продажи.</p>
-        <h2>Шаг 3</h2>
-        <p>Выбор способа получения денег. Выбери способ получения денег (USDT, карта).</p>
-        <h2>Шаг 4</h2>
-        <p>Подтверждение сделки. Проверь данные и подтверди сделку.</p>
-    </div>
-</div>
-
-<!-- СТРАНИЦА ГАРАНТИИ / ПОЛИТИКА -->
-<div class="page" id="policyPage">
-    <div class="container static-page">
-        <h1>Гарантии и Политика</h1>
-        <div class="bold-warning">В РАЗРАБОТКЕ</div>
-    </div>
-</div>
 
 <div class="page" id="sellPage">
     <div class="container">
@@ -554,7 +492,10 @@ function navigateTo(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const target = document.getElementById(page + 'Page');
     if (target) target.classList.add('active');
-    document.querySelectorAll('.nav a, .footer a').forEach(a => a.classList.toggle('active', a.dataset.page === page));
+    document.querySelectorAll('.nav a, .footer a, .hero-buttons a').forEach(a => {
+        if(a.dataset.page === page) a.classList.add('active');
+        else a.classList.remove('active');
+    });
     if (page === 'sell') renderSellSkins();
     else if (page === 'market') renderMarketSkins();
     else if (page === 'profile') renderProfile();
@@ -629,9 +570,7 @@ function sellSelectedSkins() {
 }
 
 // МАРКЕТ
-function refreshMarket() {
-    setTimeout(() => { renderMarketSkins(); }, 300);
-}
+function refreshMarket() { setTimeout(() => { renderMarketSkins(); }, 300); }
 
 function renderMarketSkins() {
     let skins = [...appData.skins];
@@ -699,26 +638,9 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         navigateTo('hero');
     });
-    document.getElementById('themeToggle').addEventListener('click', function() {
-        document.body.classList.remove('light');
-        document.getElementById('themeToggle').classList.add('active');
-        document.getElementById('themeToggleLight').classList.remove('active');
-    });
-    document.getElementById('themeToggleLight').addEventListener('click', function() {
-        document.body.classList.add('light');
-        document.getElementById('themeToggleLight').classList.add('active');
-        document.getElementById('themeToggle').classList.remove('active');
-    });
-    document.getElementById('rainToggle').addEventListener('click', function() {
-        document.getElementById('rainContainer').style.display = 'block';
-    });
-    document.getElementById('rainToggleOff').addEventListener('click', function() {
-        document.getElementById('rainContainer').style.display = 'none';
-    });
     navigateTo('hero');
     renderMarketSkins();
     
-    // Дождик
     const container = document.getElementById('rainContainer');
     for (let i = 0; i < 80; i++) {
         const drop = document.createElement('div');
