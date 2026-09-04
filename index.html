@@ -336,12 +336,33 @@
         .sell-content .top-bar .select-all { color: #8a8d99; font-size: 13px; cursor: pointer; }
         .sell-content .top-bar .select-all:hover { color: #2ecc71; }
 
+        /* Стили для карточек продажи (с чекбоксами) */
         .sell-skin-grid { 
             display: grid; 
             grid-template-columns: repeat(4, 1fr); 
             gap: 12px;
             min-height: 200px;
         }
+        .sell-skin-card { 
+            background: #14161c; 
+            border: 1px solid #26282f; 
+            border-radius: 10px; 
+            padding: 14px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+            cursor: pointer; 
+            transition: 0.2s;
+            position: relative;
+        }
+        .sell-skin-card:hover { border-color: #2ecc71; transform: translateY(-2px); }
+        .sell-checkbox { position: absolute; top: 8px; right: 8px; width: 20px; height: 20px; border: 2px solid #2ecc71; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #0b0c10; font-weight: bold; }
+        .sell-skin-card .skin-image { display: flex; align-items: center; justify-content: center; height: 60px; }
+        .sell-skin-card .skin-image img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .sell-skin-card .skin-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sell-skin-card .skin-exterior { font-size: 12px; color: #8a8d99; }
+        .sell-skin-card .skin-price { color: #2ecc71; font-weight: 700; }
+
         .sell-empty {
             grid-column: 1/-1;
             text-align: center;
@@ -535,13 +556,19 @@
                 <div class="subtitle"><a href="https://steamcommunity.com/id/me/tradeoffers/privacy#trade_offer_access_url" target="_blank" data-key="sell_where">Где взять?</a></div>
                 <label class="trade-label" data-key="sell_enter_url">Введите ваш Trade URL</label>
                 <input class="trade-input" id="sellTradeUrl" placeholder="https://steamcommunity.com/tradeoffer/new/?pa..." onchange="saveTradeUrl()">
-                <div class="min-withdraw" data-key="sell_closed">Сайт в разработке, продажа скинов закрыта!</div>
+                <div class="min-withdraw" data-key="sell_closed">Выберите скины и отправьте заявку в Telegram!</div>
             </div>
             <div class="sell-content">
                 <div class="top-bar">
-                    <span style="color:#8a8d99; font-size:13px;"><span data-key="sell_select">Выбрать</span>: <span class="select-all" id="selectAllSkins" data-key="sell_all">Все скины (0)</span> | <span class="select-all" id="selectAllContainers" data-key="sell_clear">Снять все</span></span>
+                    <span style="color:#8a8d99; font-size:13px;"><span data-key="sell_select">Выбрать</span>: <span class="select-all" id="selectAllSkins" data-key="sell_all">Все скины (0)</span></span>
                     <span style="color:#8a8d99; font-size:13px;"><span data-key="sell_total">Итого</span>: <span id="sellTotalPrice">0 ₽</span></span>
                 </div>
+                
+                <!-- КНОПКА ПРОДАЖИ В TELEGRAM -->
+                <button class="btn btn-success" style="width:100%; margin-bottom:20px; padding:14px; font-size:16px;" onclick="sellSelectedSkins()">
+                    🚀 Продать выбранные скины
+                </button>
+
                 <div class="sell-skin-grid" id="sellSkinGrid">
                     <div class="sell-empty">
                         <div class="icon">📦</div>
@@ -822,7 +849,7 @@ const translations = {
         sell_trade_url: 'Trade URL',
         sell_where: 'Где взять?',
         sell_enter_url: 'Введите ваш Trade URL',
-        sell_closed: 'Сайт в разработке, продажа скинов закрыта!',
+        sell_closed: 'Выберите скины и отправьте заявку в Telegram!',
         sell_select: 'Выбрать',
         sell_all: 'Все скины',
         sell_clear: 'Снять все',
@@ -915,7 +942,7 @@ const translations = {
         sell_trade_url: 'Trade URL',
         sell_where: 'Where to get?',
         sell_enter_url: 'Enter your Trade URL',
-        sell_closed: 'Site under development, skin sales are closed!',
+        sell_closed: 'Select skins and send a request to Telegram!',
         sell_select: 'Select',
         sell_all: 'All skins',
         sell_clear: 'Clear all',
@@ -1265,19 +1292,82 @@ function formatPrice(price) {
 }
 
 // ==========================================
-// SELL PAGE - ПУСТО
+// ЛОГИКА ПРОДАЖИ ЧЕРЕЗ TELEGRAM
 // ==========================================
+let selectedSkinsForSale = [];
+
+// Функция для отображения скинов на странице "Продать" (с чекбоксами)
 function renderSellSkins() {
     const grid = document.getElementById('sellSkinGrid');
-    grid.innerHTML = `
-        <div class="sell-empty">
-            <div class="icon">📦</div>
-            <h3 data-key="sell_empty_title">${currentLang === 'ru' ? 'Нет скинов для продажи' : 'No skins for sale'}</h3>
-            <p data-key="sell_empty_desc">${currentLang === 'ru' ? 'Добавьте скины в инвентарь через админ-панель' : 'Add skins to inventory via admin panel'}</p>
+    
+    if (appData.skins.length === 0) {
+        grid.innerHTML = `
+            <div class="sell-empty">
+                <div class="icon">📦</div>
+                <h3>${currentLang === 'ru' ? 'Нет скинов для продажи' : 'No skins for sale'}</h3>
+                <p>${currentLang === 'ru' ? 'Добавьте скины в инвентарь через админ-панель' : 'Add skins to inventory via admin panel'}</p>
+            </div>
+        `;
+        return;
+    }
+
+    grid.innerHTML = appData.skins.map((skin, index) => `
+        <div class="sell-skin-card" onclick="toggleSkinSelection(${index})">
+            <div class="sell-checkbox" id="checkbox-${index}">
+                <span id="checkmark-${index}" style="display:none;">✓</span>
+            </div>
+            <div class="skin-image">${skin.imageUrl ? `<img src="${skin.imageUrl}" alt="${skin.name}">` : `<span style="color:#4a4d5a;font-size:12px;">${skin.weapon||'Скин'}</span>`}</div>
+            <div class="skin-name">${skin.name}</div>
+            <div class="skin-exterior">${skin.exterior || ''}</div>
+            <div class="skin-price">${formatPrice(skin.price)}</div>
         </div>
-    `;
-    document.querySelector('#selectAllSkins').textContent = (currentLang === 'ru' ? 'Все скины' : 'All skins') + ' (0)';
-    document.getElementById('sellTotalPrice').textContent = '0 ₽';
+    `).join('');
+    
+    document.getElementById('selectAllSkins').textContent = (currentLang === 'ru' ? 'Выбрано' : 'Selected') + ` (${selectedSkinsForSale.length})`;
+}
+
+// Функция выбора скина
+function toggleSkinSelection(index) {
+    const skin = appData.skins[index];
+    const idxInArray = selectedSkinsForSale.findIndex(s => s.id === skin.id);
+
+    if (idxInArray > -1) {
+        selectedSkinsForSale.splice(idxInArray, 1);
+        document.getElementById(`checkbox-${index}`).style.background = 'transparent';
+        document.getElementById(`checkmark-${index}`).style.display = 'none';
+    } else {
+        selectedSkinsForSale.push(skin);
+        document.getElementById(`checkbox-${index}`).style.background = '#2ecc71';
+        document.getElementById(`checkmark-${index}`).style.display = 'block';
+    }
+    renderSellSkins();
+}
+
+// Функция "Продать выбранное"
+function sellSelectedSkins() {
+    const tradeUrl = document.getElementById('sellTradeUrl').value.trim();
+
+    if (selectedSkinsForSale.length === 0) {
+        alert(currentLang === 'ru' ? 'Выберите хотя бы один скин!' : 'Select at least one skin!');
+        return;
+    }
+
+    if (!tradeUrl) {
+        alert(currentLang === 'ru' ? 'Введите вашу Trade URL!' : 'Enter your Trade URL!');
+        return;
+    }
+
+    appData.profile.tradeUrl = tradeUrl;
+    saveData();
+
+    const skinNames = selectedSkinsForSale.map(s => s.name).join(', ');
+    const message = `Привет! У меня есть скины: ${skinNames}.\nМой Trade URL: ${tradeUrl}\nТрейд-бана нет. Я предлагаю свою стоимость, а ты свою. Давай договариваться!`;
+    const encodedMessage = encodeURIComponent(message);
+
+    window.open(`https://t.me/emerald_mrkt?text=${encodedMessage}`, '_blank');
+    
+    selectedSkinsForSale = [];
+    renderSellSkins();
 }
 
 // ==========================================
