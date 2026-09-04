@@ -30,6 +30,17 @@
         .rain-medium { animation-duration: 2s; }
         .rain-fast { animation-duration: 1.2s; }
 
+        /* ТЕМЫ */
+        body.light { background: #e8ecf1; color: #1a1a2e; }
+        body.light .header { background: #f0f2f5; border-bottom-color: #d0d4da; }
+        body.light .steam-user { background: #fff; border-color: #d0d4da; }
+        body.light .steam-name { color: #333; }
+        body.light .hero { background: #f0f2f5; border-bottom-color: #d0d4da; }
+        body.light .hero p { color: #666; }
+        body.light .sell-sidebar { background: #fff; border-color: #d0d4da; }
+        body.light .market-skin-card { background: #fff; border-color: #d0d4da; }
+        body.light .footer { background: #f0f2f5; border-top-color: #d0d4da; }
+
         .wrapper { display: flex; flex-direction: column; min-height: 100vh; position: relative; z-index: 1; }
         .content { flex: 1; }
         .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
@@ -50,8 +61,6 @@
         .btn-outline:hover { border-color: #2ecc71; color: #2ecc71 !important; }
         .btn-success { background: #2ecc71; color: #0b0c10 !important; }
         .btn-steam { background: #171a21; color: #fff; border: 1px solid #66c0f4; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; }
-        .btn-danger { background: #e74c3c; color: #fff !important; }
-        .btn-danger:hover { background: #c0392b; }
 
         /* ПРОФИЛЬ В ШАПКЕ */
         .steam-user { display: flex; align-items: center; gap: 10px; background: #1c1d23; padding: 4px 12px 4px 4px; border-radius: 30px; border: 1px solid #2c2e36; cursor: pointer; }
@@ -150,11 +159,6 @@
         .admin-save-btn:hover { background: #27ae60; }
         .admin-status { color: #2ecc71; font-size: 14px; margin-top: 12px; display: none; }
         .admin-status.show { display: block; }
-        .admin-users-panel { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
-        .admin-users-panel h2 { font-size: 20px; margin-bottom: 16px; color: #2ecc71; }
-        .admin-user-item { background: #1c1d23; border-radius: 6px; padding: 8px 14px; margin-bottom: 6px; border: 1px solid #26282f; display: flex; justify-content: space-between; align-items: center; }
-        .admin-user-item .user-name { color: #e4e6eb; font-weight: 500; }
-        .admin-user-item .user-date { color: #8a8d99; font-size: 12px; }
 
         .profile-login-box { max-width: 500px; margin: 40px auto; background: #14161c; border: 1px solid #26282f; border-radius: 16px; padding: 48px 40px; text-align: center; }
         .profile-login-box .icon { font-size: 64px; margin-bottom: 16px; }
@@ -164,9 +168,6 @@
         .profile-header { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px 32px; display: flex; align-items: center; gap: 24px; margin-bottom: 24px; }
         .profile-avatar { width: 72px; height: 72px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; color: #0b0c10; flex-shrink: 0; background-size: cover; background-position: center; }
         .profile-info h2 { font-size: 24px; }
-        .profile-info .stats { display: flex; gap: 24px; margin-top: 4px; }
-        .profile-info .stats .stat { color: #8a8d99; font-size: 14px; }
-        .profile-info .stats .stat strong { color: #2ecc71; }
 
         .profile-settings { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
         .profile-settings h3 { margin-bottom: 16px; font-size: 18px; }
@@ -190,15 +191,6 @@
     </style>
 </head>
 <body>
-
-<!-- ОНЛАЙН СЧЕТЧИК -->
-<div id="onlineWidget" style="position: fixed; bottom: 20px; right: 20px; background: rgba(20, 22, 28, 0.9); border: 1px solid #2ecc71; border-radius: 12px; padding: 10px 16px; font-family: 'Montserrat', sans-serif; color: #e4e6eb; font-size: 13px; z-index: 9999; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 20px rgba(46, 204, 113, 0.2);">
-    <div style="width: 10px; height: 10px; border-radius: 50%; background: #2ecc71; animation: pulse 1.5s infinite;"></div>
-    <span>Сейчас онлайн: <strong style="color:#2ecc71;" id="onlineCount">1</strong></span>
-</div>
-<style>
-    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.7); } }
-</style>
 
 <div class="rain-container" id="rainContainer"></div>
 
@@ -400,9 +392,9 @@
                 </div>
                 <div class="market-skin-grid" id="marketSkinGrid">
                     <div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">
-                        <div style="font-size:48px;margin-bottom:16px;"> ☹️</div>
-                        <h3 style="color:#697696;margin-bottom:12px;"> На данный момент рынок пуст</h3>
-                        <p> Пока можешь продать свои скины :D</p>
+                        <div style="font-size:48px;margin-bottom:16px;">☹️</div>
+                        <h3 style="color:#e4e6eb;margin-bottom:8px;">На данный момент рынок пуст</h3>
+                        <p>Пока можешь продать свои скины :D</p>
                     </div>
                 </div>
             </div>
@@ -425,11 +417,6 @@
                 <div class="profile-avatar" id="profileAvatar"></div>
                 <div class="profile-info">
                     <h2 id="profileName"></h2>
-                    <div class="stats">
-                        <span class="stat"><span>Баланс</span>: <strong id="profileBalance">0 ₽</strong></span>
-                        <span class="stat"><span>Куплено на</span>: <strong id="profileBought">0 ₽</strong></span>
-                        <span class="stat"><span>Продано на</span>: <strong id="profileSold">0 ₽</strong></span>
-                    </div>
                 </div>
             </div>
             <div class="profile-settings">
@@ -450,14 +437,14 @@
                 </div>
             </div>
             <div class="profile-history">
-                <h3>История транзакций</h3>
-                <div class="empty-message">Не было совершенных транзакций</div>
+                <h3>Транзакции</h3>
+                <div class="empty-message" id="transactionMessage">Только что купил</div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- СТРАНИЦА АДМИНКИ -->
+<!-- АДМИНКА -->
 <div class="page" id="adminPage">
     <div class="container">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
@@ -467,16 +454,10 @@
                 <button class="btn btn-outline" id="adminBack">← На сайт</button>
             </div>
         </div>
-        
         <div class="admin-panel">
             <h2>Управление слотами скинов</h2>
             <div id="adminSkinList"></div>
             <button class="admin-add-btn" id="adminAddSkin">+ Добавить слот</button>
-            <div style="margin-top:12px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; border-top:1px solid #26282f; padding-top:12px;">
-                <button class="btn btn-danger" id="adminDeleteSkins">Удалить слоты</button>
-                <input type="number" id="adminDeleteCount" placeholder="Кол-во" min="1" style="width:80px; background:#1c1d23; border:1px solid #26282f; color:#e4e6eb; padding:6px 10px; border-radius:4px;">
-                <span style="color:#8a8d99; font-size:13px;">(удалить последние N слотов)</span>
-            </div>
             <button class="admin-save-btn" id="adminSaveAll" style="margin-top:12px;">Сохранить все</button>
             <div class="admin-status" id="adminStatus">Сохранено!</div>
         </div>
@@ -498,35 +479,50 @@
 </div>
 
 <script>
-// ==========================================
-// ДАННЫЕ
-// ==========================================
 let currentUser = null;
 let userInventory = [];
 let selectedSteamSkins = [];
+let marketData = [];
 
-// Массив скинов для покупки (демо-рынок)
-let marketData = [
-    
-];
+// ЗАГРУЗКА РЫНКА С СЕРВЕРА
+async function fetchMarket() {
+    const response = await fetch('/api/market');
+    marketData = await response.json();
+}
 
-// ==========================================
-// АВТОРИЗАЦИЯ STEAM
-// ==========================================
+async function saveMarketToServer() {
+    await fetch('/api/market/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ skins: marketData })
+    });
+}
+
+async function buySkin(id) {
+    await fetch('/api/market/buy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+    });
+    await fetchMarket();
+    renderMarketSkins();
+    document.getElementById('transactionMessage').textContent = 'Только что купил';
+    document.getElementById('transactionMessage').style.display = 'block';
+}
+
+// АВТОРИЗАЦИЯ
 async function fetchUser() {
-    try {
-        const response = await fetch('/api/user');
-        const data = await response.json();
-        if (data.loggedIn) {
-            currentUser = { id: data.user.id, name: data.user.name, avatar: data.user.avatar };
-            updateUserUI();
-            renderProfile();
-        } else {
-            currentUser = null;
-            updateUserUI();
-            renderProfile();
-        }
-    } catch (error) { console.error(error); }
+    const response = await fetch('/api/user');
+    const data = await response.json();
+    if (data.loggedIn) {
+        currentUser = { id: data.user.id, name: data.user.name, avatar: data.user.avatar };
+        updateUserUI();
+        renderProfile();
+    } else {
+        currentUser = null;
+        updateUserUI();
+        renderProfile();
+    }
 }
 
 function logoutUser() { window.location.href = '/logout'; }
@@ -546,9 +542,7 @@ function updateUserUI() {
     }
 }
 
-// ==========================================
-// АДМИНКА (AAAA)
-// ==========================================
+// АДМИНКА
 let secretCode = '';
 document.addEventListener('keydown', function(e) {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
@@ -565,7 +559,6 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// Рендер админки
 function renderAdminSkins() {
     const container = document.getElementById('adminSkinList');
     container.innerHTML = marketData.map((skin, index) => `
@@ -593,6 +586,7 @@ function removeAdminSkin(index) {
     if (confirm('Удалить слот "' + marketData[index]?.name + '"?')) {
         marketData.splice(index, 1);
         renderAdminSkins();
+        saveMarketToServer();
         renderMarketSkins();
     }
 }
@@ -613,14 +607,13 @@ function saveAdminAll() {
             });
         }
     });
+    saveMarketToServer();
     document.getElementById('adminStatus').classList.add('show');
     setTimeout(() => document.getElementById('adminStatus').classList.remove('show'), 3000);
     renderMarketSkins();
 }
 
-// ==========================================
 // НАВИГАЦИЯ
-// ==========================================
 function navigateTo(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const target = document.getElementById(page + 'Page');
@@ -629,13 +622,11 @@ function navigateTo(page) {
         if(a.dataset.page === page) a.classList.add('active');
         else a.classList.remove('active');
     });
-    if (page === 'market') renderMarketSkins();
+    if (page === 'market') { fetchMarket().then(renderMarketSkins); }
     else if (page === 'profile') renderProfile();
 }
 
-// ==========================================
-// ПРОФИЛЬ
-// ==========================================
+// ПРОФИЛЬ (тема, анимация)
 function renderProfile() {
     if (currentUser) {
         document.getElementById('profileLoginBox').style.display = 'none';
@@ -655,9 +646,7 @@ function renderProfile() {
     }
 }
 
-// ==========================================
 // ПРОДАЖА
-// ==========================================
 async function loadSteamInventory() {
     if (!currentUser) { alert('Пожалуйста, войдите через Steam!'); return; }
     const grid = document.getElementById('sellSkinGrid');
@@ -700,7 +689,6 @@ function sellSelectedSkins() {
     
     const skinNames = userInventory.filter(item => selectedSteamSkins.includes(item.assetid)).map(item => item.name).join(', ');
     
-    // Логика: если 1 скин -> "СКИН", если 2+ -> "СКИНЫ"
     let skinWord = 'СКИН';
     if (selectedSteamSkins.length > 1) {
         skinWord = 'СКИНЫ';
@@ -714,38 +702,24 @@ function sellSelectedSkins() {
     userInventory = [];
 }
 
-// ==========================================
 // РЫНОК
-// ==========================================
 function renderMarketSkins() {
-    let skins = [...marketData];
-    const search = document.getElementById('marketSearch').value.toLowerCase();
-    const priceMin = parseFloat(document.getElementById('priceMin').value) || 0;
-    const priceMax = parseFloat(document.getElementById('priceMax').value) || Infinity;
-    if (search) skins = skins.filter(s => s.name.toLowerCase().includes(search) || s.weapon.toLowerCase().includes(search));
-    skins = skins.filter(s => s.price >= priceMin && s.price <= priceMax);
-    
-    const rarityChecked = document.querySelectorAll('.rarity-filter:checked');
-    if (rarityChecked.length > 0) skins = skins.filter(s => Array.from(rarityChecked).map(cb => cb.value).includes(s.rarity));
-    const wearChecked = document.querySelectorAll('.wear-filter:checked');
-    if (wearChecked.length > 0) skins = skins.filter(s => Array.from(wearChecked).map(cb => cb.value).includes(s.exterior));
-    
     const grid = document.getElementById('marketSkinGrid');
-    if (skins.length === 0) {
-        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;"><div style="font-size:48px;margin-bottom:16px;">🎒</div><h3 style="color:#e4e6eb;margin-bottom:8px;">Ваш инвентарь пуст</h3><p>Добавьте скины в инвентарь через админ-панель</p></div>';
+    if (marketData.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;"><div style="font-size:48px;margin-bottom:16px;">☹️</div><h3 style="color:#e4e6eb;margin-bottom:8px;">На данный момент рынок пуст</h3><p>Пока можешь продать свои скины :D</p></div>';
         return;
     }
-    grid.innerHTML = skins.map(skin => `
+    grid.innerHTML = marketData.map(skin => `
         <div class="market-skin-card">
             <div class="image">${skin.imageUrl ? `<img src="${skin.imageUrl}">` : ''}</div>
             <div class="weapon">${skin.weapon}</div>
             <div class="name">${skin.name}</div>
             <div class="exterior">${skin.exterior}</div>
             <div class="price">$${skin.price.toFixed(2)}</div>
-            <button class="buy-btn" onclick="alert('Купить ${skin.name}?')">Купить</button>
+            <button class="buy-btn" onclick="buySkin(${skin.id})">Купить</button>
         </div>
     `).join('');
-    document.getElementById('marketCount').textContent = skins.length + ' скинов';
+    document.getElementById('marketCount').textContent = marketData.length + ' скинов';
 }
 
 function resetFilters() {
@@ -753,7 +727,6 @@ function resetFilters() {
     document.getElementById('priceMax').value = '';
     document.getElementById('marketSearch').value = '';
     document.querySelectorAll('.rarity-filter, .wear-filter').forEach(cb => cb.checked = false);
-    renderMarketSkins();
 }
 
 function toggleFilter(name) {
@@ -770,11 +743,11 @@ function toggleFilter(name) {
     }
 }
 
-// ==========================================
 // ИНИЦИАЛИЗАЦИЯ
-// ==========================================
 document.addEventListener('DOMContentLoaded', function() {
     fetchUser();
+    fetchMarket();
+    
     document.querySelectorAll('.nav a, .footer a, .hero-buttons a').forEach(el => {
         el.addEventListener('click', function(e) {
             e.preventDefault();
@@ -787,6 +760,24 @@ document.addEventListener('DOMContentLoaded', function() {
         navigateTo('hero');
     });
 
+    // Профиль: тема и анимация
+    document.getElementById('themeToggle').addEventListener('click', function() {
+        document.body.classList.remove('light');
+        document.getElementById('themeToggle').classList.add('active');
+        document.getElementById('themeToggleLight').classList.remove('active');
+    });
+    document.getElementById('themeToggleLight').addEventListener('click', function() {
+        document.body.classList.add('light');
+        document.getElementById('themeToggleLight').classList.add('active');
+        document.getElementById('themeToggle').classList.remove('active');
+    });
+    document.getElementById('rainToggle').addEventListener('click', function() {
+        document.getElementById('rainContainer').style.display = 'block';
+    });
+    document.getElementById('rainToggleOff').addEventListener('click', function() {
+        document.getElementById('rainContainer').style.display = 'none';
+    });
+
     // Админка
     document.getElementById('adminBack').addEventListener('click', function() { navigateTo('hero'); });
     document.getElementById('adminLogout').addEventListener('click', function() { navigateTo('hero'); });
@@ -795,21 +786,11 @@ document.addEventListener('DOMContentLoaded', function() {
         marketData.push({ id: maxId + 1, name: 'Новый скин', weapon: 'AWP', exterior: 'Factory New', price: 100, rarity: 'covert', imageUrl: '' });
         renderAdminSkins();
     });
-    document.getElementById('adminDeleteSkins').addEventListener('click', function() {
-        const count = parseInt(document.getElementById('adminDeleteCount').value) || 1;
-        if (count <= 0) return;
-        marketData.splice(-count);
-        renderAdminSkins();
-        renderMarketSkins();
-    });
     document.getElementById('adminSaveAll').addEventListener('click', saveAdminAll);
 
     navigateTo('hero');
-    renderMarketSkins();
     
-    // ОНЛАЙН
-    document.getElementById('onlineCount').textContent = '1';
-
+    // Дождик
     const container = document.getElementById('rainContainer');
     for (let i = 0; i < 80; i++) {
         const drop = document.createElement('div');
