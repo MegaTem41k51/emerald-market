@@ -279,7 +279,7 @@
 
         <!-- Обратный таймер (ПОД часами) -->
         <div class="countdown-title">До окончания работ осталось</div>
-        <div class="countdown" id="countdown">12:00:00</div>
+        <div class="countdown" id="countdown">--:--:--</div>
 
         <!-- Текст -->
         <div class="maintenance-text">
@@ -481,40 +481,40 @@
             document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
         }
 
-        // ===== ОБРАТНЫЙ ТАЙМЕР 12 ЧАСОВ (НЕ СБРАСЫВАЕТСЯ ПРИ F5) =====
-        let totalSeconds = 12 * 60 * 60;
-        let workEndTime = null;
+        // ===== ОБРАТНЫЙ ТАЙМЕР =====
+        let remainingSeconds = null; // Изначально null, берём с сервера
 
-        function initTimer() {
-            // Пытаемся взять сохраненную дату окончания из localStorage
-            const savedEnd = localStorage.getItem('maintenance_end_time');
-            
-            if (savedEnd) {
-                workEndTime = new Date(parseInt(savedEnd));
-            } else {
-                // Если нет, устанавливаем сейчас + 12 часов и сохраняем
-                workEndTime = new Date(Date.now() + totalSeconds * 1000);
-                localStorage.setItem('maintenance_end_time', workEndTime.getTime().toString());
+        async function fetchRemainingTime() {
+            try {
+                const response = await fetch('/api/maintenance-time');
+                const data = await response.json();
+                if (data.remaining !== undefined) {
+                    remainingSeconds = data.remaining;
+                }
+            } catch (error) {
+                console.error('Не удалось получить время с сервера');
             }
         }
 
         function updateCountdown() {
-            if (!workEndTime) return;
+            if (remainingSeconds === null) {
+                document.getElementById('countdown').textContent = '--:--:--';
+                return;
+            }
 
-            const now = Date.now();
-            const diff = Math.floor((workEndTime.getTime() - now) / 1000);
-
-            if (diff <= 0) {
+            if (remainingSeconds <= 0) {
                 document.getElementById('countdown').textContent = '00:00:00';
                 return;
             }
 
-            const hours = Math.floor(diff / 3600);
-            const minutes = Math.floor((diff % 3600) / 60);
-            const seconds = diff % 60;
+            const hours = Math.floor(remainingSeconds / 3600);
+            const minutes = Math.floor((remainingSeconds % 3600) / 60);
+            const seconds = remainingSeconds % 60;
 
             const formatted = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
             document.getElementById('countdown').textContent = formatted;
+
+            remainingSeconds--;
         }
 
         // ===== ОБНОВЛЕНИЕ ТЕКСТА =====
@@ -612,13 +612,12 @@
 
         // ===== ИНИЦИАЛИЗАЦИЯ =====
         document.addEventListener('DOMContentLoaded', function() {
-            initTimer();
+            fetchRemainingTime(); // Забираем время с сервера
             
             updateClock();
             setInterval(updateClock, 1000);
             
-            updateCountdown();
-            setInterval(updateCountdown, 1000);
+            setInterval(updateCountdown, 1000); // Обновляем раз в секунду
             
             updateText();
             createStars();

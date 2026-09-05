@@ -45,19 +45,56 @@ app.get('/logout', (req, res) => {
 });
 
 // ==========================================
-// СОХРАНЕНИЕ TRADE URL
+// ТЕХРАБОТЫ: ХРАНЕНИЕ ДАТЫ ОКОНЧАНИЯ
 // ==========================================
-const DB_FILE = path.join(__dirname, 'userData.json');
+const DB_FILE = path.join(__dirname, 'maintenance.json');
+let maintenanceEndTime = null;
+
+function loadMaintenance() {
+    try {
+        if (fs.existsSync(DB_FILE)) {
+            const data = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+            maintenanceEndTime = data.endTime;
+        }
+    } catch(e) {
+        maintenanceEndTime = null;
+    }
+}
+
+function saveMaintenance() {
+    fs.writeFileSync(DB_FILE, JSON.stringify({ endTime: maintenanceEndTime }));
+}
+
+function initMaintenance() {
+    loadMaintenance();
+
+    // Если техработы ещё не запускались, запускаем их на 12 часов.
+    if (!maintenanceEndTime || maintenanceEndTime < Date.now()) {
+        maintenanceEndTime = Date.now() + 12 * 60 * 60 * 1000; // + 12 часов
+        saveMaintenance();
+    }
+}
+
+// Эндпоинт, который возвращает оставшееся время
+app.get('/api/maintenance-time', (req, res) => {
+    const remaining = Math.max(0, Math.floor((maintenanceEndTime - Date.now()) / 1000));
+    res.json({ remaining });
+});
+
+// ==========================================
+// ДАННЫЕ ПОЛЬЗОВАТЕЛЯ (Trade URL + API Key)
+// ==========================================
+const USER_DB_FILE = path.join(__dirname, 'userData.json');
 let userData = {};
 function loadUserData() {
     try {
-        if (fs.existsSync(DB_FILE)) {
-            userData = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+        if (fs.existsSync(USER_DB_FILE)) {
+            userData = JSON.parse(fs.readFileSync(USER_DB_FILE, 'utf8'));
         }
     } catch(e) { userData = {}; }
 }
 function saveUserData() {
-    fs.writeFileSync(DB_FILE, JSON.stringify(userData, null, 2));
+    fs.writeFileSync(USER_DB_FILE, JSON.stringify(userData, null, 2));
 }
 loadUserData();
 
@@ -65,7 +102,7 @@ app.post('/api/save-trade-url', (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
     const steamId = String(req.user.id);
     const tradeUrl = req.body.tradeUrl;
-    if (!userData[steamId]) userData[steamId] = { tradeUrl: '' };
+    if (!userData[steamId]) userData[steamId] = { tradeUrl: '', apiKey: '' };
     userData[steamId].tradeUrl = tradeUrl;
     saveUserData();
     res.json({ success: true });
@@ -77,8 +114,27 @@ app.get('/api/get-trade-url', (req, res) => {
     res.json({ tradeUrl: userData[steamId] ? userData[steamId].tradeUrl : '' });
 });
 
+app.post('/api/generate-api-key', (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+    const steamId = String(req.user.id);
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let key = '';
+    for (let i = 0; i < 17; i++) key += chars.charAt(Math.floor(Math.random() * chars.length));
+    
+    if (!userData[steamId]) userData[steamId] = { tradeUrl: '', apiKey: '' };
+    userData[steamId].apiKey = key;
+    saveUserData();
+    res.json({ apiKey: key });
+});
+
+app.get('/api/get-api-key', (req, res) => {
+    if (!req.user) return res.json({ apiKey: '' });
+    const steamId = String(req.user.id);
+    res.json({ apiKey: userData[steamId] ? userData[steamId].apiKey : '' });
+});
+
 // ==========================================
-// ИНВЕНТАРЬ (с фильтрацией дефолтных и дешевых)
+// ИНВЕНТАРЬ
 // ==========================================
 const DEFAULT_SKINS = [
     'usp-s', 'glock-18', 'p250', 'deagle', 'five-seven', 'tec-9', 'cz75-auto',
@@ -87,16 +143,13 @@ const DEFAULT_SKINS = [
     'nova', 'xm1014', 'mag-7', 'sawed-off', 'm249', 'negev', 'knife', 'taser'
 ];
 
-// Порог минимальной цены (если меньше - скин недоступен)
-const MIN_PRICE = 5; // В долларах
+const MIN_PRICE = 5;
 
 app.post('/api/get-inventory', async (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Пожалуйста, войдите через Steam' });
     const steamId = String(req.user.id);
 
     try {
-        await new Promise(r => setTimeout(r, 4000));
-
         const inventoryUrl = `https://steamcommunity.com/inventory/${steamId}/730/2?l=english&count=1000`;
         const inventoryResponse = await axios.get(inventoryUrl, {
             headers: {
@@ -118,30 +171,20 @@ app.post('/api/get-inventory', async (req, res) => {
             if (desc) {
                 const name = desc.market_hash_name || desc.name;
                 const weapon = (name.split('|')[0] || '').toLowerCase().trim();
-                
-                // Фильтруем дефолтные скины и оружие
                 const isDefault = DEFAULT_SKINS.includes(weapon) || desc.tags?.some(tag => tag.internal_name === 'normal');
-                
                 if (!isDefault && !name.toLowerCase().includes('case') && !name.toLowerCase().includes('crate')) {
                     items.push({
                         assetid: asset.assetid,
                         name: name,
                         image: desc.icon_url ? `https://community.akamai.steamstatic.com/economy/image/${desc.icon_url}` : '',
                         type: desc.type || '',
-                        default: false
+                        minPrice: MIN_PRICE
                     });
                 }
             }
         });
 
-        // Добавляем поле "доступность" (минимальная цена)
-        const result = items.map(item => ({
-            ...item,
-            available: true, // Пока считаем все доступными, цену подтягиваем с внешнего API
-            minPrice: MIN_PRICE
-        }));
-
-        res.json({ success: true, items: result });
+        res.json({ success: true, items });
     } catch (error) {
         res.status(500).json({ error: 'Не удалось получить инвентарь. Подожди 2 минуты и попробуй снова.' });
     }
@@ -188,4 +231,7 @@ app.get('/api/user', (req, res) => {
     }
 });
 
-app.listen(PORT, () => console.log(`✅ Сервер запущен на порту ${PORT}`));
+app.listen(PORT, () => {
+    initMaintenance(); // Запускаем техработы при старте сервера
+    console.log(`✅ Сервер запущен на порту ${PORT}`);
+});
