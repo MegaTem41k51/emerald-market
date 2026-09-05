@@ -5,55 +5,214 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Технические работы — EMERALD Market</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { 
-            height: 100%; 
-            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
-            background: linear-gradient(135deg, #0b0c10 0%, #1a1b2e 100%); 
-            color: #a5ca1d; 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html,
+        body {
+            height: 100%;
+            font-family: 'Courier New', Courier, monospace;
+            background: #050a06;
+            color: #b0ffb0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ===== ЗВЕЗДОПАД ===== */
+        .star-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            opacity: 0.7;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(120vh) translateX(-20vw);
+                opacity: 0;
+            }
+        }
+
+        /* ===== ЦЕНТРАЛЬНЫЙ БЛОК ===== */
+        .maintenance-box {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+            margin: 0 auto;
+            height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
+            padding: 20px;
         }
-        .maintenance-box {
-            max-width: 600px;
-            padding: 40px;
-            background: rgba(50, 184, 95, 0.8);
-            border: 1px solid #2c2e36;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); 
+
+        /* ===== ЦИФРОВЫЕ ЧАСЫ ===== */
+        .digital-clock {
+            font-size: 120px;
+            font-weight: 900;
+            letter-spacing: 10px;
+            color: #ccffcc;
+            text-shadow:
+                0 0 10px #62c462,
+                0 0 20px #62c462,
+                0 0 40px #2b6e2b,
+                0 0 80px #1a4a1a;
+            margin-bottom: 40px;
+            user-select: none;
         }
-        .icon {
-            font-size: 64px;
-            margin-bottom: 24px;
+
+        .clock-label {
+            font-size: 16px;
+            letter-spacing: 4px;
+            color: #7ea87e;
+            margin-bottom: 40px;
+            text-transform: uppercase;
         }
-        h1 {
-            font-size: 28px;
-            font-weight: 800;
-            color: #fff;
-            margin-bottom: 16px;
-            line-height: 1.4;
+
+        /* ===== ТЕКСТ ===== */
+        .maintenance-text {
+            font-size: 22px;
+            line-height: 1.7;
+            color: #d4ffd4;
+            background: rgba(20, 40, 20, 0.6);
+            border: 1px solid #2b6e2b;
+            border-radius: 12px;
+            padding: 30px;
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.4);
+            backdrop-filter: blur(4px);
         }
-        p {
-            color: #025c2a;
-            font-size: 18px;
-            line-height: 1.6;
+
+        .maintenance-text .icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: block;
         }
+
+        .maintenance-text .bold {
+            font-weight: bold;
+            color: #9fff9f;
+        }
+
+        .maintenance-text p {
+            margin-bottom: 12px;
+        }
+
+        /* ===== АНИМАЦИЯ МИГАНИЯ ===== */
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .blink {
+            animation: blink 1.5s infinite;
+        }
+
         @media (max-width: 600px) {
-            .maintenance-box { width: 90%; padding: 30px; }
-            h1 { font-size: 22px; }
-            p { font-size: 16px; }
+            .digital-clock {
+                font-size: 60px;
+                letter-spacing: 6px;
+                margin-bottom: 20px;
+            }
+            .clock-label {
+                font-size: 12px;
+                margin-bottom: 20px;
+            }
+            .maintenance-text {
+                font-size: 16px;
+                padding: 20px;
+            }
+            .maintenance-text .icon {
+                font-size: 36px;
+            }
         }
     </style>
 </head>
 <body>
 
+    <!-- ЗВЕЗДОПАД -->
+    <div class="star-container" id="starContainer"></div>
+
     <div class="maintenance-box">
-        <div class="icon">🔧</div>
-        <h1>Простите за неудобства, но<br>в данный момент на сайте происходят технические неполадки</h1>
-        <p>Сайт будет доступен от 1 часа до 12 часов</p>
+        <!-- Часы -->
+        <div class="digital-clock" id="clock">00:00:00</div>
+        <div class="clock-label">Московское время (МСК)</div>
+
+        <!-- Текст -->
+        <div class="maintenance-text">
+            <span class="icon">🔧</span>
+            <p class="bold">В данный момент могут наблюдаться проблемы с доступом к сайту</p>
+            <p>Работаем над исправлением 🙏</p>
+            <p>Простите за неудобства</p>
+        </div>
     </div>
+
+    <script>
+        // ===== ВРЕМЯ МСК (Москва) =====
+        function updateClock() {
+            const now = new Date();
+            // Получаем время в часовом поясе Москвы (UTC+3)
+            const mskTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Moscow' }));
+            const hours = String(mskTime.getHours()).padStart(2, '0');
+            const minutes = String(mskTime.getMinutes()).padStart(2, '0');
+            const seconds = String(mskTime.getSeconds()).padStart(2, '0');
+            document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+        }
+
+        // Обновляем каждую секунду
+        setInterval(updateClock, 1000);
+        updateClock(); // Вызываем сразу при загрузке
+
+        // ===== ЗВЕЗДОПАД =====
+        function createStars() {
+            const container = document.getElementById('starContainer');
+            const starCount = 60; // Количество падающих звезд
+
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                // Случайный размер
+                const size = Math.random() * 4 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                // Случайная позиция
+                star.style.left = `${Math.random() * 100}vw`;
+                star.style.top = `-${Math.random() * 20}vh`;
+                
+                // Случайная скорость
+                const duration = Math.random() * 3 + 2; // 2-5 секунд
+                star.style.animationDuration = `${duration}s`;
+                
+                // Случайная задержка
+                const delay = Math.random() * 5;
+                star.style.animationDelay = `${delay}s`;
+                
+                container.appendChild(star);
+            }
+        }
+
+        createStars();
+    </script>
 
 </body>
 </html>
