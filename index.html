@@ -143,8 +143,29 @@
             font-size: 16px;
             letter-spacing: 4px;
             color: #7ea87e;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             text-transform: uppercase;
+        }
+
+        /* ===== ОБРАТНЫЙ ТАЙМЕР ===== */
+        .countdown-title {
+            color: #7ea87e;
+            font-size: 14px;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .countdown {
+            font-size: 50px;
+            font-weight: 900;
+            letter-spacing: 5px;
+            color: #ccffcc;
+            text-shadow:
+                0 0 10px #62c462,
+                0 0 20px #62c462,
+                0 0 40px #2b6e2b;
+            margin-bottom: 40px;
         }
 
         /* ===== ТЕКСТ ===== */
@@ -215,16 +236,13 @@
                 letter-spacing: 6px;
                 margin-bottom: 20px;
             }
-            .clock-label {
-                font-size: 12px;
-                margin-bottom: 20px;
+            .countdown {
+                font-size: 30px;
+                letter-spacing: 3px;
             }
             .maintenance-text {
                 font-size: 16px;
                 padding: 20px;
-            }
-            .maintenance-text .icon {
-                font-size: 36px;
             }
             .search-input {
                 width: 160px;
@@ -255,9 +273,13 @@
             <div class="search-dropdown" id="searchDropdown"></div>
         </div>
 
-        <!-- Часы -->
+        <!-- Часы МСК (по умолчанию) -->
         <div class="digital-clock" id="clock">00:00:00</div>
-        <div class="clock-label" id="clockLabel">РОССИЯ</div>
+        <div class="clock-label" id="clockLabel">МСК</div>
+
+        <!-- Обратный таймер 12 часов -->
+        <div class="countdown-title">До окончания работ осталось</div>
+        <div class="countdown" id="countdown">12:00:00</div>
 
         <!-- Текст -->
         <div class="maintenance-text">
@@ -275,12 +297,16 @@
         const translations = {
             ru: {
                 searchPlaceholder: 'Поиск страны...',
+                clockLabel: 'МСК',
+                countdownTitle: 'До окончания работ осталось',
                 maintenanceTitle: 'В данный момент могут наблюдаться проблемы с доступом к сайту',
                 maintenanceWork: 'Работаем над исправлением 🙏',
                 maintenanceSorry: 'Простите за неудобства'
             },
             en: {
                 searchPlaceholder: 'Search country...',
+                clockLabel: 'MSK',
+                countdownTitle: 'Time remaining until the end of work',
                 maintenanceTitle: 'There may be some issues with the site access at the moment',
                 maintenanceWork: 'We are working on fixing it 🙏',
                 maintenanceSorry: 'Sorry for the inconvenience'
@@ -442,7 +468,8 @@
             { ru: 'Япония', en: 'Japan', tz: 'Asia/Tokyo' }
         ];
 
-        let selectedCountry = countries[0]; // Россия по умолчанию
+        // Россия по умолчанию (МСК)
+        let selectedCountry = countries.find(c => c.ru === 'Россия') || countries[0];
 
         // ===== ФУНКЦИИ =====
         function updateClock() {
@@ -454,11 +481,28 @@
             document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
         }
 
+        // ===== ОБРАТНЫЙ ТАЙМЕР 12 ЧАСОВ =====
+        let totalSeconds = 12 * 60 * 60;
+
+        function updateCountdown() {
+            if (totalSeconds <= 0) return;
+
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+
+            const formatted = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            document.getElementById('countdown').textContent = formatted;
+
+            totalSeconds--;
+        }
+
         // ===== ОБНОВЛЕНИЕ ТЕКСТА =====
         function updateText() {
             const t = translations[currentLang];
             document.getElementById('searchInput').placeholder = t.searchPlaceholder;
             document.getElementById('clockLabel').textContent = currentLang === 'ru' ? selectedCountry.ru.toUpperCase() : selectedCountry.en.toUpperCase();
+            document.getElementById('countdown').previousElementSibling.textContent = t.countdownTitle;
             document.getElementById('maintenanceTitle').textContent = t.maintenanceTitle;
             document.getElementById('maintenanceWork').textContent = t.maintenanceWork;
             document.getElementById('maintenanceSorry').textContent = t.maintenanceSorry;
@@ -474,7 +518,7 @@
             });
         });
 
-        // ===== ПОИСК (ввод и подсказки) =====
+        // ===== ПОИСК =====
         const searchInput = document.getElementById('searchInput');
         const searchDropdown = document.getElementById('searchDropdown');
 
@@ -514,7 +558,6 @@
 
         searchInput.addEventListener('input', renderSuggestions);
 
-        // Закрытие дропдауна при клике вне
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.search-box')) {
                 searchDropdown.style.display = 'none';
@@ -551,6 +594,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             updateClock();
             setInterval(updateClock, 1000);
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
             updateText();
             createStars();
         });
