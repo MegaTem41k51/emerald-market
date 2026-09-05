@@ -78,7 +78,7 @@ app.get('/api/get-trade-url', (req, res) => {
 });
 
 // ==========================================
-// ИНВЕНТАРЬ (с фильтрацией дефолтных и дешевых)
+// ИНВЕНТАРЬ (без задержки)
 // ==========================================
 const DEFAULT_SKINS = [
     'usp-s', 'glock-18', 'p250', 'deagle', 'five-seven', 'tec-9', 'cz75-auto',
@@ -94,8 +94,6 @@ app.post('/api/get-inventory', async (req, res) => {
     const steamId = String(req.user.id);
 
     try {
-        await new Promise(r => setTimeout(r, 4000));
-
         const inventoryUrl = `https://steamcommunity.com/inventory/${steamId}/730/2?l=english&count=1000`;
         const inventoryResponse = await axios.get(inventoryUrl, {
             headers: {

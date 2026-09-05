@@ -24,15 +24,17 @@
         html, body { height: 100%; font-family: 'Inter', sans-serif; background: #0b0c10; color: #e4e6eb; overflow-x: hidden; }
         
         body.light { background: #e8ecf1; color: #1a1a2e; }
+        
         body.light .header { background: #f0f2f5; border-bottom-color: #d0d4da; }
         body.light .nav a { color: #555; }
         body.light .nav a.active { color: #a855f7; }
         body.light .logo span { color: #888; }
         body.light .steam-user { background: #fff; border-color: #d0d4da; }
         body.light .steam-name { color: #333; }
+        
         body.light .sell-hero h1 { color: #333; }
         body.light .profile-avatar-box { background: #fff; border-color: #d0d4da; }
-        body.light .profile-avatar-box div { color: #333; }
+        body.light .profile-avatar-box .profile-name { color: #333; }
         body.light .profile-balance { color: #a855f7; }
         body.light .profile-tabs { background: #fff; border-color: #d0d4da; }
         body.light .profile-tab { color: #555; border-bottom-color: #e0e4ea; }
@@ -176,8 +178,15 @@
         .profile-settings { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 16px; }
         .setting-row { display: flex; gap: 8px; margin-bottom: 12px; }
         .setting-row input[type="text"] { flex: 1; background: #0b0c10; border: 1px solid #26282f; border-radius: 8px; padding: 8px 12px; color: #e4e6eb; font-size: 13px; outline: none; }
+        .setting-row input[type="text"]:focus { border-color: #a855f7; }
         .setting-row .toggle-btn { padding: 8px 12px; border-radius: 8px; border: 1px solid #26282f; background: transparent; color: #b2b4bb; cursor: pointer; font-size: 12px; }
         .setting-row .toggle-btn.active { background: #a855f7; border-color: #a855f7; color: #fff; }
+        
+        /* ФИКС: НА СВЕТЛОЙ ТЕМЕ INPUT НЕ ВЫДЕЛЯЕТСЯ */
+        body.light .profile-settings { background: #fff; border-color: #d0d4da; }
+        body.light .setting-row input[type="text"] { background: #f5f6fa; border-color: #d0d4da; color: #333; }
+        body.light .setting-row .toggle-btn { background: #f5f6fa; border-color: #d0d4da; color: #555; }
+        body.light .setting-row .toggle-btn.active { background: #a855f7; border-color: #a855f7; color: #fff; }
 
         .footer { background: #0d0e14; border-top: 1px solid #1c1d24; padding: 40px 0 24px; }
         .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 30px; }
