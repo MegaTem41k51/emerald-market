@@ -65,6 +65,108 @@
             padding: 20px;
         }
 
+        /* ===== УПРАВЛЕНИЕ (ЯЗЫК + ПОИСК) ===== */
+        .controls-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .lang-switch {
+            display: flex;
+            gap: 6px;
+            background: rgba(20, 40, 20, 0.6);
+            border: 1px solid #2b6e2b;
+            border-radius: 6px;
+            padding: 4px;
+            cursor: pointer;
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: none;
+            color: #7ea87e;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+
+        .lang-btn.active {
+            background: #9fff9f;
+            color: #050a06;
+            text-shadow: none;
+        }
+
+        .search-box {
+            position: relative;
+            background: rgba(20, 40, 20, 0.6);
+            border: 1px solid #2b6e2b;
+            border-radius: 6px;
+        }
+
+        .search-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #d4ffd4;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            padding: 10px 12px;
+            width: 200px;
+        }
+
+        .search-input::placeholder {
+            color: #7ea87e;
+        }
+
+        .search-dropdown {
+            display: none;
+            position: absolute;
+            top: 110%;
+            left: 0;
+            width: 100%;
+            background: #050a06;
+            border: 1px solid #2b6e2b;
+            border-radius: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+        }
+
+        .search-dropdown::-webkit-scrollbar {
+            width: 4px;
+        }
+        .search-dropdown::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .search-dropdown::-webkit-scrollbar-thumb {
+            background: #2b6e2b;
+        }
+
+        .country-item {
+            padding: 8px 12px;
+            color: #9fff9f;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .country-item:hover {
+            background: rgba(159, 255, 159, 0.2);
+        }
+
+        .selected-country {
+            color: #9fff9f;
+            font-size: 13px;
+            letter-spacing: 2px;
+        }
+
         /* ===== ЦИФРОВЫЕ ЧАСЫ ===== */
         .digital-clock {
             font-size: 120px;
@@ -76,7 +178,7 @@
                 0 0 20px #62c462,
                 0 0 40px #2b6e2b,
                 0 0 80px #1a4a1a;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
             user-select: none;
         }
 
@@ -143,6 +245,9 @@
             .maintenance-text .icon {
                 font-size: 36px;
             }
+            .search-input {
+                width: 140px;
+            }
         }
     </style>
 </head>
@@ -152,58 +257,171 @@
     <div class="star-container" id="starContainer"></div>
 
     <div class="maintenance-box">
+
+        <!-- УПРАВЛЕНИЕ: ЯЗЫК И ПОИСК СТРАН -->
+        <div class="controls-row">
+            <!-- Переключатель языка -->
+            <div class="lang-switch" id="langSwitch">
+                <button class="lang-btn active" data-lang="ru">RU</button>
+                <button class="lang-btn" data-lang="en">EN</button>
+            </div>
+
+            <!-- Поиск стран -->
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput" placeholder="Поиск страны...">
+                <div class="search-dropdown" id="searchDropdown"></div>
+            </div>
+        </div>
+
         <!-- Часы -->
         <div class="digital-clock" id="clock">00:00:00</div>
-        <div class="clock-label">Московское время (МСК)</div>
+        <div class="clock-label" id="clockLabel">Москва (МСК)</div>
 
         <!-- Текст -->
         <div class="maintenance-text">
             <span class="icon">🔧</span>
-            <p class="bold">В данный момент могут наблюдаться проблемы с доступом к сайту</p>
-            <p>Работаем над исправлением 🙏</p>
-            <p>Простите за неудобства</p>
+            <p class="bold" id="maintenanceTitle">В данный момент могут наблюдаться проблемы с доступом к сайту</p>
+            <p id="maintenanceWork">Работаем над исправлением 🙏</p>
+            <p id="maintenanceSorry">Простите за неудобства</p>
         </div>
     </div>
 
     <script>
-        // ===== ВРЕМЯ МСК (Москва) =====
+        // ===== ЯЗЫК =====
+        let currentLang = 'ru';
+
+        const translations = {
+            ru: {
+                searchPlaceholder: 'Поиск страны...',
+                maintenanceTitle: 'В данный момент могут наблюдаться проблемы с доступом к сайту',
+                maintenanceWork: 'Работаем над исправлением 🙏',
+                maintenanceSorry: 'Простите за неудобства'
+            },
+            en: {
+                searchPlaceholder: 'Search country...',
+                maintenanceTitle: 'There may be some issues with the site access at the moment',
+                maintenanceWork: 'We are working on fixing it 🙏',
+                maintenanceSorry: 'Sorry for the inconvenience'
+            }
+        };
+
+        // ===== ЧАСОВЫЕ ПОЯСА =====
+        const timezones = {
+            'Москва (МСК)': 'Europe/Moscow',
+            'Калининград': 'Europe/Kaliningrad',
+            'Санкт-Петербург': 'Europe/Moscow',
+            'Киев': 'Europe/Kyiv',
+            'Минск': 'Europe/Minsk',
+            'Алматы': 'Asia/Almaty',
+            'Ташкент': 'Asia/Tashkent',
+            'Баку': 'Asia/Baku',
+            'Тбилиси': 'Asia/Tbilisi',
+            'Ереван': 'Asia/Yerevan',
+            'Нью-Йорк': 'America/New_York',
+            'Лос-Анджелес': 'America/Los_Angeles',
+            'Чикаго': 'America/Chicago',
+            'Лондон': 'Europe/London',
+            'Париж': 'Europe/Paris',
+            'Берлин': 'Europe/Berlin',
+            'Мадрид': 'Europe/Madrid',
+            'Рим': 'Europe/Rome',
+            'Стамбул': 'Europe/Istanbul',
+            'Дубай': 'Asia/Dubai',
+            'Токио': 'Asia/Tokyo',
+            'Пекин': 'Asia/Shanghai',
+            'Сингапур': 'Asia/Singapore',
+            'Сидней': 'Australia/Sydney'
+        };
+
+        let selectedCountry = 'Москва (МСК)';
+        let selectedTimezone = 'Europe/Moscow';
+
+        // ===== ФУНКЦИИ =====
         function updateClock() {
             const now = new Date();
-            // Получаем время в часовом поясе Москвы (UTC+3)
-            const mskTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Moscow' }));
-            const hours = String(mskTime.getHours()).padStart(2, '0');
-            const minutes = String(mskTime.getMinutes()).padStart(2, '0');
-            const seconds = String(mskTime.getSeconds()).padStart(2, '0');
+            const timeStr = new Date(now.toLocaleString('en-US', { timeZone: selectedTimezone }));
+            const hours = String(timeStr.getHours()).padStart(2, '0');
+            const minutes = String(timeStr.getMinutes()).padStart(2, '0');
+            const seconds = String(timeStr.getSeconds()).padStart(2, '0');
             document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
         }
 
-        // Обновляем каждую секунду
-        setInterval(updateClock, 1000);
-        updateClock(); // Вызываем сразу при загрузке
+        // ===== ОБНОВЛЕНИЕ ТЕКСТА =====
+        function updateText() {
+            const t = translations[currentLang];
+            document.getElementById('searchInput').placeholder = t.searchPlaceholder;
+            document.getElementById('maintenanceTitle').textContent = t.maintenanceTitle;
+            document.getElementById('maintenanceWork').textContent = t.maintenanceWork;
+            document.getElementById('maintenanceSorry').textContent = t.maintenanceSorry;
+            document.getElementById('clockLabel').textContent = selectedCountry;
+        }
+
+        // ===== ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА =====
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                currentLang = this.dataset.lang;
+                document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                updateText();
+            });
+        });
+
+        // ===== ПОИСК СТРАН =====
+        const searchInput = document.getElementById('searchInput');
+        const searchDropdown = document.getElementById('searchDropdown');
+
+        function renderCountries(filter = '') {
+            const countries = Object.keys(timezones).filter(c => c.toLowerCase().includes(filter.toLowerCase()));
+            searchDropdown.innerHTML = countries.map(c => `<div class="country-item">${c}</div>`).join('');
+            
+            document.querySelectorAll('.country-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    selectedCountry = this.textContent;
+                    selectedTimezone = timezones[selectedCountry];
+                    searchInput.value = '';
+                    searchDropdown.style.display = 'none';
+                    updateClock();
+                    updateText();
+                });
+            });
+        }
+
+        searchInput.addEventListener('input', function() {
+            const val = this.value;
+            if (val.length > 0) {
+                searchDropdown.style.display = 'block';
+                renderCountries(val);
+            } else {
+                searchDropdown.style.display = 'none';
+            }
+        });
+
+        // Закрытие дропдауна при клике вне
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.search-box')) {
+                searchDropdown.style.display = 'none';
+            }
+        });
 
         // ===== ЗВЕЗДОПАД =====
         function createStars() {
             const container = document.getElementById('starContainer');
-            const starCount = 60; // Количество падающих звезд
+            const starCount = 60;
 
             for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
                 
-                // Случайный размер
                 const size = Math.random() * 4 + 1;
                 star.style.width = `${size}px`;
                 star.style.height = `${size}px`;
                 
-                // Случайная позиция
                 star.style.left = `${Math.random() * 100}vw`;
                 star.style.top = `-${Math.random() * 20}vh`;
                 
-                // Случайная скорость
-                const duration = Math.random() * 3 + 2; // 2-5 секунд
+                const duration = Math.random() * 3 + 2;
                 star.style.animationDuration = `${duration}s`;
                 
-                // Случайная задержка
                 const delay = Math.random() * 5;
                 star.style.animationDelay = `${delay}s`;
                 
@@ -211,7 +429,14 @@
             }
         }
 
-        createStars();
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
+        document.addEventListener('DOMContentLoaded', function() {
+            updateClock();
+            setInterval(updateClock, 1000);
+            updateText();
+            renderCountries();
+            createStars();
+        });
     </script>
 
 </body>
