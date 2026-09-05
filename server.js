@@ -7,7 +7,6 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
-const { HttpsProxyAgent } = require('https-proxy-agent');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,9 +14,6 @@ const PORT = process.env.PORT || 3000;
 const STEAM_API_KEY = process.env.STEAM_API_KEY;
 const SESSION_SECRET = process.env.SESSION_SECRET || 'my_secret_123';
 const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
-
-// ⚠️ ЗАМЕНИ ЭТО НА ТВОЙ РЕАЛЬНЫЙ ПРОКСИ (IP:PORT или логин:пароль@IP:PORT)
-const PROXY_URL = ''; // Например: 'http://user:pass@proxy.com:8080' 
 
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
@@ -49,31 +45,62 @@ app.get('/logout', (req, res) => {
 });
 
 // ==========================================
-// ИНВЕНТАРЬ (добавляем прокси и задержку)
+// СОХРАНЕНИЕ TRADE URL И ПРОФИЛЯ
+// ==========================================
+const DB_FILE = path.join(__dirname, 'userData.json');
+let userData = {}; // { steamId: { tradeUrl: '...' } }
+
+function loadUserData() {
+    try {
+        if (fs.existsSync(DB_FILE)) {
+            userData = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+        }
+    } catch(e) { userData = {}; }
+}
+function saveUserData() {
+    fs.writeFileSync(DB_FILE, JSON.stringify(userData, null, 2));
+}
+loadUserData();
+
+// Сохранить Trade URL
+app.post('/api/save-trade-url', (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+    
+    const steamId = String(req.user.id);
+    const tradeUrl = req.body.tradeUrl;
+    
+    if (!userData[steamId]) userData[steamId] = { tradeUrl: '' };
+    userData[steamId].tradeUrl = tradeUrl;
+    saveUserData();
+    
+    res.json({ success: true });
+});
+
+// Получить Trade URL
+app.get('/api/get-trade-url', (req, res) => {
+    if (!req.user) return res.json({ tradeUrl: '' });
+    const steamId = String(req.user.id);
+    res.json({ tradeUrl: userData[steamId] ? userData[steamId].tradeUrl : '' });
+});
+
+// ==========================================
+// ИНВЕНТАРЬ
 // ==========================================
 app.post('/api/get-inventory', async (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Пожалуйста, войдите через Steam' });
     const steamId = String(req.user.id);
 
-    const config = {
-        headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Referer': 'https://steamcommunity.com/'
-        },
-        timeout: 15000
-    };
-
-    // Если есть прокси, добавляем его
-    if (PROXY_URL) {
-        config.httpsAgent = new HttpsProxyAgent(PROXY_URL);
-    }
-
     try {
-        // Ждём 3 секунды, чтобы не спамить
-        await new Promise(r => setTimeout(r, 3000));
+        // Ждём 4 секунды, чтобы Steam не забанил
+        await new Promise(r => setTimeout(r, 4000));
 
         const inventoryUrl = `https://steamcommunity.com/inventory/${steamId}/730/2?l=english&count=1000`;
-        const inventoryResponse = await axios.get(inventoryUrl, config);
+        const inventoryResponse = await axios.get(inventoryUrl, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Referer': 'https://steamcommunity.com/'
+            }
+        });
 
         const inventory = inventoryResponse.data;
         if (!inventory.assets || inventory.assets.length === 0) return res.json({ success: true, items: [] });
@@ -97,38 +124,32 @@ app.post('/api/get-inventory', async (req, res) => {
 
         res.json({ success: true, items });
     } catch (error) {
-        res.status(500).json({ error: 'Не удалось получить инвентарь. Подожди 5 минут и попробуй снова.' });
+        res.status(500).json({ error: 'Не удалось получить инвентарь. Подожди 2 минуты и попробуй снова.' });
     }
 });
 
 // ==========================================
-// РЫНОК (сохраняем на сервере, чтобы видели все)
+// РЫНОК (для всех)
 // ==========================================
-const DB_FILE = path.join(__dirname, 'marketData.json');
+const MARKET_FILE = path.join(__dirname, 'marketData.json');
 let marketData = [];
+
 function loadMarket() {
     try {
-        if (fs.existsSync(DB_FILE)) {
-            marketData = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
-        } else {
-            marketData = [{ id: 1, name: 'AWP | Dragon Lore', weapon: 'AWP', exterior: 'Factory New', price: 3500, rarity: 'covert', imageUrl: '' }];
-            saveMarket();
+        if (fs.existsSync(MARKET_FILE)) {
+            marketData = JSON.parse(fs.readFileSync(MARKET_FILE, 'utf8'));
         }
     } catch(e) { marketData = []; }
 }
-function saveMarket() { fs.writeFileSync(DB_FILE, JSON.stringify(marketData, null, 2)); }
+function saveMarket() {
+    fs.writeFileSync(MARKET_FILE, JSON.stringify(marketData, null, 2));
+}
 loadMarket();
 
 app.get('/api/market', (req, res) => { res.json(marketData); });
 app.post('/api/market/save', (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Нет доступа' });
     marketData = req.body.skins;
-    saveMarket();
-    res.json({ success: true });
-});
-app.post('/api/market/buy', (req, res) => {
-    const skinId = req.body.id;
-    marketData = marketData.filter(s => s.id !== skinId);
     saveMarket();
     res.json({ success: true });
 });

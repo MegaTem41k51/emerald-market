@@ -45,8 +45,6 @@
         .btn:hover { background: #9333ea; }
         .btn-outline { background: transparent; color: #b2b4bb !important; border: 1px solid #2c2e36; padding: 7px 18px; border-radius: 6px; font-weight: 500; font-size: 13px; cursor: pointer; }
         .btn-outline:hover { border-color: #a855f7; color: #a855f7 !important; }
-        .btn-success { background: #a855f7; color: #fff !important; }
-        .btn-success:hover { background: #9333ea; }
         .btn-steam { background: #171a21; color: #fff; border: 1px solid #66c0f4; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; }
 
         .steam-user { display: flex; align-items: center; gap: 10px; background: #1c1d23; padding: 4px 12px 4px 4px; border-radius: 30px; border: 1px solid #2c2e36; cursor: pointer; }
@@ -123,28 +121,6 @@
         .profile-history h3 { margin-bottom: 16px; font-size: 18px; text-align: left; }
         .profile-history .empty-message { color: #6a6d7a; font-size: 16px; padding: 30px 0; }
 
-        /* ДРУГИЕ СТРАНИЦЫ */
-        .static-page { max-width: 800px; margin: 0 auto; }
-        .static-page h1 { font-size: 32px; color: #a855f7; margin-bottom: 24px; }
-        .static-page h2 { font-size: 20px; color: #a855f7; margin-top: 24px; margin-bottom: 12px; }
-        .static-page p { line-height: 1.7; color: #b2b4bb; margin-bottom: 12px; }
-        .static-page a { color: #a855f7; text-decoration: none; }
-        .bold-warning { font-weight: 900; color: #e74c3c; font-size: 18px; text-align: center; margin: 20px 0; }
-
-        .admin-panel { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
-        .admin-panel h2 { font-size: 20px; margin-bottom: 16px; color: #a855f7; }
-        .admin-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
-        .admin-row label { color: #8a8d99; font-size: 13px; min-width: 120px; }
-        .admin-row input, .admin-row select { flex: 1; min-width: 120px; background: #1c1d23; border: 1px solid #2c2e36; color: #e4e6eb; padding: 8px 12px; border-radius: 6px; font-size: 13px; outline: none; }
-        .admin-skin-item { background: #1c1d23; border-radius: 8px; padding: 12px 16px; margin-bottom: 8px; border: 1px solid #26282f; }
-        .admin-skin-item .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        .admin-skin-item .row input, .admin-skin-item .row select { background: #0b0c10; border: 1px solid #26282f; color: #e4e6eb; padding: 4px 8px; border-radius: 4px; font-size: 12px; outline: none; }
-        .admin-skin-item .row .remove-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; padding: 0 4px; }
-        .admin-add-btn { background: #a855f7; color: #fff; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; }
-        .admin-save-btn { background: #a855f7; color: #fff; border: none; padding: 12px 32px; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 16px; }
-        .admin-status { color: #a855f7; font-size: 14px; margin-top: 12px; display: none; }
-        .admin-status.show { display: block; }
-
         .footer { background: #0d0e14; border-top: 1px solid #1c1d24; padding: 40px 0 24px; }
         .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 30px; }
         .footer-grid .col h4 { color: #e4e6eb; margin-bottom: 12px; font-size: 16px; }
@@ -199,17 +175,9 @@
                 </div>
                 
                 <div class="skin-grid-sell" id="sellSkinGrid">
-                    <div class="sell-skin-card">
-                        <div class="sell-badge">Недоступно</div>
-                        <div class="image"><span style="color:#4a4d5a;font-size:12px;">M4A1-S</span></div>
-                        <div class="name">M4A1-S | Electron</div>
-                        <div class="price">73,75 ₽</div>
-                    </div>
-                    <div class="sell-skin-card">
-                        <div class="sell-badge">Недоступно</div>
-                        <div class="image"><span style="color:#4a4d5a;font-size:12px;">Стикер</span></div>
-                        <div class="name">Sticker | Team Liquid</div>
-                        <div class="price">0,89 ₽</div>
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #8a8d99;">
+                        Введите Trade URL в панели справа и нажмите «Сохранить»<br>
+                        После этого здесь появятся ваши скины.
                     </div>
                 </div>
             </div>
@@ -224,7 +192,7 @@
                         <a href="https://steamcommunity.com/id/me/tradeoffers/privacy#trade_offer_access_url" target="_blank" style="color: #a855f7; font-size: 13px; text-decoration: none;">Где взять?</a>
                     </div>
                     <input type="text" id="sellTradeUrl" placeholder="https://steamcommunity.com/tradeoffer/new/?pa...">
-                    <button class="btn" style="width: 100%; margin-top: 8px;" onclick="saveTradeUrl()">Применить</button>
+                    <button class="btn" style="width: 100%; margin-top: 8px;" onclick="saveTradeUrl()">Сохранить</button>
                 </div>
 
                 <div class="sidebar-section">
@@ -282,7 +250,6 @@
             <div class="profile-settings">
                 <h3>Настройки</h3>
                 
-                <!-- TRADE URL В ПРОФИЛЕ -->
                 <div class="setting-row">
                     <label>🔗 Trade URL</label>
                     <input type="text" id="profileTradeUrl" placeholder="Введите ваш Trade URL">
@@ -304,7 +271,7 @@
     </div>
 </div>
 
-<!-- ДРУГИЕ СТРАНИЦЫ (остальное не трогаю) -->
+<!-- ДРУГИЕ СТРАНИЦЫ -->
 <div class="page" id="marketPage">
     <div class="container">
         <h2 style="font-size: 24px; font-weight: 700;">Купить скины</h2>
@@ -348,6 +315,9 @@
 <script>
 // ===== ЛОГИКА STEAM / ПРОФИЛЯ =====
 let currentUser = null;
+let userInventory = [];
+let selectedSteamSkins = [];
+
 async function fetchUser() {
     const response = await fetch('/api/user');
     const data = await response.json();
@@ -355,13 +325,16 @@ async function fetchUser() {
         currentUser = { id: data.user.id, name: data.user.name, avatar: data.user.avatar };
         updateUserUI();
         renderProfile();
+        loadTradeUrl(); // Загружаем сохраненную Trade URL
     } else {
         currentUser = null;
         updateUserUI();
         renderProfile();
     }
 }
+
 function logoutUser() { window.location.href = '/logout'; }
+
 function updateUserUI() {
     const actions = document.getElementById('headerActions');
     if (currentUser) {
@@ -377,24 +350,82 @@ function updateUserUI() {
     }
 }
 
-// ===== СОХРАНЕНИЕ TRADE URL =====
-function saveTradeUrl() {
-    const url = document.getElementById('sellTradeUrl').value.trim();
-    if (url) {
-        document.getElementById('profileTradeUrl').value = url; // Сохраняем в профиль
-        alert('Trade URL сохранен!');
-    } else {
-        alert('Введите Trade URL!');
+// ===== TRADE URL =====
+async function loadTradeUrl() {
+    const response = await fetch('/api/get-trade-url');
+    const data = await response.json();
+    if (data.tradeUrl) {
+        document.getElementById('sellTradeUrl').value = data.tradeUrl;
+        document.getElementById('profileTradeUrl').value = data.tradeUrl;
+        loadSteamInventory(); // Автоматически загружаем инвентарь
     }
 }
 
-function saveProfileTradeUrl() {
+async function saveTradeUrl() {
+    const url = document.getElementById('sellTradeUrl').value.trim();
+    if (!url) { alert('Введите Trade URL!'); return; }
+    
+    document.getElementById('profileTradeUrl').value = url;
+    await fetch('/api/save-trade-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tradeUrl: url })
+    });
+    alert('Trade URL сохранен! Сейчас загрузим скины...');
+    loadSteamInventory();
+}
+
+async function saveProfileTradeUrl() {
     const url = document.getElementById('profileTradeUrl').value.trim();
-    if (url) {
-        document.getElementById('sellTradeUrl').value = url; // Сохраняем в продажу
-        alert('Trade URL сохранен!');
+    if (!url) { alert('Введите Trade URL!'); return; }
+    
+    document.getElementById('sellTradeUrl').value = url;
+    await fetch('/api/save-trade-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tradeUrl: url })
+    });
+    alert('Trade URL сохранен! Сейчас загрузим скины...');
+    loadSteamInventory();
+}
+
+// ===== ИНВЕНТАРЬ =====
+async function loadSteamInventory() {
+    if (!currentUser) { alert('Пожалуйста, войдите через Steam!'); return; }
+    const grid = document.getElementById('sellSkinGrid');
+    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #8a8d99;">⏳ Загружаем ваш инвентарь...</div>';
+
+    try {
+        const response = await fetch('/api/get-inventory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+        const data = await response.json();
+        if (data.error) { alert(data.error); grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #8a8d99;">Ошибка. Попробуй через 2 минуты.</div>'; return; }
+        
+        userInventory = data.items;
+        if (userInventory.length === 0) {
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #8a8d99;">Инвентарь пуст или скрыт.</div>';
+            return;
+        }
+        
+        grid.innerHTML = userInventory.map((item, index) => `
+            <div class="sell-skin-card" onclick="toggleSteamSkinSelection(${index})">
+                <div class="sell-badge">${item.type || 'Скин'}</div>
+                <div class="image">${item.image ? `<img src="${item.image}">` : ''}</div>
+                <div class="name">${item.name}</div>
+                <div class="price">Ваш предмет</div>
+            </div>
+        `).join('');
+    } catch (error) {
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #8a8d99;">Ошибка подключения.</div>';
+    }
+}
+
+function toggleSteamSkinSelection(index) {
+    const item = userInventory[index];
+    const idx = selectedSteamSkins.findIndex(id => id === item.assetid);
+    if (idx > -1) {
+        selectedSteamSkins.splice(idx, 1);
     } else {
-        alert('Введите Trade URL!');
+        selectedSteamSkins.push(item.assetid);
     }
 }
 
