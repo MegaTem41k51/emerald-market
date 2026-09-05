@@ -65,13 +65,14 @@
             padding: 20px;
         }
 
-        /* ===== УПРАВЛЕНИЕ (ПОИСК) ===== */
+        /* ===== ПОИСК ===== */
         .search-box {
             position: relative;
             background: rgba(20, 40, 20, 0.6);
             border: 1px solid #2b6e2b;
             border-radius: 6px;
             margin-bottom: 40px;
+            cursor: pointer;
         }
 
         .search-input {
@@ -82,7 +83,8 @@
             font-family: 'Courier New', Courier, monospace;
             font-size: 14px;
             padding: 10px 12px;
-            width: 220px; /* Увеличено на 2px (было 218) */
+            width: 220px;
+            cursor: pointer;
         }
 
         .search-input::placeholder {
@@ -122,12 +124,6 @@
 
         .country-item:hover {
             background: rgba(159, 255, 159, 0.2);
-        }
-
-        .selected-country {
-            color: #9fff9f;
-            font-size: 13px;
-            letter-spacing: 2px;
         }
 
         /* ===== ЦИФРОВЫЕ ЧАСЫ ===== */
@@ -181,11 +177,11 @@
             margin-bottom: 12px;
         }
 
-        /* ===== ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА (ЛЕВЫЙ НИЖНИЙ УГОЛ) ===== */
+        /* ===== ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА (ПРАВЫЙ НИЖНИЙ УГОЛ) ===== */
         .lang-switch {
             position: fixed;
             bottom: 20px;
-            left: 20px;
+            right: 20px;
             z-index: 20;
             display: flex;
             gap: 6px;
@@ -233,12 +229,11 @@
                 font-size: 36px;
             }
             .search-input {
-                width: 180px;
+                width: 160px;
             }
             .lang-switch {
                 bottom: 10px;
-                left: 10px;
-                font-size: 12px;
+                right: 10px;
             }
         }
     </style>
@@ -248,7 +243,7 @@
     <!-- ЗВЕЗДОПАД -->
     <div class="star-container" id="starContainer"></div>
 
-    <!-- ЯЗЫК: ВНИЗУ СЛЕВА -->
+    <!-- ЯЗЫК: В ПРАВОМ НИЖНЕМ УГЛУ -->
     <div class="lang-switch" id="langSwitch">
         <button class="lang-btn active" data-lang="ru">RU</button>
         <button class="lang-btn" data-lang="en">EN</button>
@@ -256,15 +251,15 @@
 
     <div class="maintenance-box">
 
-        <!-- ПОИСК СТРАН (оставлен сверху, увеличен на 2px) -->
-        <div class="search-box">
-            <input type="text" class="search-input" id="searchInput" placeholder="Поиск страны...">
+        <!-- ПОИСК СТРАН (открывается по клику, список по алфавиту) -->
+        <div class="search-box" id="searchBox">
+            <input type="text" class="search-input" id="searchInput" placeholder="Поиск страны..." readonly>
             <div class="search-dropdown" id="searchDropdown"></div>
         </div>
 
         <!-- Часы -->
         <div class="digital-clock" id="clock">00:00:00</div>
-        <div class="clock-label" id="clockLabel">Москва (МСК)</div>
+        <div class="clock-label" id="clockLabel">Москва</div>
 
         <!-- Текст -->
         <div class="maintenance-text">
@@ -282,106 +277,114 @@
         const translations = {
             ru: {
                 searchPlaceholder: 'Поиск страны...',
-                clockLabel: 'Москва (МСК)',
                 maintenanceTitle: 'В данный момент могут наблюдаться проблемы с доступом к сайту',
                 maintenanceWork: 'Работаем над исправлением 🙏',
                 maintenanceSorry: 'Простите за неудобства'
             },
             en: {
                 searchPlaceholder: 'Search country...',
-                clockLabel: 'Moscow (MSK)',
                 maintenanceTitle: 'There may be some issues with the site access at the moment',
                 maintenanceWork: 'We are working on fixing it 🙏',
                 maintenanceSorry: 'Sorry for the inconvenience'
             }
         };
 
-        // ===== ЧАСОВЫЕ ПОЯСА (ВСЕ СТРАНЫ МИРА) =====
-        const timezones = {
-            'Москва': 'Europe/Moscow',
-            'Санкт-Петербург': 'Europe/Moscow',
-            'Калининград': 'Europe/Kaliningrad',
-            'Киев': 'Europe/Kyiv',
-            'Минск': 'Europe/Minsk',
-            'Алматы': 'Asia/Almaty',
-            'Ташкент': 'Asia/Tashkent',
-            'Баку': 'Asia/Baku',
-            'Тбилиси': 'Asia/Tbilisi',
-            'Ереван': 'Asia/Yerevan',
-            'Нью-Йорк': 'America/New_York',
-            'Лос-Анджелес': 'America/Los_Angeles',
-            'Чикаго': 'America/Chicago',
-            'Денвер': 'America/Denver',
-            'Торонто': 'America/Toronto',
-            'Мехико': 'America/Mexico_City',
-            'Сан-Паулу': 'America/Sao_Paulo',
-            'Буэнос-Айрес': 'America/Argentina/Buenos_Aires',
-            'Лондон': 'Europe/London',
-            'Париж': 'Europe/Paris',
-            'Берлин': 'Europe/Berlin',
-            'Мадрид': 'Europe/Madrid',
-            'Рим': 'Europe/Rome',
-            'Амстердам': 'Europe/Amsterdam',
-            'Брюссель': 'Europe/Brussels',
-            'Вена': 'Europe/Vienna',
-            'Прага': 'Europe/Prague',
-            'Варшава': 'Europe/Warsaw',
-            'Будапешт': 'Europe/Budapest',
-            'Стокгольм': 'Europe/Stockholm',
-            'Осло': 'Europe/Oslo',
-            'Копенгаген': 'Europe/Copenhagen',
-            'Хельсинки': 'Europe/Helsinki',
-            'Стамбул': 'Europe/Istanbul',
-            'Афины': 'Europe/Athens',
-            'Дубай': 'Asia/Dubai',
-            'Абу-Даби': 'Asia/Dubai',
-            'Доха': 'Asia/Qatar',
-            'Эр-Рияд': 'Asia/Riyadh',
-            'Тегеран': 'Asia/Tehran',
-            'Иерусалим': 'Asia/Jerusalem',
-            'Тель-Авив': 'Asia/Jerusalem',
-            'Исламабад': 'Asia/Karachi',
-            'Дели': 'Asia/Kolkata',
-            'Мумбаи': 'Asia/Kolkata',
-            'Бангкок': 'Asia/Bangkok',
-            'Джакарта': 'Asia/Jakarta',
+        // ===== ЧАСОВЫЕ ПОЯСА (ВСЕ СТРАНЫ, СПИСОК ПО АЛФАВИТУ) =====
+        const countries = [
+            'Австралия', 'Австрия', 'Азербайджан', 'Албания', 'Алжир', 'Ангола',
+            'Аргентина', 'Армения', 'Афганистан', 'Багамы', 'Бангладеш', 'Барбадос',
+            'Бахрейн', 'Беларусь', 'Бельгия', 'Белиз', 'Бенин', 'Болгария',
+            'Боливия', 'Босния и Герцеговина', 'Ботсвана', 'Бразилия', 'Бруней',
+            'Буркина-Фасо', 'Бурунди', 'Бутан', 'Вануату', 'Великобритания',
+            'Венгрия', 'Венесуэла', 'Вьетнам', 'Габон', 'Гаити', 'Гайана',
+            'Гамбия', 'Гана', 'Гватемала', 'Гвинея', 'Германия', 'Гондурас',
+            'Гренада', 'Греция', 'Грузия', 'Дания', 'Джибути', 'Доминикана',
+            'Египет', 'Замбия', 'Зимбабве', 'Израиль', 'Индия', 'Индонезия',
+            'Иордания', 'Ирак', 'Иран', 'Ирландия', 'Исландия', 'Испания',
+            'Италия', 'Йемен', 'Казахстан', 'Камбоджа', 'Камерун', 'Канада',
+            'Катар', 'Кения', 'Кипр', 'Киргизия', 'Китай', 'Колумбия',
+            'Конго', 'Корея', 'Коста-Рика', 'Кот-д’Ивуар', 'Куба', 'Кувейт',
+            'Лаос', 'Латвия', 'Ливан', 'Ливия', 'Литва', 'Люксембург',
+            'Маврикий', 'Мавритания', 'Мадагаскар', 'Малави', 'Малайзия',
+            'Мали', 'Мальдивы', 'Мальта', 'Марокко', 'Мексика', 'Мозамбик',
+            'Молдова', 'Монголия', 'Мьянма', 'Намибия', 'Непал', 'Нигерия',
+            'Нидерланды', 'Никарагуа', 'Новая Зеландия', 'Норвегия', 'ОАЭ',
+            'Оман', 'Пакистан', 'Панама', 'Парагвай', 'Перу', 'Польша',
+            'Португалия', 'Россия', 'Румыния', 'Сальвадор', 'Саудовская Аравия',
+            'Северная Македония', 'Сенегал', 'Сербия', 'Сингапур', 'Сирия',
+            'Словакия', 'Словения', 'Сомали', 'Судан', 'США', 'Сьерра-Леоне',
+            'Таджикистан', 'Таиланд', 'Танзания', 'Тунис', 'Туркменистан',
+            'Турция', 'Уганда', 'Узбекистан', 'Украина', 'Уругвай',
+            'Филиппины', 'Финляндия', 'Франция', 'Хорватия', 'Черногория',
+            'Чехия', 'Чили', 'Швейцария', 'Швеция', 'Эквадор', 'Эстония',
+            'Эфиопия', 'ЮАР', 'Ямайка', 'Япония'
+        ];
+
+        const timezoneMap = {
+            'Россия': 'Europe/Moscow',
+            'США': 'America/New_York',
+            'Великобритания': 'Europe/London',
+            'Франция': 'Europe/Paris',
+            'Германия': 'Europe/Berlin',
+            'Италия': 'Europe/Rome',
+            'Испания': 'Europe/Madrid',
+            'Китай': 'Asia/Shanghai',
+            'Япония': 'Asia/Tokyo',
+            'Индия': 'Asia/Kolkata',
+            'Австралия': 'Australia/Sydney',
+            'Канада': 'America/Toronto',
+            'Бразилия': 'America/Sao_Paulo',
+            'Мексика': 'America/Mexico_City',
+            'Турция': 'Europe/Istanbul',
+            'ОАЭ': 'Asia/Dubai',
+            'Казахстан': 'Asia/Almaty',
+            'Украина': 'Europe/Kyiv',
+            'Беларусь': 'Europe/Minsk',
+            'Польша': 'Europe/Warsaw',
+            'Чехия': 'Europe/Prague',
+            'Швеция': 'Europe/Stockholm',
+            'Норвегия': 'Europe/Oslo',
+            'Финляндия': 'Europe/Helsinki',
+            'Дания': 'Europe/Copenhagen',
+            'Нидерланды': 'Europe/Amsterdam',
+            'Бельгия': 'Europe/Brussels',
+            'Австрия': 'Europe/Vienna',
+            'Швейцария': 'Europe/Zurich',
+            'Греция': 'Europe/Athens',
+            'Португалия': 'Europe/Lisbon',
+            'Ирландия': 'Europe/Dublin',
+            'Аргентина': 'America/Argentina/Buenos_Aires',
+            'Чили': 'America/Santiago',
+            'Колумбия': 'America/Bogota',
+            'Перу': 'America/Lima',
+            'ЮАР': 'Africa/Johannesburg',
+            'Египет': 'Africa/Cairo',
+            'Израиль': 'Asia/Jerusalem',
+            'Саудовская Аравия': 'Asia/Riyadh',
+            'Иран': 'Asia/Tehran',
+            'Ирак': 'Asia/Baghdad',
+            'Сирия': 'Asia/Damascus',
+            'Иордания': 'Asia/Amman',
+            'Ливан': 'Asia/Beirut',
+            'Азербайджан': 'Asia/Baku',
+            'Грузия': 'Asia/Tbilisi',
+            'Армения': 'Asia/Yerevan',
+            'Узбекистан': 'Asia/Tashkent',
+            'Таджикистан': 'Asia/Dushanbe',
+            'Туркменистан': 'Asia/Ashgabat',
+            'Киргизия': 'Asia/Bishkek',
+            'Монголия': 'Asia/Ulaanbaatar',
+            'Индонезия': 'Asia/Jakarta',
+            'Малайзия': 'Asia/Kuala_Lumpur',
             'Сингапур': 'Asia/Singapore',
-            'Куала-Лумпур': 'Asia/Kuala_Lumpur',
-            'Гонконг': 'Asia/Hong_Kong',
-            'Пекин': 'Asia/Shanghai',
-            'Шанхай': 'Asia/Shanghai',
-            'Сеул': 'Asia/Seoul',
-            'Токио': 'Asia/Tokyo',
-            'Осака': 'Asia/Tokyo',
-            'Сидней': 'Australia/Sydney',
-            'Мельбурн': 'Australia/Melbourne',
-            'Брисбен': 'Australia/Brisbane',
-            'Перт': 'Australia/Perth',
-            'Окленд': 'Pacific/Auckland',
-            'Гонолулу': 'Pacific/Honolulu',
-            'Анкоридж': 'America/Anchorage',
-            'Рейкьявик': 'Atlantic/Reykjavik',
-            'Лиссабон': 'Europe/Lisbon',
-            'Дублин': 'Europe/Dublin',
-            'Белград': 'Europe/Belgrade',
-            'Загреб': 'Europe/Zagreb',
-            'София': 'Europe/Sofia',
-            'Бухарест': 'Europe/Bucharest',
-            'Вильнюс': 'Europe/Vilnius',
-            'Рига': 'Europe/Riga',
-            'Таллин': 'Europe/Tallinn',
-            'Бишкек': 'Asia/Bishkek',
-            'Астана': 'Asia/Almaty',
-            'Душанбе': 'Asia/Dushanbe',
-            'Ашхабад': 'Asia/Ashgabat',
-            'Улан-Батор': 'Asia/Ulaanbaatar',
-            'Пхеньян': 'Asia/Pyongyang',
-            'Ханой': 'Asia/Ho_Chi_Minh',
-            'Манила': 'Asia/Manila',
-            'Тайбэй': 'Asia/Taipei'
+            'Таиланд': 'Asia/Bangkok',
+            'Вьетнам': 'Asia/Ho_Chi_Minh',
+            'Филиппины': 'Asia/Manila',
+            'Южная Корея': 'Asia/Seoul',
+            'Новая Зеландия': 'Pacific/Auckland'
         };
 
-        let selectedCountry = 'Москва';
+        let selectedCountry = 'Россия';
         let selectedTimezone = 'Europe/Moscow';
 
         // ===== ФУНКЦИИ =====
@@ -414,18 +417,19 @@
             });
         });
 
-        // ===== ПОИСК СТРАН =====
+        // ===== ПОИСК (клик по строке - открывается список по алфавиту) =====
+        const searchBox = document.getElementById('searchBox');
         const searchInput = document.getElementById('searchInput');
         const searchDropdown = document.getElementById('searchDropdown');
 
         function renderCountries(filter = '') {
-            const countries = Object.keys(timezones).filter(c => c.toLowerCase().includes(filter.toLowerCase()));
-            searchDropdown.innerHTML = countries.map(c => `<div class="country-item">${c}</div>`).join('');
+            const filtered = countries.filter(c => c.toLowerCase().includes(filter.toLowerCase()));
+            searchDropdown.innerHTML = filtered.map(c => `<div class="country-item">${c}</div>`).join('');
             
             document.querySelectorAll('.country-item').forEach(item => {
                 item.addEventListener('click', function() {
                     selectedCountry = this.textContent;
-                    selectedTimezone = timezones[selectedCountry];
+                    selectedTimezone = timezoneMap[selectedCountry] || 'Europe/Moscow';
                     searchInput.value = '';
                     searchDropdown.style.display = 'none';
                     updateClock();
@@ -434,13 +438,20 @@
             });
         }
 
+        // По клику на строку открываем полный список
+        searchBox.addEventListener('click', function() {
+            renderCountries();
+            searchDropdown.style.display = 'block';
+        });
+
         searchInput.addEventListener('input', function() {
             const val = this.value;
             if (val.length > 0) {
                 searchDropdown.style.display = 'block';
                 renderCountries(val);
             } else {
-                searchDropdown.style.display = 'none';
+                searchDropdown.style.display = 'block';
+                renderCountries();
             }
         });
 
@@ -482,7 +493,6 @@
             updateClock();
             setInterval(updateClock, 1000);
             updateText();
-            renderCountries();
             createStars();
         });
     </script>
