@@ -44,7 +44,9 @@ app.get('/logout', (req, res) => {
     req.logout(() => res.redirect('/'));
 });
 
-// ===== ДАННЫЕ ПОЛЬЗОВАТЕЛЯ (Trade URL + API Key) =====
+// ==========================================
+// СОХРАНЕНИЕ TRADE URL
+// ==========================================
 const DB_FILE = path.join(__dirname, 'userData.json');
 let userData = {};
 function loadUserData() {
@@ -63,7 +65,7 @@ app.post('/api/save-trade-url', (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
     const steamId = String(req.user.id);
     const tradeUrl = req.body.tradeUrl;
-    if (!userData[steamId]) userData[steamId] = { tradeUrl: '', apiKey: '' };
+    if (!userData[steamId]) userData[steamId] = { tradeUrl: '' };
     userData[steamId].tradeUrl = tradeUrl;
     saveUserData();
     res.json({ success: true });
@@ -75,26 +77,9 @@ app.get('/api/get-trade-url', (req, res) => {
     res.json({ tradeUrl: userData[steamId] ? userData[steamId].tradeUrl : '' });
 });
 
-app.post('/api/generate-api-key', (req, res) => {
-    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
-    const steamId = String(req.user.id);
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let key = '';
-    for (let i = 0; i < 17; i++) key += chars.charAt(Math.floor(Math.random() * chars.length));
-    
-    if (!userData[steamId]) userData[steamId] = { tradeUrl: '', apiKey: '' };
-    userData[steamId].apiKey = key;
-    saveUserData();
-    res.json({ apiKey: key });
-});
-
-app.get('/api/get-api-key', (req, res) => {
-    if (!req.user) return res.json({ apiKey: '' });
-    const steamId = String(req.user.id);
-    res.json({ apiKey: userData[steamId] ? userData[steamId].apiKey : '' });
-});
-
-// ===== ИНВЕНТАРЬ =====
+// ==========================================
+// ИНВЕНТАРЬ (с фильтрацией дефолтных и дешевых)
+// ==========================================
 const DEFAULT_SKINS = [
     'usp-s', 'glock-18', 'p250', 'deagle', 'five-seven', 'tec-9', 'cz75-auto',
     'ak-47', 'm4a4', 'm4a1-s', 'famas', 'galil ar', 'ssg 08', 'awp', 'scar-20',
@@ -102,13 +87,16 @@ const DEFAULT_SKINS = [
     'nova', 'xm1014', 'mag-7', 'sawed-off', 'm249', 'negev', 'knife', 'taser'
 ];
 
-const MIN_PRICE = 5;
+// Порог минимальной цены (если меньше - скин недоступен)
+const MIN_PRICE = 5; // В долларах
 
 app.post('/api/get-inventory', async (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Пожалуйста, войдите через Steam' });
     const steamId = String(req.user.id);
 
     try {
+        await new Promise(r => setTimeout(r, 4000));
+
         const inventoryUrl = `https://steamcommunity.com/inventory/${steamId}/730/2?l=english&count=1000`;
         const inventoryResponse = await axios.get(inventoryUrl, {
             headers: {
@@ -130,28 +118,41 @@ app.post('/api/get-inventory', async (req, res) => {
             if (desc) {
                 const name = desc.market_hash_name || desc.name;
                 const weapon = (name.split('|')[0] || '').toLowerCase().trim();
+                
+                // Фильтруем дефолтные скины и оружие
                 const isDefault = DEFAULT_SKINS.includes(weapon) || desc.tags?.some(tag => tag.internal_name === 'normal');
+                
                 if (!isDefault && !name.toLowerCase().includes('case') && !name.toLowerCase().includes('crate')) {
                     items.push({
                         assetid: asset.assetid,
                         name: name,
                         image: desc.icon_url ? `https://community.akamai.steamstatic.com/economy/image/${desc.icon_url}` : '',
                         type: desc.type || '',
-                        minPrice: MIN_PRICE
+                        default: false
                     });
                 }
             }
         });
 
-        res.json({ success: true, items });
+        // Добавляем поле "доступность" (минимальная цена)
+        const result = items.map(item => ({
+            ...item,
+            available: true, // Пока считаем все доступными, цену подтягиваем с внешнего API
+            minPrice: MIN_PRICE
+        }));
+
+        res.json({ success: true, items: result });
     } catch (error) {
         res.status(500).json({ error: 'Не удалось получить инвентарь. Подожди 2 минуты и попробуй снова.' });
     }
 });
 
-// ===== РЫНОК =====
+// ==========================================
+// РЫНОК
+// ==========================================
 const MARKET_FILE = path.join(__dirname, 'marketData.json');
 let marketData = [];
+
 function loadMarket() {
     try {
         if (fs.existsSync(MARKET_FILE)) {

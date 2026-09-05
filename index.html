@@ -45,8 +45,6 @@
         .btn:hover { background: #9333ea; }
         .btn-outline { background: transparent; color: #b2b4bb !important; border: 1px solid #2c2e36; padding: 7px 18px; border-radius: 6px; font-weight: 500; font-size: 13px; cursor: pointer; }
         .btn-outline:hover { border-color: #a855f7; color: #a855f7 !important; }
-        .btn-success { background: #a855f7; color: #fff !important; }
-        .btn-success:hover { background: #9333ea; }
         .btn-steam { background: #171a21; color: #fff; border: 1px solid #66c0f4; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; }
 
         .steam-user { display: flex; align-items: center; gap: 10px; background: #1c1d23; padding: 4px 12px 4px 4px; border-radius: 30px; border: 1px solid #2c2e36; cursor: pointer; }
@@ -81,6 +79,13 @@
         .sell-skin-card .selected-check { position: absolute; top: 8px; left: 8px; width: 20px; height: 20px; border-radius: 50%; border: 2px solid #a855f7; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; background: #a855f7; opacity: 0; transition: 0.2s; }
         .sell-skin-card.selected .selected-check { opacity: 1; }
 
+        /* НЕДОСТУПНО */
+        .sell-skin-card.unavailable { cursor: not-allowed; opacity: 0.5; }
+        .sell-skin-card.unavailable:hover { border-color: #26282f; }
+        .unavailable-badge { background: rgba(231, 76, 60, 0.15); color: #e74c3c; font-size: 10px; padding: 2px 6px; border-radius: 4px; position: absolute; top: 8px; right: 8px; font-weight: 700; }
+        .unavailable-tooltip { display: none; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #14161c; border: 1px solid #a855f7; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #fff; z-index: 10; width: 200px; text-align: center; }
+        .sell-skin-card.unavailable:hover .unavailable-tooltip { display: block; }
+
         .sell-sidebar { width: 340px; min-width: 340px; background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 20px; position: sticky; top: 80px; }
         .sell-sidebar h3 { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 16px; }
         .sell-sidebar .total-label { color: #8a8d99; font-size: 14px; margin-bottom: 4px; }
@@ -101,33 +106,42 @@
 
         .sell-final-btn { width: 100%; background: #a855f7; color: #fff; border: none; border-radius: 8px; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px; }
         .sell-final-btn:hover { background: #9333ea; }
-        /* ============================== */
 
-        /* ДРУГИЕ СТРАНИЦЫ */
+        /* ===== ПРОФИЛЬ ===== */
+        .profile-login-box { max-width: 500px; margin: 40px auto; background: #14161c; border: 1px solid #26282f; border-radius: 16px; padding: 48px 40px; text-align: center; }
+        .profile-login-box h2 { color: #e4e6eb; font-size: 24px; margin-bottom: 8px; }
+        .profile-login-box p { color: #8a8d99; font-size: 16px; margin-bottom: 24px; }
+
+        .profile-layout { display: flex; gap: 24px; }
+        .profile-left { width: 300px; min-width: 300px; display: flex; flex-direction: column; gap: 16px; }
+        .profile-avatar-box { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 20px; text-align: center; }
+        .profile-avatar { width: 96px; height: 96px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 700; color: #0b0c10; flex-shrink: 0; background-size: cover; background-position: center; margin: 0 auto 12px; }
+        .profile-balance { font-size: 20px; font-weight: 800; color: #a855f7; margin-bottom: 16px; }
+        .profile-tabs { background: #14161c; border: 1px solid #26282f; border-radius: 12px; overflow: hidden; }
+        .profile-tab { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #b2b4bb; font-size: 14px; cursor: pointer; border-bottom: 1px solid #1c1d23; transition: 0.2s; }
+        .profile-tab:hover { background: #1c1d23; color: #fff; }
+        .profile-tab.active { background: #a855f7; color: #fff; }
+
+        .profile-right { flex: 1; }
+        .profile-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .profile-card { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 20px; text-align: center; }
+        .profile-card .icon { font-size: 32px; margin-bottom: 8px; }
+        .profile-card .value { font-size: 18px; font-weight: 700; color: #fff; }
+        .profile-card .label { color: #8a8d99; font-size: 12px; margin-top: 4px; }
+
+        .profile-transactions { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px; }
+        .profile-transactions h3 { margin-bottom: 16px; font-size: 18px; }
+        .transaction-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        .transaction-table th, .transaction-table td { text-align: left; padding: 12px; border-bottom: 1px solid #1c1d23; font-size: 13px; color: #b2b4bb; }
+        .transaction-table th { color: #fff; }
+
+        /* ===== ОСТАЛЬНОЕ ===== */
         .static-page { max-width: 800px; margin: 0 auto; }
         .static-page h1 { font-size: 32px; color: #a855f7; margin-bottom: 24px; }
         .static-page h2 { font-size: 20px; color: #a855f7; margin-top: 24px; margin-bottom: 12px; }
         .static-page p { line-height: 1.7; color: #b2b4bb; margin-bottom: 12px; }
         .static-page a { color: #a855f7; text-decoration: none; }
         .bold-warning { font-weight: 900; color: #e74c3c; font-size: 18px; text-align: center; margin: 20px 0; }
-
-        .profile-login-box { max-width: 500px; margin: 40px auto; background: #14161c; border: 1px solid #26282f; border-radius: 16px; padding: 48px 40px; text-align: center; }
-        .profile-login-box h2 { color: #e4e6eb; font-size: 24px; margin-bottom: 8px; }
-        .profile-login-box p { color: #8a8d99; font-size: 16px; margin-bottom: 24px; }
-
-        .profile-header { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px 32px; display: flex; align-items: center; gap: 24px; margin-bottom: 24px; }
-        .profile-avatar { width: 72px; height: 72px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; color: #0b0c10; flex-shrink: 0; background-size: cover; background-position: center; }
-        .profile-info h2 { font-size: 24px; }
-        .profile-settings { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
-        .profile-settings h3 { margin-bottom: 16px; font-size: 18px; }
-        .profile-settings .setting-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
-        .profile-settings .setting-row label { color: #8a8d99; font-size: 13px; min-width: 100px; }
-        .profile-settings .setting-row input[type="text"] { flex: 1; background: #1c1d23; border: 1px solid #2c2e36; color: #e4e6eb; padding: 8px 12px; border-radius: 6px; font-size: 13px; outline: none; }
-        .profile-settings .setting-row .toggle-btn { padding: 6px 16px; border-radius: 6px; border: 1px solid #2c2e36; background: transparent; color: #b2b4bb; cursor: pointer; font-size: 12px; }
-        .profile-settings .setting-row .toggle-btn.active { background: #a855f7; border-color: #a855f7; color: #fff; }
-        .profile-history { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px; text-align: center; }
-        .profile-history h3 { margin-bottom: 16px; font-size: 18px; text-align: left; }
-        .profile-history .empty-message { color: #6a6d7a; font-size: 16px; padding: 30px 0; }
 
         .admin-panel { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
         .admin-panel h2 { font-size: 20px; margin-bottom: 16px; color: #a855f7; }
@@ -150,7 +164,7 @@
         .footer-grid .col a:hover { color: #a855f7; }
         .footer-bottom { text-align: center; margin-top: 32px; padding-top: 20px; border-top: 1px solid #1c1d23; color: #6a6d7a; font-size: 14px; }
 
-        @media (max-width: 992px) { .sell-layout { flex-direction: column; } .sell-sidebar { width: 100%; min-width: unset; position: static; } .skin-grid-sell { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 992px) { .sell-layout { flex-direction: column; } .sell-sidebar { width: 100%; min-width: unset; position: static; } .skin-grid-sell { grid-template-columns: repeat(3, 1fr); } .profile-layout { flex-direction: column; } .profile-left { width: 100%; min-width: unset; } .profile-cards { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 600px) { .skin-grid-sell { grid-template-columns: repeat(2, 1fr); } }
     </style>
 </head>
@@ -197,17 +211,9 @@
                 </div>
                 
                 <div class="skin-grid-sell" id="sellSkinGrid">
-                    <div class="sell-skin-card">
-                        <div class="sell-badge">Недоступно</div>
-                        <div class="image"><span style="color:#4a4d5a;font-size:12px;">M4A1-S</span></div>
-                        <div class="name">M4A1-S | Electron</div>
-                        <div class="price">73,75 ₽</div>
-                    </div>
-                    <div class="sell-skin-card">
-                        <div class="sell-badge">Недоступно</div>
-                        <div class="image"><span style="color:#4a4d5a;font-size:12px;">Стикер</span></div>
-                        <div class="name">Sticker | Team Liquid</div>
-                        <div class="price">0,89 ₽</div>
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #8a8d99;">
+                        Введите Trade URL в панели справа и нажмите «Сохранить»<br>
+                        После этого здесь появятся ваши скины.
                     </div>
                 </div>
             </div>
@@ -215,6 +221,16 @@
             <div class="sell-sidebar">
                 <h3>Выбрано 0 скинов на 0,00 ₽</h3>
                 
+                <!-- TRADE URL -->
+                <div class="sidebar-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <label style="margin-bottom: 0;">🔗 Trade URL</label>
+                        <a href="https://steamcommunity.com/id/me/tradeoffers/privacy#trade_offer_access_url" target="_blank" style="color: #a855f7; font-size: 13px; text-decoration: none;">Где взять?</a>
+                    </div>
+                    <input type="text" id="sellTradeUrl" placeholder="https://steamcommunity.com/tradeoffer/new/?pa...">
+                    <button class="btn" style="width: 100%; margin-top: 8px;" onclick="saveTradeUrl()">Сохранить</button>
+                </div>
+
                 <div class="sidebar-section">
                     <label>Введите промокод</label>
                     <input type="text" placeholder="Промокод">
@@ -248,14 +264,7 @@
     </div>
 </div>
 
-<!-- ДРУГИЕ СТРАНИЦЫ (не трогаю) -->
-<div class="page" id="marketPage">
-    <div class="container">
-        <h2 style="font-size: 24px; font-weight: 700;">Купить скины</h2>
-        <p style="color:#8a8d99; margin-bottom:20px;">Здесь будут ваши скины</p>
-    </div>
-</div>
-
+<!-- СТРАНИЦА ПРОФИЛЯ -->
 <div class="page" id="profilePage">
     <div class="container">
         <div id="profileLoginBox" style="display:block;">
@@ -267,26 +276,91 @@
             </div>
         </div>
         <div id="profileContent" style="display:none;">
-            <div class="profile-header">
-                <div class="profile-avatar" id="profileAvatar"></div>
-                <div class="profile-info">
-                    <h2 id="profileName"></h2>
+            <div class="profile-layout">
+                <div class="profile-left">
+                    <div class="profile-avatar-box">
+                        <div class="profile-avatar" id="profileAvatar"></div>
+                        <div style="font-size: 18px; font-weight: 700; color: #fff;" id="profileName"></div>
+                        <div class="profile-balance">0,00 ₽</div>
+                    </div>
+                    
+                    <div class="profile-tabs">
+                        <div class="profile-tab active">Транзакции</div>
+                        <div class="profile-tab">Обмены</div>
+                        <div class="profile-tab">Верификация</div>
+                        <div class="profile-tab">Сессии</div>
+                        <div class="profile-tab">API</div>
+                    </div>
+                    
+                    <div class="profile-settings" style="margin-top: 16px;">
+                        <div class="setting-row" style="display: flex; gap: 8px;">
+                            <input type="text" id="profileTradeUrl" placeholder="Trade URL" style="flex: 1;">
+                            <button class="btn" style="padding: 8px 12px; font-size: 12px;" onclick="saveProfileTradeUrl()">Сохранить</button>
+                        </div>
+                        <div class="setting-row" style="margin-top: 12px; display: flex; gap: 8px;">
+                            <button class="toggle-btn" id="themeToggle">Тёмная</button>
+                            <button class="toggle-btn" id="themeToggleLight">Светлая</button>
+                        </div>
+                        <div class="setting-row" style="margin-top: 12px; display: flex; gap: 8px;">
+                            <button class="toggle-btn" id="rainToggle">Анимация Вкл</button>
+                            <button class="toggle-btn" id="rainToggleOff">Анимация Выкл</button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="profile-settings">
-                <h3>Настройки</h3>
-                <div class="setting-row">
-                    <label>Тема</label>
-                    <button class="toggle-btn active" id="themeToggle">Тёмная</button>
-                    <button class="toggle-btn" id="themeToggleLight">Светлая</button>
-                </div>
-                <div class="setting-row">
-                    <label>Анимация</label>
-                    <button class="toggle-btn active" id="rainToggle">Вкл</button>
-                    <button class="toggle-btn" id="rainToggleOff">Выкл</button>
+
+                <div class="profile-right">
+                    <div class="profile-cards">
+                        <div class="profile-card">
+                            <div class="icon">🛒</div>
+                            <div class="value">0,00 ₽</div>
+                            <div class="label">Продано на сумму</div>
+                        </div>
+                        <div class="profile-card">
+                            <div class="icon">🛍️</div>
+                            <div class="value">0,00 ₽</div>
+                            <div class="label">Куплено на сумму</div>
+                        </div>
+                        <div class="profile-card">
+                            <div class="icon">⏰</div>
+                            <div class="value">0 дня</div>
+                            <div class="label">Времени на сайте</div>
+                        </div>
+                        <div class="profile-card">
+                            <div class="icon">🛡️</div>
+                            <div class="value">Отсутствует</div>
+                            <div class="label">КУС верификация</div>
+                        </div>
+                    </div>
+
+                    <div class="profile-transactions">
+                        <h3>Транзакции</h3>
+                        <table class="transaction-table">
+                            <thead>
+                                <tr>
+                                    <th>Сервис</th>
+                                    <th>Дата</th>
+                                    <th>Сумма</th>
+                                    <th>Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="4" style="text-align: center; padding: 30px; color: #6a6d7a;">Нет транзакций</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- ДРУГИЕ СТРАНИЦЫ -->
+<div class="page" id="marketPage">
+    <div class="container">
+        <h2 style="font-size: 24px; font-weight: 700;">Купить скины</h2>
+        <p style="color:#8a8d99; margin-bottom:20px;">Здесь будут ваши скины</p>
     </div>
 </div>
 
@@ -324,8 +398,11 @@
 </div>
 
 <script>
-// ===== ЛОГИКА ПРОФИЛЯ / STEAM (не трогаю) =====
+// ===== ЛОГИКА STEAM =====
 let currentUser = null;
+let userInventory = [];
+let selectedSteamSkins = [];
+
 async function fetchUser() {
     const response = await fetch('/api/user');
     const data = await response.json();
@@ -333,13 +410,16 @@ async function fetchUser() {
         currentUser = { id: data.user.id, name: data.user.name, avatar: data.user.avatar };
         updateUserUI();
         renderProfile();
+        loadTradeUrl();
     } else {
         currentUser = null;
         updateUserUI();
         renderProfile();
     }
 }
+
 function logoutUser() { window.location.href = '/logout'; }
+
 function updateUserUI() {
     const actions = document.getElementById('headerActions');
     if (currentUser) {
@@ -352,6 +432,107 @@ function updateUserUI() {
         `;
     } else {
         actions.innerHTML = `<a href="/auth/steam" class="btn btn-steam">Войти через Steam</a>`;
+    }
+}
+
+// ===== TRADE URL =====
+async function loadTradeUrl() {
+    const response = await fetch('/api/get-trade-url');
+    const data = await response.json();
+    if (data.tradeUrl) {
+        document.getElementById('sellTradeUrl').value = data.tradeUrl;
+        document.getElementById('profileTradeUrl').value = data.tradeUrl;
+    }
+}
+
+async function saveTradeUrl() {
+    const url = document.getElementById('sellTradeUrl').value.trim();
+    if (!url) { alert('Введите Trade URL!'); return; }
+    
+    document.getElementById('profileTradeUrl').value = url;
+    await fetch('/api/save-trade-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tradeUrl: url })
+    });
+    alert('Trade URL сохранен! Сейчас загрузим скины...');
+    loadSteamInventory();
+}
+
+async function saveProfileTradeUrl() {
+    const url = document.getElementById('profileTradeUrl').value.trim();
+    if (!url) { alert('Введите Trade URL!'); return; }
+    
+    document.getElementById('sellTradeUrl').value = url;
+    await fetch('/api/save-trade-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tradeUrl: url })
+    });
+    alert('Trade URL сохранен! Сейчас загрузим скины...');
+    loadSteamInventory();
+}
+
+// ===== ИНВЕНТАРЬ =====
+async function loadSteamInventory() {
+    if (!currentUser) { alert('Пожалуйста, войдите через Steam!'); return; }
+    const grid = document.getElementById('sellSkinGrid');
+    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #8a8d99;">⏳ Загружаем ваш инвентарь...</div>';
+
+    try {
+        const response = await fetch('/api/get-inventory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+        const data = await response.json();
+        if (data.error) { alert(data.error); grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #8a8d99;">Ошибка. Попробуй через 2 минуты.</div>'; return; }
+        
+        userInventory = data.items;
+        if (userInventory.length === 0) {
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #8a8d99;">Инвентарь пуст или скрыт.</div>';
+            return;
+        }
+        
+        // Временная демо-логика: к каждому скину добавляем цену (можно подтягивать с внешнего API)
+        userInventory = userInventory.map((item, index) => ({
+            ...item,
+            price: (index + 1) * 0.5 + 1 // Условная цена от 1.5$ до 20$
+        }));
+
+        grid.innerHTML = userInventory.map((item, index) => `
+            <div class="sell-skin-card ${item.price < 5 ? 'unavailable' : ''}" onclick="toggleSteamSkinSelection(${index})">
+                ${item.price < 5 ? `
+                    <div class="unavailable-badge">Недоступно</div>
+                    <div class="unavailable-tooltip">Мы не принимаем данный скин, возможно, из-за его низкой цены</div>
+                ` : ''}
+                ${item.price >= 5 ? `<div class="sell-badge">${item.type || 'Скин'}</div>` : ''}
+                <div class="image">${item.image ? `<img src="${item.image}">` : ''}</div>
+                <div class="name">${item.name}</div>
+                <div class="price" style="color: ${item.price < 5 ? '#e74c3c' : '#a855f7'};">
+                    ${item.price < 5 ? 'Недоступно' : '$' + item.price.toFixed(2)}
+                </div>
+                <div class="selected-check">✓</div>
+            </div>
+        `).join('');
+    } catch (error) {
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #8a8d99;">Ошибка подключения.</div>';
+    }
+}
+
+function toggleSteamSkinSelection(index) {
+    const item = userInventory[index];
+    
+    // Если скин недоступен, не выбираем его
+    if (item.price < 5) return;
+    
+    const idx = selectedSteamSkins.findIndex(id => id === item.assetid);
+    if (idx > -1) {
+        selectedSteamSkins.splice(idx, 1);
+        // Снять выделение
+        const cards = document.querySelectorAll('.sell-skin-card');
+        cards[index].classList.remove('selected');
+    } else {
+        selectedSteamSkins.push(item.assetid);
+        // Добавить выделение
+        const cards = document.querySelectorAll('.sell-skin-card');
+        cards[index].classList.add('selected');
     }
 }
 
@@ -407,7 +588,7 @@ function renderAdminSkins() {
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
     fetchUser();
-    document.querySelectorAll('.nav a, .footer a').forEach(el => {
+    document.querySelectorAll('.nav a').forEach(el => {
         el.addEventListener('click', function(e) {
             e.preventDefault();
             const page = this.dataset.page;
