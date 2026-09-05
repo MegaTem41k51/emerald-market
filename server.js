@@ -87,8 +87,7 @@ const DEFAULT_SKINS = [
     'nova', 'xm1014', 'mag-7', 'sawed-off', 'm249', 'negev', 'knife', 'taser'
 ];
 
-// Порог минимальной цены (если меньше - скин недоступен)
-const MIN_PRICE = 5; // В долларах
+const MIN_PRICE = 5;
 
 app.post('/api/get-inventory', async (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Пожалуйста, войдите через Steam' });
@@ -119,7 +118,6 @@ app.post('/api/get-inventory', async (req, res) => {
                 const name = desc.market_hash_name || desc.name;
                 const weapon = (name.split('|')[0] || '').toLowerCase().trim();
                 
-                // Фильтруем дефолтные скины и оружие
                 const isDefault = DEFAULT_SKINS.includes(weapon) || desc.tags?.some(tag => tag.internal_name === 'normal');
                 
                 if (!isDefault && !name.toLowerCase().includes('case') && !name.toLowerCase().includes('crate')) {
@@ -128,20 +126,13 @@ app.post('/api/get-inventory', async (req, res) => {
                         name: name,
                         image: desc.icon_url ? `https://community.akamai.steamstatic.com/economy/image/${desc.icon_url}` : '',
                         type: desc.type || '',
-                        default: false
+                        minPrice: MIN_PRICE
                     });
                 }
             }
         });
 
-        // Добавляем поле "доступность" (минимальная цена)
-        const result = items.map(item => ({
-            ...item,
-            available: true, // Пока считаем все доступными, цену подтягиваем с внешнего API
-            minPrice: MIN_PRICE
-        }));
-
-        res.json({ success: true, items: result });
+        res.json({ success: true, items });
     } catch (error) {
         res.status(500).json({ error: 'Не удалось получить инвентарь. Подожди 2 минуты и попробуй снова.' });
     }
