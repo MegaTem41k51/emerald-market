@@ -34,6 +34,14 @@
         body.light .profile-avatar-box { background: #fff; border-color: #d0d4da; }
         body.light .profile-avatar-box .profile-name { color: #333; }
         body.light .profile-balance { color: #a855f7; }
+        body.light .profile-tabs { background: #fff; border-color: #d0d4da; }
+        body.light .profile-tab { color: #555; border-bottom-color: #e0e4ea; }
+        body.light .profile-tab.active { background: #a855f7; color: #fff; }
+        body.light .profile-card { background: #fff; border-color: #d0d4da; }
+        body.light .profile-card .value { color: #333; }
+        body.light .profile-transactions { background: #fff; border-color: #d0d4da; }
+        body.light .transaction-table th, body.light .transaction-table td { border-bottom-color: #e0e4ea; color: #666; }
+        body.light .transaction-table th { color: #333; }
         body.light .footer { background: #f0f2f5; border-top-color: #d0d4da; }
         body.light .footer-grid .col a { color: #555; }
         body.light .footer-bottom { color: #999; }
@@ -69,7 +77,7 @@
         .page { display: none; padding: 30px 0 60px; }
         .page.active { display: block; }
 
-        /* ===== ПРОДАЖА ===== */
+        /* ===== СТРАНИЦА ПРОДАЖИ ===== */
         .sell-hero { text-align: center; margin-bottom: 40px; }
         .sell-hero h1 { font-size: 34px; font-weight: 800; color: #fff; }
         .sell-hero h1 span { color: #a855f7; }
@@ -119,7 +127,7 @@
         .sell-final-btn { width: 100%; background: #a855f7; color: #fff; border: none; border-radius: 8px; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px; }
         .sell-final-btn:hover { background: #9333ea; }
 
-        /* ===== ПРОФИЛЬ (только 1 страница, без табов) ===== */
+        /* ===== ПРОФИЛЬ ===== */
         .profile-login-box { max-width: 500px; margin: 40px auto; background: #14161c; border: 1px solid #26282f; border-radius: 16px; padding: 48px 40px; text-align: center; }
         .profile-login-box h2 { color: #e4e6eb; font-size: 24px; margin-bottom: 8px; }
         .profile-login-box p { color: #8a8d99; font-size: 16px; margin-bottom: 24px; }
@@ -129,31 +137,36 @@
         .profile-avatar { width: 96px; height: 96px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 700; color: #0b0c10; flex-shrink: 0; background-size: cover; background-position: center; margin: 0 auto 12px; }
         .profile-name { font-size: 18px; font-weight: 700; color: #fff; }
         .profile-balance { font-size: 20px; font-weight: 800; color: #a855f7; margin-top: 8px; }
+
+        /* САЙДБАР ВКЛАДОК (КАК НА ФОТО) */
+        .profile-tabs { background: #14161c; border: 1px solid #26282f; border-radius: 12px; overflow: hidden; }
+        .profile-tab { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #b2b4bb; font-size: 14px; cursor: pointer; border-bottom: 1px solid #1c1d23; transition: 0.2s; }
+        .profile-tab .icon { font-size: 18px; }
+        .profile-tab:hover { background: #1c1d23; color: #fff; }
+        .profile-tab.active { background: #a855f7; color: #fff; }
+
         .profile-right { flex: 1; }
         .profile-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
         .profile-card { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 20px; text-align: center; }
         .profile-card .icon { font-size: 32px; margin-bottom: 8px; }
         .profile-card .value { font-size: 18px; font-weight: 700; color: #fff; }
         .profile-card .label { color: #8a8d99; font-size: 12px; margin-top: 4px; }
-        .profile-settings { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 16px; }
-        .setting-row { display: flex; gap: 8px; margin-bottom: 12px; }
-        .setting-row input[type="text"] { flex: 1; background: #0b0c10; border: 1px solid #26282f; border-radius: 8px; padding: 8px 12px; color: #e4e6eb; font-size: 13px; outline: none; }
-        .setting-row input[type="text"]:focus { border-color: #a855f7; }
-        .setting-row .toggle-btn { padding: 8px 12px; border-radius: 8px; border: 1px solid #26282f; background: transparent; color: #b2b4bb; cursor: pointer; font-size: 12px; }
-        .setting-row .toggle-btn.active { background: #a855f7; border-color: #a855f7; color: #fff; }
-        body.light .profile-settings { background: #fff; border-color: #d0d4da; }
-        body.light .setting-row input[type="text"] { background: #f5f6fa; border-color: #d0d4da; color: #333; }
-        body.light .setting-row .toggle-btn { background: #f5f6fa; border-color: #d0d4da; color: #555; }
-        body.light .setting-row .toggle-btn.active { background: #a855f7; border-color: #a855f7; color: #fff; }
 
-        /* ===== СТРАНИЦА ОБМЕНЫ ===== */
-        .exchanges-page h1 { color: #a855f7; font-size: 28px; margin-bottom: 24px; }
+        .profile-content-section { display: none; }
+        .profile-content-section.active { display: block; }
+
+        .profile-transactions { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px; }
+        .profile-transactions h3 { margin-bottom: 16px; font-size: 18px; }
+        .transaction-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        .transaction-table th, .transaction-table td { text-align: left; padding: 12px; border-bottom: 1px solid #1c1d23; font-size: 13px; color: #b2b4bb; }
+        .transaction-table th { color: #fff; }
+
+        /* ОБМЕНЫ */
         .exchange-empty { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 60px; text-align: center; color: #b2b4bb; }
         .exchange-empty .icon { font-size: 48px; margin-bottom: 16px; }
         .exchange-empty h3 { color: #fff; margin-bottom: 8px; }
 
-        /* ===== СТРАНИЦА ВЕРИФИКАЦИЯ ===== */
-        .verification-page h1 { color: #a855f7; font-size: 28px; margin-bottom: 24px; }
+        /* ВЕРИФИКАЦИЯ */
         .verification-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
         .verification-card { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px; }
         .verification-card h4 { display: flex; align-items: center; gap: 12px; font-size: 18px; margin-bottom: 16px; }
@@ -164,8 +177,7 @@
         .verification-card .input-group { display: flex; gap: 8px; }
         .verification-card .input-group input { flex: 1; background: #0b0c10; border: 1px solid #26282f; border-radius: 8px; padding: 10px; color: #e4e6eb; }
 
-        /* ===== СТРАНИЦА СЕССИИ ===== */
-        .sessions-page h1 { color: #a855f7; font-size: 28px; margin-bottom: 24px; }
+        /* СЕССИИ */
         .session-table { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px; }
         .session-table table { width: 100%; border-collapse: collapse; }
         .session-table th, .session-table td { padding: 12px; border-bottom: 1px solid #1c1d23; font-size: 13px; color: #b2b4bb; text-align: left; }
@@ -173,13 +185,20 @@
         .session-table .online { color: #22c55e; font-weight: 700; }
         .session-table .offline { color: #e74c3c; font-weight: 700; }
 
-        /* ===== СТРАНИЦА API ===== */
-        .api-page h1 { color: #a855f7; font-size: 28px; margin-bottom: 24px; }
+        /* API */
         .api-section { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px; }
         .api-section h3 { font-size: 18px; margin-bottom: 16px; }
         .api-section .input-group { display: flex; gap: 12px; }
         .api-section input { flex: 1; background: #0b0c10; border: 1px solid #26282f; border-radius: 8px; padding: 12px; color: #e4e6eb; font-family: monospace; font-size: 14px; }
         .api-section button { background: #a855f7; color: #fff; border: none; border-radius: 8px; padding: 12px 24px; font-size: 14px; font-weight: 600; cursor: pointer; }
+
+        /* ПРОФИЛЬ НАСТРОЙКИ */
+        .profile-settings { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 16px; }
+        .setting-row { display: flex; gap: 8px; margin-bottom: 12px; }
+        .setting-row input[type="text"] { flex: 1; background: #0b0c10; border: 1px solid #26282f; border-radius: 8px; padding: 8px 12px; color: #e4e6eb; font-size: 13px; outline: none; }
+        .setting-row input[type="text"]:focus { border-color: #a855f7; }
+        .setting-row .toggle-btn { padding: 8px 12px; border-radius: 8px; border: 1px solid #26282f; background: transparent; color: #b2b4bb; cursor: pointer; font-size: 12px; }
+        .setting-row .toggle-btn.active { background: #a855f7; border-color: #a855f7; color: #fff; }
 
         .footer { background: #0d0e14; border-top: 1px solid #1c1d24; padding: 40px 0 24px; }
         .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 30px; }
@@ -203,10 +222,6 @@
             <a class="active" data-page="sell">Продать скины</a>
             <a data-page="market">Купить скины</a>
             <a data-page="profile">Профиль</a>
-            <a data-page="exchanges">Обмены</a>
-            <a data-page="verification">Верификация</a>
-            <a data-page="sessions">Сессии</a>
-            <a data-page="api">API</a>
         </nav>
         <div class="header-actions" id="headerActions">
             <a href="/auth/steam" class="btn btn-steam">Войти через Steam</a>
@@ -249,7 +264,6 @@
             <div class="sell-sidebar">
                 <h3>Выбрано 0 скинов на 0,00 ₽</h3>
                 
-                <!-- TRADE URL -->
                 <div class="sidebar-section">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                         <label style="margin-bottom: 0;">🔗 Trade URL</label>
@@ -292,7 +306,7 @@
     </div>
 </div>
 
-<!-- СТРАНИЦА ПРОФИЛЯ (1 страница с настройками) -->
+<!-- СТРАНИЦА ПРОФИЛЯ -->
 <div class="page" id="profilePage">
     <div class="container">
         <div id="profileLoginBox" style="display:block;">
@@ -310,6 +324,34 @@
                         <div class="profile-avatar" id="profileAvatar"></div>
                         <div class="profile-name" id="profileName"></div>
                         <div class="profile-balance">0,00 ₽</div>
+                    </div>
+                    
+                    <!-- САЙДБАР ВКЛАДОК (КАК НА ФОТО) -->
+                    <div class="profile-tabs">
+                        <div class="profile-tab active" data-tab="transactions">
+                            <span class="icon">📄</span>
+                            Транзакции
+                        </div>
+                        <div class="profile-tab" data-tab="exchanges">
+                            <span class="icon">📦</span>
+                            Обмены
+                        </div>
+                        <div class="profile-tab" data-tab="verification">
+                            <span class="icon">🛡️</span>
+                            Верификация
+                        </div>
+                        <div class="profile-tab" data-tab="sessions">
+                            <span class="icon">🔒</span>
+                            Сессии
+                        </div>
+                        <div class="profile-tab" data-tab="referral">
+                            <span class="icon">🔗</span>
+                            Реферальная система
+                        </div>
+                        <div class="profile-tab" data-tab="api">
+                            <span class="icon">💻</span>
+                            API
+                        </div>
                     </div>
                     
                     <div class="profile-settings">
@@ -352,118 +394,115 @@
                         </div>
                     </div>
 
-                    <div class="profile-transactions">
-                        <h3>Транзакции</h3>
-                        <table class="transaction-table">
-                            <thead>
-                                <tr>
-                                    <th>Сервис</th>
-                                    <th>Дата</th>
-                                    <th>Сумма</th>
-                                    <th>Статус</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td colspan="4" style="text-align: center; padding: 30px; color: #6a6d7a;">Нет транзакций</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <!-- РАЗДЕЛЫ, КОТОРЫЕ ОТКРЫВАЮТСЯ -->
+                    <div class="profile-content-section active" id="section-transactions">
+                        <div class="profile-transactions">
+                            <h3>Транзакции</h3>
+                            <table class="transaction-table">
+                                <thead>
+                                    <tr>
+                                        <th>Сервис</th>
+                                        <th>Дата</th>
+                                        <th>Сумма</th>
+                                        <th>Статус</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; padding: 30px; color: #6a6d7a;">Нет транзакций</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="profile-content-section" id="section-exchanges">
+                        <div class="exchange-empty">
+                            <div class="icon">📦</div>
+                            <h3>У вас пока нет предметов</h3>
+                            <p>Покупайте и продавайте скины через EMERALD Market</p>
+                        </div>
+                    </div>
+
+                    <div class="profile-content-section" id="section-verification">
+                        <div class="verification-cards">
+                            <div class="verification-card">
+                                <h4>
+                                    <span style="background:#a855f7; color:#fff; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px;">1</span>
+                                    Верификация
+                                    <span class="badge orange">Отсутствует</span>
+                                </h4>
+                                <p>К сожалению, вы не можете пройти верификацию.</p>
+                                <button class="btn" style="width: 100%;">Начать КУС процедуру</button>
+                            </div>
+                            <div class="verification-card">
+                                <h4>
+                                    <span style="background:#a855f7; color:#fff; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px;">2</span>
+                                    Email
+                                    <span class="badge green">Подтвержден</span>
+                                </h4>
+                                <p>Пожалуйста, указывайте свой личный почтовый ящик.</p>
+                                <div class="input-group">
+                                    <input type="text" value="artemggchka@gmail.com" readonly>
+                                    <button class="btn" style="background: #e74c3c;">Отвязать</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-box" style="margin-top: 24px; background: rgba(234, 88, 12, 0.15); border-color: #ea580c; color: #ea580c;">
+                            ⚠️ КУС (Know Your Customer) — это процедура подтверждения личности, направленная на повышение безопасности платформы. Прошедшие верификацию пользователи получают больше удобств и дополнительную защиту при использовании сервиса. Обратите внимание, КУС процедура доступна только пользователям, достигшим 16-летнего возраста.
+                        </div>
+                    </div>
+
+                    <div class="profile-content-section" id="section-sessions">
+                        <div class="session-table">
+                            <h3 style="margin-bottom: 16px;">Ваши сессии</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Устройство</th>
+                                        <th>Местоположение</th>
+                                        <th>IP-Адрес</th>
+                                        <th>Статус</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Windows 10 (Chrome)</td>
+                                        <td>RU</td>
+                                        <td>89.254.249.156</td>
+                                        <td class="online">Онлайн</td>
+                                    </tr>
+                                    <tr>
+                                        <td>iPhone iOS 18 (Safari)</td>
+                                        <td>JP</td>
+                                        <td>93.115.158.57</td>
+                                        <td class="offline">Оффлайн</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="profile-content-section" id="section-referral">
+                        <div class="exchange-empty">
+                            <div class="icon">🔗</div>
+                            <h3>Реферальная система</h3>
+                            <p>Здесь будет ваша реферальная ссылка</p>
+                        </div>
+                    </div>
+
+                    <div class="profile-content-section" id="section-api">
+                        <div class="api-section">
+                            <h3>Ваш API Key</h3>
+                            <div class="input-group">
+                                <input type="text" id="apiKeyInput" placeholder="Не сгенерирован" readonly>
+                                <button onclick="generateApiKey()">Сгенерировать</button>
+                            </div>
+                            <p style="color: #8a8d99; font-size: 13px; margin-top: 12px;">Этот ключ будет использоваться для доступа к API сайта.</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-
-<!-- СТРАНИЦА ОБМЕНЫ -->
-<div class="page" id="exchangesPage">
-    <div class="container exchanges-page">
-        <h1>Обмены</h1>
-        <div class="exchange-empty">
-            <div class="icon">📦</div>
-            <h3>У вас пока нет предметов</h3>
-            <p>Покупайте и продавайте скины через EMERALD Market</p>
-        </div>
-    </div>
-</div>
-
-<!-- СТРАНИЦА ВЕРИФИКАЦИЯ -->
-<div class="page" id="verificationPage">
-    <div class="container verification-page">
-        <h1>Верификация</h1>
-        <div class="verification-cards">
-            <div class="verification-card">
-                <h4>
-                    <span style="background:#a855f7; color:#fff; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px;">1</span>
-                    Верификация
-                    <span class="badge orange">Отсутствует</span>
-                </h4>
-                <p>К сожалению, вы не можете пройти верификацию.</p>
-                <button class="btn" style="width: 100%;">Начать КУС процедуру</button>
-            </div>
-            <div class="verification-card">
-                <h4>
-                    <span style="background:#a855f7; color:#fff; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px;">2</span>
-                    Email
-                    <span class="badge green">Подтвержден</span>
-                </h4>
-                <p>Пожалуйста, указывайте свой личный почтовый ящик.</p>
-                <div class="input-group">
-                    <input type="text" value="artemggchka@gmail.com" readonly>
-                    <button class="btn" style="background: #e74c3c;">Отвязать</button>
-                </div>
-            </div>
-        </div>
-        <div class="info-box" style="margin-top: 24px; background: rgba(234, 88, 12, 0.15); border-color: #ea580c; color: #ea580c;">
-            ⚠️ КУС (Know Your Customer) — это процедура подтверждения личности, направленная на повышение безопасности платформы. Прошедшие верификацию пользователи получают больше удобств и дополнительную защиту при использовании сервиса. Обратите внимание, КУС процедура доступна только пользователям, достигшим 16-летнего возраста.
-        </div>
-    </div>
-</div>
-
-<!-- СТРАНИЦА СЕССИИ -->
-<div class="page" id="sessionsPage">
-    <div class="container sessions-page">
-        <h1>Ваши сессии</h1>
-        <div class="session-table">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Устройство</th>
-                        <th>Местоположение</th>
-                        <th>IP-Адрес</th>
-                        <th>Статус</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Windows 10 (Chrome)</td>
-                        <td>RU</td>
-                        <td>89.254.249.156</td>
-                        <td class="online">Онлайн</td>
-                    </tr>
-                    <tr>
-                        <td>iPhone iOS 18 (Safari)</td>
-                        <td>JP</td>
-                        <td>93.115.158.57</td>
-                        <td class="offline">Оффлайн</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<!-- СТРАНИЦА API -->
-<div class="page" id="apiPage">
-    <div class="container api-page">
-        <h1>Ваш API Key</h1>
-        <div class="api-section">
-            <div class="input-group">
-                <input type="text" id="apiKeyInput" placeholder="Не сгенерирован" readonly>
-                <button onclick="generateApiKey()">Сгенерировать</button>
-            </div>
-            <p style="color: #8a8d99; font-size: 13px; margin-top: 12px;">Этот ключ будет использоваться для доступа к API сайта.</p>
         </div>
     </div>
 </div>
@@ -682,6 +721,20 @@ function renderProfile() {
         document.getElementById('profileContent').style.display = 'none';
     }
 }
+
+// ===== ВКЛАДКИ В САЙДБАРЕ =====
+document.querySelectorAll('.profile-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        const tabName = this.dataset.tab;
+        document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        document.querySelectorAll('.profile-content-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.getElementById('section-' + tabName).classList.add('active');
+    });
+});
 
 // ===== ТЕМА И АНИМАЦИЯ =====
 function setTheme(theme) {
