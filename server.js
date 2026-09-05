@@ -45,10 +45,11 @@ app.get('/logout', (req, res) => {
 });
 
 // ==========================================
-// СОХРАНЕНИЕ TRADE URL
+// ПРОФИЛЬ: TRADE URL и API KEY
 // ==========================================
 const DB_FILE = path.join(__dirname, 'userData.json');
 let userData = {};
+
 function loadUserData() {
     try {
         if (fs.existsSync(DB_FILE)) {
@@ -61,24 +62,51 @@ function saveUserData() {
 }
 loadUserData();
 
+// Сохранить Trade URL
 app.post('/api/save-trade-url', (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
     const steamId = String(req.user.id);
     const tradeUrl = req.body.tradeUrl;
-    if (!userData[steamId]) userData[steamId] = { tradeUrl: '' };
+    if (!userData[steamId]) userData[steamId] = { tradeUrl: '', apiKey: '' };
     userData[steamId].tradeUrl = tradeUrl;
     saveUserData();
     res.json({ success: true });
 });
 
+// Получить Trade URL
 app.get('/api/get-trade-url', (req, res) => {
     if (!req.user) return res.json({ tradeUrl: '' });
     const steamId = String(req.user.id);
     res.json({ tradeUrl: userData[steamId] ? userData[steamId].tradeUrl : '' });
 });
 
+// Генерация API ключа (17 символов, англ. буквы и цифры)
+app.post('/api/generate-api-key', (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+    const steamId = String(req.user.id);
+    
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let key = '';
+    for (let i = 0; i < 17; i++) {
+        key += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    
+    if (!userData[steamId]) userData[steamId] = { tradeUrl: '', apiKey: '' };
+    userData[steamId].apiKey = key;
+    saveUserData();
+    
+    res.json({ apiKey: key });
+});
+
+// Получить API ключ
+app.get('/api/get-api-key', (req, res) => {
+    if (!req.user) return res.json({ apiKey: '' });
+    const steamId = String(req.user.id);
+    res.json({ apiKey: userData[steamId] ? userData[steamId].apiKey : '' });
+});
+
 // ==========================================
-// ИНВЕНТАРЬ (без задержки)
+// ИНВЕНТАРЬ
 // ==========================================
 const DEFAULT_SKINS = [
     'usp-s', 'glock-18', 'p250', 'deagle', 'five-seven', 'tec-9', 'cz75-auto',
