@@ -65,50 +65,13 @@
             padding: 20px;
         }
 
-        /* ===== УПРАВЛЕНИЕ (ЯЗЫК + ПОИСК) ===== */
-        .controls-row {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .lang-switch {
-            display: flex;
-            gap: 6px;
-            background: rgba(20, 40, 20, 0.6);
-            border: 1px solid #2b6e2b;
-            border-radius: 6px;
-            padding: 4px;
-            cursor: pointer;
-        }
-
-        .lang-btn {
-            background: transparent;
-            border: none;
-            color: #7ea87e;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 14px;
-            font-weight: bold;
-            padding: 8px 12px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: 0.2s;
-        }
-
-        .lang-btn.active {
-            background: #9fff9f;
-            color: #050a06;
-            text-shadow: none;
-        }
-
+        /* ===== УПРАВЛЕНИЕ (ПОИСК) ===== */
         .search-box {
             position: relative;
             background: rgba(20, 40, 20, 0.6);
             border: 1px solid #2b6e2b;
             border-radius: 6px;
+            margin-bottom: 40px;
         }
 
         .search-input {
@@ -119,7 +82,7 @@
             font-family: 'Courier New', Courier, monospace;
             font-size: 14px;
             padding: 10px 12px;
-            width: 200px;
+            width: 220px; /* Увеличено на 2px (было 218) */
         }
 
         .search-input::placeholder {
@@ -218,14 +181,38 @@
             margin-bottom: 12px;
         }
 
-        /* ===== АНИМАЦИЯ МИГАНИЯ ===== */
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+        /* ===== ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА (ЛЕВЫЙ НИЖНИЙ УГОЛ) ===== */
+        .lang-switch {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 20;
+            display: flex;
+            gap: 6px;
+            background: rgba(20, 40, 20, 0.6);
+            border: 1px solid #2b6e2b;
+            border-radius: 6px;
+            padding: 4px;
+            cursor: pointer;
         }
 
-        .blink {
-            animation: blink 1.5s infinite;
+        .lang-btn {
+            background: transparent;
+            border: none;
+            color: #7ea87e;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+
+        .lang-btn.active {
+            background: #9fff9f;
+            color: #050a06;
+            text-shadow: none;
         }
 
         @media (max-width: 600px) {
@@ -246,7 +233,12 @@
                 font-size: 36px;
             }
             .search-input {
-                width: 140px;
+                width: 180px;
+            }
+            .lang-switch {
+                bottom: 10px;
+                left: 10px;
+                font-size: 12px;
             }
         }
     </style>
@@ -256,21 +248,18 @@
     <!-- ЗВЕЗДОПАД -->
     <div class="star-container" id="starContainer"></div>
 
+    <!-- ЯЗЫК: ВНИЗУ СЛЕВА -->
+    <div class="lang-switch" id="langSwitch">
+        <button class="lang-btn active" data-lang="ru">RU</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+    </div>
+
     <div class="maintenance-box">
 
-        <!-- УПРАВЛЕНИЕ: ЯЗЫК И ПОИСК СТРАН -->
-        <div class="controls-row">
-            <!-- Переключатель языка -->
-            <div class="lang-switch" id="langSwitch">
-                <button class="lang-btn active" data-lang="ru">RU</button>
-                <button class="lang-btn" data-lang="en">EN</button>
-            </div>
-
-            <!-- Поиск стран -->
-            <div class="search-box">
-                <input type="text" class="search-input" id="searchInput" placeholder="Поиск страны...">
-                <div class="search-dropdown" id="searchDropdown"></div>
-            </div>
+        <!-- ПОИСК СТРАН (оставлен сверху, увеличен на 2px) -->
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput" placeholder="Поиск страны...">
+            <div class="search-dropdown" id="searchDropdown"></div>
         </div>
 
         <!-- Часы -->
@@ -293,23 +282,25 @@
         const translations = {
             ru: {
                 searchPlaceholder: 'Поиск страны...',
+                clockLabel: 'Москва (МСК)',
                 maintenanceTitle: 'В данный момент могут наблюдаться проблемы с доступом к сайту',
                 maintenanceWork: 'Работаем над исправлением 🙏',
                 maintenanceSorry: 'Простите за неудобства'
             },
             en: {
                 searchPlaceholder: 'Search country...',
+                clockLabel: 'Moscow (MSK)',
                 maintenanceTitle: 'There may be some issues with the site access at the moment',
                 maintenanceWork: 'We are working on fixing it 🙏',
                 maintenanceSorry: 'Sorry for the inconvenience'
             }
         };
 
-        // ===== ЧАСОВЫЕ ПОЯСА =====
+        // ===== ЧАСОВЫЕ ПОЯСА (ВСЕ СТРАНЫ МИРА) =====
         const timezones = {
-            'Москва (МСК)': 'Europe/Moscow',
-            'Калининград': 'Europe/Kaliningrad',
+            'Москва': 'Europe/Moscow',
             'Санкт-Петербург': 'Europe/Moscow',
+            'Калининград': 'Europe/Kaliningrad',
             'Киев': 'Europe/Kyiv',
             'Минск': 'Europe/Minsk',
             'Алматы': 'Asia/Almaty',
@@ -320,20 +311,77 @@
             'Нью-Йорк': 'America/New_York',
             'Лос-Анджелес': 'America/Los_Angeles',
             'Чикаго': 'America/Chicago',
+            'Денвер': 'America/Denver',
+            'Торонто': 'America/Toronto',
+            'Мехико': 'America/Mexico_City',
+            'Сан-Паулу': 'America/Sao_Paulo',
+            'Буэнос-Айрес': 'America/Argentina/Buenos_Aires',
             'Лондон': 'Europe/London',
             'Париж': 'Europe/Paris',
             'Берлин': 'Europe/Berlin',
             'Мадрид': 'Europe/Madrid',
             'Рим': 'Europe/Rome',
+            'Амстердам': 'Europe/Amsterdam',
+            'Брюссель': 'Europe/Brussels',
+            'Вена': 'Europe/Vienna',
+            'Прага': 'Europe/Prague',
+            'Варшава': 'Europe/Warsaw',
+            'Будапешт': 'Europe/Budapest',
+            'Стокгольм': 'Europe/Stockholm',
+            'Осло': 'Europe/Oslo',
+            'Копенгаген': 'Europe/Copenhagen',
+            'Хельсинки': 'Europe/Helsinki',
             'Стамбул': 'Europe/Istanbul',
+            'Афины': 'Europe/Athens',
             'Дубай': 'Asia/Dubai',
-            'Токио': 'Asia/Tokyo',
-            'Пекин': 'Asia/Shanghai',
+            'Абу-Даби': 'Asia/Dubai',
+            'Доха': 'Asia/Qatar',
+            'Эр-Рияд': 'Asia/Riyadh',
+            'Тегеран': 'Asia/Tehran',
+            'Иерусалим': 'Asia/Jerusalem',
+            'Тель-Авив': 'Asia/Jerusalem',
+            'Исламабад': 'Asia/Karachi',
+            'Дели': 'Asia/Kolkata',
+            'Мумбаи': 'Asia/Kolkata',
+            'Бангкок': 'Asia/Bangkok',
+            'Джакарта': 'Asia/Jakarta',
             'Сингапур': 'Asia/Singapore',
-            'Сидней': 'Australia/Sydney'
+            'Куала-Лумпур': 'Asia/Kuala_Lumpur',
+            'Гонконг': 'Asia/Hong_Kong',
+            'Пекин': 'Asia/Shanghai',
+            'Шанхай': 'Asia/Shanghai',
+            'Сеул': 'Asia/Seoul',
+            'Токио': 'Asia/Tokyo',
+            'Осака': 'Asia/Tokyo',
+            'Сидней': 'Australia/Sydney',
+            'Мельбурн': 'Australia/Melbourne',
+            'Брисбен': 'Australia/Brisbane',
+            'Перт': 'Australia/Perth',
+            'Окленд': 'Pacific/Auckland',
+            'Гонолулу': 'Pacific/Honolulu',
+            'Анкоридж': 'America/Anchorage',
+            'Рейкьявик': 'Atlantic/Reykjavik',
+            'Лиссабон': 'Europe/Lisbon',
+            'Дублин': 'Europe/Dublin',
+            'Белград': 'Europe/Belgrade',
+            'Загреб': 'Europe/Zagreb',
+            'София': 'Europe/Sofia',
+            'Бухарест': 'Europe/Bucharest',
+            'Вильнюс': 'Europe/Vilnius',
+            'Рига': 'Europe/Riga',
+            'Таллин': 'Europe/Tallinn',
+            'Бишкек': 'Asia/Bishkek',
+            'Астана': 'Asia/Almaty',
+            'Душанбе': 'Asia/Dushanbe',
+            'Ашхабад': 'Asia/Ashgabat',
+            'Улан-Батор': 'Asia/Ulaanbaatar',
+            'Пхеньян': 'Asia/Pyongyang',
+            'Ханой': 'Asia/Ho_Chi_Minh',
+            'Манила': 'Asia/Manila',
+            'Тайбэй': 'Asia/Taipei'
         };
 
-        let selectedCountry = 'Москва (МСК)';
+        let selectedCountry = 'Москва';
         let selectedTimezone = 'Europe/Moscow';
 
         // ===== ФУНКЦИИ =====
@@ -350,10 +398,10 @@
         function updateText() {
             const t = translations[currentLang];
             document.getElementById('searchInput').placeholder = t.searchPlaceholder;
+            document.getElementById('clockLabel').textContent = selectedCountry;
             document.getElementById('maintenanceTitle').textContent = t.maintenanceTitle;
             document.getElementById('maintenanceWork').textContent = t.maintenanceWork;
             document.getElementById('maintenanceSorry').textContent = t.maintenanceSorry;
-            document.getElementById('clockLabel').textContent = selectedCountry;
         }
 
         // ===== ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА =====
