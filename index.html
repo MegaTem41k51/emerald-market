@@ -72,7 +72,6 @@
             border: 1px solid #2b6e2b;
             border-radius: 6px;
             margin-bottom: 40px;
-            cursor: pointer;
         }
 
         .search-input {
@@ -84,7 +83,6 @@
             font-size: 14px;
             padding: 10px 12px;
             width: 220px;
-            cursor: pointer;
         }
 
         .search-input::placeholder {
@@ -253,7 +251,7 @@
 
         <!-- ПОИСК СТРАН -->
         <div class="search-box" id="searchBox">
-            <input type="text" class="search-input" id="searchInput" placeholder="Поиск страны..." readonly>
+            <input type="text" class="search-input" id="searchInput" placeholder="Поиск страны..." autocomplete="off">
             <div class="search-dropdown" id="searchDropdown"></div>
         </div>
 
@@ -289,7 +287,7 @@
             }
         };
 
-        // ===== СТРАНЫ (RU и EN названия + часовой пояс) =====
+        // ===== СТРАНЫ =====
         const countries = [
             { ru: 'Австралия', en: 'Australia', tz: 'Australia/Sydney' },
             { ru: 'Австрия', en: 'Austria', tz: 'Europe/Vienna' },
@@ -444,7 +442,7 @@
             { ru: 'Япония', en: 'Japan', tz: 'Asia/Tokyo' }
         ];
 
-        let selectedCountry = countries[0]; // По умолчанию Россия
+        let selectedCountry = countries[0]; // Россия по умолчанию
 
         // ===== ФУНКЦИИ =====
         function updateClock() {
@@ -476,17 +474,28 @@
             });
         });
 
-        // ===== ПОИСК =====
-        const searchBox = document.getElementById('searchBox');
+        // ===== ПОИСК (ввод и подсказки) =====
         const searchInput = document.getElementById('searchInput');
         const searchDropdown = document.getElementById('searchDropdown');
 
-        function renderCountries(filter = '') {
-            const filtered = countries.filter(c => {
-                const name = currentLang === 'ru' ? c.ru : c.en;
-                return name.toLowerCase().includes(filter.toLowerCase());
-            });
-            searchDropdown.innerHTML = filtered.map(c => `<div class="country-item" data-ru="${c.ru}" data-en="${c.en}" data-tz="${c.tz}">${currentLang === 'ru' ? c.ru : c.en}</div>`).join('');
+        function renderSuggestions() {
+            const query = searchInput.value.trim().toLowerCase();
+            let filtered = countries;
+
+            if (query.length > 0) {
+                filtered = countries.filter(c => {
+                    const name = currentLang === 'ru' ? c.ru : c.en;
+                    return name.toLowerCase().includes(query);
+                });
+            }
+
+            if (filtered.length === 0) {
+                searchDropdown.innerHTML = '<div style="padding: 10px; color: #7ea87e;">Не найдено</div>';
+            } else {
+                searchDropdown.innerHTML = filtered.map(c => `<div class="country-item" data-ru="${c.ru}" data-en="${c.en}" data-tz="${c.tz}">${currentLang === 'ru' ? c.ru : c.en}</div>`).join('');
+            }
+
+            searchDropdown.style.display = 'block';
             
             document.querySelectorAll('.country-item').forEach(item => {
                 item.addEventListener('click', function() {
@@ -503,22 +512,7 @@
             });
         }
 
-        // По клику на строку открываем полный список
-        searchBox.addEventListener('click', function() {
-            renderCountries();
-            searchDropdown.style.display = 'block';
-        });
-
-        searchInput.addEventListener('input', function() {
-            const val = this.value;
-            if (val.length > 0) {
-                searchDropdown.style.display = 'block';
-                renderCountries(val);
-            } else {
-                searchDropdown.style.display = 'block';
-                renderCountries();
-            }
-        });
+        searchInput.addEventListener('input', renderSuggestions);
 
         // Закрытие дропдауна при клике вне
         document.addEventListener('click', function(e) {
