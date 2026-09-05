@@ -44,12 +44,9 @@ app.get('/logout', (req, res) => {
     req.logout(() => res.redirect('/'));
 });
 
-// ==========================================
-// ПРОФИЛЬ: TRADE URL и API KEY
-// ==========================================
+// ===== ДАННЫЕ ПОЛЬЗОВАТЕЛЯ (Trade URL + API Key) =====
 const DB_FILE = path.join(__dirname, 'userData.json');
 let userData = {};
-
 function loadUserData() {
     try {
         if (fs.existsSync(DB_FILE)) {
@@ -62,7 +59,6 @@ function saveUserData() {
 }
 loadUserData();
 
-// Сохранить Trade URL
 app.post('/api/save-trade-url', (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
     const steamId = String(req.user.id);
@@ -73,41 +69,32 @@ app.post('/api/save-trade-url', (req, res) => {
     res.json({ success: true });
 });
 
-// Получить Trade URL
 app.get('/api/get-trade-url', (req, res) => {
     if (!req.user) return res.json({ tradeUrl: '' });
     const steamId = String(req.user.id);
     res.json({ tradeUrl: userData[steamId] ? userData[steamId].tradeUrl : '' });
 });
 
-// Генерация API ключа (17 символов, англ. буквы и цифры)
 app.post('/api/generate-api-key', (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
     const steamId = String(req.user.id);
-    
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let key = '';
-    for (let i = 0; i < 17; i++) {
-        key += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
+    for (let i = 0; i < 17; i++) key += chars.charAt(Math.floor(Math.random() * chars.length));
     
     if (!userData[steamId]) userData[steamId] = { tradeUrl: '', apiKey: '' };
     userData[steamId].apiKey = key;
     saveUserData();
-    
     res.json({ apiKey: key });
 });
 
-// Получить API ключ
 app.get('/api/get-api-key', (req, res) => {
     if (!req.user) return res.json({ apiKey: '' });
     const steamId = String(req.user.id);
     res.json({ apiKey: userData[steamId] ? userData[steamId].apiKey : '' });
 });
 
-// ==========================================
-// ИНВЕНТАРЬ
-// ==========================================
+// ===== ИНВЕНТАРЬ =====
 const DEFAULT_SKINS = [
     'usp-s', 'glock-18', 'p250', 'deagle', 'five-seven', 'tec-9', 'cz75-auto',
     'ak-47', 'm4a4', 'm4a1-s', 'famas', 'galil ar', 'ssg 08', 'awp', 'scar-20',
@@ -143,9 +130,7 @@ app.post('/api/get-inventory', async (req, res) => {
             if (desc) {
                 const name = desc.market_hash_name || desc.name;
                 const weapon = (name.split('|')[0] || '').toLowerCase().trim();
-                
                 const isDefault = DEFAULT_SKINS.includes(weapon) || desc.tags?.some(tag => tag.internal_name === 'normal');
-                
                 if (!isDefault && !name.toLowerCase().includes('case') && !name.toLowerCase().includes('crate')) {
                     items.push({
                         assetid: asset.assetid,
@@ -164,12 +149,9 @@ app.post('/api/get-inventory', async (req, res) => {
     }
 });
 
-// ==========================================
-// РЫНОК
-// ==========================================
+// ===== РЫНОК =====
 const MARKET_FILE = path.join(__dirname, 'marketData.json');
 let marketData = [];
-
 function loadMarket() {
     try {
         if (fs.existsSync(MARKET_FILE)) {
