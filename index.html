@@ -251,7 +251,7 @@
 
     <div class="maintenance-box">
 
-        <!-- ПОИСК СТРАН (открывается по клику, список по алфавиту) -->
+        <!-- ПОИСК СТРАН -->
         <div class="search-box" id="searchBox">
             <input type="text" class="search-input" id="searchInput" placeholder="Поиск страны..." readonly>
             <div class="search-dropdown" id="searchDropdown"></div>
@@ -259,7 +259,7 @@
 
         <!-- Часы -->
         <div class="digital-clock" id="clock">00:00:00</div>
-        <div class="clock-label" id="clockLabel">Москва</div>
+        <div class="clock-label" id="clockLabel">РОССИЯ</div>
 
         <!-- Текст -->
         <div class="maintenance-text">
@@ -289,108 +289,167 @@
             }
         };
 
-        // ===== ЧАСОВЫЕ ПОЯСА (ВСЕ СТРАНЫ, СПИСОК ПО АЛФАВИТУ) =====
+        // ===== СТРАНЫ (RU и EN названия + часовой пояс) =====
         const countries = [
-            'Австралия', 'Австрия', 'Азербайджан', 'Албания', 'Алжир', 'Ангола',
-            'Аргентина', 'Армения', 'Афганистан', 'Багамы', 'Бангладеш', 'Барбадос',
-            'Бахрейн', 'Беларусь', 'Бельгия', 'Белиз', 'Бенин', 'Болгария',
-            'Боливия', 'Босния и Герцеговина', 'Ботсвана', 'Бразилия', 'Бруней',
-            'Буркина-Фасо', 'Бурунди', 'Бутан', 'Вануату', 'Великобритания',
-            'Венгрия', 'Венесуэла', 'Вьетнам', 'Габон', 'Гаити', 'Гайана',
-            'Гамбия', 'Гана', 'Гватемала', 'Гвинея', 'Германия', 'Гондурас',
-            'Гренада', 'Греция', 'Грузия', 'Дания', 'Джибути', 'Доминикана',
-            'Египет', 'Замбия', 'Зимбабве', 'Израиль', 'Индия', 'Индонезия',
-            'Иордания', 'Ирак', 'Иран', 'Ирландия', 'Исландия', 'Испания',
-            'Италия', 'Йемен', 'Казахстан', 'Камбоджа', 'Камерун', 'Канада',
-            'Катар', 'Кения', 'Кипр', 'Киргизия', 'Китай', 'Колумбия',
-            'Конго', 'Корея', 'Коста-Рика', 'Кот-д’Ивуар', 'Куба', 'Кувейт',
-            'Лаос', 'Латвия', 'Ливан', 'Ливия', 'Литва', 'Люксембург',
-            'Маврикий', 'Мавритания', 'Мадагаскар', 'Малави', 'Малайзия',
-            'Мали', 'Мальдивы', 'Мальта', 'Марокко', 'Мексика', 'Мозамбик',
-            'Молдова', 'Монголия', 'Мьянма', 'Намибия', 'Непал', 'Нигерия',
-            'Нидерланды', 'Никарагуа', 'Новая Зеландия', 'Норвегия', 'ОАЭ',
-            'Оман', 'Пакистан', 'Панама', 'Парагвай', 'Перу', 'Польша',
-            'Португалия', 'Россия', 'Румыния', 'Сальвадор', 'Саудовская Аравия',
-            'Северная Македония', 'Сенегал', 'Сербия', 'Сингапур', 'Сирия',
-            'Словакия', 'Словения', 'Сомали', 'Судан', 'США', 'Сьерра-Леоне',
-            'Таджикистан', 'Таиланд', 'Танзания', 'Тунис', 'Туркменистан',
-            'Турция', 'Уганда', 'Узбекистан', 'Украина', 'Уругвай',
-            'Филиппины', 'Финляндия', 'Франция', 'Хорватия', 'Черногория',
-            'Чехия', 'Чили', 'Швейцария', 'Швеция', 'Эквадор', 'Эстония',
-            'Эфиопия', 'ЮАР', 'Ямайка', 'Япония'
+            { ru: 'Австралия', en: 'Australia', tz: 'Australia/Sydney' },
+            { ru: 'Австрия', en: 'Austria', tz: 'Europe/Vienna' },
+            { ru: 'Азербайджан', en: 'Azerbaijan', tz: 'Asia/Baku' },
+            { ru: 'Албания', en: 'Albania', tz: 'Europe/Tirane' },
+            { ru: 'Алжир', en: 'Algeria', tz: 'Africa/Algiers' },
+            { ru: 'Ангола', en: 'Angola', tz: 'Africa/Luanda' },
+            { ru: 'Аргентина', en: 'Argentina', tz: 'America/Argentina/Buenos_Aires' },
+            { ru: 'Армения', en: 'Armenia', tz: 'Asia/Yerevan' },
+            { ru: 'Афганистан', en: 'Afghanistan', tz: 'Asia/Kabul' },
+            { ru: 'Багамы', en: 'Bahamas', tz: 'America/Nassau' },
+            { ru: 'Бангладеш', en: 'Bangladesh', tz: 'Asia/Dhaka' },
+            { ru: 'Барбадос', en: 'Barbados', tz: 'America/Barbados' },
+            { ru: 'Бахрейн', en: 'Bahrain', tz: 'Asia/Bahrain' },
+            { ru: 'Беларусь', en: 'Belarus', tz: 'Europe/Minsk' },
+            { ru: 'Бельгия', en: 'Belgium', tz: 'Europe/Brussels' },
+            { ru: 'Белиз', en: 'Belize', tz: 'America/Belize' },
+            { ru: 'Бенин', en: 'Benin', tz: 'Africa/Porto-Novo' },
+            { ru: 'Болгария', en: 'Bulgaria', tz: 'Europe/Sofia' },
+            { ru: 'Боливия', en: 'Bolivia', tz: 'America/La_Paz' },
+            { ru: 'Босния и Герцеговина', en: 'Bosnia and Herzegovina', tz: 'Europe/Sarajevo' },
+            { ru: 'Ботсвана', en: 'Botswana', tz: 'Africa/Gaborone' },
+            { ru: 'Бразилия', en: 'Brazil', tz: 'America/Sao_Paulo' },
+            { ru: 'Бруней', en: 'Brunei', tz: 'Asia/Brunei' },
+            { ru: 'Буркина-Фасо', en: 'Burkina Faso', tz: 'Africa/Ouagadougou' },
+            { ru: 'Бурунди', en: 'Burundi', tz: 'Africa/Bujumbura' },
+            { ru: 'Бутан', en: 'Bhutan', tz: 'Asia/Thimphu' },
+            { ru: 'Вануату', en: 'Vanuatu', tz: 'Pacific/Efate' },
+            { ru: 'Великобритания', en: 'United Kingdom', tz: 'Europe/London' },
+            { ru: 'Венгрия', en: 'Hungary', tz: 'Europe/Budapest' },
+            { ru: 'Венесуэла', en: 'Venezuela', tz: 'America/Caracas' },
+            { ru: 'Вьетнам', en: 'Vietnam', tz: 'Asia/Ho_Chi_Minh' },
+            { ru: 'Габон', en: 'Gabon', tz: 'Africa/Libreville' },
+            { ru: 'Гаити', en: 'Haiti', tz: 'America/Port-au-Prince' },
+            { ru: 'Гайана', en: 'Guyana', tz: 'America/Guyana' },
+            { ru: 'Гамбия', en: 'Gambia', tz: 'Africa/Banjul' },
+            { ru: 'Гана', en: 'Ghana', tz: 'Africa/Accra' },
+            { ru: 'Гватемала', en: 'Guatemala', tz: 'America/Guatemala' },
+            { ru: 'Гвинея', en: 'Guinea', tz: 'Africa/Conakry' },
+            { ru: 'Германия', en: 'Germany', tz: 'Europe/Berlin' },
+            { ru: 'Гондурас', en: 'Honduras', tz: 'America/Tegucigalpa' },
+            { ru: 'Гренада', en: 'Grenada', tz: 'America/Grenada' },
+            { ru: 'Греция', en: 'Greece', tz: 'Europe/Athens' },
+            { ru: 'Грузия', en: 'Georgia', tz: 'Asia/Tbilisi' },
+            { ru: 'Дания', en: 'Denmark', tz: 'Europe/Copenhagen' },
+            { ru: 'Джибути', en: 'Djibouti', tz: 'Africa/Djibouti' },
+            { ru: 'Доминикана', en: 'Dominican Republic', tz: 'America/Santo_Domingo' },
+            { ru: 'Египет', en: 'Egypt', tz: 'Africa/Cairo' },
+            { ru: 'Замбия', en: 'Zambia', tz: 'Africa/Lusaka' },
+            { ru: 'Зимбабве', en: 'Zimbabwe', tz: 'Africa/Harare' },
+            { ru: 'Израиль', en: 'Israel', tz: 'Asia/Jerusalem' },
+            { ru: 'Индия', en: 'India', tz: 'Asia/Kolkata' },
+            { ru: 'Индонезия', en: 'Indonesia', tz: 'Asia/Jakarta' },
+            { ru: 'Иордания', en: 'Jordan', tz: 'Asia/Amman' },
+            { ru: 'Ирак', en: 'Iraq', tz: 'Asia/Baghdad' },
+            { ru: 'Иран', en: 'Iran', tz: 'Asia/Tehran' },
+            { ru: 'Ирландия', en: 'Ireland', tz: 'Europe/Dublin' },
+            { ru: 'Исландия', en: 'Iceland', tz: 'Atlantic/Reykjavik' },
+            { ru: 'Испания', en: 'Spain', tz: 'Europe/Madrid' },
+            { ru: 'Италия', en: 'Italy', tz: 'Europe/Rome' },
+            { ru: 'Йемен', en: 'Yemen', tz: 'Asia/Aden' },
+            { ru: 'Казахстан', en: 'Kazakhstan', tz: 'Asia/Almaty' },
+            { ru: 'Камбоджа', en: 'Cambodia', tz: 'Asia/Phnom_Penh' },
+            { ru: 'Камерун', en: 'Cameroon', tz: 'Africa/Douala' },
+            { ru: 'Канада', en: 'Canada', tz: 'America/Toronto' },
+            { ru: 'Катар', en: 'Qatar', tz: 'Asia/Qatar' },
+            { ru: 'Кения', en: 'Kenya', tz: 'Africa/Nairobi' },
+            { ru: 'Кипр', en: 'Cyprus', tz: 'Asia/Nicosia' },
+            { ru: 'Киргизия', en: 'Kyrgyzstan', tz: 'Asia/Bishkek' },
+            { ru: 'Китай', en: 'China', tz: 'Asia/Shanghai' },
+            { ru: 'Колумбия', en: 'Colombia', tz: 'America/Bogota' },
+            { ru: 'Конго', en: 'Congo', tz: 'Africa/Brazzaville' },
+            { ru: 'Корея', en: 'South Korea', tz: 'Asia/Seoul' },
+            { ru: 'Коста-Рика', en: 'Costa Rica', tz: 'America/Costa_Rica' },
+            { ru: 'Кот-д’Ивуар', en: 'Ivory Coast', tz: 'Africa/Abidjan' },
+            { ru: 'Куба', en: 'Cuba', tz: 'America/Havana' },
+            { ru: 'Кувейт', en: 'Kuwait', tz: 'Asia/Kuwait' },
+            { ru: 'Лаос', en: 'Laos', tz: 'Asia/Vientiane' },
+            { ru: 'Латвия', en: 'Latvia', tz: 'Europe/Riga' },
+            { ru: 'Ливан', en: 'Lebanon', tz: 'Asia/Beirut' },
+            { ru: 'Ливия', en: 'Libya', tz: 'Africa/Tripoli' },
+            { ru: 'Литва', en: 'Lithuania', tz: 'Europe/Vilnius' },
+            { ru: 'Люксембург', en: 'Luxembourg', tz: 'Europe/Luxembourg' },
+            { ru: 'Маврикий', en: 'Mauritius', tz: 'Indian/Mauritius' },
+            { ru: 'Мавритания', en: 'Mauritania', tz: 'Africa/Nouakchott' },
+            { ru: 'Мадагаскар', en: 'Madagascar', tz: 'Indian/Antananarivo' },
+            { ru: 'Малави', en: 'Malawi', tz: 'Africa/Blantyre' },
+            { ru: 'Малайзия', en: 'Malaysia', tz: 'Asia/Kuala_Lumpur' },
+            { ru: 'Мали', en: 'Mali', tz: 'Africa/Bamako' },
+            { ru: 'Мальдивы', en: 'Maldives', tz: 'Indian/Maldives' },
+            { ru: 'Мальта', en: 'Malta', tz: 'Europe/Malta' },
+            { ru: 'Марокко', en: 'Morocco', tz: 'Africa/Casablanca' },
+            { ru: 'Мексика', en: 'Mexico', tz: 'America/Mexico_City' },
+            { ru: 'Мозамбик', en: 'Mozambique', tz: 'Africa/Maputo' },
+            { ru: 'Молдова', en: 'Moldova', tz: 'Europe/Chisinau' },
+            { ru: 'Монголия', en: 'Mongolia', tz: 'Asia/Ulaanbaatar' },
+            { ru: 'Мьянма', en: 'Myanmar', tz: 'Asia/Yangon' },
+            { ru: 'Намибия', en: 'Namibia', tz: 'Africa/Windhoek' },
+            { ru: 'Непал', en: 'Nepal', tz: 'Asia/Kathmandu' },
+            { ru: 'Нигерия', en: 'Nigeria', tz: 'Africa/Lagos' },
+            { ru: 'Нидерланды', en: 'Netherlands', tz: 'Europe/Amsterdam' },
+            { ru: 'Никарагуа', en: 'Nicaragua', tz: 'America/Managua' },
+            { ru: 'Новая Зеландия', en: 'New Zealand', tz: 'Pacific/Auckland' },
+            { ru: 'Норвегия', en: 'Norway', tz: 'Europe/Oslo' },
+            { ru: 'ОАЭ', en: 'UAE', tz: 'Asia/Dubai' },
+            { ru: 'Оман', en: 'Oman', tz: 'Asia/Muscat' },
+            { ru: 'Пакистан', en: 'Pakistan', tz: 'Asia/Karachi' },
+            { ru: 'Панама', en: 'Panama', tz: 'America/Panama' },
+            { ru: 'Парагвай', en: 'Paraguay', tz: 'America/Asuncion' },
+            { ru: 'Перу', en: 'Peru', tz: 'America/Lima' },
+            { ru: 'Польша', en: 'Poland', tz: 'Europe/Warsaw' },
+            { ru: 'Португалия', en: 'Portugal', tz: 'Europe/Lisbon' },
+            { ru: 'Россия', en: 'Russia', tz: 'Europe/Moscow' },
+            { ru: 'Румыния', en: 'Romania', tz: 'Europe/Bucharest' },
+            { ru: 'Сальвадор', en: 'El Salvador', tz: 'America/El_Salvador' },
+            { ru: 'Саудовская Аравия', en: 'Saudi Arabia', tz: 'Asia/Riyadh' },
+            { ru: 'Северная Македония', en: 'North Macedonia', tz: 'Europe/Skopje' },
+            { ru: 'Сенегал', en: 'Senegal', tz: 'Africa/Dakar' },
+            { ru: 'Сербия', en: 'Serbia', tz: 'Europe/Belgrade' },
+            { ru: 'Сингапур', en: 'Singapore', tz: 'Asia/Singapore' },
+            { ru: 'Сирия', en: 'Syria', tz: 'Asia/Damascus' },
+            { ru: 'Словакия', en: 'Slovakia', tz: 'Europe/Bratislava' },
+            { ru: 'Словения', en: 'Slovenia', tz: 'Europe/Ljubljana' },
+            { ru: 'Сомали', en: 'Somalia', tz: 'Africa/Mogadishu' },
+            { ru: 'Судан', en: 'Sudan', tz: 'Africa/Khartoum' },
+            { ru: 'США', en: 'USA', tz: 'America/New_York' },
+            { ru: 'Сьерра-Леоне', en: 'Sierra Leone', tz: 'Africa/Freetown' },
+            { ru: 'Таджикистан', en: 'Tajikistan', tz: 'Asia/Dushanbe' },
+            { ru: 'Таиланд', en: 'Thailand', tz: 'Asia/Bangkok' },
+            { ru: 'Танзания', en: 'Tanzania', tz: 'Africa/Dar_es_Salaam' },
+            { ru: 'Тунис', en: 'Tunisia', tz: 'Africa/Tunis' },
+            { ru: 'Туркменистан', en: 'Turkmenistan', tz: 'Asia/Ashgabat' },
+            { ru: 'Турция', en: 'Turkey', tz: 'Europe/Istanbul' },
+            { ru: 'Уганда', en: 'Uganda', tz: 'Africa/Kampala' },
+            { ru: 'Узбекистан', en: 'Uzbekistan', tz: 'Asia/Tashkent' },
+            { ru: 'Украина', en: 'Ukraine', tz: 'Europe/Kyiv' },
+            { ru: 'Уругвай', en: 'Uruguay', tz: 'America/Montevideo' },
+            { ru: 'Филиппины', en: 'Philippines', tz: 'Asia/Manila' },
+            { ru: 'Финляндия', en: 'Finland', tz: 'Europe/Helsinki' },
+            { ru: 'Франция', en: 'France', tz: 'Europe/Paris' },
+            { ru: 'Хорватия', en: 'Croatia', tz: 'Europe/Zagreb' },
+            { ru: 'Черногория', en: 'Montenegro', tz: 'Europe/Podgorica' },
+            { ru: 'Чехия', en: 'Czech Republic', tz: 'Europe/Prague' },
+            { ru: 'Чили', en: 'Chile', tz: 'America/Santiago' },
+            { ru: 'Швейцария', en: 'Switzerland', tz: 'Europe/Zurich' },
+            { ru: 'Швеция', en: 'Sweden', tz: 'Europe/Stockholm' },
+            { ru: 'Эквадор', en: 'Ecuador', tz: 'America/Guayaquil' },
+            { ru: 'Эстония', en: 'Estonia', tz: 'Europe/Tallinn' },
+            { ru: 'Эфиопия', en: 'Ethiopia', tz: 'Africa/Addis_Ababa' },
+            { ru: 'ЮАР', en: 'South Africa', tz: 'Africa/Johannesburg' },
+            { ru: 'Ямайка', en: 'Jamaica', tz: 'America/Jamaica' },
+            { ru: 'Япония', en: 'Japan', tz: 'Asia/Tokyo' }
         ];
 
-        const timezoneMap = {
-            'Россия': 'Europe/Moscow',
-            'США': 'America/New_York',
-            'Великобритания': 'Europe/London',
-            'Франция': 'Europe/Paris',
-            'Германия': 'Europe/Berlin',
-            'Италия': 'Europe/Rome',
-            'Испания': 'Europe/Madrid',
-            'Китай': 'Asia/Shanghai',
-            'Япония': 'Asia/Tokyo',
-            'Индия': 'Asia/Kolkata',
-            'Австралия': 'Australia/Sydney',
-            'Канада': 'America/Toronto',
-            'Бразилия': 'America/Sao_Paulo',
-            'Мексика': 'America/Mexico_City',
-            'Турция': 'Europe/Istanbul',
-            'ОАЭ': 'Asia/Dubai',
-            'Казахстан': 'Asia/Almaty',
-            'Украина': 'Europe/Kyiv',
-            'Беларусь': 'Europe/Minsk',
-            'Польша': 'Europe/Warsaw',
-            'Чехия': 'Europe/Prague',
-            'Швеция': 'Europe/Stockholm',
-            'Норвегия': 'Europe/Oslo',
-            'Финляндия': 'Europe/Helsinki',
-            'Дания': 'Europe/Copenhagen',
-            'Нидерланды': 'Europe/Amsterdam',
-            'Бельгия': 'Europe/Brussels',
-            'Австрия': 'Europe/Vienna',
-            'Швейцария': 'Europe/Zurich',
-            'Греция': 'Europe/Athens',
-            'Португалия': 'Europe/Lisbon',
-            'Ирландия': 'Europe/Dublin',
-            'Аргентина': 'America/Argentina/Buenos_Aires',
-            'Чили': 'America/Santiago',
-            'Колумбия': 'America/Bogota',
-            'Перу': 'America/Lima',
-            'ЮАР': 'Africa/Johannesburg',
-            'Египет': 'Africa/Cairo',
-            'Израиль': 'Asia/Jerusalem',
-            'Саудовская Аравия': 'Asia/Riyadh',
-            'Иран': 'Asia/Tehran',
-            'Ирак': 'Asia/Baghdad',
-            'Сирия': 'Asia/Damascus',
-            'Иордания': 'Asia/Amman',
-            'Ливан': 'Asia/Beirut',
-            'Азербайджан': 'Asia/Baku',
-            'Грузия': 'Asia/Tbilisi',
-            'Армения': 'Asia/Yerevan',
-            'Узбекистан': 'Asia/Tashkent',
-            'Таджикистан': 'Asia/Dushanbe',
-            'Туркменистан': 'Asia/Ashgabat',
-            'Киргизия': 'Asia/Bishkek',
-            'Монголия': 'Asia/Ulaanbaatar',
-            'Индонезия': 'Asia/Jakarta',
-            'Малайзия': 'Asia/Kuala_Lumpur',
-            'Сингапур': 'Asia/Singapore',
-            'Таиланд': 'Asia/Bangkok',
-            'Вьетнам': 'Asia/Ho_Chi_Minh',
-            'Филиппины': 'Asia/Manila',
-            'Южная Корея': 'Asia/Seoul',
-            'Новая Зеландия': 'Pacific/Auckland'
-        };
-
-        let selectedCountry = 'Россия';
-        let selectedTimezone = 'Europe/Moscow';
+        let selectedCountry = countries[0]; // По умолчанию Россия
 
         // ===== ФУНКЦИИ =====
         function updateClock() {
             const now = new Date();
-            const timeStr = new Date(now.toLocaleString('en-US', { timeZone: selectedTimezone }));
+            const timeStr = new Date(now.toLocaleString('en-US', { timeZone: selectedCountry.tz }));
             const hours = String(timeStr.getHours()).padStart(2, '0');
             const minutes = String(timeStr.getMinutes()).padStart(2, '0');
             const seconds = String(timeStr.getSeconds()).padStart(2, '0');
@@ -401,7 +460,7 @@
         function updateText() {
             const t = translations[currentLang];
             document.getElementById('searchInput').placeholder = t.searchPlaceholder;
-            document.getElementById('clockLabel').textContent = selectedCountry;
+            document.getElementById('clockLabel').textContent = currentLang === 'ru' ? selectedCountry.ru.toUpperCase() : selectedCountry.en.toUpperCase();
             document.getElementById('maintenanceTitle').textContent = t.maintenanceTitle;
             document.getElementById('maintenanceWork').textContent = t.maintenanceWork;
             document.getElementById('maintenanceSorry').textContent = t.maintenanceSorry;
@@ -417,19 +476,25 @@
             });
         });
 
-        // ===== ПОИСК (клик по строке - открывается список по алфавиту) =====
+        // ===== ПОИСК =====
         const searchBox = document.getElementById('searchBox');
         const searchInput = document.getElementById('searchInput');
         const searchDropdown = document.getElementById('searchDropdown');
 
         function renderCountries(filter = '') {
-            const filtered = countries.filter(c => c.toLowerCase().includes(filter.toLowerCase()));
-            searchDropdown.innerHTML = filtered.map(c => `<div class="country-item">${c}</div>`).join('');
+            const filtered = countries.filter(c => {
+                const name = currentLang === 'ru' ? c.ru : c.en;
+                return name.toLowerCase().includes(filter.toLowerCase());
+            });
+            searchDropdown.innerHTML = filtered.map(c => `<div class="country-item" data-ru="${c.ru}" data-en="${c.en}" data-tz="${c.tz}">${currentLang === 'ru' ? c.ru : c.en}</div>`).join('');
             
             document.querySelectorAll('.country-item').forEach(item => {
                 item.addEventListener('click', function() {
-                    selectedCountry = this.textContent;
-                    selectedTimezone = timezoneMap[selectedCountry] || 'Europe/Moscow';
+                    selectedCountry = {
+                        ru: this.dataset.ru,
+                        en: this.dataset.en,
+                        tz: this.dataset.tz
+                    };
                     searchInput.value = '';
                     searchDropdown.style.display = 'none';
                     updateClock();
