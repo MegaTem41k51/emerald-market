@@ -23,11 +23,40 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; font-family: 'Inter', sans-serif; background: #0b0c10; color: #e4e6eb; overflow-x: hidden; }
         
-        body.light { background: #f0f2f5; color: #1a1a2e; }
-        
+        body.light { background: #e8ecf1; color: #1a1a2e; }
+        body.light .header { background: #f0f2f5; border-bottom-color: #d0d4da; }
+        body.light .nav a { color: #555; }
+        body.light .nav a.active { color: #a855f7; }
+        body.light .logo span { color: #888; }
+        body.light .steam-user { background: #fff; border-color: #d0d4da; }
+        body.light .steam-name { color: #333; }
+        body.light .sell-hero h1 { color: #333; }
+        body.light .profile-avatar-box { background: #fff; border-color: #d0d4da; }
+        body.light .profile-avatar-box div { color: #333; }
+        body.light .profile-balance { color: #a855f7; }
+        body.light .profile-tabs { background: #fff; border-color: #d0d4da; }
+        body.light .profile-tab { color: #555; border-bottom-color: #e0e4ea; }
+        body.light .profile-tab.active { background: #a855f7; color: #fff; }
+        body.light .profile-card { background: #fff; border-color: #d0d4da; }
+        body.light .profile-card .value { color: #333; }
+        body.light .profile-transactions { background: #fff; border-color: #d0d4da; }
+        body.light .transaction-table th, body.light .transaction-table td { border-bottom-color: #e0e4ea; color: #666; }
+        body.light .transaction-table th { color: #333; }
+        body.light .footer { background: #f0f2f5; border-top-color: #d0d4da; }
+        body.light .footer-grid .col a { color: #555; }
+        body.light .footer-bottom { color: #999; }
+
         .wrapper { display: flex; flex-direction: column; min-height: 100vh; position: relative; z-index: 1; }
         .content { flex: 1; }
         .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+
+        .rain-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+        .rain { position: absolute; width: 2px; background: linear-gradient(to bottom, rgba(168, 85, 247, 0.1), rgba(168, 85, 247, 0.5)); animation: rainFall linear infinite; }
+        body.light .rain { background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5)); }
+        @keyframes rainFall { 0% { transform: translateY(-100vh) rotate(10deg); opacity: 0.3; } 100% { transform: translateY(100vh) rotate(10deg); opacity: 0.8; } }
+        .rain-slow { animation-duration: 3s; }
+        .rain-medium { animation-duration: 2s; }
+        .rain-fast { animation-duration: 1.2s; }
 
         .header { background: #0d0e14; border-bottom: 1px solid #1c1d24; padding: 12px 0; position: sticky; top: 0; z-index: 100; }
         .header-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
@@ -39,6 +68,7 @@
         .nav a { color: #b2b4bb; cursor: pointer; padding: 4px 0; border-bottom: 2px solid transparent; text-decoration: none; transition: 0.2s; }
         .nav a:hover { color: #a855f7; }
         .nav a.active { color: #fff; border-bottom-color: #a855f7; }
+        body.light .nav a.active { color: #a855f7; border-bottom-color: #a855f7; }
         .header-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 
         .btn { background: #a855f7; color: #fff !important; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; border: none; cursor: pointer; transition: 0.2s; }
@@ -67,6 +97,7 @@
         .filters-row { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
         .filter-select, .filter-input { background: #14161c; border: 1px solid #26282f; border-radius: 8px; padding: 8px 12px; color: #e4e6eb; font-size: 14px; outline: none; }
         .filter-input { flex: 1; min-width: 200px; }
+        body.light .filter-select, body.light .filter-input { background: #fff; border-color: #d0d4da; color: #333; }
 
         .skin-grid-sell { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
         .sell-skin-card { background: #14161c; border: 1px solid #26282f; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; cursor: pointer; position: relative; }
@@ -79,7 +110,6 @@
         .sell-skin-card .selected-check { position: absolute; top: 8px; left: 8px; width: 20px; height: 20px; border-radius: 50%; border: 2px solid #a855f7; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; background: #a855f7; opacity: 0; transition: 0.2s; }
         .sell-skin-card.selected .selected-check { opacity: 1; }
 
-        /* НЕДОСТУПНО */
         .sell-skin-card.unavailable { cursor: not-allowed; opacity: 0.5; }
         .sell-skin-card.unavailable:hover { border-color: #26282f; }
         .unavailable-badge { background: rgba(231, 76, 60, 0.15); color: #e74c3c; font-size: 10px; padding: 2px 6px; border-radius: 4px; position: absolute; top: 8px; right: 8px; font-weight: 700; }
@@ -95,14 +125,20 @@
         .sidebar-section label { color: #8a8d99; font-size: 13px; display: block; margin-bottom: 8px; }
         .sidebar-section input[type="text"] { width: 100%; background: #0b0c10; border: 1px solid #26282f; border-radius: 8px; padding: 10px 12px; color: #e4e6eb; font-size: 14px; outline: none; }
         .sidebar-section input[type="text"]:focus { border-color: #a855f7; }
+        body.light .sell-sidebar { background: #fff; border-color: #d0d4da; }
+        body.light .sell-sidebar h3 { color: #333; }
+        body.light .sidebar-section input[type="text"] { background: #f5f6fa; border-color: #d0d4da; color: #333; }
 
         .payment-methods { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
         .pay-btn { background: #1c1d23; border: 1px solid #26282f; border-radius: 8px; padding: 10px 16px; color: #b2b4bb; font-size: 13px; cursor: pointer; font-weight: 600; }
         .pay-btn:hover { border-color: #a855f7; }
         .pay-btn.active { background: #a855f7; border-color: #a855f7; color: #fff; }
+        body.light .pay-btn { background: #f5f6fa; border-color: #d0d4da; color: #555; }
 
         .info-box { background: #1c1d23; border: 1px solid #26282f; border-radius: 8px; padding: 14px; color: #b2b4bb; font-size: 13px; line-height: 1.5; margin-bottom: 12px; }
         .info-box strong { color: #fff; }
+        body.light .info-box { background: #f5f6fa; border-color: #d0d4da; color: #555; }
+        body.light .info-box strong { color: #333; }
 
         .sell-final-btn { width: 100%; background: #a855f7; color: #fff; border: none; border-radius: 8px; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px; }
         .sell-final-btn:hover { background: #9333ea; }
@@ -116,7 +152,9 @@
         .profile-left { width: 300px; min-width: 300px; display: flex; flex-direction: column; gap: 16px; }
         .profile-avatar-box { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 20px; text-align: center; }
         .profile-avatar { width: 96px; height: 96px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 700; color: #0b0c10; flex-shrink: 0; background-size: cover; background-position: center; margin: 0 auto 12px; }
-        .profile-balance { font-size: 20px; font-weight: 800; color: #a855f7; margin-bottom: 16px; }
+        .profile-name { font-size: 18px; font-weight: 700; color: #fff; }
+        .profile-balance { font-size: 20px; font-weight: 800; color: #a855f7; margin-top: 8px; }
+
         .profile-tabs { background: #14161c; border: 1px solid #26282f; border-radius: 12px; overflow: hidden; }
         .profile-tab { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #b2b4bb; font-size: 14px; cursor: pointer; border-bottom: 1px solid #1c1d23; transition: 0.2s; }
         .profile-tab:hover { background: #1c1d23; color: #fff; }
@@ -135,27 +173,11 @@
         .transaction-table th, .transaction-table td { text-align: left; padding: 12px; border-bottom: 1px solid #1c1d23; font-size: 13px; color: #b2b4bb; }
         .transaction-table th { color: #fff; }
 
-        /* ===== ОСТАЛЬНОЕ ===== */
-        .static-page { max-width: 800px; margin: 0 auto; }
-        .static-page h1 { font-size: 32px; color: #a855f7; margin-bottom: 24px; }
-        .static-page h2 { font-size: 20px; color: #a855f7; margin-top: 24px; margin-bottom: 12px; }
-        .static-page p { line-height: 1.7; color: #b2b4bb; margin-bottom: 12px; }
-        .static-page a { color: #a855f7; text-decoration: none; }
-        .bold-warning { font-weight: 900; color: #e74c3c; font-size: 18px; text-align: center; margin: 20px 0; }
-
-        .admin-panel { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
-        .admin-panel h2 { font-size: 20px; margin-bottom: 16px; color: #a855f7; }
-        .admin-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
-        .admin-row label { color: #8a8d99; font-size: 13px; min-width: 120px; }
-        .admin-row input, .admin-row select { flex: 1; min-width: 120px; background: #1c1d23; border: 1px solid #2c2e36; color: #e4e6eb; padding: 8px 12px; border-radius: 6px; font-size: 13px; outline: none; }
-        .admin-skin-item { background: #1c1d23; border-radius: 8px; padding: 12px 16px; margin-bottom: 8px; border: 1px solid #26282f; }
-        .admin-skin-item .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        .admin-skin-item .row input, .admin-skin-item .row select { background: #0b0c10; border: 1px solid #26282f; color: #e4e6eb; padding: 4px 8px; border-radius: 4px; font-size: 12px; outline: none; }
-        .admin-skin-item .row .remove-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; padding: 0 4px; }
-        .admin-add-btn { background: #a855f7; color: #fff; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; }
-        .admin-save-btn { background: #a855f7; color: #fff; border: none; padding: 12px 32px; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 16px; }
-        .admin-status { color: #a855f7; font-size: 14px; margin-top: 12px; display: none; }
-        .admin-status.show { display: block; }
+        .profile-settings { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 16px; }
+        .setting-row { display: flex; gap: 8px; margin-bottom: 12px; }
+        .setting-row input[type="text"] { flex: 1; background: #0b0c10; border: 1px solid #26282f; border-radius: 8px; padding: 8px 12px; color: #e4e6eb; font-size: 13px; outline: none; }
+        .setting-row .toggle-btn { padding: 8px 12px; border-radius: 8px; border: 1px solid #26282f; background: transparent; color: #b2b4bb; cursor: pointer; font-size: 12px; }
+        .setting-row .toggle-btn.active { background: #a855f7; border-color: #a855f7; color: #fff; }
 
         .footer { background: #0d0e14; border-top: 1px solid #1c1d24; padding: 40px 0 24px; }
         .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 30px; }
@@ -169,6 +191,8 @@
     </style>
 </head>
 <body>
+
+<div class="rain-container" id="rainContainer"></div>
 
 <div class="wrapper">
 
@@ -280,7 +304,7 @@
                 <div class="profile-left">
                     <div class="profile-avatar-box">
                         <div class="profile-avatar" id="profileAvatar"></div>
-                        <div style="font-size: 18px; font-weight: 700; color: #fff;" id="profileName"></div>
+                        <div class="profile-name" id="profileName"></div>
                         <div class="profile-balance">0,00 ₽</div>
                     </div>
                     
@@ -292,17 +316,17 @@
                         <div class="profile-tab">API</div>
                     </div>
                     
-                    <div class="profile-settings" style="margin-top: 16px;">
-                        <div class="setting-row" style="display: flex; gap: 8px;">
-                            <input type="text" id="profileTradeUrl" placeholder="Trade URL" style="flex: 1;">
+                    <div class="profile-settings">
+                        <div class="setting-row">
+                            <input type="text" id="profileTradeUrl" placeholder="Trade URL">
                             <button class="btn" style="padding: 8px 12px; font-size: 12px;" onclick="saveProfileTradeUrl()">Сохранить</button>
                         </div>
-                        <div class="setting-row" style="margin-top: 12px; display: flex; gap: 8px;">
-                            <button class="toggle-btn" id="themeToggle">Тёмная</button>
+                        <div class="setting-row">
+                            <button class="toggle-btn active" id="themeToggle">Тёмная</button>
                             <button class="toggle-btn" id="themeToggleLight">Светлая</button>
                         </div>
-                        <div class="setting-row" style="margin-top: 12px; display: flex; gap: 8px;">
-                            <button class="toggle-btn" id="rainToggle">Анимация Вкл</button>
+                        <div class="setting-row">
+                            <button class="toggle-btn active" id="rainToggle">Анимация Вкл</button>
                             <button class="toggle-btn" id="rainToggleOff">Анимация Выкл</button>
                         </div>
                     </div>
@@ -490,10 +514,10 @@ async function loadSteamInventory() {
             return;
         }
         
-        // Временная демо-логика: к каждому скину добавляем цену (можно подтягивать с внешнего API)
+        // Временная демо-логика: цена от 1.5$ до 20$
         userInventory = userInventory.map((item, index) => ({
             ...item,
-            price: (index + 1) * 0.5 + 1 // Условная цена от 1.5$ до 20$
+            price: (index + 1) * 0.5 + 1
         }));
 
         grid.innerHTML = userInventory.map((item, index) => `
@@ -518,19 +542,15 @@ async function loadSteamInventory() {
 
 function toggleSteamSkinSelection(index) {
     const item = userInventory[index];
-    
-    // Если скин недоступен, не выбираем его
-    if (item.price < 5) return;
+    if (item.price < 5) return; // Недоступные не выбираются
     
     const idx = selectedSteamSkins.findIndex(id => id === item.assetid);
     if (idx > -1) {
         selectedSteamSkins.splice(idx, 1);
-        // Снять выделение
         const cards = document.querySelectorAll('.sell-skin-card');
         cards[index].classList.remove('selected');
     } else {
         selectedSteamSkins.push(item.assetid);
-        // Добавить выделение
         const cards = document.querySelectorAll('.sell-skin-card');
         cards[index].classList.add('selected');
     }
@@ -541,6 +561,13 @@ function navigateTo(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const target = document.getElementById(page + 'Page');
     if (target) target.classList.add('active');
+    document.querySelectorAll('.nav a').forEach(a => {
+        if (a.dataset.page === page) {
+            a.classList.add('active');
+        } else {
+            a.classList.remove('active');
+        }
+    });
 }
 
 // ===== ПРОФИЛЬ =====
@@ -585,9 +612,48 @@ function renderAdminSkins() {
     container.innerHTML = '<div style="color:#8a8d99; padding:20px; text-align:center;">Нет слотов</div>';
 }
 
+// ===== ТЕМА И АНИМАЦИЯ =====
+function setTheme(theme) {
+    if (theme === 'light') {
+        document.body.classList.add('light');
+        document.getElementById('themeToggle').classList.remove('active');
+        document.getElementById('themeToggleLight').classList.add('active');
+    } else {
+        document.body.classList.remove('light');
+        document.getElementById('themeToggle').classList.add('active');
+        document.getElementById('themeToggleLight').classList.remove('active');
+    }
+}
+
+function setAnimation(on) {
+    if (on) {
+        document.getElementById('rainContainer').style.display = 'block';
+        document.getElementById('rainToggle').classList.add('active');
+        document.getElementById('rainToggleOff').classList.remove('active');
+    } else {
+        document.getElementById('rainContainer').style.display = 'none';
+        document.getElementById('rainToggle').classList.remove('active');
+        document.getElementById('rainToggleOff').classList.add('active');
+    }
+}
+
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
     fetchUser();
+    // Создание дождя
+    const container = document.getElementById('rainContainer');
+    for (let i = 0; i < 80; i++) {
+        const drop = document.createElement('div');
+        drop.className = 'rain';
+        const speed = ['rain-slow', 'rain-medium', 'rain-fast'][Math.floor(Math.random() * 3)];
+        drop.classList.add(speed);
+        drop.style.left = Math.random() * 100 + '%';
+        drop.style.height = (10 + Math.random() * 30) + 'px';
+        drop.style.animationDelay = Math.random() * 3 + 's';
+        drop.style.animationDuration = (1.2 + Math.random() * 2) + 's';
+        container.appendChild(drop);
+    }
+
     document.querySelectorAll('.nav a').forEach(el => {
         el.addEventListener('click', function(e) {
             e.preventDefault();
@@ -600,23 +666,20 @@ document.addEventListener('DOMContentLoaded', function() {
         navigateTo('sell');
     });
     
-    // Профиль: тема и анимация
+    // Профиль: тема
     document.getElementById('themeToggle').addEventListener('click', function() {
-        document.body.classList.remove('light');
-        document.getElementById('themeToggle').classList.add('active');
-        document.getElementById('themeToggleLight').classList.remove('active');
+        setTheme('dark');
     });
     document.getElementById('themeToggleLight').addEventListener('click', function() {
-        document.body.classList.add('light');
-        document.getElementById('themeToggleLight').classList.add('active');
-        document.getElementById('themeToggle').classList.remove('active');
+        setTheme('light');
     });
 
+    // Профиль: анимация
     document.getElementById('rainToggle').addEventListener('click', function() {
-        // Здесь можно добавить включение дождя
+        setAnimation(true);
     });
     document.getElementById('rainToggleOff').addEventListener('click', function() {
-        // Здесь можно добавить выключение дождя
+        setAnimation(false);
     });
 
     document.getElementById('adminBack').addEventListener('click', function() { navigateTo('sell'); });
