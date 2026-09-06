@@ -12,6 +12,6 @@
     "express-session": "^1.18.0",
     "passport": "^0.7.0",
     "passport-steam": "^1.0.18",
-    "steam-inventory-api-ng": "^1.0.11"
+    "steamcommunity": "^3.47.0"
   }
 }

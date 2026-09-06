@@ -2,11 +2,10 @@ const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
 const SteamStrategy = require('passport-steam').Strategy;
-const axios = require('axios');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
-const Inventory = require('steam-inventory-api-ng');
+const SteamCommunity = require('steamcommunity');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,6 +13,8 @@ const PORT = process.env.PORT || 3000;
 const STEAM_API_KEY = process.env.STEAM_API_KEY;
 const SESSION_SECRET = process.env.SESSION_SECRET || 'supersecret';
 const BASE_URL = process.env.BASE_URL || `https://emerald-market-2.onrender.com`;
+
+const community = new SteamCommunity();
 
 app.use(express.static(__dirname));
 app.use(bodyParser.json());
@@ -57,27 +58,19 @@ app.get('/api/user', (req, res) => {
     }
 });
 
-// 1. ПОЛУЧАЕМ ИНВЕНТАРЬ ЧЕРЕЗ СЕРВЕР (БЕЗ CORS - все работает через Node)
-app.post('/api/get-inventory', async (req, res) => {
+// ЭТОТ КОД ПОЛУЧАЕТ ИНВЕНТАРЬ ЧЕРЕЗ БИБЛИОТЕКУ, КОТОРАЯ САМА ОБХОДИТ БАНЫ
+app.post('/api/get-inventory', (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Не авторизован' });
     const steamId = String(req.user.id);
 
-    try {
-        // ИСПОЛЬЗУЕМ СПЕЦИАЛЬНУЮ БИБЛИОТЕКУ, КОТОРАЯ САМА ДЕЛАЕТ ПОВТОРНЫЕ ПОПЫТКИ
-        // И ДЕРЖИТ НИЗКИЙ УРОВЕНЬ ЗАПРОСОВ, ЧТОБЫ STEAM НЕ БЛОКИРОВАЛ.
-        // count нужно снизить до <= 2500 [citation:1]
-        const options = {
-            steamID: steamId,
-            appID: '730',
-            contextID: '2',
-            count: 2500,
-            method: 'new'
-        };
+    // Библиотека steamcommunity сама делает запрос и возвращает скины
+    community.getInventoryItems(steamId, 730, 2, (err, items) => {
+        if (err) {
+            console.error('Ошибка при получении инвентаря:', err.message);
+            return res.status(500).json({ error: 'Не удалось получить инвентарь. Подожди 5 минут и попробуй снова.' });
+        }
 
-        const inventory = new Inventory(options);
-        const items = await inventory.get();
-
-        // Фильтруем дефолтные скины и получаем чистый список
+        // Фильтруем и возвращаем только нужные скины
         const result = items.map(item => ({
             assetid: item.assetid,
             name: item.market_hash_name || item.name,
@@ -86,10 +79,7 @@ app.post('/api/get-inventory', async (req, res) => {
         }));
 
         res.json({ success: true, items: result });
-
-    } catch (error) {
-        res.status(500).json({ error: 'Не удалось получить инвентарь. Подожди 5 минут и попробуй снова.' });
-    }
+    });
 });
 
 // 2. СОХРАНЕНИЕ TRADE URL (по-прежнему работает)
