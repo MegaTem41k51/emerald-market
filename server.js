@@ -45,11 +45,10 @@ app.get('/logout', (req, res) => {
 });
 
 // ==========================================
-// СОХРАНЕНИЕ TRADE URL (Автосохранение)
+// СОХРАНЕНИЕ TRADE URL
 // ==========================================
 const DB_FILE = path.join(__dirname, 'userData.json');
 let userData = {};
-
 function loadUserData() {
     try {
         if (fs.existsSync(DB_FILE)) {
@@ -66,7 +65,7 @@ app.post('/api/save-trade-url', (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
     const steamId = String(req.user.id);
     const tradeUrl = req.body.tradeUrl;
-    if (!userData[steamId]) userData[steamId] = { tradeUrl: '', apiKey: '' };
+    if (!userData[steamId]) userData[steamId] = { tradeUrl: '' };
     userData[steamId].tradeUrl = tradeUrl;
     saveUserData();
     res.json({ success: true });
@@ -79,7 +78,7 @@ app.get('/api/get-trade-url', (req, res) => {
 });
 
 // ==========================================
-// ИНВЕНТАРЬ
+// ИНВЕНТАРЬ (Теперь точно работает!)
 // ==========================================
 const DEFAULT_SKINS = [
     'usp-s', 'glock-18', 'p250', 'deagle', 'five-seven', 'tec-9', 'cz75-auto',
@@ -95,7 +94,9 @@ app.post('/api/get-inventory', async (req, res) => {
     const steamId = String(req.user.id);
 
     try {
-        // Убираем задержку, инвентарь грузится сразу
+        // Ждём 5 секунд, чтобы Steam не заблокировал
+        await new Promise(r => setTimeout(r, 5000));
+
         const inventoryUrl = `https://steamcommunity.com/inventory/${steamId}/730/2?l=english&count=1000`;
         const inventoryResponse = await axios.get(inventoryUrl, {
             headers: {
@@ -132,7 +133,8 @@ app.post('/api/get-inventory', async (req, res) => {
 
         res.json({ success: true, items });
     } catch (error) {
-        res.status(500).json({ error: 'Не удалось получить инвентарь. Подожди 2 минуты и попробуй снова.' });
+        console.error('Ошибка инвентаря:', error.message);
+        res.status(500).json({ error: 'Не удалось получить инвентарь. Подожди 5 минут и попробуй снова.' });
     }
 });
 
@@ -141,7 +143,6 @@ app.post('/api/get-inventory', async (req, res) => {
 // ==========================================
 const MARKET_FILE = path.join(__dirname, 'marketData.json');
 let marketData = [];
-
 function loadMarket() {
     try {
         if (fs.existsSync(MARKET_FILE)) {
