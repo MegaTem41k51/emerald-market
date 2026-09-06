@@ -56,9 +56,55 @@ app.get('/api/user', (req, res) => {
     }
 });
 
-// ПОЛУЧЕНИЕ ИНВЕНТАРЯ
+// --- ХРАНЕНИЕ НАСТРОЕК И TRADE URL ---
+const DB_FILE = path.join(__dirname, 'userData.json');
+let userData = {};
+if (fs.existsSync(DB_FILE)) {
+    userData = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+}
+
+function saveUserData() {
+    fs.writeFileSync(DB_FILE, JSON.stringify(userData, null, 2));
+}
+
+app.post('/api/save-settings', (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите' });
+    const steamId = String(req.user.id);
+    if (!userData[steamId]) userData[steamId] = {};
+    userData[steamId].theme = req.body.theme;
+    userData[steamId].rain = req.body.rain;
+    saveUserData();
+    res.json({ success: true });
+});
+
+app.get('/api/get-settings', (req, res) => {
+    if (!req.user) return res.json({ theme: 'dark', rain: true });
+    const steamId = String(req.user.id);
+    res.json({ 
+        theme: userData[steamId]?.theme || 'dark', 
+        rain: userData[steamId]?.rain !== false 
+    });
+});
+
+app.post('/api/save-trade-url', (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите' });
+    const steamId = String(req.user.id);
+    const tradeUrl = req.body.tradeUrl;
+    if (!userData[steamId]) userData[steamId] = {};
+    userData[steamId].tradeUrl = tradeUrl;
+    saveUserData();
+    res.json({ success: true });
+});
+
+app.get('/api/get-trade-url', (req, res) => {
+    if (!req.user) return res.json({ tradeUrl: '' });
+    const steamId = String(req.user.id);
+    res.json({ tradeUrl: userData[steamId]?.tradeUrl || '' });
+});
+
+// --- ИНВЕНТАРЬ (снижаем count чтобы Steam не банил) ---
 app.post('/api/get-inventory', async (req, res) => {
-    if (!req.user) return res.status(401).json({ error: 'Пожалуйста, войдите через Steam' });
+    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
     const steamId = String(req.user.id);
 
     try {
@@ -99,29 +145,6 @@ app.post('/api/get-inventory', async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: 'Не удалось получить инвентарь. Подожди 5 минут и попробуй снова.' });
     }
-});
-
-// СОХРАНЕНИЕ TRADE URL
-const DB_FILE = path.join(__dirname, 'userData.json');
-let userData = {};
-if (fs.existsSync(DB_FILE)) {
-    userData = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
-}
-
-app.post('/api/save-trade-url', (req, res) => {
-    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
-    const steamId = String(req.user.id);
-    const tradeUrl = req.body.tradeUrl;
-    if (!userData[steamId]) userData[steamId] = { tradeUrl: '' };
-    userData[steamId].tradeUrl = tradeUrl;
-    fs.writeFileSync(DB_FILE, JSON.stringify(userData, null, 2));
-    res.json({ success: true });
-});
-
-app.get('/api/get-trade-url', (req, res) => {
-    if (!req.user) return res.json({ tradeUrl: '' });
-    const steamId = String(req.user.id);
-    res.json({ tradeUrl: userData[steamId] ? userData[steamId].tradeUrl : '' });
 });
 
 const DEFAULT_SKINS = [

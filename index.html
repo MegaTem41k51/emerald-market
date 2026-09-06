@@ -467,6 +467,7 @@ async function fetchUser() {
         updateUserUI();
         renderProfile();
         loadTradeUrl();
+        loadSettings();
     } else {
         currentUser = null;
         updateUserUI();
@@ -490,6 +491,70 @@ function updateUserUI() {
         actions.innerHTML = `<a href="/auth/steam" class="btn btn-steam">Войти через Steam</a>`;
     }
 }
+
+// ===== НАСТРОЙКИ (сохраняются на сервере!) =====
+async function loadSettings() {
+    const response = await fetch('/api/get-settings');
+    const data = await response.json();
+    
+    if (data.theme === 'light') {
+        document.body.classList.add('light');
+        document.getElementById('themeToggle').classList.remove('active');
+        document.getElementById('themeToggleLight').classList.add('active');
+    } else {
+        document.body.classList.remove('light');
+        document.getElementById('themeToggle').classList.add('active');
+        document.getElementById('themeToggleLight').classList.remove('active');
+    }
+    
+    if (data.rain) {
+        document.getElementById('rainContainer').style.display = 'block';
+        document.getElementById('rainToggle').classList.add('active');
+        document.getElementById('rainToggleOff').classList.remove('active');
+    } else {
+        document.getElementById('rainContainer').style.display = 'none';
+        document.getElementById('rainToggle').classList.remove('active');
+        document.getElementById('rainToggleOff').classList.add('active');
+    }
+}
+
+async function saveSettings() {
+    const theme = document.body.classList.contains('light') ? 'light' : 'dark';
+    const rain = document.getElementById('rainContainer').style.display !== 'none';
+    await fetch('/api/save-settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ theme, rain })
+    });
+}
+
+document.getElementById('themeToggle').addEventListener('click', function() {
+    document.body.classList.remove('light');
+    this.classList.add('active');
+    document.getElementById('themeToggleLight').classList.remove('active');
+    saveSettings();
+});
+
+document.getElementById('themeToggleLight').addEventListener('click', function() {
+    document.body.classList.add('light');
+    this.classList.add('active');
+    document.getElementById('themeToggle').classList.remove('active');
+    saveSettings();
+});
+
+document.getElementById('rainToggle').addEventListener('click', function() {
+    document.getElementById('rainContainer').style.display = 'block';
+    this.classList.add('active');
+    document.getElementById('rainToggleOff').classList.remove('active');
+    saveSettings();
+});
+
+document.getElementById('rainToggleOff').addEventListener('click', function() {
+    document.getElementById('rainContainer').style.display = 'none';
+    this.classList.add('active');
+    document.getElementById('rainToggle').classList.remove('active');
+    saveSettings();
+});
 
 // ===== TRADE URL =====
 async function loadTradeUrl() {
@@ -632,54 +697,9 @@ document.querySelectorAll('.profile-tab').forEach(tab => {
     });
 });
 
-// ===== ТЕМА И АНИМАЦИЯ (СОХРАНЯЕТСЯ) =====
-function setTheme(theme) {
-    if (theme === 'light') {
-        document.body.classList.add('light');
-        localStorage.setItem('emeraldTheme', 'light');
-        document.getElementById('themeToggle').classList.remove('active');
-        document.getElementById('themeToggleLight').classList.add('active');
-    } else {
-        document.body.classList.remove('light');
-        localStorage.setItem('emeraldTheme', 'dark');
-        document.getElementById('themeToggle').classList.add('active');
-        document.getElementById('themeToggleLight').classList.remove('active');
-    }
-}
-
-function setAnimation(on) {
-    if (on) {
-        document.getElementById('rainContainer').style.display = 'block';
-        localStorage.setItem('emeraldRain', 'on');
-        document.getElementById('rainToggle').classList.add('active');
-        document.getElementById('rainToggleOff').classList.remove('active');
-    } else {
-        document.getElementById('rainContainer').style.display = 'none';
-        localStorage.setItem('emeraldRain', 'off');
-        document.getElementById('rainToggle').classList.remove('active');
-        document.getElementById('rainToggleOff').classList.add('active');
-    }
-}
-
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
     fetchUser();
-    
-    // ЧИТАЕМ НАСТРОЙКИ ПЕРЕД ЗАГРУЗКОЙ
-    const savedTheme = localStorage.getItem('emeraldTheme');
-    const savedRain = localStorage.getItem('emeraldRain');
-    
-    if (savedTheme === 'light') {
-        setTheme('light');
-    } else {
-        setTheme('dark');
-    }
-    
-    if (savedRain === 'off') {
-        setAnimation(false);
-    } else {
-        setAnimation(true);
-    }
     
     const container = document.getElementById('rainContainer');
     for (let i = 0; i < 80; i++) {
