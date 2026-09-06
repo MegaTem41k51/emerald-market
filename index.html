@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EMERALD Market</title>
+    <title>XYN</title>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -44,12 +44,42 @@
         .page { display: none; padding: 30px 0 60px; }
         .page.active { display: block; }
 
-        /* ===== ПРОДАЖА ===== */
+        /* ПРОФИЛЬ */
+        .profile-login-box { max-width: 500px; margin: 40px auto; background: #14161c; border: 1px solid #26282f; border-radius: 16px; padding: 48px 40px; text-align: center; }
+        .profile-login-box .icon { font-size: 64px; margin-bottom: 16px; }
+        .profile-login-box h2 { color: #e4e6eb; font-size: 24px; margin-bottom: 8px; }
+        .profile-login-box p { color: #8a8d99; font-size: 16px; margin-bottom: 24px; }
+        .profile-layout { display: flex; gap: 24px; }
+        .profile-left { width: 300px; min-width: 300px; display: flex; flex-direction: column; gap: 16px; }
+        .profile-avatar-box { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 20px; text-align: center; }
+        .profile-avatar { width: 96px; height: 96px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 700; color: #0b0c10; flex-shrink: 0; background-size: cover; background-position: center; margin: 0 auto 12px; }
+        .profile-name { font-size: 18px; font-weight: 700; color: #fff; }
+        .profile-balance { font-size: 20px; font-weight: 800; color: #2ecc71; margin-top: 8px; }
+        .trade-url-btn-blue { background: #2ecc71; color: #0b0c10; border: none; border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; }
+        .profile-tabs { background: #14161c; border: 1px solid #26282f; border-radius: 12px; overflow: hidden; }
+        .profile-tab { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #b2b4bb; font-size: 14px; cursor: pointer; border-bottom: 1px solid #1c1d23; transition: 0.2s; }
+        .profile-tab .icon { font-size: 18px; }
+        .profile-tab:hover { background: #1c1d23; color: #fff; }
+        .profile-tab.active { background: #2ecc71; color: #0b0c10; }
+        .profile-right { flex: 1; }
+        .profile-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .profile-card { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 20px; text-align: center; }
+        .profile-card .icon { font-size: 32px; margin-bottom: 8px; }
+        .profile-card .value { font-size: 18px; font-weight: 700; color: #fff; }
+        .profile-card .label { color: #8a8d99; font-size: 12px; margin-top: 4px; }
+        .profile-content-section { display: none; }
+        .profile-content-section.active { display: block; }
+        .profile-transactions { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px; }
+        .profile-transactions h3 { margin-bottom: 16px; font-size: 18px; }
+        .transaction-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        .transaction-table th, .transaction-table td { text-align: left; padding: 12px; border-bottom: 1px solid #1c1d23; font-size: 13px; color: #b2b4bb; }
+        .transaction-table th { color: #fff; }
+
+        /* ПРОДАЖА */
         .sell-title { text-align: center; font-size: 30px; font-weight: 800; color: #fff; margin-bottom: 30px; }
         .sell-layout { display: flex; gap: 24px; }
         .sell-left { flex: 1; }
         .sell-right { width: 380px; min-width: 380px; background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px; }
-
         .filters-row { display: flex; gap: 12px; margin-bottom: 20px; align-items: center; }
         .filter-select { background: #14161c; border: 1px solid #26282f; border-radius: 8px; padding: 10px 12px; color: #e4e6eb; font-size: 14px; outline: none; width: 120px; }
         .filter-search { flex: 1; display: flex; align-items: center; background: #14161c; border: 1px solid #26282f; border-radius: 8px; padding: 10px 12px; }
@@ -58,7 +88,6 @@
         .select-all-btn { background: #1c1d23; border: 1px solid #26282f; border-radius: 8px; padding: 10px 16px; color: #e4e6eb; font-size: 13px; cursor: pointer; }
         .trade-url-btn { background: #2ecc71; color: #0b0c10; border: none; border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
         .refresh-btn { background: transparent; border: none; color: #8a8d99; font-size: 20px; cursor: pointer; }
-
         .skins-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
         .skin-card { background: #14161c; border: 1px solid #26282f; border-radius: 8px; padding: 10px; position: relative; cursor: pointer; }
         .skin-card:hover { border-color: #2ecc71; }
@@ -69,18 +98,15 @@
         .skin-card .price { font-size: 14px; font-weight: 700; color: #2ecc71; text-align: center; margin-top: 4px; }
         .skin-card.selected { border-color: #2ecc71; }
         .skin-card.selected::after { content: '✓'; position: absolute; top: 8px; left: 8px; background: #2ecc71; color: #0b0c10; width: 20px; height: 20px; border-radius: 50%; font-size: 12px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
-
         .sell-right h3 { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 20px; }
         .promo-input { display: flex; gap: 8px; margin-bottom: 20px; }
         .promo-input input { flex: 1; background: #0b0c10; border: 1px solid #26282f; border-radius: 8px; padding: 12px; color: #e4e6eb; font-size: 14px; }
         .promo-input button { background: #2ecc71; color: #0b0c10; border: none; border-radius: 8px; padding: 12px 20px; font-weight: 700; font-size: 14px; cursor: pointer; }
-
         .payment-methods { display: flex; gap: 8px; margin-bottom: 20px; }
         .pay-method { flex: 1; background: #1c1d23; border: 1px solid #26282f; border-radius: 8px; padding: 12px; text-align: center; cursor: pointer; }
         .pay-method.active { border-color: #2ecc71; }
         .pay-method .icon { font-size: 24px; margin-bottom: 6px; }
         .pay-method .label { font-size: 12px; color: #b2b4bb; }
-
         .sum-box { background: #1c1d23; border: 1px solid #26282f; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
         .sum-box .total { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .sum-box .total .label { color: #8a8d99; font-size: 13px; }
@@ -88,14 +114,13 @@
         .sum-box .final { display: flex; justify-content: space-between; align-items: center; }
         .sum-box .final .label { color: #8a8d99; font-size: 13px; }
         .sum-box .final .value { color: #2ecc71; font-size: 14px; font-weight: 700; }
-
         .sell-btn { width: 100%; background: #2ecc71; color: #0b0c10; border: none; border-radius: 8px; padding: 16px; font-size: 16px; font-weight: 800; cursor: pointer; }
         .sell-btn:hover { background: #27ae60; }
 
         .footer { background: #101116; border-top: 1px solid #26282f; padding: 40px 0 24px; }
         .footer-bottom { text-align: center; color: #6a6d7a; font-size: 14px; }
 
-        @media (max-width: 992px) { .sell-layout { flex-direction: column; } .sell-right { width: 100%; min-width: unset; } .skins-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 992px) { .sell-layout { flex-direction: column; } .sell-right { width: 100%; min-width: unset; } .skins-grid { grid-template-columns: repeat(3, 1fr); } .profile-layout { flex-direction: column; } .profile-left { width: 100%; min-width: unset; } .profile-cards { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 600px) { .skins-grid { grid-template-columns: repeat(2, 1fr); } }
     </style>
 </head>
@@ -201,14 +226,7 @@
     </div>
 </div>
 
-<!-- ДРУГИЕ СТРАНИЦЫ -->
-<div class="page" id="marketPage">
-    <div class="container">
-        <h2 style="font-size: 24px; font-weight: 700;">Купить скины</h2>
-        <p style="color:#8a8d99; margin-bottom:20px;">Здесь будут ваши скины</p>
-    </div>
-</div>
-
+<!-- СТРАНИЦА ПРОФИЛЯ -->
 <div class="page" id="profilePage">
     <div class="container">
         <div id="profileLoginBox" style="display:block;">
@@ -220,13 +238,132 @@
             </div>
         </div>
         <div id="profileContent" style="display:none;">
-            <div class="profile-header">
-                <div class="profile-avatar" id="profileAvatar"></div>
-                <div class="profile-info">
-                    <h2 id="profileName"></h2>
+            <div class="profile-layout">
+                <div class="profile-left">
+                    <div class="profile-avatar-box">
+                        <div class="profile-avatar" id="profileAvatar"></div>
+                        <div class="profile-name" id="profileName"></div>
+                        <div class="profile-balance">0,00 ₽</div>
+                    </div>
+                    <button class="trade-url-btn-blue" onclick="toggleTradeUrlInput()">🔗 Trade URL</button>
+                    <div class="profile-tabs">
+                        <div class="profile-tab active" data-tab="transactions">
+                            <span class="icon">📄</span>
+                            Транзакции
+                        </div>
+                        <div class="profile-tab" data-tab="exchanges">
+                            <span class="icon">📦</span>
+                            Обмены
+                        </div>
+                        <div class="profile-tab" data-tab="verification">
+                            <span class="icon">🛡️</span>
+                            Верификация
+                        </div>
+                        <div class="profile-tab" data-tab="sessions">
+                            <span class="icon">🔒</span>
+                            Сессии
+                        </div>
+                        <div class="profile-tab" data-tab="referral">
+                            <span class="icon">🔗</span>
+                            Реферальная система
+                        </div>
+                        <div class="profile-tab" data-tab="api">
+                            <span class="icon">💻</span>
+                            API
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-right">
+                    <div class="profile-cards">
+                        <div class="profile-card">
+                            <div class="icon">🛒</div>
+                            <div class="value">0,00 ₽</div>
+                            <div class="label">Продано на сумму</div>
+                        </div>
+                        <div class="profile-card">
+                            <div class="icon">🛍️</div>
+                            <div class="value">0,00 ₽</div>
+                            <div class="label">Куплено на сумму</div>
+                        </div>
+                        <div class="profile-card">
+                            <div class="icon">⏰</div>
+                            <div class="value">0 дня</div>
+                            <div class="label">Времени на сайте</div>
+                        </div>
+                        <div class="profile-card">
+                            <div class="icon">🛡️</div>
+                            <div class="value">Отсутствует</div>
+                            <div class="label">КУС верификация</div>
+                        </div>
+                    </div>
+
+                    <div class="profile-content-section active" id="section-transactions">
+                        <div class="profile-transactions">
+                            <h3>Транзакции</h3>
+                            <table class="transaction-table">
+                                <thead>
+                                    <tr>
+                                        <th>Сервис</th>
+                                        <th>Дата</th>
+                                        <th>Сумма</th>
+                                        <th>Статус</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; padding: 30px; color: #6a6d7a;">Нет транзакций</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="profile-content-section" id="section-exchanges">
+                        <div class="profile-transactions">
+                            <h3>Обмены</h3>
+                            <p style="color:#8a8d99; text-align:center; padding: 40px;">У вас пока нет предметов</p>
+                        </div>
+                    </div>
+
+                    <div class="profile-content-section" id="section-verification">
+                        <div class="profile-transactions">
+                            <h3>Верификация</h3>
+                            <p style="color:#8a8d99;">К сожалению, вы не можете пройти верификацию.</p>
+                        </div>
+                    </div>
+
+                    <div class="profile-content-section" id="section-sessions">
+                        <div class="profile-transactions">
+                            <h3>Сессии</h3>
+                            <p style="color:#8a8d99;">Информация о сессиях появится позже</p>
+                        </div>
+                    </div>
+
+                    <div class="profile-content-section" id="section-referral">
+                        <div class="profile-transactions">
+                            <h3>Реферальная система</h3>
+                            <p style="color:#8a8d99;">Здесь будет ваша реферальная ссылка</p>
+                        </div>
+                    </div>
+
+                    <div class="profile-content-section" id="section-api">
+                        <div class="profile-transactions">
+                            <h3>API</h3>
+                            <p style="color:#8a8d99;">Здесь будет ваш API ключ</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- ДРУГИЕ СТРАНИЦЫ -->
+<div class="page" id="marketPage">
+    <div class="container">
+        <h2 style="font-size: 24px; font-weight: 700;">Купить скины</h2>
+        <p style="color:#8a8d99; margin-bottom:20px;">Здесь будут ваши скины</p>
     </div>
 </div>
 
@@ -239,7 +376,6 @@ let currentUser = null;
 let userInventory = [];
 let selectedSteamSkins = [];
 
-// 1. ПОЛУЧАЕМ ПОЛЬЗОВАТЕЛЯ
 async function fetchUser() {
     const response = await fetch('/api/user');
     const data = await response.json();
@@ -247,8 +383,11 @@ async function fetchUser() {
         currentUser = { id: data.user.id, name: data.user.name, avatar: data.user.avatar };
         updateUserUI();
         renderProfile();
+        loadTradeUrl();
     }
 }
+
+function logoutUser() { window.location.href = '/logout'; }
 
 function updateUserUI() {
     const actions = document.getElementById('headerActions');
@@ -265,15 +404,26 @@ function updateUserUI() {
     }
 }
 
-function logoutUser() { window.location.href = '/logout'; }
-
 function navigateTo(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const target = document.getElementById(page + 'Page');
     if (target) target.classList.add('active');
 }
 
-// 2. КНОПКА TRADE URL
+function renderProfile() {
+    if (currentUser) {
+        document.getElementById('profileLoginBox').style.display = 'none';
+        document.getElementById('profileContent').style.display = 'block';
+        document.getElementById('profileName').textContent = currentUser.name;
+        if (currentUser.avatar) {
+            document.getElementById('profileAvatar').style.backgroundImage = `url('${currentUser.avatar}')`;
+            document.getElementById('profileAvatar').style.backgroundSize = 'cover';
+            document.getElementById('profileAvatar').style.backgroundPosition = 'center';
+            document.getElementById('profileAvatar').textContent = '';
+        }
+    }
+}
+
 let tradeUrlInput = null;
 function toggleTradeUrlInput() {
     if (!tradeUrlInput) {
@@ -298,7 +448,14 @@ function toggleTradeUrlInput() {
     }
 }
 
-// 3. ЗАГРУЗКА ИНВЕНТАРЯ ЧЕРЕЗ СЕРВЕР (самый безопасный способ)
+async function loadTradeUrl() {
+    const response = await fetch('/api/get-trade-url');
+    const data = await response.json();
+    if (data.tradeUrl) {
+        loadSteamInventory();
+    }
+}
+
 async function loadSteamInventory() {
     if (!currentUser) { alert('Пожалуйста, войдите через Steam!'); return; }
     const grid = document.getElementById('sellSkinGrid');
@@ -343,23 +500,20 @@ function toggleSkinSelection(index) {
     document.getElementById('selectedCount').textContent = selectedSteamSkins.length;
 }
 
-function renderProfile() {
-    if (currentUser) {
-        document.getElementById('profileLoginBox').style.display = 'none';
-        document.getElementById('profileContent').style.display = 'block';
-        document.getElementById('profileName').textContent = currentUser.name;
-        if (currentUser.avatar) {
-            document.getElementById('profileAvatar').style.backgroundImage = `url('${currentUser.avatar}')`;
-            document.getElementById('profileAvatar').style.backgroundSize = 'cover';
-            document.getElementById('profileAvatar').style.backgroundPosition = 'center';
-            document.getElementById('profileAvatar').textContent = '';
-        }
-    }
-}
+document.querySelectorAll('.profile-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        const tabName = this.dataset.tab;
+        document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        document.querySelectorAll('.profile-content-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.getElementById('section-' + tabName).classList.add('active');
+    });
+});
 
 document.addEventListener('DOMContentLoaded', function() {
     fetchUser();
-    
     document.querySelectorAll('.nav a').forEach(el => {
         el.addEventListener('click', function(e) {
             e.preventDefault();
@@ -373,7 +527,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     navigateTo('sell');
     
-    // Дождик
     const container = document.getElementById('rainContainer');
     for (let i = 0; i < 80; i++) {
         const drop = document.createElement('div');
