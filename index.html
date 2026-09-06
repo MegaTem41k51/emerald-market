@@ -254,8 +254,85 @@
         .faq-answer a { color: #2ecc71; text-decoration: none; }
         .faq-answer a:hover { text-decoration: underline; }
 
-        @media (max-width: 992px) { .sell-layout { flex-direction: column; } .sell-sidebar { width: 100%; min-width: unset; position: static; } .skin-grid-sell { grid-template-columns: repeat(3, 1fr); } .profile-layout { flex-direction: column; } .profile-left { width: 100%; min-width: unset; } .profile-cards { grid-template-columns: repeat(2, 1fr); } }
+        /* ===== СТРАНИЦА ПОДДЕРЖКИ ===== */
+        .support-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .support-card {
+            background: #14161c;
+            border: 1px solid #26282f;
+            border-radius: 16px;
+            padding: 30px 40px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        body.light .support-card { background: #ffffff; border-color: #d0d4da; }
+        .support-card .icon-big { font-size: 56px; margin-bottom: 16px; }
+        .support-card h2 { font-size: 24px; font-weight: 700; margin-bottom: 12px; color: #fff; }
+        body.light .support-card h2 { color: #333; }
+        .support-card p { color: #b2b4bb; font-size: 16px; line-height: 1.7; }
+        body.light .support-card p { color: #555; }
+        .support-channels {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 24px;
+        }
+        .support-channel {
+            background: #1c1d23;
+            border: 1px solid #26282f;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        body.light .support-channel { background: #f5f6fa; border-color: #d0d4da; }
+        .support-channel:hover { border-color: #2ecc71; transform: translateY(-2px); }
+        .support-channel .channel-icon { font-size: 32px; margin-bottom: 8px; }
+        .support-channel .channel-name { font-weight: 600; font-size: 16px; color: #fff; }
+        body.light .support-channel .channel-name { color: #333; }
+        .support-channel .channel-desc { font-size: 13px; color: #8a8d99; margin-top: 4px; }
+        body.light .support-channel .channel-desc { color: #777; }
+
+        @media (max-width: 992px) { .sell-layout { flex-direction: column; } .sell-sidebar { width: 100%; min-width: unset; position: static; } .skin-grid-sell { grid-template-columns: repeat(3, 1fr); } .profile-layout { flex-direction: column; } .profile-left { width: 100%; min-width: unset; } .profile-cards { grid-template-columns: repeat(2, 1fr); } .support-channels { grid-template-columns: 1fr; } }
         @media (max-width: 600px) { .skin-grid-sell { grid-template-columns: repeat(2, 1fr); } }
+
+        /* ===== КНОПКА TELEGRAM В УГЛУ ===== */
+        .telegram-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 999;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: #0088cc;
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(0, 136, 204, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: 0.3s;
+            font-size: 34px;
+        }
+        .telegram-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(0, 136, 204, 0.7);
+        }
+        body.light .telegram-float {
+            box-shadow: 0 4px 20px rgba(0, 136, 204, 0.3);
+        }
+        .telegram-float svg {
+            width: 36px;
+            height: 36px;
+            fill: #fff;
+        }
     </style>
 </head>
 <body>
@@ -271,6 +348,11 @@
     </div>
 </div>
 
+<!-- КНОПКА TELEGRAM В ПРАВОМ НИЖНЕМ УГЛУ -->
+<a href="https://t.me/ikiawka" target="_blank" class="telegram-float" aria-label="Telegram">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.1-.2-.11-.06-.26-.04-.37-.02-.16.02-2.64 1.68-2.64 1.68l-2.91-1.92c-.35-.23-.74-.49-.13-.74.64-.26 1.35-.53 1.35-.53s2.1-.8 3.87-1.21c.82-.19 1.58-.06 1.98.35.42.42.56 1.02.48 1.62z"/></svg>
+</a>
+
 <div class="wrapper">
 
 <header class="header">
@@ -281,6 +363,7 @@
             <a data-page="market">Купить скины</a>
             <a data-page="profile">Профиль</a>
             <a data-page="faq">FAQ</a>
+            <a data-page="support">Поддержка</a>
         </nav>
         <div class="header-actions" id="headerActions">
             <a href="/auth/steam" class="btn btn-steam">Войти через Steam</a>
@@ -534,7 +617,7 @@
                     <span class="arrow">▾</span>
                 </div>
                 <div class="faq-answer">
-                    Мы еще работаем над системой бонусов, однако в наших соц. сетях — VK и Telegram мы публикуем промокоды, проводим конкурсы, а также рассказываем о других приятных нововведениях на сайте.
+                    Мы еще работаем над системой бонусов, однако в нашем Telegram канале мы иногда публикуем QR-коды,делаем прокачки, а также рассказываем о других приятных нововведениях.
                 </div>
             </div>
 
@@ -545,7 +628,7 @@
                 </div>
                 <div class="faq-answer">
                     Если в течение 15-20 минут вы не получили выплату или скин, смело обращайтесь к нам в поддержку.<br><br>
-                    Самым быстрым вариантом решения проблемы будет способ обратиться в поддержку через JivoChat, который находится в правом нижнем углу. Также вы можете отправить нам электронное письмо по адресу support@aim.market — мы также рассмотрим ваше обращение.
+                    Самым быстрым вариантом решения проблемы будет способ обратиться в поддержку через Telegram, который находится в правом нижнем углу.
                 </div>
             </div>
 
@@ -576,6 +659,67 @@
     </div>
 </div>
 
+<!-- СТРАНИЦА ПОДДЕРЖКИ -->
+<div class="page" id="supportPage">
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1 style="font-size: 34px; font-weight: 800; color: #fff;">
+                Служба <span style="color: #2ecc71;">поддержки</span>
+            </h1>
+            <p style="color: #8a8d99; margin-top: 8px; font-size: 16px;">
+                Мы всегда готовы помочь вам с любыми вопросами
+            </p>
+        </div>
+
+        <div class="support-container">
+            <div class="support-card">
+                <div class="icon-big">💬</div>
+                <h2>Как связаться с нами?</h2>
+                <p>
+                    Выберите удобный для вас способ связи. Наши специалисты ответят на все ваши вопросы
+                    в кратчайшие сроки. Мы работаем ежедневно с 10:00 до 22:00 по МСК.
+                </p>
+                <div class="support-channels">
+                    <a href="https://t.me/ikiawka" target="_blank" class="support-channel">
+                        <div class="channel-icon">📱</div>
+                        <div class="channel-name">Telegram</div>
+                        <div class="channel-desc">Быстрый ответ</div>
+                    </a>
+                    <a href="mailto:support@emeraldmarket.ru" class="support-channel">
+                        <div class="channel-icon">📧</div>
+                        <div class="channel-name">Email</div>
+                        <div class="channel-desc">support@emeraldmarket.ru</div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="support-card" style="border-color: #2ecc71;">
+                <div class="icon-big">📋</div>
+                <h2>Частые вопросы</h2>
+                <p style="margin-bottom: 16px;">
+                    Перед обращением в поддержку, пожалуйста, ознакомьтесь с нашим <a href="#" onclick="navigateTo('faq'); return false;" style="color: #2ecc71; text-decoration: none; font-weight: 600;">FAQ</a>.
+                    Возможно, ответ на ваш вопрос уже есть там.
+                </p>
+                <p style="color: #8a8d99; font-size: 14px;">
+                    Среднее время ответа: 5-15 минут
+                </p>
+            </div>
+
+            <div class="support-card">
+                <div class="icon-big">🕐</div>
+                <h2>Время работы</h2>
+                <p>
+                    <strong style="color: #fff;">Пн-Пт:</strong> 10:00 - 22:00 (МСК)<br>
+                    <strong style="color: #fff;">Сб-Вс:</strong> 12:00 - 20:00 (МСК)
+                </p>
+                <p style="margin-top: 12px; color: #8a8d99; font-size: 14px;">
+                    Вне рабочего времени ответ может занять до 24 часов
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
 </div>
 
 <footer class="footer">
@@ -589,11 +733,11 @@
             <div class="col">
                 <h4>Помощь</h4>
                 <a onclick="navigateTo('faq')">FAQ</a>
-                <a href="#">Поддержка</a>
+                <a onclick="navigateTo('support')">Поддержка</a>
             </div>
             <div class="col">
                 <h4>Контакты</h4>
-                <a href="#">Telegram</a>
+                <a href="https://t.me/ikiawka" target="_blank">Telegram</a>
                 <a href="#">VK</a>
             </div>
             <div class="col">
