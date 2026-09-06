@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EMERALD Market</title>
-    
+
     <!-- Yandex.Metrika counter -->
     <script type="text/javascript">
         (function(m,e,t,r,i,k,a){
@@ -18,13 +18,13 @@
     </script>
     <noscript><div><img src="https://mc.yandex.ru/watch/112295525" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
     <!-- /Yandex.Metrika counter -->
-    
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; font-family: 'Inter', sans-serif; background: #0a0f0d; color: #e4e6eb; overflow-x: hidden; }
-        
+
         body.light { background: #f0f5f1; color: #1a1a2e; }
-        
+
         body.light .header { background: #e0f0e4; border-bottom-color: #d0d4da; }
         body.light .nav a { color: #555; }
         body.light .nav a.active { color: #2ecc71; }
@@ -50,6 +50,9 @@
         body.light .setting-row input[type="text"] { background: #f5f6fa; border-color: #d0d4da; color: #333; }
         body.light .setting-row .toggle-btn { background: #f5f6fa; border-color: #d0d4da; color: #555; }
         body.light .setting-row .toggle-btn.active { background: #2ecc71; border-color: #2ecc71; color: #ffffff; }
+        body.light .faq-item { background: #ffffff; border-color: #d0d4da; }
+        body.light .faq-question { color: #333; }
+        body.light .faq-answer { color: #555; border-top-color: #e0e4ea; }
 
         .wrapper { display: flex; flex-direction: column; min-height: 100vh; position: relative; z-index: 1; }
         .content { flex: 1; }
@@ -172,7 +175,7 @@
         .footer { background: #0d0e14; border-top: 1px solid #1c1d24; padding: 40px 0 24px; }
         .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 30px; }
         .footer-grid .col h4 { color: #e4e6eb; margin-bottom: 12px; font-size: 16px; }
-        .footer-grid .col a { display: block; color: #8a8d99; font-size: 14px; padding: 4px 0; cursor: pointer; }
+        .footer-grid .col a { display: block; color: #8a8d99; font-size: 14px; padding: 4px 0; cursor: pointer; text-decoration: none; }
         .footer-grid .col a:hover { color: #2ecc71; }
         .footer-bottom { text-align: center; margin-top: 32px; padding-top: 20px; border-top: 1px solid #1c1d23; color: #6a6d7a; font-size: 14px; }
 
@@ -215,6 +218,42 @@
         .modal-content p { font-size: 16px; margin-bottom: 24px; color: #b2b4bb; }
         .modal-content .btn { width: 100%; }
 
+        /* ===== FAQ ===== */
+        .faq-section { margin-top: 30px; }
+        .faq-item { background: #14161c; border: 1px solid #26282f; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: #e4e6eb;
+            user-select: none;
+            transition: background 0.2s;
+        }
+        .faq-question:hover { background: #1c1d23; }
+        .faq-question .arrow { transition: transform 0.3s; font-size: 18px; color: #2ecc71; }
+        .faq-item.open .faq-question .arrow { transform: rotate(180deg); }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.3s ease;
+            padding: 0 20px;
+            color: #b2b4bb;
+            font-size: 14px;
+            line-height: 1.7;
+            border-top: 1px solid transparent;
+        }
+        .faq-item.open .faq-answer {
+            max-height: 600px;
+            padding: 16px 20px 20px;
+            border-top-color: #26282f;
+        }
+        .faq-answer a { color: #2ecc71; text-decoration: none; }
+        .faq-answer a:hover { text-decoration: underline; }
+
         @media (max-width: 992px) { .sell-layout { flex-direction: column; } .sell-sidebar { width: 100%; min-width: unset; position: static; } .skin-grid-sell { grid-template-columns: repeat(3, 1fr); } .profile-layout { flex-direction: column; } .profile-left { width: 100%; min-width: unset; } .profile-cards { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 600px) { .skin-grid-sell { grid-template-columns: repeat(2, 1fr); } }
     </style>
@@ -241,6 +280,7 @@
             <a class="active" data-page="sell">Продать скины</a>
             <a data-page="market">Купить скины</a>
             <a data-page="profile">Профиль</a>
+            <a data-page="faq">FAQ</a>
         </nav>
         <div class="header-actions" id="headerActions">
             <a href="/auth/steam" class="btn btn-steam">Войти через Steam</a>
@@ -256,7 +296,7 @@
         <div class="sell-hero">
             <h1>Продавайте скины <span>Counter Strike 2</span> выгодно</h1>
         </div>
-        
+
         <div class="sell-layout">
             <div class="sell-main">
                 <div class="filters-row">
@@ -270,7 +310,7 @@
                     </select>
                     <button class="btn-outline" style="border-radius: 8px; padding: 8px 14px;">Выбрать все</button>
                 </div>
-                
+
                 <div class="skin-grid-sell" id="sellSkinGrid">
                     <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #8a8d99;">
                         Введите Trade URL в панели справа и нажмите «Сохранить»<br>
@@ -281,7 +321,7 @@
 
             <div class="sell-sidebar">
                 <h3>Выбрано 0 скинов на 0,00 ₽</h3>
-                
+
                 <div class="sidebar-section">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                         <label style="margin-bottom: 0;">🔗 Trade URL</label>
@@ -333,7 +373,7 @@
                         <div class="profile-name" id="profileName"></div>
                         <div class="profile-balance">0,00 ₽</div>
                     </div>
-                    
+
                     <div class="profile-tabs">
                         <div class="profile-tab active" data-tab="transactions">Транзакции</div>
                         <div class="profile-tab" data-tab="exchanges">Обмены</div>
@@ -341,7 +381,7 @@
                         <div class="profile-tab" data-tab="sessions">Сессии</div>
                         <div class="profile-tab" data-tab="api">API</div>
                     </div>
-                    
+
                     <div class="profile-settings">
                         <div class="setting-row">
                             <input type="text" id="profileTradeUrl" placeholder="Trade URL">
@@ -434,7 +474,139 @@
     </div>
 </div>
 
+<!-- СТРАНИЦА FAQ -->
+<div class="page" id="faqPage">
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1 style="font-size: 34px; font-weight: 800; color: #fff;">
+                Часто задаваемые <span style="color: #2ecc71;">вопросы</span>
+            </h1>
+            <p style="color: #8a8d99; margin-top: 8px; font-size: 16px;">
+                Ответы на самые популярные вопросы о нашей платформе
+            </p>
+        </div>
+
+        <div class="faq-section">
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>Какие у вас гарантии?</span>
+                    <span class="arrow">▾</span>
+                </div>
+                <div class="faq-answer">
+                    Мы совсем недавно запустились, однако имеем за плечами огромный опыт в работе со скинами Steam и нацелены на долгосрочные результаты, кратковременная прибыль — это не про нас. Также вы можете обратить внимание, что мы активно вкладываемся в маркетинг для роста аудитории. А <a href="https://t.me/emerald_mrkt/14" target="_blank">здесь</a> вы можете увидеть отзывы других пользователей либо оставить свой, за что мы будем премного благодарны.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>Как быстро происходит выплата?</span>
+                    <span class="arrow">▾</span>
+                </div>
+                <div class="faq-answer">
+                    Так как Steam ввели новые правила в систему обмена под названием «Trade Protection». Выплаты осуществляются через 7 дней после совершения обмена, во время того как истекает срок защиты обменов в Steam. Выплата приходит, как правило, за 5-10 минут.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>Что будет, если я отменю обмен при покупке скинов?</span>
+                    <span class="arrow">▾</span>
+                </div>
+                <div class="faq-answer">
+                    Если вы отмените обмен, который ещё не состоялся в Steam, средства вернутся на ваш баланс в полном объёме.<br><br>
+                    В случае, если успешная покупка была отменена через систему Trade Protected Items, возврат средств не предусмотрен. На нашем сайте представлены предметы от разных поставщиков. Отмена купленного предмета несёт за собой дополнительные издержки и риски, кроме того, подобные действия могут быть использованы для манипуляции с ценами.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>Как быстро приходит скин после покупки?</span>
+                    <span class="arrow">▾</span>
+                </div>
+                <div class="faq-answer">
+                    Если скин не находится в статусе холда, тогда примерное время ожидание его составит 5 минут, хоть и чаще это еще быстрее.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>Есть ли у вас бонусы?</span>
+                    <span class="arrow">▾</span>
+                </div>
+                <div class="faq-answer">
+                    Мы еще работаем над системой бонусов, однако в наших соц. сетях — VK и Telegram мы публикуем промокоды, проводим конкурсы, а также рассказываем о других приятных нововведениях на сайте.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>Что делать, если не пришли деньги или скин?</span>
+                    <span class="arrow">▾</span>
+                </div>
+                <div class="faq-answer">
+                    Если в течение 15-20 минут вы не получили выплату или скин, смело обращайтесь к нам в поддержку.<br><br>
+                    Самым быстрым вариантом решения проблемы будет способ обратиться в поддержку через JivoChat, который находится в правом нижнем углу. Также вы можете отправить нам электронное письмо по адресу support@aim.market — мы также рассмотрим ваше обращение.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>Мой предмет недоступен к продаже!</span>
+                    <span class="arrow">▾</span>
+                </div>
+                <div class="faq-answer">
+                    Такое случается и на это есть несколько причин:<br><br>
+                    1. Ваш предмет слишком дешевый<br>
+                    2. У вашего скина последнее время слишком нестабильная цена — этим самым мы защищаемся от абуза скинов.<br>
+                    3. Мы приняли слишком много таких же скинов за последнее время.<br><br>
+                    Если все-таки вы считаете, что ваш скин не подходит ни под один параметр — обращайтесь к нам в поддержку, мы предложим цену за ваш предмет.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>Вы берете комиссию?</span>
+                    <span class="arrow">▾</span>
+                </div>
+                <div class="faq-answer">
+                    Это зависит от выбранного варианта выплаты или пополнения. Все проценты видны до начала процесса продажи или покупки, вся информация прозрачна.
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="col">
+                <h4>Продажа</h4>
+                <a onclick="navigateTo('sell')">Продать скины</a>
+                <a onclick="navigateTo('market')">Купить скины</a>
+            </div>
+            <div class="col">
+                <h4>Помощь</h4>
+                <a onclick="navigateTo('faq')">FAQ</a>
+                <a href="#">Поддержка</a>
+            </div>
+            <div class="col">
+                <h4>Контакты</h4>
+                <a href="#">Telegram</a>
+                <a href="#">VK</a>
+            </div>
+            <div class="col">
+                <h4>Информация</h4>
+                <a href="#">Политика конфиденциальности</a>
+                <a href="#">Пользовательское соглашение</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © 2025 EMERALD Market. Все права защищены.
+        </div>
+    </div>
+</footer>
 
 </div>
 
@@ -491,7 +663,7 @@ function updateUserUI() {
 async function loadSettings() {
     const response = await fetch('/api/get-settings');
     const data = await response.json();
-    
+
     if (data.theme === 'light') {
         document.body.classList.add('light');
         document.getElementById('themeToggle').classList.remove('active');
@@ -501,7 +673,7 @@ async function loadSettings() {
         document.getElementById('themeToggle').classList.add('active');
         document.getElementById('themeToggleLight').classList.remove('active');
     }
-    
+
     if (data.rain) {
         document.getElementById('rainContainer').style.display = 'block';
         document.getElementById('rainToggle').classList.add('active');
@@ -564,7 +736,7 @@ async function loadTradeUrl() {
 async function saveTradeUrl() {
     const url = document.getElementById('sellTradeUrl').value.trim();
     if (!url) { showModal('Ошибка', 'Введите Trade URL!'); return; }
-    
+
     document.getElementById('profileTradeUrl').value = url;
     await fetch('/api/save-trade-url', {
         method: 'POST',
@@ -578,7 +750,7 @@ async function saveTradeUrl() {
 async function saveProfileTradeUrl() {
     const url = document.getElementById('profileTradeUrl').value.trim();
     if (!url) { showModal('Ошибка', 'Введите Trade URL!'); return; }
-    
+
     document.getElementById('sellTradeUrl').value = url;
     await fetch('/api/save-trade-url', {
         method: 'POST',
@@ -922,10 +1094,23 @@ document.querySelectorAll('.profile-tab').forEach(tab => {
     });
 });
 
+// ===== FAQ =====
+function toggleFaq(element) {
+    const item = element.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+
+    // Закрываем все
+    document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('open'));
+
+    if (!isOpen) {
+        item.classList.add('open');
+    }
+}
+
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
     fetchUser();
-    
+
     const container = document.getElementById('rainContainer');
     for (let i = 0; i < 80; i++) {
         const drop = document.createElement('div');
