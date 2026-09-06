@@ -176,7 +176,7 @@
         .footer-grid .col a:hover { color: #2ecc71; }
         .footer-bottom { text-align: center; margin-top: 32px; padding-top: 20px; border-top: 1px solid #1c1d23; color: #6a6d7a; font-size: 14px; }
 
-        /* ===== В РАЗРАБОТКЕ (показывается только внутри активной вкладки) ===== */
+        /* ===== В РАЗРАБОТКЕ ===== */
         .in-development {
             font-size: 48px;
             font-weight: 900;
@@ -186,10 +186,7 @@
             text-transform: uppercase;
             text-shadow: 0 0 15px rgba(46, 204, 113, 0.5);
         }
-        body.light .in-development {
-            color: #2ecc71;
-            text-shadow: none;
-        }
+        body.light .in-development { color: #2ecc71; text-shadow: none; }
 
         /* ===== МОДАЛКИ ===== */
         .modal-overlay {
@@ -213,18 +210,9 @@
             box-shadow: 0 0 40px rgba(46, 204, 113, 0.4);
         }
         body.light .modal-content { background: #ffffff; border-color: #2ecc71; color: #333; }
-        .modal-content h2 {
-            font-size: 26px;
-            font-weight: 900;
-            margin-bottom: 12px;
-            color: #fff;
-        }
+        .modal-content h2 { font-size: 26px; font-weight: 900; margin-bottom: 12px; color: #fff; }
         body.light .modal-content h2 { color: #2ecc71; }
-        .modal-content p {
-            font-size: 16px;
-            margin-bottom: 24px;
-            color: #b2b4bb;
-        }
+        .modal-content p { font-size: 16px; margin-bottom: 24px; color: #b2b4bb; }
         .modal-content .btn { width: 100%; }
 
         @media (max-width: 992px) { .sell-layout { flex-direction: column; } .sell-sidebar { width: 100%; min-width: unset; position: static; } .skin-grid-sell { grid-template-columns: repeat(3, 1fr); } .profile-layout { flex-direction: column; } .profile-left { width: 100%; min-width: unset; } .profile-cards { grid-template-columns: repeat(2, 1fr); } }
@@ -304,14 +292,10 @@
                     <button class="btn" style="width: 100%; margin-top: 8px;" onclick="saveTradeUrl()">Сохранить</button>
                 </div>
 
-                <div class="sidebar-section">
-                    <label>Введите промокод</label>
-                    <input type="text" placeholder="В разработке">
-                    <button class="btn" style="width: 100%; margin-top: 8px;">Применить</button>
-                </div>
+                <!-- ПРОМОКОД УБРАН -->
 
                 <div class="sidebar-section">
-                    <label>Выберите метод вывода(В РАЗРАБОТКЕ)</label>
+                    <label>Выберите метод вывода</label>
                     <div class="payment-methods">
                         <button class="pay-btn active">VISA</button>
                         <button class="pay-btn">МИР</button>
@@ -321,7 +305,7 @@
                 </div>
 
                 <div class="info-box">
-                 <strong></strong>
+                    Вы мгновенно получите деньги на баланс сайта и сразу сможете использовать их для покупки скинов. <strong>Бонус: доступны на выходные скидки. Вывод средств возможен через 7 дней после обмена.</strong>
                 </div>
 
                 <div class="sidebar-section">
@@ -401,11 +385,11 @@
                         <div class="profile-card">
                             <div class="icon">🛡️</div>
                             <div class="value">Отсутствует</div>
-                            <div class="label">КУС верификация (в разработке)
-                            </div>
+                            <div class="label">КУС верификация</div>
                         </div>
                     </div>
 
+                    <!-- ТРАНЗАКЦИИ: таблица, остальное В РАЗРАБОТКЕ -->
                     <div class="profile-content-section active" id="section-transactions">
                         <div class="profile-transactions">
                             <h3>Транзакции</h3>
@@ -428,19 +412,19 @@
                     </div>
 
                     <div class="profile-content-section" id="section-exchanges">
-                        <div class="in-development"></div>
+                        <div class="in-development">В РАЗРАБОТКЕ</div>
                     </div>
 
                     <div class="profile-content-section" id="section-verification">
-                        <div class="in-development"></div>
+                        <div class="in-development">В РАЗРАБОТКЕ</div>
                     </div>
 
                     <div class="profile-content-section" id="section-sessions">
-                        <div class="in-development"></div>
+                        <div class="in-development">В РАЗРАБОТКЕ</div>
                     </div>
 
                     <div class="profile-content-section" id="section-api">
-                        <div class="in-development"></div>
+                        <div class="in-development">В РАЗРАБОТКЕ</div>
                     </div>
                 </div>
             </div>
@@ -448,11 +432,13 @@
     </div>
 </div>
 
-<!-- ДРУГИЕ СТРАНИЦЫ -->
+<!-- СТРАНИЦА КУПИТЬ СКИНЫ -->
 <div class="page" id="marketPage">
     <div class="container">
-        <h2 style="font-size: 34px; font-weight: 700;">На данный момент</h2>
-        <p style="color:#8a8d99; margin-bottom:20px;">Скинов для продажи нет!</p>
+        <div style="text-align: center; padding: 150px 0;">
+            <h2 style="font-size: 36px; font-weight: 900; color: #2ecc71; margin-bottom: 16px;">На данный момент</h2>
+            <p style="font-size: 24px; color: #8a8d99;">Скинов для продажи нет!</p>
+        </div>
     </div>
 </div>
 
