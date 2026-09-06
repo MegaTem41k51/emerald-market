@@ -21,61 +21,64 @@
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; font-family: 'Inter', sans-serif; background: #0a0f0d; color: #e4e6eb; overflow-x: hidden; }
+        html, body { height: 100%; font-family: 'Inter', sans-serif; background: #0b0c10; color: #e4e6eb; overflow-x: hidden; }
         
-        body.light { background: #f0f5f1; color: #1a1a2e; }
-        
-        body.light .header { background: #e0f0e4; border-bottom-color: #d0d4da; }
+        body.light { background: #e8ecf1; color: #1a1a2e; }
+        body.light .header { background: #f0f2f5; border-bottom-color: #d0d4da; }
         body.light .nav a { color: #555; }
-        body.light .nav a.active { color: #2ecc71; }
+        body.light .nav a.active { color: #a855f7; }
         body.light .logo span { color: #888; }
-        body.light .steam-user { background: #ffffff; border-color: #d0d4da; }
+        body.light .steam-user { background: #fff; border-color: #d0d4da; }
         body.light .steam-name { color: #333; }
         body.light .sell-hero h1 { color: #333; }
-        body.light .profile-avatar-box { background: #ffffff; border-color: #d0d4da; }
+        body.light .profile-avatar-box { background: #fff; border-color: #d0d4da; }
         body.light .profile-avatar-box div { color: #333; }
-        body.light .profile-balance { color: #2ecc71; }
-        body.light .profile-tabs { background: #ffffff; border-color: #d0d4da; }
+        body.light .profile-balance { color: #a855f7; }
+        body.light .profile-tabs { background: #fff; border-color: #d0d4da; }
         body.light .profile-tab { color: #555; border-bottom-color: #e0e4ea; }
-        body.light .profile-tab.active { background: #2ecc71; color: #ffffff; }
-        body.light .profile-card { background: #ffffff; border-color: #d0d4da; }
+        body.light .profile-tab.active { background: #a855f7; color: #fff; }
+        body.light .profile-card { background: #fff; border-color: #d0d4da; }
         body.light .profile-card .value { color: #333; }
-        body.light .profile-transactions { background: #ffffff; border-color: #d0d4da; }
+        body.light .profile-transactions { background: #fff; border-color: #d0d4da; }
         body.light .transaction-table th, body.light .transaction-table td { border-bottom-color: #e0e4ea; color: #666; }
         body.light .transaction-table th { color: #333; }
-        body.light .footer { background: #e0f0e4; border-top-color: #d0d4da; }
+        body.light .footer { background: #f0f2f5; border-top-color: #d0d4da; }
         body.light .footer-grid .col a { color: #555; }
         body.light .footer-bottom { color: #999; }
-        body.light .profile-settings { background: #ffffff; border-color: #d0d4da; }
-        body.light .setting-row input[type="text"] { background: #f5f6fa; border-color: #d0d4da; color: #333; }
-        body.light .setting-row .toggle-btn { background: #f5f6fa; border-color: #d0d4da; color: #555; }
-        body.light .setting-row .toggle-btn.active { background: #2ecc71; border-color: #2ecc71; color: #ffffff; }
 
         .wrapper { display: flex; flex-direction: column; min-height: 100vh; position: relative; z-index: 1; }
         .content { flex: 1; }
         .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
 
+        .rain-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+        .rain { position: absolute; width: 2px; background: linear-gradient(to bottom, rgba(168, 85, 247, 0.1), rgba(168, 85, 247, 0.5)); animation: rainFall linear infinite; }
+        body.light .rain { background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5)); }
+        @keyframes rainFall { 0% { transform: translateY(-100vh) rotate(10deg); opacity: 0.3; } 100% { transform: translateY(100vh) rotate(10deg); opacity: 0.8; } }
+        .rain-slow { animation-duration: 3s; }
+        .rain-medium { animation-duration: 2s; }
+        .rain-fast { animation-duration: 1.2s; }
+
         .header { background: #0d0e14; border-bottom: 1px solid #1c1d24; padding: 12px 0; position: sticky; top: 0; z-index: 100; }
         .header-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-        .logo { font-size: 24px; font-weight: 800; color: #2ecc71; cursor: pointer; display: flex; align-items: center; gap: 6px; text-decoration: none; }
+        .logo { font-size: 24px; font-weight: 800; color: #a855f7; cursor: pointer; display: flex; align-items: center; gap: 6px; text-decoration: none; }
         .logo span { color: #8a8d99; font-weight: 400; }
         .logo::before { content: '◆'; font-size: 20px; }
 
         .nav { display: flex; gap: 28px; font-weight: 500; font-size: 15px; flex-wrap: wrap; }
         .nav a { color: #b2b4bb; cursor: pointer; padding: 4px 0; border-bottom: 2px solid transparent; text-decoration: none; transition: 0.2s; }
-        .nav a:hover { color: #2ecc71; }
-        .nav a.active { color: #ffffff; border-bottom-color: #2ecc71; }
-        body.light .nav a.active { color: #2ecc71; border-bottom-color: #2ecc71; }
+        .nav a:hover { color: #a855f7; }
+        .nav a.active { color: #fff; border-bottom-color: #a855f7; }
+        body.light .nav a.active { color: #a855f7; border-bottom-color: #a855f7; }
         .header-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 
-        .btn { background: #2ecc71; color: #0b0c10 !important; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; border: none; cursor: pointer; transition: 0.2s; }
-        .btn:hover { background: #27ae60; }
+        .btn { background: #a855f7; color: #fff !important; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; border: none; cursor: pointer; transition: 0.2s; }
+        .btn:hover { background: #9333ea; }
         .btn-outline { background: transparent; color: #b2b4bb !important; border: 1px solid #2c2e36; padding: 7px 18px; border-radius: 6px; font-weight: 500; font-size: 13px; cursor: pointer; }
-        .btn-outline:hover { border-color: #2ecc71; color: #2ecc71 !important; }
+        .btn-outline:hover { border-color: #a855f7; color: #a855f7 !important; }
         .btn-steam { background: #171a21; color: #fff; border: 1px solid #66c0f4; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; }
 
         .steam-user { display: flex; align-items: center; gap: 10px; background: #1c1d23; padding: 4px 12px 4px 4px; border-radius: 30px; border: 1px solid #2c2e36; cursor: pointer; }
-        .steam-user:hover { border-color: #2ecc71; }
+        .steam-user:hover { border-color: #a855f7; }
         .steam-avatar { width: 32px; height: 32px; border-radius: 50%; background-size: cover; background-position: center; flex-shrink: 0; }
         .steam-name { font-size: 13px; font-weight: 500; color: #e4e6eb; }
         .steam-logout { background: none; border: none; color: #8a8d99; font-size: 14px; padding: 0 4px; }
@@ -86,7 +89,7 @@
         /* ===== СТРАНИЦА ПРОДАЖИ ===== */
         .sell-hero { text-align: center; margin-bottom: 40px; }
         .sell-hero h1 { font-size: 34px; font-weight: 800; color: #fff; }
-        .sell-hero h1 span { color: #2ecc71; }
+        .sell-hero h1 span { color: #a855f7; }
 
         .sell-layout { display: flex; gap: 24px; align-items: flex-start; }
         .sell-main { flex: 1; }
@@ -94,42 +97,42 @@
         .filters-row { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
         .filter-select, .filter-input { background: #14161c; border: 1px solid #26282f; border-radius: 8px; padding: 8px 12px; color: #e4e6eb; font-size: 14px; outline: none; }
         .filter-input { flex: 1; min-width: 200px; }
-        body.light .filter-select, body.light .filter-input { background: #ffffff; border-color: #d0d4da; color: #333; }
+        body.light .filter-select, body.light .filter-input { background: #fff; border-color: #d0d4da; color: #333; }
 
         .skin-grid-sell { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
         .sell-skin-card { background: #14161c; border: 1px solid #26282f; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; cursor: pointer; position: relative; }
-        .sell-skin-card:hover { border-color: #2ecc71; }
-        .sell-badge { background: rgba(46, 204, 113, 0.15); color: #2ecc71; font-size: 11px; padding: 2px 8px; border-radius: 6px; position: absolute; top: 8px; right: 8px; font-weight: 600; }
+        .sell-skin-card:hover { border-color: #a855f7; }
+        .sell-badge { background: rgba(168, 85, 247, 0.15); color: #a855f7; font-size: 11px; padding: 2px 8px; border-radius: 6px; position: absolute; top: 8px; right: 8px; font-weight: 600; }
         .sell-skin-card .image { background: #1c1d23; border-radius: 6px; height: 80px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .sell-skin-card .image img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .sell-skin-card .name { font-size: 13px; font-weight: 600; margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .sell-skin-card .price { color: #2ecc71; font-weight: 700; font-size: 15px; margin-top: 4px; }
-        .sell-skin-card .selected-check { position: absolute; top: 8px; left: 8px; width: 20px; height: 20px; border-radius: 50%; border: 2px solid #2ecc71; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; background: #2ecc71; opacity: 0; transition: 0.2s; }
+        .sell-skin-card .price { color: #a855f7; font-weight: 700; font-size: 15px; margin-top: 4px; }
+        .sell-skin-card .selected-check { position: absolute; top: 8px; left: 8px; width: 20px; height: 20px; border-radius: 50%; border: 2px solid #a855f7; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; background: #a855f7; opacity: 0; transition: 0.2s; }
         .sell-skin-card.selected .selected-check { opacity: 1; }
 
         .sell-skin-card.unavailable { cursor: not-allowed; opacity: 0.5; }
         .sell-skin-card.unavailable:hover { border-color: #26282f; }
         .unavailable-badge { background: rgba(231, 76, 60, 0.15); color: #e74c3c; font-size: 10px; padding: 2px 6px; border-radius: 4px; position: absolute; top: 8px; right: 8px; font-weight: 700; }
-        .unavailable-tooltip { display: none; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #14161c; border: 1px solid #2ecc71; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #fff; z-index: 10; width: 200px; text-align: center; }
+        .unavailable-tooltip { display: none; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #14161c; border: 1px solid #a855f7; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #fff; z-index: 10; width: 200px; text-align: center; }
         .sell-skin-card.unavailable:hover .unavailable-tooltip { display: block; }
 
         .sell-sidebar { width: 340px; min-width: 340px; background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 20px; position: sticky; top: 80px; }
         .sell-sidebar h3 { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 16px; }
         .sell-sidebar .total-label { color: #8a8d99; font-size: 14px; margin-bottom: 4px; }
-        .sell-sidebar .total-price { font-size: 24px; font-weight: 800; color: #2ecc71; margin-bottom: 16px; }
+        .sell-sidebar .total-price { font-size: 24px; font-weight: 800; color: #a855f7; margin-bottom: 16px; }
 
         .sidebar-section { margin-bottom: 20px; }
         .sidebar-section label { color: #8a8d99; font-size: 13px; display: block; margin-bottom: 8px; }
         .sidebar-section input[type="text"] { width: 100%; background: #0b0c10; border: 1px solid #26282f; border-radius: 8px; padding: 10px 12px; color: #e4e6eb; font-size: 14px; outline: none; }
-        .sidebar-section input[type="text"]:focus { border-color: #2ecc71; }
-        body.light .sell-sidebar { background: #ffffff; border-color: #d0d4da; }
+        .sidebar-section input[type="text"]:focus { border-color: #a855f7; }
+        body.light .sell-sidebar { background: #fff; border-color: #d0d4da; }
         body.light .sell-sidebar h3 { color: #333; }
         body.light .sidebar-section input[type="text"] { background: #f5f6fa; border-color: #d0d4da; color: #333; }
 
         .payment-methods { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
         .pay-btn { background: #1c1d23; border: 1px solid #26282f; border-radius: 8px; padding: 10px 16px; color: #b2b4bb; font-size: 13px; cursor: pointer; font-weight: 600; }
-        .pay-btn:hover { border-color: #2ecc71; }
-        .pay-btn.active { background: #2ecc71; border-color: #2ecc71; color: #fff; }
+        .pay-btn:hover { border-color: #a855f7; }
+        .pay-btn.active { background: #a855f7; border-color: #a855f7; color: #fff; }
         body.light .pay-btn { background: #f5f6fa; border-color: #d0d4da; color: #555; }
 
         .info-box { background: #1c1d23; border: 1px solid #26282f; border-radius: 8px; padding: 14px; color: #b2b4bb; font-size: 13px; line-height: 1.5; margin-bottom: 12px; }
@@ -137,8 +140,8 @@
         body.light .info-box { background: #f5f6fa; border-color: #d0d4da; color: #555; }
         body.light .info-box strong { color: #333; }
 
-        .sell-final-btn { width: 100%; background: #2ecc71; color: #fff; border: none; border-radius: 8px; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px; }
-        .sell-final-btn:hover { background: #27ae60; }
+        .sell-final-btn { width: 100%; background: #a855f7; color: #fff; border: none; border-radius: 8px; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px; }
+        .sell-final-btn:hover { background: #9333ea; }
 
         /* ===== ПРОФИЛЬ ===== */
         .profile-login-box { max-width: 500px; margin: 40px auto; background: #14161c; border: 1px solid #26282f; border-radius: 16px; padding: 48px 40px; text-align: center; }
@@ -150,12 +153,12 @@
         .profile-avatar-box { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 20px; text-align: center; }
         .profile-avatar { width: 96px; height: 96px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 700; color: #0b0c10; flex-shrink: 0; background-size: cover; background-position: center; margin: 0 auto 12px; }
         .profile-name { font-size: 18px; font-weight: 700; color: #fff; }
-        .profile-balance { font-size: 20px; font-weight: 800; color: #2ecc71; margin-top: 8px; }
+        .profile-balance { font-size: 20px; font-weight: 800; color: #a855f7; margin-top: 8px; }
 
         .profile-tabs { background: #14161c; border: 1px solid #26282f; border-radius: 12px; overflow: hidden; }
         .profile-tab { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #b2b4bb; font-size: 14px; cursor: pointer; border-bottom: 1px solid #1c1d23; transition: 0.2s; }
         .profile-tab:hover { background: #1c1d23; color: #fff; }
-        .profile-tab.active { background: #2ecc71; color: #fff; }
+        .profile-tab.active { background: #a855f7; color: #fff; }
 
         .profile-right { flex: 1; }
         .profile-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
@@ -174,29 +177,14 @@
         .setting-row { display: flex; gap: 8px; margin-bottom: 12px; }
         .setting-row input[type="text"] { flex: 1; background: #0b0c10; border: 1px solid #26282f; border-radius: 8px; padding: 8px 12px; color: #e4e6eb; font-size: 13px; outline: none; }
         .setting-row .toggle-btn { padding: 8px 12px; border-radius: 8px; border: 1px solid #26282f; background: transparent; color: #b2b4bb; cursor: pointer; font-size: 12px; }
-        .setting-row .toggle-btn.active { background: #2ecc71; border-color: #2ecc71; color: #fff; }
+        .setting-row .toggle-btn.active { background: #a855f7; border-color: #a855f7; color: #fff; }
 
         .footer { background: #0d0e14; border-top: 1px solid #1c1d24; padding: 40px 0 24px; }
         .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 30px; }
         .footer-grid .col h4 { color: #e4e6eb; margin-bottom: 12px; font-size: 16px; }
         .footer-grid .col a { display: block; color: #8a8d99; font-size: 14px; padding: 4px 0; cursor: pointer; }
-        .footer-grid .col a:hover { color: #2ecc71; }
+        .footer-grid .col a:hover { color: #a855f7; }
         .footer-bottom { text-align: center; margin-top: 32px; padding-top: 20px; border-top: 1px solid #1c1d23; color: #6a6d7a; font-size: 14px; }
-
-        /* ===== В РАЗРАБОТКЕ ===== */
-        .in-development {
-            font-size: 40px;
-            font-weight: 900;
-            color: #2ecc71;
-            text-align: center;
-            padding: 100px 0;
-            text-transform: uppercase;
-            text-shadow: 0 0 15px rgba(46, 204, 113, 0.5);
-        }
-        .in-development.light {
-            color: #1a1a2e;
-            text-shadow: none;
-        }
 
         @media (max-width: 992px) { .sell-layout { flex-direction: column; } .sell-sidebar { width: 100%; min-width: unset; position: static; } .skin-grid-sell { grid-template-columns: repeat(3, 1fr); } .profile-layout { flex-direction: column; } .profile-left { width: 100%; min-width: unset; } .profile-cards { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 600px) { .skin-grid-sell { grid-template-columns: repeat(2, 1fr); } }
@@ -257,11 +245,11 @@
             <div class="sell-sidebar">
                 <h3>Выбрано 0 скинов на 0,00 ₽</h3>
                 
-                <!-- TRADE URL (по центру) -->
+                <!-- TRADE URL -->
                 <div class="sidebar-section">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                         <label style="margin-bottom: 0;">🔗 Trade URL</label>
-                        <a href="https://steamcommunity.com/id/me/tradeoffers/privacy#trade_offer_access_url" target="_blank" style="color: #2ecc71; font-size: 13px; text-decoration: none;">Где взять?</a>
+                        <a href="https://steamcommunity.com/id/me/tradeoffers/privacy#trade_offer_access_url" target="_blank" style="color: #a855f7; font-size: 13px; text-decoration: none;">Где взять?</a>
                     </div>
                     <input type="text" id="sellTradeUrl" placeholder="https://steamcommunity.com/tradeoffer/new/?pa...">
                     <button class="btn" style="width: 100%; margin-top: 8px;" onclick="saveTradeUrl()">Сохранить</button>
@@ -291,7 +279,7 @@
                     <label>Общая стоимость предметов</label>
                     <div style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px;">0,00 ₽</div>
                     <label>Всего к выплате</label>
-                    <div style="font-size: 16px; font-weight: 700; color: #2ecc71;">0,00 ₽</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #a855f7;">0,00 ₽</div>
                 </div>
 
                 <button class="sell-final-btn">Продать</button>
@@ -321,11 +309,11 @@
                     </div>
                     
                     <div class="profile-tabs">
-                        <div class="profile-tab active" data-tab="transactions">Транзакции</div>
-                        <div class="profile-tab" data-tab="exchanges">Обмены</div>
-                        <div class="profile-tab" data-tab="verification">Верификация</div>
-                        <div class="profile-tab" data-tab="sessions">Сессии</div>
-                        <div class="profile-tab" data-tab="api">API</div>
+                        <div class="profile-tab active">Транзакции</div>
+                        <div class="profile-tab">Обмены</div>
+                        <div class="profile-tab">Верификация</div>
+                        <div class="profile-tab">Сессии</div>
+                        <div class="profile-tab">API</div>
                     </div>
                     
                     <div class="profile-settings">
@@ -368,41 +356,23 @@
                         </div>
                     </div>
 
-                    <div class="profile-content-section active" id="section-transactions">
-                        <div class="profile-transactions">
-                            <h3>Транзакции</h3>
-                            <table class="transaction-table">
-                                <thead>
-                                    <tr>
-                                        <th>Сервис</th>
-                                        <th>Дата</th>
-                                        <th>Сумма</th>
-                                        <th>Статус</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td colspan="4" style="text-align: center; padding: 30px; color: #6a6d7a;">Нет транзакций</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="profile-content-section" id="section-exchanges">
-                        <div class="in-development">В РАЗРАБОТКЕ</div>
-                    </div>
-
-                    <div class="profile-content-section" id="section-verification">
-                        <div class="in-development">В РАЗРАБОТКЕ</div>
-                    </div>
-
-                    <div class="profile-content-section" id="section-sessions">
-                        <div class="in-development">В РАЗРАБОТКЕ</div>
-                    </div>
-
-                    <div class="profile-content-section" id="section-api">
-                        <div class="in-development">В РАЗРАБОТКЕ</div>
+                    <div class="profile-transactions">
+                        <h3>Транзакции</h3>
+                        <table class="transaction-table">
+                            <thead>
+                                <tr>
+                                    <th>Сервис</th>
+                                    <th>Дата</th>
+                                    <th>Сумма</th>
+                                    <th>Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="4" style="text-align: center; padding: 30px; color: #6a6d7a;">Нет транзакций</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -418,7 +388,36 @@
     </div>
 </div>
 
+<div class="page" id="adminPage">
+    <div class="container">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+            <h1 style="color:#a855f7; font-size:28px;">Админ-панель</h1>
+            <div>
+                <button class="btn btn-danger" id="adminLogout">Выйти</button>
+                <button class="btn btn-outline" id="adminBack">← На сайт</button>
+            </div>
+        </div>
+        <div class="admin-panel">
+            <h2>Управление слотами скинов</h2>
+            <div id="adminSkinList"></div>
+            <button class="admin-add-btn" id="adminAddSkin">+ Добавить слот</button>
+            <button class="admin-save-btn" id="adminSaveAll" style="margin-top:12px;">Сохранить все</button>
+            <div class="admin-status" id="adminStatus">Сохранено!</div>
+        </div>
+    </div>
 </div>
+
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="col"><h4>EMERALD Market</h4><a href="#">О нас</a><a href="#">Контакты</a></div>
+            <div class="col"><h4>Помощь</h4><a href="#">FAQ</a><a href="#">Гарантии</a></div>
+        </div>
+        <div class="footer-bottom">© 2025-2026 EMERALD Market. Все права защищены.</div>
+    </div>
+</footer>
 
 </div>
 
@@ -530,7 +529,9 @@ async function loadSteamInventory() {
                 ${item.price >= 5 ? `<div class="sell-badge">${item.type || 'Скин'}</div>` : ''}
                 <div class="image">${item.image ? `<img src="${item.image}">` : ''}</div>
                 <div class="name">${item.name}</div>
-                <div class="price" style="color: ${item.price < 5 ? '#e74c3c' : '#2ecc71'};">${item.price < 5 ? 'Недоступно' : '$' + item.price.toFixed(2)}</div>
+                <div class="price" style="color: ${item.price < 5 ? '#e74c3c' : '#a855f7'};">
+                    ${item.price < 5 ? 'Недоступно' : '$' + item.price.toFixed(2)}
+                </div>
                 <div class="selected-check">✓</div>
             </div>
         `).join('');
@@ -541,7 +542,7 @@ async function loadSteamInventory() {
 
 function toggleSteamSkinSelection(index) {
     const item = userInventory[index];
-    if (item.price < 5) return;
+    if (item.price < 5) return; // Недоступные не выбираются
     
     const idx = selectedSteamSkins.findIndex(id => id === item.assetid);
     if (idx > -1) {
@@ -589,45 +590,48 @@ function renderProfile() {
     }
 }
 
-// ===== ВКЛАДКИ ПРОФИЛЯ =====
-document.querySelectorAll('.profile-tab').forEach(tab => {
-    tab.addEventListener('click', function() {
-        const tabName = this.dataset.tab;
-        document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
-        this.classList.add('active');
-        document.querySelectorAll('.profile-content-section').forEach(section => {
-            section.classList.remove('active');
-        });
-        document.getElementById('section-' + tabName).classList.add('active');
-    });
+// ===== АДМИНКА (AAAA) =====
+let secretCode = '';
+document.addEventListener('keydown', function(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    secretCode += e.key;
+    if (secretCode.length > 4) secretCode = secretCode.slice(-4);
+    if (secretCode.toLowerCase() === 'aaaa') {
+        if (currentUser) {
+            navigateTo('admin');
+            renderAdminSkins();
+        } else {
+            alert('Сначала войдите через Steam!');
+        }
+        secretCode = '';
+    }
 });
 
-// ===== ТЕМА И АНИМАЦИЯ (СОХРАНЯЕТСЯ ПРИ F5) =====
+function renderAdminSkins() {
+    const container = document.getElementById('adminSkinList');
+    container.innerHTML = '<div style="color:#8a8d99; padding:20px; text-align:center;">Нет слотов</div>';
+}
+
+// ===== ТЕМА И АНИМАЦИЯ =====
 function setTheme(theme) {
     if (theme === 'light') {
         document.body.classList.add('light');
-        localStorage.setItem('emeraldTheme', 'light');
         document.getElementById('themeToggle').classList.remove('active');
         document.getElementById('themeToggleLight').classList.add('active');
-        document.querySelectorAll('.in-development').forEach(el => el.classList.add('light'));
     } else {
         document.body.classList.remove('light');
-        localStorage.setItem('emeraldTheme', 'dark');
         document.getElementById('themeToggle').classList.add('active');
         document.getElementById('themeToggleLight').classList.remove('active');
-        document.querySelectorAll('.in-development').forEach(el => el.classList.remove('light'));
     }
 }
 
 function setAnimation(on) {
     if (on) {
         document.getElementById('rainContainer').style.display = 'block';
-        localStorage.setItem('emeraldRain', 'on');
         document.getElementById('rainToggle').classList.add('active');
         document.getElementById('rainToggleOff').classList.remove('active');
     } else {
         document.getElementById('rainContainer').style.display = 'none';
-        localStorage.setItem('emeraldRain', 'off');
         document.getElementById('rainToggle').classList.remove('active');
         document.getElementById('rainToggleOff').classList.add('active');
     }
@@ -636,23 +640,6 @@ function setAnimation(on) {
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
     fetchUser();
-    
-    // Проверяем сохраненные настройки
-    const savedTheme = localStorage.getItem('emeraldTheme');
-    const savedRain = localStorage.getItem('emeraldRain');
-    
-    if (savedTheme === 'light') {
-        setTheme('light');
-    } else {
-        setTheme('dark');
-    }
-    
-    if (savedRain === 'off') {
-        setAnimation(false);
-    } else {
-        setAnimation(true);
-    }
-    
     // Создание дождя
     const container = document.getElementById('rainContainer');
     for (let i = 0; i < 80; i++) {
@@ -678,6 +665,25 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         navigateTo('sell');
     });
+    
+    // Профиль: тема
+    document.getElementById('themeToggle').addEventListener('click', function() {
+        setTheme('dark');
+    });
+    document.getElementById('themeToggleLight').addEventListener('click', function() {
+        setTheme('light');
+    });
+
+    // Профиль: анимация
+    document.getElementById('rainToggle').addEventListener('click', function() {
+        setAnimation(true);
+    });
+    document.getElementById('rainToggleOff').addEventListener('click', function() {
+        setAnimation(false);
+    });
+
+    document.getElementById('adminBack').addEventListener('click', function() { navigateTo('sell'); });
+    document.getElementById('adminLogout').addEventListener('click', function() { navigateTo('sell'); });
 });
 </script>
 </body>
