@@ -4,6 +4,7 @@ const passport = require('passport');
 const SteamStrategy = require('passport-steam').Strategy;
 const axios = require('axios');
 const bodyParser = require('body-parser');
+const fs = require('fs');
 const path = require('path');
 
 const app = express();
@@ -13,12 +14,12 @@ const STEAM_API_KEY = process.env.STEAM_API_KEY;
 const SESSION_SECRET = process.env.SESSION_SECRET || 'supersecret';
 const BASE_URL = process.env.BASE_URL || `https://emerald-market-2.onrender.com`;
 
-// РАЗДАЁМ СТАТИКУ
+// Раздаём HTML
 app.use(express.static(__dirname));
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ПРОСТАЯ СЕССИЯ БЕЗ ФАЙЛОВ (MemoryStore)
+// Простая сессия (MemoryStore)
 app.use(session({
     secret: SESSION_SECRET,
     resave: false,
@@ -66,7 +67,6 @@ app.post('/api/get-inventory', async (req, res) => {
     const steamId = String(req.user.id);
 
     try {
-        // Задержка, чтобы Steam не забанил
         await new Promise(r => setTimeout(r, 3000));
 
         const inventoryUrl = `https://steamcommunity.com/inventory/${steamId}/730/2?l=english&count=300`;
