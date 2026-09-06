@@ -4,22 +4,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EMERALD Market</title>
-    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; font-family: 'Inter', sans-serif; background: #0b0c10; color: #e4e6eb; overflow-x: hidden; }
-        
         .rain-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
         .rain { position: absolute; width: 2px; background: linear-gradient(to bottom, rgba(46,204,113,0.1), rgba(46,204,113,0.3)); animation: rainFall linear infinite; }
         @keyframes rainFall { 0% { transform: translateY(-100vh) rotate(10deg); opacity: 0.3; } 100% { transform: translateY(100vh) rotate(10deg); opacity: 0.8; } }
         .rain-slow { animation-duration: 3s; }
         .rain-medium { animation-duration: 2s; }
         .rain-fast { animation-duration: 1.2s; }
-
         .wrapper { display: flex; flex-direction: column; min-height: 100vh; position: relative; z-index: 1; }
         .content { flex: 1; }
         .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
-
         .header { background: #111318; border-bottom: 1px solid #26282f; padding: 12px 0; position: sticky; top: 0; z-index: 100; }
         .header-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
         .logo { font-size: 24px; font-weight: 800; color: #2ecc71; cursor: pointer; display: flex; align-items: center; gap: 10px; text-decoration: none; }
@@ -29,36 +25,27 @@
         .nav a:hover { color: #2ecc71; }
         .nav a.active { color: #2ecc71; border-bottom-color: #2ecc71; }
         .header-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-
         .btn { background: #2ecc71; color: #0b0c10 !important; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; border: none; cursor: pointer; transition: 0.2s; }
         .btn:hover { background: #27ae60; }
-        .btn-outline { background: transparent; color: #b2b4bb !important; border: 1px solid #3a3c46; padding: 7px 18px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; }
         .btn-steam { background: #171a21; color: #fff; border: 1px solid #66c0f4; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; }
-
         .steam-user { display: flex; align-items: center; gap: 10px; background: #1c1d23; padding: 4px 12px 4px 4px; border-radius: 30px; border: 1px solid #2c2e36; cursor: pointer; }
         .steam-user:hover { border-color: #2ecc71; }
         .steam-avatar { width: 32px; height: 32px; border-radius: 50%; background-size: cover; background-position: center; flex-shrink: 0; }
         .steam-name { font-size: 14px; font-weight: 600; color: #e4e6eb; }
         .steam-logout { background: none; border: none; color: #8a8d99; font-size: 14px; padding: 0 4px; }
-
         .page { display: none; padding: 30px 0 60px; }
         .page.active { display: block; }
-
-        /* ===== ПРОДАЖА ===== */
         .sell-title { text-align: center; font-size: 30px; font-weight: 800; color: #fff; margin-bottom: 30px; }
         .sell-layout { display: flex; gap: 24px; }
         .sell-left { flex: 1; }
         .sell-right { width: 380px; min-width: 380px; background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px; }
-
         .filters-row { display: flex; gap: 12px; margin-bottom: 20px; align-items: center; }
         .filter-select { background: #14161c; border: 1px solid #26282f; border-radius: 8px; padding: 10px 12px; color: #e4e6eb; font-size: 14px; outline: none; width: 120px; }
         .filter-search { flex: 1; display: flex; align-items: center; background: #14161c; border: 1px solid #26282f; border-radius: 8px; padding: 10px 12px; }
         .filter-search input { flex: 1; background: transparent; border: none; outline: none; color: #e4e6eb; font-size: 14px; }
-        .filter-search svg { width: 18px; height: 18px; fill: #8a8d99; }
         .select-all-btn { background: #1c1d23; border: 1px solid #26282f; border-radius: 8px; padding: 10px 16px; color: #e4e6eb; font-size: 13px; cursor: pointer; }
         .trade-url-btn { background: #2ecc71; color: #0b0c10; border: none; border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
         .refresh-btn { background: transparent; border: none; color: #8a8d99; font-size: 20px; cursor: pointer; }
-
         .skins-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
         .skin-card { background: #14161c; border: 1px solid #26282f; border-radius: 8px; padding: 10px; position: relative; cursor: pointer; }
         .skin-card:hover { border-color: #2ecc71; }
@@ -69,18 +56,15 @@
         .skin-card .price { font-size: 14px; font-weight: 700; color: #2ecc71; text-align: center; margin-top: 4px; }
         .skin-card.selected { border-color: #2ecc71; }
         .skin-card.selected::after { content: '✓'; position: absolute; top: 8px; left: 8px; background: #2ecc71; color: #0b0c10; width: 20px; height: 20px; border-radius: 50%; font-size: 12px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
-
         .sell-right h3 { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 20px; }
         .promo-input { display: flex; gap: 8px; margin-bottom: 20px; }
         .promo-input input { flex: 1; background: #0b0c10; border: 1px solid #26282f; border-radius: 8px; padding: 12px; color: #e4e6eb; font-size: 14px; }
         .promo-input button { background: #2ecc71; color: #0b0c10; border: none; border-radius: 8px; padding: 12px 20px; font-weight: 700; font-size: 14px; cursor: pointer; }
-
         .payment-methods { display: flex; gap: 8px; margin-bottom: 20px; }
         .pay-method { flex: 1; background: #1c1d23; border: 1px solid #26282f; border-radius: 8px; padding: 12px; text-align: center; cursor: pointer; }
         .pay-method.active { border-color: #2ecc71; }
         .pay-method .icon { font-size: 24px; margin-bottom: 6px; }
         .pay-method .label { font-size: 12px; color: #b2b4bb; }
-
         .sum-box { background: #1c1d23; border: 1px solid #26282f; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
         .sum-box .total { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .sum-box .total .label { color: #8a8d99; font-size: 13px; }
@@ -88,23 +72,17 @@
         .sum-box .final { display: flex; justify-content: space-between; align-items: center; }
         .sum-box .final .label { color: #8a8d99; font-size: 13px; }
         .sum-box .final .value { color: #2ecc71; font-size: 14px; font-weight: 700; }
-
         .sell-btn { width: 100%; background: #2ecc71; color: #0b0c10; border: none; border-radius: 8px; padding: 16px; font-size: 16px; font-weight: 800; cursor: pointer; }
         .sell-btn:hover { background: #27ae60; }
-
         .footer { background: #101116; border-top: 1px solid #26282f; padding: 40px 0 24px; }
         .footer-bottom { text-align: center; color: #6a6d7a; font-size: 14px; }
-
         @media (max-width: 992px) { .sell-layout { flex-direction: column; } .sell-right { width: 100%; min-width: unset; } .skins-grid { grid-template-columns: repeat(3, 1fr); } }
         @media (max-width: 600px) { .skins-grid { grid-template-columns: repeat(2, 1fr); } }
     </style>
 </head>
 <body>
-
 <div class="rain-container" id="rainContainer"></div>
-
 <div class="wrapper">
-
 <header class="header">
     <div class="container header-inner">
         <a href="#" class="logo" id="logoLink">EMERALD<span>Market</span></a>
@@ -118,90 +96,48 @@
         </div>
     </div>
 </header>
-
 <div class="content">
-
-<!-- СТРАНИЦА ПРОДАЖИ -->
 <div class="page active" id="sellPage">
     <div class="container">
         <h1 class="sell-title">Продавайте скины CS2 мгновенно</h1>
-        
         <div class="sell-layout">
             <div class="sell-left">
                 <div class="filters-row">
-                    <select class="filter-select">
-                        <option>CS2</option>
-                        <option>CS:GO</option>
-                    </select>
+                    <select class="filter-select"><option>CS2</option></select>
                     <div class="filter-search">
                         <input type="text" id="marketSearch" placeholder="Поиск по названию">
-                        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
                     </div>
-                    <select class="filter-select">
-                        <option>Сначала дороже</option>
-                        <option>Сначала дешевле</option>
-                    </select>
+                    <select class="filter-select"><option>Сначала дороже</option></select>
                     <button class="select-all-btn">Выбрать все</button>
-                    <button class="trade-url-btn" onclick="toggleTradeUrlInput()">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                        Trade URL
-                    </button>
+                    <button class="trade-url-btn" onclick="toggleTradeUrlInput()">Trade URL</button>
                     <button class="refresh-btn" onclick="loadSteamInventory()">⟳</button>
                 </div>
-                
                 <div class="skins-grid" id="sellSkinGrid">
-                    <div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">
-                        Введите Trade URL и скины появятся здесь
-                    </div>
+                    <div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">Введите Trade URL и скины появятся здесь</div>
                 </div>
             </div>
-            
             <div class="sell-right">
-                <h3>Выбрано <span id="selectedCount">0</span> скинов на <span id="selectedPrice">0,00 ₽</span></h3>
-                
+                <h3>Выбрано <span id="selectedCount">0</span> скинов</h3>
                 <div class="promo-input">
                     <input type="text" placeholder="Введите промокод">
                     <button>Применить</button>
                 </div>
-                
                 <p style="color:#8a8d99; font-size:13px; margin-bottom:12px;">Выберите метод вывода</p>
                 <div class="payment-methods">
-                    <div class="pay-method active">
-                        <div class="icon">💳</div>
-                        <div class="label">МИР</div>
-                    </div>
-                    <div class="pay-method">
-                        <div class="icon">💳</div>
-                        <div class="label">VISA</div>
-                    </div>
-                    <div class="pay-method">
-                        <div class="icon">💵</div>
-                        <div class="label">СБП</div>
-                    </div>
-                    <div class="pay-method">
-                        <div class="icon">🪙</div>
-                        <div class="label">USDT</div>
-                    </div>
+                    <div class="pay-method active"><div class="icon">💳</div><div class="label">МИР</div></div>
+                    <div class="pay-method"><div class="icon">💳</div><div class="label">VISA</div></div>
+                    <div class="pay-method"><div class="icon">💵</div><div class="label">СБП</div></div>
+                    <div class="pay-method"><div class="icon">🪙</div><div class="label">USDT</div></div>
                 </div>
-                
                 <div class="sum-box">
-                    <div class="total">
-                        <span class="label">Общая стоимость предметов</span>
-                        <span class="value">0,00 ₽</span>
-                    </div>
-                    <div class="final">
-                        <span class="label">Всего к выплате</span>
-                        <span class="value">0,00 ₽</span>
-                    </div>
+                    <div class="total"><span class="label">Общая стоимость предметов</span><span class="value">0,00 ₽</span></div>
+                    <div class="final"><span class="label">Всего к выплате</span><span class="value">0,00 ₽</span></div>
                 </div>
-                
                 <button class="sell-btn">Выплатить</button>
             </div>
         </div>
     </div>
 </div>
-
-<!-- ДРУГИЕ СТРАНИЦЫ -->
 <div class="page" id="profilePage">
     <div class="container">
         <div id="profileLoginBox" style="display:block;">
@@ -215,30 +151,22 @@
         <div id="profileContent" style="display:none;">
             <div class="profile-header">
                 <div class="profile-avatar" id="profileAvatar"></div>
-                <div class="profile-info">
-                    <h2 id="profileName"></h2>
-                </div>
+                <div class="profile-info"><h2 id="profileName"></h2></div>
             </div>
         </div>
     </div>
 </div>
-
 <div class="page" id="marketPage">
     <div class="container">
         <h2 style="font-size: 24px; font-weight: 700;">Купить скины</h2>
-        <p style="color:#8a8d99; margin-bottom:20px;">Здесь будут ваши скины</p>
     </div>
 </div>
-
 </div>
-
 </div>
-
 <script>
 let currentUser = null;
 let userInventory = [];
 let selectedSteamSkins = [];
-
 async function fetchUser() {
     const response = await fetch('/api/user');
     const data = await response.json();
@@ -248,30 +176,20 @@ async function fetchUser() {
         renderProfile();
     }
 }
-
 function logoutUser() { window.location.href = '/logout'; }
-
 function updateUserUI() {
     const actions = document.getElementById('headerActions');
     if (currentUser) {
-        actions.innerHTML = `
-            <div class="steam-user" style="cursor:pointer;" onclick="navigateTo('profile')">
-                <div class="steam-avatar" style="background-image:url('${currentUser.avatar}');"></div>
-                <span class="steam-name">${currentUser.name}</span>
-                <button class="steam-logout" onclick="event.stopPropagation(); logoutUser()">✕</button>
-            </div>
-        `;
+        actions.innerHTML = `<div class="steam-user" style="cursor:pointer;" onclick="navigateTo('profile')"><div class="steam-avatar" style="background-image:url('${currentUser.avatar}');"></div><span class="steam-name">${currentUser.name}</span><button class="steam-logout" onclick="event.stopPropagation(); logoutUser()">✕</button></div>`;
     } else {
         actions.innerHTML = `<a href="/auth/steam" class="btn btn-steam">Войти через Steam</a>`;
     }
 }
-
 function navigateTo(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const target = document.getElementById(page + 'Page');
     if (target) target.classList.add('active');
 }
-
 function renderProfile() {
     if (currentUser) {
         document.getElementById('profileLoginBox').style.display = 'none';
@@ -285,7 +203,6 @@ function renderProfile() {
         }
     }
 }
-
 let tradeUrlInput = null;
 function toggleTradeUrlInput() {
     if (!tradeUrlInput) {
@@ -295,11 +212,7 @@ function toggleTradeUrlInput() {
         tradeUrlInput.style.cssText = 'flex:1; background:#0b0c10; border:1px solid #2ecc71; border-radius:8px; padding:10px 12px; color:#e4e6eb; font-size:14px; outline:none;';
         tradeUrlInput.addEventListener('blur', async function() {
             if (this.value.trim()) {
-                await fetch('/api/save-trade-url', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ tradeUrl: this.value.trim() })
-                });
+                await fetch('/api/save-trade-url', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tradeUrl: this.value.trim() }) });
                 loadSteamInventory();
             }
         });
@@ -309,51 +222,28 @@ function toggleTradeUrlInput() {
         tradeUrlInput = null;
     }
 }
-
 async function loadSteamInventory() {
     if (!currentUser) { alert('Пожалуйста, войдите через Steam!'); return; }
     const grid = document.getElementById('sellSkinGrid');
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">⏳ Загружаем ваш инвентарь...</div>';
-
     try {
-        const response = await fetch('/api/get-inventory', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({})
-        });
+        const response = await fetch('/api/get-inventory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
         const data = await response.json();
         if (data.error) { alert(data.error); return; }
         userInventory = data.items;
-        if (userInventory.length === 0) {
-            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">Инвентарь пуст или скрыт.</div>';
-            return;
-        }
-        grid.innerHTML = userInventory.map((item, index) => `
-            <div class="skin-card" onclick="toggleSkinSelection(${index})">
-                <div class="badge">${item.type || 'Скин'}</div>
-                <div class="image">${item.image ? `<img src="${item.image}">` : ''}</div>
-                <div class="name">${item.name}</div>
-                <div class="price">0,00 ₽</div>
-            </div>
-        `).join('');
+        if (userInventory.length === 0) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">Инвентарь пуст или скрыт.</div>'; return; }
+        grid.innerHTML = userInventory.map((item, index) => `<div class="skin-card" onclick="toggleSkinSelection(${index})"><div class="badge">${item.type || 'Скин'}</div><div class="image">${item.image ? `<img src="${item.image}">` : ''}</div><div class="name">${item.name}</div><div class="price">0,00 ₽</div></div>`).join('');
     } catch (error) {
         grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">Ошибка. Попробуй позже.</div>';
     }
 }
-
 function toggleSkinSelection(index) {
     const item = userInventory[index];
     const idx = selectedSteamSkins.findIndex(id => id === item.assetid);
-    if (idx > -1) {
-        selectedSteamSkins.splice(idx, 1);
-        document.querySelectorAll('.skin-card')[index].classList.remove('selected');
-    } else {
-        selectedSteamSkins.push(item.assetid);
-        document.querySelectorAll('.skin-card')[index].classList.add('selected');
-    }
+    if (idx > -1) { selectedSteamSkins.splice(idx, 1); document.querySelectorAll('.skin-card')[index].classList.remove('selected'); }
+    else { selectedSteamSkins.push(item.assetid); document.querySelectorAll('.skin-card')[index].classList.add('selected'); }
     document.getElementById('selectedCount').textContent = selectedSteamSkins.length;
 }
-
 document.addEventListener('DOMContentLoaded', function() {
     fetchUser();
     document.querySelectorAll('.nav a').forEach(el => {
@@ -362,13 +252,8 @@ document.addEventListener('DOMContentLoaded', function() {
             navigateTo(this.dataset.page);
         });
     });
-    document.getElementById('logoLink').addEventListener('click', function(e) {
-        e.preventDefault();
-        navigateTo('sell');
-    });
-
+    document.getElementById('logoLink').addEventListener('click', function(e) { e.preventDefault(); navigateTo('sell'); });
     navigateTo('sell');
-    
     const container = document.getElementById('rainContainer');
     for (let i = 0; i < 80; i++) {
         const drop = document.createElement('div');
