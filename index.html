@@ -24,16 +24,17 @@
         html, body { height: 100%; font-family: 'Inter', sans-serif; background: #0a0f0d; color: #e4e6eb; overflow-x: hidden; }
         
         body.light { background: #f0f5f1; color: #1a1a2e; }
+        
         body.light .header { background: #e0f0e4; border-bottom-color: #d0d4da; }
         body.light .nav a { color: #555; }
         body.light .nav a.active { color: #2ecc71; }
         body.light .logo span { color: #888; }
         body.light .steam-user { background: #ffffff; border-color: #d0d4da; }
         body.light .steam-name { color: #333; }
-        body.light .sell-sidebar { background: #ffffff; border-color: #d0d4da; }
-        body.light .sell-sidebar h3 { color: #333; }
-        body.light .filter-select, body.light .filter-input { background: #ffffff; border-color: #d0d4da; color: #333; }
+        body.light .sell-hero h1 { color: #333; }
         body.light .profile-avatar-box { background: #ffffff; border-color: #d0d4da; }
+        body.light .profile-avatar-box div { color: #333; }
+        body.light .profile-balance { color: #2ecc71; }
         body.light .profile-tabs { background: #ffffff; border-color: #d0d4da; }
         body.light .profile-tab { color: #555; border-bottom-color: #e0e4ea; }
         body.light .profile-tab.active { background: #2ecc71; color: #ffffff; }
@@ -175,6 +176,57 @@
         .footer-grid .col a:hover { color: #2ecc71; }
         .footer-bottom { text-align: center; margin-top: 32px; padding-top: 20px; border-top: 1px solid #1c1d23; color: #6a6d7a; font-size: 14px; }
 
+        /* ===== В РАЗРАБОТКЕ (показывается только внутри активной вкладки) ===== */
+        .in-development {
+            font-size: 48px;
+            font-weight: 900;
+            color: #2ecc71;
+            text-align: center;
+            padding: 100px 0;
+            text-transform: uppercase;
+            text-shadow: 0 0 15px rgba(46, 204, 113, 0.5);
+        }
+        body.light .in-development {
+            color: #2ecc71;
+            text-shadow: none;
+        }
+
+        /* ===== МОДАЛКИ ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-content {
+            background: #14161c;
+            border: 1px solid #2ecc71;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(46, 204, 113, 0.4);
+        }
+        body.light .modal-content { background: #ffffff; border-color: #2ecc71; color: #333; }
+        .modal-content h2 {
+            font-size: 26px;
+            font-weight: 900;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+        body.light .modal-content h2 { color: #2ecc71; }
+        .modal-content p {
+            font-size: 16px;
+            margin-bottom: 24px;
+            color: #b2b4bb;
+        }
+        .modal-content .btn { width: 100%; }
+
         @media (max-width: 992px) { .sell-layout { flex-direction: column; } .sell-sidebar { width: 100%; min-width: unset; position: static; } .skin-grid-sell { grid-template-columns: repeat(3, 1fr); } .profile-layout { flex-direction: column; } .profile-left { width: 100%; min-width: unset; } .profile-cards { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 600px) { .skin-grid-sell { grid-template-columns: repeat(2, 1fr); } }
     </style>
@@ -182,6 +234,15 @@
 <body>
 
 <div class="rain-container" id="rainContainer"></div>
+
+<!-- МОДАЛКА -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal-content">
+        <h2 id="modalTitle">Заголовок</h2>
+        <p id="modalText">Текст</p>
+        <button class="btn" onclick="closeModal()">ОК</button>
+    </div>
+</div>
 
 <div class="wrapper">
 
@@ -399,6 +460,16 @@
 </div>
 
 <script>
+// ===== МОДАЛКА =====
+function showModal(title, text) {
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalText').textContent = text;
+    document.getElementById('modalOverlay').classList.add('show');
+}
+function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('show');
+}
+
 // ===== ЛОГИКА STEAM =====
 let currentUser = null;
 let userInventory = [];
@@ -448,7 +519,7 @@ async function loadTradeUrl() {
 
 async function saveTradeUrl() {
     const url = document.getElementById('sellTradeUrl').value.trim();
-    if (!url) { alert('Введите Trade URL!'); return; }
+    if (!url) { showModal('Ошибка', 'Введите Trade URL!'); return; }
     
     document.getElementById('profileTradeUrl').value = url;
     await fetch('/api/save-trade-url', {
@@ -456,13 +527,13 @@ async function saveTradeUrl() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tradeUrl: url })
     });
-    alert('Trade URL сохранен! Сейчас загрузим скины...');
+    showModal('Успех', 'Trade URL сохранен! Сейчас загрузим скины...');
     loadSteamInventory();
 }
 
 async function saveProfileTradeUrl() {
     const url = document.getElementById('profileTradeUrl').value.trim();
-    if (!url) { alert('Введите Trade URL!'); return; }
+    if (!url) { showModal('Ошибка', 'Введите Trade URL!'); return; }
     
     document.getElementById('sellTradeUrl').value = url;
     await fetch('/api/save-trade-url', {
@@ -470,20 +541,20 @@ async function saveProfileTradeUrl() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tradeUrl: url })
     });
-    alert('Trade URL сохранен! Сейчас загрузим скины...');
+    showModal('Успех', 'Trade URL сохранен! Сейчас загрузим скины...');
     loadSteamInventory();
 }
 
 // ===== ИНВЕНТАРЬ =====
 async function loadSteamInventory() {
-    if (!currentUser) { alert('Пожалуйста, войдите через Steam!'); return; }
+    if (!currentUser) { showModal('Ошибка', 'Пожалуйста, войдите через Steam!'); return; }
     const grid = document.getElementById('sellSkinGrid');
     grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #8a8d99;">⏳ Загружаем ваш инвентарь...</div>';
 
     try {
         const response = await fetch('/api/get-inventory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
         const data = await response.json();
-        if (data.error) { alert(data.error); grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #8a8d99;">Ошибка. Попробуй через 2 минуты.</div>'; return; }
+        if (data.error) { showModal('Ошибка', data.error); return; }
         
         userInventory = data.items;
         if (userInventory.length === 0) {
@@ -584,13 +655,11 @@ function setTheme(theme) {
         localStorage.setItem('emeraldTheme', 'light');
         document.getElementById('themeToggle').classList.remove('active');
         document.getElementById('themeToggleLight').classList.add('active');
-        document.querySelectorAll('.in-development').forEach(el => el.classList.add('light'));
     } else {
         document.body.classList.remove('light');
         localStorage.setItem('emeraldTheme', 'dark');
         document.getElementById('themeToggle').classList.add('active');
         document.getElementById('themeToggleLight').classList.remove('active');
-        document.querySelectorAll('.in-development').forEach(el => el.classList.remove('light'));
     }
 }
 
