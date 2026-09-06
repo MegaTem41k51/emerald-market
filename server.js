@@ -89,8 +89,7 @@ app.post('/api/get-inventory', async (req, res) => {
                         assetid: asset.assetid,
                         name: name,
                         image: desc.icon_url ? `https://community.akamai.steamstatic.com/economy/image/${desc.icon_url}` : '',
-                        type: desc.type || '',
-                        minPrice: MIN_PRICE
+                        type: desc.type || ''
                     });
                 }
             }
