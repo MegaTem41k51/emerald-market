@@ -3,626 +3,474 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Технические работы — EMERALD Market</title>
+    <title>EMERALD Market</title>
+    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; font-family: 'Inter', sans-serif; background: #020205; color: #e4e6eb; overflow-x: hidden; }
+        
+        /* ===== СВЕЧЕНИЕ И ГРАДИЕНТ ===== */
+        .glow-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(46, 204, 113, 0.08), transparent 60%),
+                        radial-gradient(circle at 20% 80%, rgba(168, 85, 247, 0.06), transparent 50%),
+                        #020205;
+            z-index: -1;
+            animation: bgShift 10s ease infinite alternate;
         }
-        html,
-        body {
-            height: 100%;
-            font-family: 'Courier New', Courier, monospace;
-            background: #050a06;
-            color: #b0ffb0;
-            overflow: hidden;
-            position: relative;
+        
+        @keyframes bgShift {
+            0% { transform: scale(1); filter: brightness(1); }
+            100% { transform: scale(1.05); filter: brightness(1.2); }
         }
 
-        /* ===== ЗВЕЗДОПАД ===== */
-        .star-container {
+        /* ===== АНИМИРОВАННАЯ НЕОНОВАЯ РАМКА ===== */
+        .neon-frame {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 10px; left: 10px; right: 10px; bottom: 10px;
+            border: 2px solid rgba(46, 204, 113, 0.3);
+            border-radius: 20px;
             pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
-        }
-        .star {
-            position: absolute;
-            background: #fff;
-            border-radius: 50%;
-            opacity: 0.7;
-            animation: fall linear infinite;
+            z-index: 1000;
+            animation: borderPulse 3s ease-in-out infinite;
         }
 
-        @keyframes fall {
-            0% {
-                transform: translateY(0) translateX(0);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(120vh) translateX(-20vw);
-                opacity: 0;
-            }
+        @keyframes borderPulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(46, 204, 113, 0.3), inset 0 0 10px rgba(46, 204, 113, 0.1); }
+            50% { box-shadow: 0 0 40px rgba(46, 204, 113, 0.8), inset 0 0 20px rgba(46, 204, 113, 0.4); }
         }
 
-        /* ===== ЦЕНТРАЛЬНЫЙ БЛОК ===== */
-        .maintenance-box {
-            position: relative;
-            z-index: 1;
-            max-width: 700px;
-            margin: 0 auto;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 20px;
-        }
-
-        /* ===== ПОИСК ===== */
-        .search-box {
-            position: relative;
-            background: rgba(20, 40, 20, 0.6);
-            border: 1px solid #2b6e2b;
-            border-radius: 6px;
-            margin-bottom: 40px;
-        }
-
-        .search-input {
-            background: transparent;
-            border: none;
-            outline: none;
-            color: #d4ffd4;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 14px;
-            padding: 10px 12px;
-            width: 220px;
-        }
-
-        .search-input::placeholder {
-            color: #7ea87e;
-        }
-
-        .search-dropdown {
-            display: none;
-            position: absolute;
-            top: 110%;
-            left: 0;
-            width: 100%;
-            background: #050a06;
-            border: 1px solid #2b6e2b;
-            border-radius: 6px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 10;
-        }
-
-        .search-dropdown::-webkit-scrollbar {
-            width: 4px;
-        }
-        .search-dropdown::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .search-dropdown::-webkit-scrollbar-thumb {
-            background: #2b6e2b;
-        }
-
-        .country-item {
-            padding: 8px 12px;
-            color: #9fff9f;
-            font-size: 13px;
-            cursor: pointer;
-        }
-
-        .country-item:hover {
-            background: rgba(159, 255, 159, 0.2);
-        }
-
-        /* ===== ЦИФРОВЫЕ ЧАСЫ ===== */
-        .digital-clock {
-            font-size: 120px;
-            font-weight: 900;
-            letter-spacing: 10px;
-            color: #ccffcc;
-            text-shadow:
-                0 0 10px #62c462,
-                0 0 20px #62c462,
-                0 0 40px #2b6e2b,
-                0 0 80px #1a4a1a;
-            margin-bottom: 20px;
-            user-select: none;
-        }
-
-        .clock-label {
-            font-size: 16px;
-            letter-spacing: 4px;
-            color: #7ea87e;
-            margin-bottom: 30px;
-            text-transform: uppercase;
-        }
-
-        /* ===== ОБРАТНЫЙ ТАЙМЕР (ПОД ЧАСАМИ) ===== */
-        .countdown-title {
-            color: #7ea87e;
-            font-size: 14px;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-
-        .countdown {
-            font-size: 50px;
-            font-weight: 900;
-            letter-spacing: 5px;
-            color: #ccffcc;
-            text-shadow:
-                0 0 10px #62c462,
-                0 0 20px #62c462,
-                0 0 40px #2b6e2b;
-            margin-bottom: 40px;
-        }
-
-        /* ===== ТЕКСТ ===== */
-        .maintenance-text {
-            font-size: 22px;
-            line-height: 1.7;
-            color: #d4ffd4;
-            background: rgba(20, 40, 20, 0.6);
-            border: 1px solid #2b6e2b;
-            border-radius: 12px;
-            padding: 30px;
-            text-shadow: 0 0 5px rgba(0, 255, 0, 0.4);
-            backdrop-filter: blur(4px);
-        }
-
-        .maintenance-text .icon {
-            font-size: 48px;
-            margin-bottom: 20px;
-            display: block;
-        }
-
-        .maintenance-text .bold {
-            font-weight: bold;
-            color: #9fff9f;
-        }
-
-        .maintenance-text p {
-            margin-bottom: 12px;
-        }
-
-        /* ===== ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА (ПРАВЫЙ НИЖНИЙ УГОЛ) ===== */
-        .lang-switch {
+        /* ===== ЛЕТАЮЩИЕ ЧАСТИЦЫ ===== */
+        .particles {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 20;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px; height: 4px;
+            background: #2ecc71;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: floatParticle linear infinite;
+        }
+
+        @keyframes floatParticle {
+            0% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) translateX(20px); opacity: 0; }
+        }
+
+        /* ===== НЕОНОВЫЙ ЛОГОТИП ===== */
+        .logo {
+            font-size: 28px;
+            font-weight: 900;
+            color: #2ecc71;
+            text-shadow: 0 0 10px #2ecc71, 0 0 20px #2ecc71, 0 0 40px #2ecc71;
+            animation: logoGlow 2s ease-in-out infinite alternate;
+            cursor: pointer;
             display: flex;
-            gap: 6px;
-            background: rgba(20, 40, 20, 0.6);
-            border: 1px solid #2b6e2b;
-            border-radius: 6px;
-            padding: 4px;
-            cursor: pointer;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
         }
 
-        .lang-btn {
-            background: transparent;
-            border: none;
-            color: #7ea87e;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 14px;
-            font-weight: bold;
-            padding: 8px 12px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: 0.2s;
+        @keyframes logoGlow {
+            0% { text-shadow: 0 0 5px #2ecc71, 0 0 10px #2ecc71; }
+            100% { text-shadow: 0 0 20px #2ecc71, 0 0 40px #2ecc71, 0 0 80px #2ecc71; }
         }
 
-        .lang-btn.active {
-            background: #9fff9f;
-            color: #050a06;
+        .logo span {
+            color: #e4e6eb;
+            font-weight: 400;
             text-shadow: none;
         }
 
-        @media (max-width: 600px) {
-            .digital-clock {
-                font-size: 60px;
-                letter-spacing: 6px;
-                margin-bottom: 20px;
-            }
-            .countdown {
-                font-size: 30px;
-                letter-spacing: 3px;
-            }
-            .maintenance-text {
-                font-size: 16px;
-                padding: 20px;
-            }
-            .search-input {
-                width: 160px;
-            }
-            .lang-switch {
-                bottom: 10px;
-                right: 10px;
-            }
+        /* ===== ПУЛЬСИРУЮЩИЙ ЗАГОЛОВОК ===== */
+        .sell-title {
+            font-size: 36px;
+            font-weight: 900;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px #2ecc71, 0 0 20px #2ecc71;
+            animation: titlePulse 3s ease-in-out infinite;
         }
+
+        @keyframes titlePulse {
+            0%, 100% { text-shadow: 0 0 10px #2ecc71, 0 0 20px #2ecc71; }
+            50% { text-shadow: 0 0 30px #2ecc71, 0 0 60px #2ecc71, 0 0 90px #2ecc71; }
+        }
+
+        /* ===== ОСТАЛЬНОЕ (КАК БЫЛО) ===== */
+        .wrapper { display: flex; flex-direction: column; min-height: 100vh; position: relative; z-index: 1; }
+        .content { flex: 1; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+        .header { background: rgba(10, 10, 15, 0.8); border-bottom: 1px solid rgba(46, 204, 113, 0.2); padding: 12px 0; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
+        .header-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+        .nav { display: flex; gap: 28px; font-weight: 600; font-size: 15px; flex-wrap: wrap; }
+        .nav a { color: #b2b4bb; cursor: pointer; padding: 4px 0; border-bottom: 2px solid transparent; text-decoration: none; transition: 0.2s; }
+        .nav a:hover { color: #2ecc71; text-shadow: 0 0 8px #2ecc71; }
+        .nav a.active { color: #2ecc71; border-bottom-color: #2ecc71; text-shadow: 0 0 8px #2ecc71; }
+        .header-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+
+        .btn { background: linear-gradient(135deg, #2ecc71, #27ae60); color: #0b0c10 !important; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; border: none; cursor: pointer; transition: 0.2s; }
+        .btn:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(46, 204, 113, 0.8); }
+        .btn-steam { background: #171a21; color: #fff; border: 1px solid #66c0f4; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; }
+
+        .steam-user { display: flex; align-items: center; gap: 10px; background: rgba(20, 22, 28, 0.8); padding: 4px 12px 4px 4px; border-radius: 30px; border: 1px solid rgba(46, 204, 113, 0.4); cursor: pointer; }
+        .steam-user:hover { border-color: #2ecc71; box-shadow: 0 0 10px rgba(46, 204, 113, 0.5); }
+        .steam-avatar { width: 32px; height: 32px; border-radius: 50%; background-size: cover; background-position: center; flex-shrink: 0; }
+        .steam-name { font-size: 14px; font-weight: 600; color: #e4e6eb; }
+        .steam-logout { background: none; border: none; color: #8a8d99; font-size: 14px; padding: 0 4px; }
+
+        .page { display: none; padding: 30px 0 60px; }
+        .page.active { display: block; }
+
+        .sell-layout { display: flex; gap: 24px; }
+        .sell-left { flex: 1; }
+        .sell-right { width: 380px; min-width: 380px; background: rgba(20, 22, 28, 0.8); border: 1px solid rgba(46, 204, 113, 0.2); border-radius: 12px; padding: 24px; backdrop-filter: blur(10px); }
+        .filters-row { display: flex; gap: 12px; margin-bottom: 20px; align-items: center; }
+        .filter-select { background: rgba(20, 22, 28, 0.8); border: 1px solid rgba(46, 204, 113, 0.2); border-radius: 8px; padding: 10px 12px; color: #e4e6eb; font-size: 14px; outline: none; width: 120px; }
+        .filter-search { flex: 1; display: flex; align-items: center; background: rgba(20, 22, 28, 0.8); border: 1px solid rgba(46, 204, 113, 0.2); border-radius: 8px; padding: 10px 12px; }
+        .filter-search input { flex: 1; background: transparent; border: none; outline: none; color: #e4e6eb; font-size: 14px; }
+        .select-all-btn { background: rgba(20, 22, 28, 0.8); border: 1px solid rgba(46, 204, 113, 0.2); border-radius: 8px; padding: 10px 16px; color: #e4e6eb; font-size: 13px; cursor: pointer; }
+        .trade-url-btn { background: linear-gradient(135deg, #2ecc71, #27ae60); color: #0b0c10; border: none; border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .refresh-btn { background: transparent; border: none; color: #8a8d99; font-size: 20px; cursor: pointer; }
+        .skins-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .skin-card { background: rgba(20, 22, 28, 0.8); border: 1px solid rgba(46, 204, 113, 0.2); border-radius: 8px; padding: 10px; position: relative; cursor: pointer; transition: 0.3s; }
+        .skin-card:hover { border-color: #2ecc71; box-shadow: 0 0 20px rgba(46, 204, 113, 0.3); transform: translateY(-5px); }
+        .skin-card .badge { position: absolute; top: 8px; right: 8px; background: #a855f7; color: #fff; font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 700; }
+        .skin-card .image { height: 90px; display: flex; align-items: center; justify-content: center; }
+        .skin-card .image img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .skin-card .name { font-size: 12px; font-weight: 600; color: #e4e6eb; text-align: center; margin-top: 6px; }
+        .skin-card .price { font-size: 14px; font-weight: 700; color: #2ecc71; text-align: center; margin-top: 4px; }
+        .skin-card.selected { border-color: #2ecc71; box-shadow: 0 0 20px rgba(46, 204, 113, 0.5); }
+        .skin-card.selected::after { content: '✓'; position: absolute; top: 8px; left: 8px; background: #2ecc71; color: #0b0c10; width: 20px; height: 20px; border-radius: 50%; font-size: 12px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
+        .sell-right h3 { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 20px; }
+        .promo-input { display: flex; gap: 8px; margin-bottom: 20px; }
+        .promo-input input { flex: 1; background: #0b0c10; border: 1px solid rgba(46, 204, 113, 0.2); border-radius: 8px; padding: 12px; color: #e4e6eb; font-size: 14px; }
+        .promo-input button { background: #2ecc71; color: #0b0c10; border: none; border-radius: 8px; padding: 12px 20px; font-weight: 700; font-size: 14px; cursor: pointer; }
+        .payment-methods { display: flex; gap: 8px; margin-bottom: 20px; }
+        .pay-method { flex: 1; background: rgba(20, 22, 28, 0.8); border: 1px solid rgba(46, 204, 113, 0.2); border-radius: 8px; padding: 12px; text-align: center; cursor: pointer; }
+        .pay-method.active { border-color: #2ecc71; }
+        .pay-method .icon { font-size: 24px; margin-bottom: 6px; }
+        .pay-method .label { font-size: 12px; color: #b2b4bb; }
+        .sum-box { background: rgba(20, 22, 28, 0.8); border: 1px solid rgba(46, 204, 113, 0.2); border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+        .sum-box .total { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .sum-box .total .label { color: #8a8d99; font-size: 13px; }
+        .sum-box .total .value { color: #2ecc71; font-size: 18px; font-weight: 700; }
+        .sum-box .final { display: flex; justify-content: space-between; align-items: center; }
+        .sum-box .final .label { color: #8a8d99; font-size: 13px; }
+        .sum-box .final .value { color: #2ecc71; font-size: 14px; font-weight: 700; }
+        .sell-btn { width: 100%; background: linear-gradient(135deg, #2ecc71, #27ae60); color: #0b0c10; border: none; border-radius: 8px; padding: 16px; font-size: 16px; font-weight: 800; cursor: pointer; }
+        .sell-btn:hover { box-shadow: 0 0 30px rgba(46, 204, 113, 0.8); }
+        .footer { background: rgba(10, 10, 15, 0.8); border-top: 1px solid rgba(46, 204, 113, 0.2); padding: 40px 0 24px; }
+        .footer-bottom { text-align: center; color: #6a6d7a; font-size: 14px; text-shadow: 0 0 5px rgba(46, 204, 113, 0.3); }
+        @media (max-width: 992px) { .sell-layout { flex-direction: column; } .sell-right { width: 100%; min-width: unset; } .skins-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 600px) { .skins-grid { grid-template-columns: repeat(2, 1fr); } }
     </style>
 </head>
 <body>
 
-    <!-- ЗВЕЗДОПАД -->
-    <div class="star-container" id="starContainer"></div>
+<!-- НЕОНОВАЯ РАМКА -->
+<div class="neon-frame"></div>
 
-    <!-- ЯЗЫК: В ПРАВОМ НИЖНЕМ УГЛУ -->
-    <div class="lang-switch" id="langSwitch">
-        <button class="lang-btn active" data-lang="ru">RU</button>
-        <button class="lang-btn" data-lang="en">EN</button>
-    </div>
+<!-- АНИМИРОВАННЫЙ ФОН -->
+<div class="glow-bg"></div>
 
-    <div class="maintenance-box">
+<!-- ЛЕТАЮЩИЕ ЧАСТИЦЫ -->
+<div class="particles" id="particles"></div>
 
-        <!-- ПОИСК СТРАН -->
-        <div class="search-box" id="searchBox">
-            <input type="text" class="search-input" id="searchInput" placeholder="Поиск страны..." autocomplete="off">
-            <div class="search-dropdown" id="searchDropdown"></div>
-        </div>
+<div class="wrapper">
 
-        <!-- Часы МСК (по умолчанию) -->
-        <div class="digital-clock" id="clock">00:00:00</div>
-        <div class="clock-label" id="clockLabel">МСК</div>
-
-        <!-- Обратный таймер (ПОД часами) -->
-        <div class="countdown-title">До окончания работ осталось</div>
-        <div class="countdown" id="countdown">--:--:--</div>
-
-        <!-- Текст -->
-        <div class="maintenance-text">
-            <span class="icon">🔧</span>
-            <p class="bold" id="maintenanceTitle">В данный момент могут наблюдаться проблемы с доступом к сайту</p>
-            <p id="maintenanceWork">Работаем над исправлением 🙏</p>
-            <p id="maintenanceSorry">Простите за неудобства</p>
+<header class="header">
+    <div class="container header-inner">
+        <a href="#" class="logo" id="logoLink">EMERALD<span>Market</span></a>
+        <nav class="nav">
+            <a class="active" data-page="sell">Продать скины</a>
+            <a data-page="market">Купить скины</a>
+            <a data-page="profile">Профиль</a>
+        </nav>
+        <div class="header-actions" id="headerActions">
+            <a href="/auth/steam" class="btn btn-steam">Войти через Steam</a>
         </div>
     </div>
+</header>
 
-    <script>
-        // ===== ЯЗЫК =====
-        let currentLang = 'ru';
+<div class="content">
 
-        const translations = {
-            ru: {
-                searchPlaceholder: 'Поиск страны...',
-                clockLabel: 'МСК',
-                countdownTitle: 'До окончания работ осталось',
-                maintenanceTitle: 'В данный момент могут наблюдаться проблемы с доступом к сайту',
-                maintenanceWork: 'Работаем над исправлением 🙏',
-                maintenanceSorry: 'Простите за неудобства'
-            },
-            en: {
-                searchPlaceholder: 'Search country...',
-                clockLabel: 'MSK',
-                countdownTitle: 'Time remaining until the end of work',
-                maintenanceTitle: 'There may be some issues with the site access at the moment',
-                maintenanceWork: 'We are working on fixing it 🙏',
-                maintenanceSorry: 'Sorry for the inconvenience'
-            }
-        };
+<!-- СТРАНИЦА ПРОДАЖИ -->
+<div class="page active" id="sellPage">
+    <div class="container">
+        <h1 class="sell-title">Продавайте скины CS2 мгновенно</h1>
+        
+        <div class="sell-layout">
+            <div class="sell-left">
+                <div class="filters-row">
+                    <select class="filter-select">
+                        <option>CS2</option>
+                        <option>CS:GO</option>
+                    </select>
+                    <div class="filter-search">
+                        <input type="text" id="marketSearch" placeholder="Поиск по названию">
+                    </div>
+                    <select class="filter-select">
+                        <option>Сначала дороже</option>
+                        <option>Сначала дешевле</option>
+                    </select>
+                    <button class="select-all-btn">Выбрать все</button>
+                    <button class="trade-url-btn" onclick="toggleTradeUrlInput()">
+                        Trade URL
+                    </button>
+                    <button class="refresh-btn" onclick="loadSteamInventory()">⟳</button>
+                </div>
+                
+                <div class="skins-grid" id="sellSkinGrid">
+                    <div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">
+                        Введите Trade URL и скины появятся здесь
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sell-right">
+                <h3>Выбрано <span id="selectedCount">0</span> скинов на <span id="selectedPrice">0,00 ₽</span></h3>
+                
+                <div class="promo-input">
+                    <input type="text" placeholder="Введите промокод">
+                    <button>Применить</button>
+                </div>
+                
+                <p style="color:#8a8d99; font-size:13px; margin-bottom:12px;">Выберите метод вывода</p>
+                <div class="payment-methods">
+                    <div class="pay-method active">
+                        <div class="icon">💳</div>
+                        <div class="label">МИР</div>
+                    </div>
+                    <div class="pay-method">
+                        <div class="icon">💳</div>
+                        <div class="label">VISA</div>
+                    </div>
+                    <div class="pay-method">
+                        <div class="icon">💵</div>
+                        <div class="label">СБП</div>
+                    </div>
+                    <div class="pay-method">
+                        <div class="icon">🪙</div>
+                        <div class="label">USDT</div>
+                    </div>
+                </div>
+                
+                <div class="sum-box">
+                    <div class="total">
+                        <span class="label">Общая стоимость предметов</span>
+                        <span class="value">0,00 ₽</span>
+                    </div>
+                    <div class="final">
+                        <span class="label">Всего к выплате</span>
+                        <span class="value">0,00 ₽</span>
+                    </div>
+                </div>
+                
+                <button class="sell-btn">Выплатить</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-        // ===== СТРАНЫ =====
-        const countries = [
-            { ru: 'Австралия', en: 'Australia', tz: 'Australia/Sydney' },
-            { ru: 'Австрия', en: 'Austria', tz: 'Europe/Vienna' },
-            { ru: 'Азербайджан', en: 'Azerbaijan', tz: 'Asia/Baku' },
-            { ru: 'Албания', en: 'Albania', tz: 'Europe/Tirane' },
-            { ru: 'Алжир', en: 'Algeria', tz: 'Africa/Algiers' },
-            { ru: 'Ангола', en: 'Angola', tz: 'Africa/Luanda' },
-            { ru: 'Аргентина', en: 'Argentina', tz: 'America/Argentina/Buenos_Aires' },
-            { ru: 'Армения', en: 'Armenia', tz: 'Asia/Yerevan' },
-            { ru: 'Афганистан', en: 'Afghanistan', tz: 'Asia/Kabul' },
-            { ru: 'Багамы', en: 'Bahamas', tz: 'America/Nassau' },
-            { ru: 'Бангладеш', en: 'Bangladesh', tz: 'Asia/Dhaka' },
-            { ru: 'Барбадос', en: 'Barbados', tz: 'America/Barbados' },
-            { ru: 'Бахрейн', en: 'Bahrain', tz: 'Asia/Bahrain' },
-            { ru: 'Беларусь', en: 'Belarus', tz: 'Europe/Minsk' },
-            { ru: 'Бельгия', en: 'Belgium', tz: 'Europe/Brussels' },
-            { ru: 'Белиз', en: 'Belize', tz: 'America/Belize' },
-            { ru: 'Бенин', en: 'Benin', tz: 'Africa/Porto-Novo' },
-            { ru: 'Болгария', en: 'Bulgaria', tz: 'Europe/Sofia' },
-            { ru: 'Боливия', en: 'Bolivia', tz: 'America/La_Paz' },
-            { ru: 'Босния и Герцеговина', en: 'Bosnia and Herzegovina', tz: 'Europe/Sarajevo' },
-            { ru: 'Ботсвана', en: 'Botswana', tz: 'Africa/Gaborone' },
-            { ru: 'Бразилия', en: 'Brazil', tz: 'America/Sao_Paulo' },
-            { ru: 'Бруней', en: 'Brunei', tz: 'Asia/Brunei' },
-            { ru: 'Буркина-Фасо', en: 'Burkina Faso', tz: 'Africa/Ouagadougou' },
-            { ru: 'Бурунди', en: 'Burundi', tz: 'Africa/Bujumbura' },
-            { ru: 'Бутан', en: 'Bhutan', tz: 'Asia/Thimphu' },
-            { ru: 'Вануату', en: 'Vanuatu', tz: 'Pacific/Efate' },
-            { ru: 'Великобритания', en: 'United Kingdom', tz: 'Europe/London' },
-            { ru: 'Венгрия', en: 'Hungary', tz: 'Europe/Budapest' },
-            { ru: 'Венесуэла', en: 'Venezuela', tz: 'America/Caracas' },
-            { ru: 'Вьетнам', en: 'Vietnam', tz: 'Asia/Ho_Chi_Minh' },
-            { ru: 'Габон', en: 'Gabon', tz: 'Africa/Libreville' },
-            { ru: 'Гаити', en: 'Haiti', tz: 'America/Port-au-Prince' },
-            { ru: 'Гайана', en: 'Guyana', tz: 'America/Guyana' },
-            { ru: 'Гамбия', en: 'Gambia', tz: 'Africa/Banjul' },
-            { ru: 'Гана', en: 'Ghana', tz: 'Africa/Accra' },
-            { ru: 'Гватемала', en: 'Guatemala', tz: 'America/Guatemala' },
-            { ru: 'Гвинея', en: 'Guinea', tz: 'Africa/Conakry' },
-            { ru: 'Германия', en: 'Germany', tz: 'Europe/Berlin' },
-            { ru: 'Гондурас', en: 'Honduras', tz: 'America/Tegucigalpa' },
-            { ru: 'Гренада', en: 'Grenada', tz: 'America/Grenada' },
-            { ru: 'Греция', en: 'Greece', tz: 'Europe/Athens' },
-            { ru: 'Грузия', en: 'Georgia', tz: 'Asia/Tbilisi' },
-            { ru: 'Дания', en: 'Denmark', tz: 'Europe/Copenhagen' },
-            { ru: 'Джибути', en: 'Djibouti', tz: 'Africa/Djibouti' },
-            { ru: 'Доминикана', en: 'Dominican Republic', tz: 'America/Santo_Domingo' },
-            { ru: 'Египет', en: 'Egypt', tz: 'Africa/Cairo' },
-            { ru: 'Замбия', en: 'Zambia', tz: 'Africa/Lusaka' },
-            { ru: 'Зимбабве', en: 'Zimbabwe', tz: 'Africa/Harare' },
-            { ru: 'Израиль', en: 'Israel', tz: 'Asia/Jerusalem' },
-            { ru: 'Индия', en: 'India', tz: 'Asia/Kolkata' },
-            { ru: 'Индонезия', en: 'Indonesia', tz: 'Asia/Jakarta' },
-            { ru: 'Иордания', en: 'Jordan', tz: 'Asia/Amman' },
-            { ru: 'Ирак', en: 'Iraq', tz: 'Asia/Baghdad' },
-            { ru: 'Иран', en: 'Iran', tz: 'Asia/Tehran' },
-            { ru: 'Ирландия', en: 'Ireland', tz: 'Europe/Dublin' },
-            { ru: 'Исландия', en: 'Iceland', tz: 'Atlantic/Reykjavik' },
-            { ru: 'Испания', en: 'Spain', tz: 'Europe/Madrid' },
-            { ru: 'Италия', en: 'Italy', tz: 'Europe/Rome' },
-            { ru: 'Йемен', en: 'Yemen', tz: 'Asia/Aden' },
-            { ru: 'Казахстан', en: 'Kazakhstan', tz: 'Asia/Almaty' },
-            { ru: 'Камбоджа', en: 'Cambodia', tz: 'Asia/Phnom_Penh' },
-            { ru: 'Камерун', en: 'Cameroon', tz: 'Africa/Douala' },
-            { ru: 'Канада', en: 'Canada', tz: 'America/Toronto' },
-            { ru: 'Катар', en: 'Qatar', tz: 'Asia/Qatar' },
-            { ru: 'Кения', en: 'Kenya', tz: 'Africa/Nairobi' },
-            { ru: 'Кипр', en: 'Cyprus', tz: 'Asia/Nicosia' },
-            { ru: 'Киргизия', en: 'Kyrgyzstan', tz: 'Asia/Bishkek' },
-            { ru: 'Китай', en: 'China', tz: 'Asia/Shanghai' },
-            { ru: 'Колумбия', en: 'Colombia', tz: 'America/Bogota' },
-            { ru: 'Конго', en: 'Congo', tz: 'Africa/Brazzaville' },
-            { ru: 'Корея', en: 'South Korea', tz: 'Asia/Seoul' },
-            { ru: 'Коста-Рика', en: 'Costa Rica', tz: 'America/Costa_Rica' },
-            { ru: 'Кот-д’Ивуар', en: 'Ivory Coast', tz: 'Africa/Abidjan' },
-            { ru: 'Куба', en: 'Cuba', tz: 'America/Havana' },
-            { ru: 'Кувейт', en: 'Kuwait', tz: 'Asia/Kuwait' },
-            { ru: 'Лаос', en: 'Laos', tz: 'Asia/Vientiane' },
-            { ru: 'Латвия', en: 'Latvia', tz: 'Europe/Riga' },
-            { ru: 'Ливан', en: 'Lebanon', tz: 'Asia/Beirut' },
-            { ru: 'Ливия', en: 'Libya', tz: 'Africa/Tripoli' },
-            { ru: 'Литва', en: 'Lithuania', tz: 'Europe/Vilnius' },
-            { ru: 'Люксембург', en: 'Luxembourg', tz: 'Europe/Luxembourg' },
-            { ru: 'Маврикий', en: 'Mauritius', tz: 'Indian/Mauritius' },
-            { ru: 'Мавритания', en: 'Mauritania', tz: 'Africa/Nouakchott' },
-            { ru: 'Мадагаскар', en: 'Madagascar', tz: 'Indian/Antananarivo' },
-            { ru: 'Малави', en: 'Malawi', tz: 'Africa/Blantyre' },
-            { ru: 'Малайзия', en: 'Malaysia', tz: 'Asia/Kuala_Lumpur' },
-            { ru: 'Мали', en: 'Mali', tz: 'Africa/Bamako' },
-            { ru: 'Мальдивы', en: 'Maldives', tz: 'Indian/Maldives' },
-            { ru: 'Мальта', en: 'Malta', tz: 'Europe/Malta' },
-            { ru: 'Марокко', en: 'Morocco', tz: 'Africa/Casablanca' },
-            { ru: 'Мексика', en: 'Mexico', tz: 'America/Mexico_City' },
-            { ru: 'Мозамбик', en: 'Mozambique', tz: 'Africa/Maputo' },
-            { ru: 'Молдова', en: 'Moldova', tz: 'Europe/Chisinau' },
-            { ru: 'Монголия', en: 'Mongolia', tz: 'Asia/Ulaanbaatar' },
-            { ru: 'Мьянма', en: 'Myanmar', tz: 'Asia/Yangon' },
-            { ru: 'Намибия', en: 'Namibia', tz: 'Africa/Windhoek' },
-            { ru: 'Непал', en: 'Nepal', tz: 'Asia/Kathmandu' },
-            { ru: 'Нигерия', en: 'Nigeria', tz: 'Africa/Lagos' },
-            { ru: 'Нидерланды', en: 'Netherlands', tz: 'Europe/Amsterdam' },
-            { ru: 'Никарагуа', en: 'Nicaragua', tz: 'America/Managua' },
-            { ru: 'Новая Зеландия', en: 'New Zealand', tz: 'Pacific/Auckland' },
-            { ru: 'Норвегия', en: 'Norway', tz: 'Europe/Oslo' },
-            { ru: 'ОАЭ', en: 'UAE', tz: 'Asia/Dubai' },
-            { ru: 'Оман', en: 'Oman', tz: 'Asia/Muscat' },
-            { ru: 'Пакистан', en: 'Pakistan', tz: 'Asia/Karachi' },
-            { ru: 'Панама', en: 'Panama', tz: 'America/Panama' },
-            { ru: 'Парагвай', en: 'Paraguay', tz: 'America/Asuncion' },
-            { ru: 'Перу', en: 'Peru', tz: 'America/Lima' },
-            { ru: 'Польша', en: 'Poland', tz: 'Europe/Warsaw' },
-            { ru: 'Португалия', en: 'Portugal', tz: 'Europe/Lisbon' },
-            { ru: 'Россия', en: 'Russia', tz: 'Europe/Moscow' },
-            { ru: 'Румыния', en: 'Romania', tz: 'Europe/Bucharest' },
-            { ru: 'Сальвадор', en: 'El Salvador', tz: 'America/El_Salvador' },
-            { ru: 'Саудовская Аравия', en: 'Saudi Arabia', tz: 'Asia/Riyadh' },
-            { ru: 'Северная Македония', en: 'North Macedonia', tz: 'Europe/Skopje' },
-            { ru: 'Сенегал', en: 'Senegal', tz: 'Africa/Dakar' },
-            { ru: 'Сербия', en: 'Serbia', tz: 'Europe/Belgrade' },
-            { ru: 'Сингапур', en: 'Singapore', tz: 'Asia/Singapore' },
-            { ru: 'Сирия', en: 'Syria', tz: 'Asia/Damascus' },
-            { ru: 'Словакия', en: 'Slovakia', tz: 'Europe/Bratislava' },
-            { ru: 'Словения', en: 'Slovenia', tz: 'Europe/Ljubljana' },
-            { ru: 'Сомали', en: 'Somalia', tz: 'Africa/Mogadishu' },
-            { ru: 'Судан', en: 'Sudan', tz: 'Africa/Khartoum' },
-            { ru: 'США', en: 'USA', tz: 'America/New_York' },
-            { ru: 'Сьерра-Леоне', en: 'Sierra Leone', tz: 'Africa/Freetown' },
-            { ru: 'Таджикистан', en: 'Tajikistan', tz: 'Asia/Dushanbe' },
-            { ru: 'Таиланд', en: 'Thailand', tz: 'Asia/Bangkok' },
-            { ru: 'Танзания', en: 'Tanzania', tz: 'Africa/Dar_es_Salaam' },
-            { ru: 'Тунис', en: 'Tunisia', tz: 'Africa/Tunis' },
-            { ru: 'Туркменистан', en: 'Turkmenistan', tz: 'Asia/Ashgabat' },
-            { ru: 'Турция', en: 'Turkey', tz: 'Europe/Istanbul' },
-            { ru: 'Уганда', en: 'Uganda', tz: 'Africa/Kampala' },
-            { ru: 'Узбекистан', en: 'Uzbekistan', tz: 'Asia/Tashkent' },
-            { ru: 'Украина', en: 'Ukraine', tz: 'Europe/Kyiv' },
-            { ru: 'Уругвай', en: 'Uruguay', tz: 'America/Montevideo' },
-            { ru: 'Филиппины', en: 'Philippines', tz: 'Asia/Manila' },
-            { ru: 'Финляндия', en: 'Finland', tz: 'Europe/Helsinki' },
-            { ru: 'Франция', en: 'France', tz: 'Europe/Paris' },
-            { ru: 'Хорватия', en: 'Croatia', tz: 'Europe/Zagreb' },
-            { ru: 'Черногория', en: 'Montenegro', tz: 'Europe/Podgorica' },
-            { ru: 'Чехия', en: 'Czech Republic', tz: 'Europe/Prague' },
-            { ru: 'Чили', en: 'Chile', tz: 'America/Santiago' },
-            { ru: 'Швейцария', en: 'Switzerland', tz: 'Europe/Zurich' },
-            { ru: 'Швеция', en: 'Sweden', tz: 'Europe/Stockholm' },
-            { ru: 'Эквадор', en: 'Ecuador', tz: 'America/Guayaquil' },
-            { ru: 'Эстония', en: 'Estonia', tz: 'Europe/Tallinn' },
-            { ru: 'Эфиопия', en: 'Ethiopia', tz: 'Africa/Addis_Ababa' },
-            { ru: 'ЮАР', en: 'South Africa', tz: 'Africa/Johannesburg' },
-            { ru: 'Ямайка', en: 'Jamaica', tz: 'America/Jamaica' },
-            { ru: 'Япония', en: 'Japan', tz: 'Asia/Tokyo' }
-        ];
+<!-- ДРУГИЕ СТРАНИЦЫ -->
+<div class="page" id="profilePage">
+    <div class="container">
+        <div id="profileLoginBox" style="display:block;">
+            <div class="profile-login-box">
+                <div class="icon" style="font-size: 64px;">🎮</div>
+                <h2>Войдите через Steam</h2>
+                <p>Чтобы получить доступ к этой странице</p>
+                <a href="/auth/steam" class="btn btn-steam" style="margin-top:10px;">Войти через Steam</a>
+            </div>
+        </div>
+        <div id="profileContent" style="display:none;">
+            <div class="profile-header">
+                <div class="profile-avatar" id="profileAvatar"></div>
+                <div class="profile-info">
+                    <h2 id="profileName"></h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-        // Россия по умолчанию (МСК)
-        let selectedCountry = countries.find(c => c.ru === 'Россия') || countries[0];
+<div class="page" id="marketPage">
+    <div class="container">
+        <h2 style="font-size: 24px; font-weight: 700;">Купить скины</h2>
+        <p style="color:#8a8d99; margin-bottom:20px;">Здесь будут ваши скины</p>
+    </div>
+</div>
 
-        // ===== ФУНКЦИИ =====
-        function updateClock() {
-            const now = new Date();
-            const timeStr = new Date(now.toLocaleString('en-US', { timeZone: selectedCountry.tz }));
-            const hours = String(timeStr.getHours()).padStart(2, '0');
-            const minutes = String(timeStr.getMinutes()).padStart(2, '0');
-            const seconds = String(timeStr.getSeconds()).padStart(2, '0');
-            document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+</div>
+
+</div>
+
+<script>
+let currentUser = null;
+let userInventory = [];
+let selectedSteamSkins = [];
+
+async function fetchUser() {
+    const response = await fetch('/api/user');
+    const data = await response.json();
+    if (data.loggedIn) {
+        currentUser = { id: data.user.id, name: data.user.name, avatar: data.user.avatar };
+        updateUserUI();
+        renderProfile();
+    }
+}
+
+function logoutUser() { window.location.href = '/logout'; }
+
+function updateUserUI() {
+    const actions = document.getElementById('headerActions');
+    if (currentUser) {
+        actions.innerHTML = `
+            <div class="steam-user" style="cursor:pointer;" onclick="navigateTo('profile')">
+                <div class="steam-avatar" style="background-image:url('${currentUser.avatar}');"></div>
+                <span class="steam-name">${currentUser.name}</span>
+                <button class="steam-logout" onclick="event.stopPropagation(); logoutUser()">✕</button>
+            </div>
+        `;
+    } else {
+        actions.innerHTML = `<a href="/auth/steam" class="btn btn-steam">Войти через Steam</a>`;
+    }
+}
+
+function navigateTo(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById(page + 'Page');
+    if (target) target.classList.add('active');
+}
+
+function renderProfile() {
+    if (currentUser) {
+        document.getElementById('profileLoginBox').style.display = 'none';
+        document.getElementById('profileContent').style.display = 'block';
+        document.getElementById('profileName').textContent = currentUser.name;
+        if (currentUser.avatar) {
+            document.getElementById('profileAvatar').style.backgroundImage = `url('${currentUser.avatar}')`;
+            document.getElementById('profileAvatar').style.backgroundSize = 'cover';
+            document.getElementById('profileAvatar').style.backgroundPosition = 'center';
+            document.getElementById('profileAvatar').textContent = '';
         }
+    }
+}
 
-        // ===== ОБРАТНЫЙ ТАЙМЕР =====
-        let remainingSeconds = null; // Изначально null, берём с сервера
-
-        async function fetchRemainingTime() {
-            try {
-                const response = await fetch('/api/maintenance-time');
-                const data = await response.json();
-                if (data.remaining !== undefined) {
-                    remainingSeconds = data.remaining;
-                }
-            } catch (error) {
-                console.error('Не удалось получить время с сервера');
-            }
-        }
-
-        function updateCountdown() {
-            if (remainingSeconds === null) {
-                document.getElementById('countdown').textContent = '--:--:--';
-                return;
-            }
-
-            if (remainingSeconds <= 0) {
-                document.getElementById('countdown').textContent = '00:00:00';
-                return;
-            }
-
-            const hours = Math.floor(remainingSeconds / 3600);
-            const minutes = Math.floor((remainingSeconds % 3600) / 60);
-            const seconds = remainingSeconds % 60;
-
-            const formatted = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-            document.getElementById('countdown').textContent = formatted;
-
-            remainingSeconds--;
-        }
-
-        // ===== ОБНОВЛЕНИЕ ТЕКСТА =====
-        function updateText() {
-            const t = translations[currentLang];
-            document.getElementById('searchInput').placeholder = t.searchPlaceholder;
-            document.getElementById('clockLabel').textContent = currentLang === 'ru' ? selectedCountry.ru.toUpperCase() : selectedCountry.en.toUpperCase();
-            document.getElementById('countdown').previousElementSibling.textContent = t.countdownTitle;
-            document.getElementById('maintenanceTitle').textContent = t.maintenanceTitle;
-            document.getElementById('maintenanceWork').textContent = t.maintenanceWork;
-            document.getElementById('maintenanceSorry').textContent = t.maintenanceSorry;
-        }
-
-        // ===== ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА =====
-        document.querySelectorAll('.lang-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                currentLang = this.dataset.lang;
-                document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                updateText();
-            });
-        });
-
-        // ===== ПОИСК =====
-        const searchInput = document.getElementById('searchInput');
-        const searchDropdown = document.getElementById('searchDropdown');
-
-        function renderSuggestions() {
-            const query = searchInput.value.trim().toLowerCase();
-            let filtered = countries;
-
-            if (query.length > 0) {
-                filtered = countries.filter(c => {
-                    const name = currentLang === 'ru' ? c.ru : c.en;
-                    return name.toLowerCase().includes(query);
+let tradeUrlInput = null;
+function toggleTradeUrlInput() {
+    if (!tradeUrlInput) {
+        tradeUrlInput = document.createElement('input');
+        tradeUrlInput.type = 'text';
+        tradeUrlInput.placeholder = 'https://steamcommunity.com/tradeoffer/new/?...';
+        tradeUrlInput.style.cssText = 'flex:1; background:#0b0c10; border:1px solid #2ecc71; border-radius:8px; padding:10px 12px; color:#e4e6eb; font-size:14px; outline:none;';
+        tradeUrlInput.addEventListener('blur', async function() {
+            if (this.value.trim()) {
+                await fetch('/api/save-trade-url', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tradeUrl: this.value.trim() })
                 });
-            }
-
-            if (filtered.length === 0) {
-                searchDropdown.innerHTML = '<div style="padding: 10px; color: #7ea87e;">Не найдено</div>';
-            } else {
-                searchDropdown.innerHTML = filtered.map(c => `<div class="country-item" data-ru="${c.ru}" data-en="${c.en}" data-tz="${c.tz}">${currentLang === 'ru' ? c.ru : c.en}</div>`).join('');
-            }
-
-            searchDropdown.style.display = 'block';
-            
-            document.querySelectorAll('.country-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    selectedCountry = {
-                        ru: this.dataset.ru,
-                        en: this.dataset.en,
-                        tz: this.dataset.tz
-                    };
-                    searchInput.value = '';
-                    searchDropdown.style.display = 'none';
-                    updateClock();
-                    updateText();
-                });
-            });
-        }
-
-        searchInput.addEventListener('input', renderSuggestions);
-
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.search-box')) {
-                searchDropdown.style.display = 'none';
+                loadSteamInventory();
             }
         });
+        document.querySelector('.filters-row').insertBefore(tradeUrlInput, document.querySelector('.refresh-btn'));
+    } else {
+        tradeUrlInput.remove();
+        tradeUrlInput = null;
+    }
+}
 
-        // ===== ЗВЕЗДОПАД =====
-        function createStars() {
-            const container = document.getElementById('starContainer');
-            const starCount = 60;
+async function loadSteamInventory() {
+    if (!currentUser) { alert('Пожалуйста, войдите через Steam!'); return; }
+    const grid = document.getElementById('sellSkinGrid');
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">⏳ Загружаем ваш инвентарь...</div>';
 
-            for (let i = 0; i < starCount; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                
-                const size = Math.random() * 4 + 1;
-                star.style.width = `${size}px`;
-                star.style.height = `${size}px`;
-                
-                star.style.left = `${Math.random() * 100}vw`;
-                star.style.top = `-${Math.random() * 20}vh`;
-                
-                const duration = Math.random() * 3 + 2;
-                star.style.animationDuration = `${duration}s`;
-                
-                const delay = Math.random() * 5;
-                star.style.animationDelay = `${delay}s`;
-                
-                container.appendChild(star);
-            }
-        }
-
-        // ===== ИНИЦИАЛИЗАЦИЯ =====
-        document.addEventListener('DOMContentLoaded', function() {
-            fetchRemainingTime(); // Забираем время с сервера
-            
-            updateClock();
-            setInterval(updateClock, 1000);
-            
-            setInterval(updateCountdown, 1000); // Обновляем раз в секунду
-            
-            updateText();
-            createStars();
+    try {
+        const response = await fetch('/api/get-inventory', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
         });
-    </script>
+        const data = await response.json();
+        if (data.error) { alert(data.error); return; }
+        userInventory = data.items;
+        if (userInventory.length === 0) {
+            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">Инвентарь пуст или скрыт.</div>';
+            return;
+        }
+        grid.innerHTML = userInventory.map((item, index) => `
+            <div class="skin-card" onclick="toggleSkinSelection(${index})">
+                <div class="badge">${item.type || 'Скин'}</div>
+                <div class="image">${item.image ? `<img src="${item.image}">` : ''}</div>
+                <div class="name">${item.name}</div>
+                <div class="price">0,00 ₽</div>
+            </div>
+        `).join('');
+    } catch (error) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">Ошибка. Попробуй позже.</div>';
+    }
+}
 
+function toggleSkinSelection(index) {
+    const item = userInventory[index];
+    const idx = selectedSteamSkins.findIndex(id => id === item.assetid);
+    if (idx > -1) {
+        selectedSteamSkins.splice(idx, 1);
+        document.querySelectorAll('.skin-card')[index].classList.remove('selected');
+    } else {
+        selectedSteamSkins.push(item.assetid);
+        document.querySelectorAll('.skin-card')[index].classList.add('selected');
+    }
+    document.getElementById('selectedCount').textContent = selectedSteamSkins.length;
+}
+
+// ЛЕТАЮЩИЕ ЧАСТИЦЫ
+function createParticles() {
+    const container = document.getElementById('particles');
+    const count = 50;
+    for (let i = 0; i < count; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.bottom = '-10px';
+        particle.style.animationDuration = (Math.random() * 15 + 5) + 's';
+        particle.style.animationDelay = (Math.random() * 10) + 's';
+        particle.style.width = (Math.random() * 4 + 1) + 'px';
+        particle.style.height = particle.style.width;
+        particle.style.background = Math.random() > 0.5 ? '#2ecc71' : '#a855f7';
+        container.appendChild(particle);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    fetchUser();
+    createParticles();
+    
+    document.querySelectorAll('.nav a').forEach(el => {
+        el.addEventListener('click', function(e) {
+            e.preventDefault();
+            navigateTo(this.dataset.page);
+        });
+    });
+    document.getElementById('logoLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        navigateTo('sell');
+    });
+
+    navigateTo('sell');
+});
+</script>
 </body>
 </html>

@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Технические работы — EMERALD Market</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html,
+        body {
+            height: 100%;
+            font-family: 'Courier New', Courier, monospace;
+            background: #050a06;
+            color: #b0ffb0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ===== ЗВЕЗДОПАД ===== */
+        .star-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            opacity: 0.7;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(120vh) translateX(-20vw);
+                opacity: 0;
+            }
+        }
+
+        /* ===== ЦЕНТРАЛЬНЫЙ БЛОК ===== */
+        .maintenance-box {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+            margin: 0 auto;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* ===== ПОИСК ===== */
+        .search-box {
+            position: relative;
+            background: rgba(20, 40, 20, 0.6);
+            border: 1px solid #2b6e2b;
+            border-radius: 6px;
+            margin-bottom: 40px;
+        }
+
+        .search-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #d4ffd4;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            padding: 10px 12px;
+            width: 220px;
+        }
+
+        .search-input::placeholder {
+            color: #7ea87e;
+        }
+
+        .search-dropdown {
+            display: none;
+            position: absolute;
+            top: 110%;
+            left: 0;
+            width: 100%;
+            background: #050a06;
+            border: 1px solid #2b6e2b;
+            border-radius: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+        }
+
+        .search-dropdown::-webkit-scrollbar {
+            width: 4px;
+        }
+        .search-dropdown::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .search-dropdown::-webkit-scrollbar-thumb {
+            background: #2b6e2b;
+        }
+
+        .country-item {
+            padding: 8px 12px;
+            color: #9fff9f;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .country-item:hover {
+            background: rgba(159, 255, 159, 0.2);
+        }
+
+        /* ===== ЦИФРОВЫЕ ЧАСЫ ===== */
+        .digital-clock {
+            font-size: 120px;
+            font-weight: 900;
+            letter-spacing: 10px;
+            color: #ccffcc;
+            text-shadow:
+                0 0 10px #62c462,
+                0 0 20px #62c462,
+                0 0 40px #2b6e2b,
+                0 0 80px #1a4a1a;
+            margin-bottom: 20px;
+            user-select: none;
+        }
+
+        .clock-label {
+            font-size: 16px;
+            letter-spacing: 4px;
+            color: #7ea87e;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        /* ===== ОБРАТНЫЙ ТАЙМЕР (ПОД ЧАСАМИ) ===== */
+        .countdown-title {
+            color: #7ea87e;
+            font-size: 14px;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .countdown {
+            font-size: 50px;
+            font-weight: 900;
+            letter-spacing: 5px;
+            color: #ccffcc;
+            text-shadow:
+                0 0 10px #62c462,
+                0 0 20px #62c462,
+                0 0 40px #2b6e2b;
+            margin-bottom: 40px;
+        }
+
+        /* ===== ТЕКСТ ===== */
+        .maintenance-text {
+            font-size: 22px;
+            line-height: 1.7;
+            color: #d4ffd4;
+            background: rgba(20, 40, 20, 0.6);
+            border: 1px solid #2b6e2b;
+            border-radius: 12px;
+            padding: 30px;
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.4);
+            backdrop-filter: blur(4px);
+        }
+
+        .maintenance-text .icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .maintenance-text .bold {
+            font-weight: bold;
+            color: #9fff9f;
+        }
+
+        .maintenance-text p {
+            margin-bottom: 12px;
+        }
+
+        /* ===== ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА (ПРАВЫЙ НИЖНИЙ УГОЛ) ===== */
+        .lang-switch {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 20;
+            display: flex;
+            gap: 6px;
+            background: rgba(20, 40, 20, 0.6);
+            border: 1px solid #2b6e2b;
+            border-radius: 6px;
+            padding: 4px;
+            cursor: pointer;
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: none;
+            color: #7ea87e;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+
+        .lang-btn.active {
+            background: #9fff9f;
+            color: #050a06;
+            text-shadow: none;
+        }
+
+        @media (max-width: 600px) {
+            .digital-clock {
+                font-size: 60px;
+                letter-spacing: 6px;
+                margin-bottom: 20px;
+            }
+            .countdown {
+                font-size: 30px;
+                letter-spacing: 3px;
+            }
+            .maintenance-text {
+                font-size: 16px;
+                padding: 20px;
+            }
+            .search-input {
+                width: 160px;
+            }
+            .lang-switch {
+                bottom: 10px;
+                right: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ЗВЕЗДОПАД -->
+    <div class="star-container" id="starContainer"></div>
+
+    <!-- ЯЗЫК: В ПРАВОМ НИЖНЕМ УГЛУ -->
+    <div class="lang-switch" id="langSwitch">
+        <button class="lang-btn active" data-lang="ru">RU</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+    </div>
+
+    <div class="maintenance-box">
+
+        <!-- ПОИСК СТРАН -->
+        <div class="search-box" id="searchBox">
+            <input type="text" class="search-input" id="searchInput" placeholder="Поиск страны..." autocomplete="off">
+            <div class="search-dropdown" id="searchDropdown"></div>
+        </div>
+
+        <!-- Часы МСК (по умолчанию) -->
+        <div class="digital-clock" id="clock">00:00:00</div>
+        <div class="clock-label" id="clockLabel">МСК</div>
+
+        <!-- Обратный таймер (ПОД часами) -->
+        <div class="countdown-title">До окончания работ осталось</div>
+        <div class="countdown" id="countdown">--:--:--</div>
+
+        <!-- Текст -->
+        <div class="maintenance-text">
+            <span class="icon">🔧</span>
+            <p class="bold" id="maintenanceTitle">В данный момент могут наблюдаться проблемы с доступом к сайту</p>
+            <p id="maintenanceWork">Работаем над исправлением 🙏</p>
+            <p id="maintenanceSorry">Простите за неудобства</p>
+        </div>
+    </div>
+
+    <script>
+        // ===== ЯЗЫК =====
+        let currentLang = 'ru';
+
+        const translations = {
+            ru: {
+                searchPlaceholder: 'Поиск страны...',
+                clockLabel: 'МСК',
+                countdownTitle: 'До окончания работ осталось',
+                maintenanceTitle: 'В данный момент могут наблюдаться проблемы с доступом к сайту',
+                maintenanceWork: 'Работаем над исправлением 🙏',
+                maintenanceSorry: 'Простите за неудобства'
+            },
+            en: {
+                searchPlaceholder: 'Search country...',
+                clockLabel: 'MSK',
+                countdownTitle: 'Time remaining until the end of work',
+                maintenanceTitle: 'There may be some issues with the site access at the moment',
+                maintenanceWork: 'We are working on fixing it 🙏',
+                maintenanceSorry: 'Sorry for the inconvenience'
+            }
+        };
+
+        // ===== СТРАНЫ =====
+        const countries = [
+            { ru: 'Австралия', en: 'Australia', tz: 'Australia/Sydney' },
+            { ru: 'Австрия', en: 'Austria', tz: 'Europe/Vienna' },
+            { ru: 'Азербайджан', en: 'Azerbaijan', tz: 'Asia/Baku' },
+            { ru: 'Албания', en: 'Albania', tz: 'Europe/Tirane' },
+            { ru: 'Алжир', en: 'Algeria', tz: 'Africa/Algiers' },
+            { ru: 'Ангола', en: 'Angola', tz: 'Africa/Luanda' },
+            { ru: 'Аргентина', en: 'Argentina', tz: 'America/Argentina/Buenos_Aires' },
+            { ru: 'Армения', en: 'Armenia', tz: 'Asia/Yerevan' },
+            { ru: 'Афганистан', en: 'Afghanistan', tz: 'Asia/Kabul' },
+            { ru: 'Багамы', en: 'Bahamas', tz: 'America/Nassau' },
+            { ru: 'Бангладеш', en: 'Bangladesh', tz: 'Asia/Dhaka' },
+            { ru: 'Барбадос', en: 'Barbados', tz: 'America/Barbados' },
+            { ru: 'Бахрейн', en: 'Bahrain', tz: 'Asia/Bahrain' },
+            { ru: 'Беларусь', en: 'Belarus', tz: 'Europe/Minsk' },
+            { ru: 'Бельгия', en: 'Belgium', tz: 'Europe/Brussels' },
+            { ru: 'Белиз', en: 'Belize', tz: 'America/Belize' },
+            { ru: 'Бенин', en: 'Benin', tz: 'Africa/Porto-Novo' },
+            { ru: 'Болгария', en: 'Bulgaria', tz: 'Europe/Sofia' },
+            { ru: 'Боливия', en: 'Bolivia', tz: 'America/La_Paz' },
+            { ru: 'Босния и Герцеговина', en: 'Bosnia and Herzegovina', tz: 'Europe/Sarajevo' },
+            { ru: 'Ботсвана', en: 'Botswana', tz: 'Africa/Gaborone' },
+            { ru: 'Бразилия', en: 'Brazil', tz: 'America/Sao_Paulo' },
+            { ru: 'Бруней', en: 'Brunei', tz: 'Asia/Brunei' },
+            { ru: 'Буркина-Фасо', en: 'Burkina Faso', tz: 'Africa/Ouagadougou' },
+            { ru: 'Бурунди', en: 'Burundi', tz: 'Africa/Bujumbura' },
+            { ru: 'Бутан', en: 'Bhutan', tz: 'Asia/Thimphu' },
+            { ru: 'Вануату', en: 'Vanuatu', tz: 'Pacific/Efate' },
+            { ru: 'Великобритания', en: 'United Kingdom', tz: 'Europe/London' },
+            { ru: 'Венгрия', en: 'Hungary', tz: 'Europe/Budapest' },
+            { ru: 'Венесуэла', en: 'Venezuela', tz: 'America/Caracas' },
+            { ru: 'Вьетнам', en: 'Vietnam', tz: 'Asia/Ho_Chi_Minh' },
+            { ru: 'Габон', en: 'Gabon', tz: 'Africa/Libreville' },
+            { ru: 'Гаити', en: 'Haiti', tz: 'America/Port-au-Prince' },
+            { ru: 'Гайана', en: 'Guyana', tz: 'America/Guyana' },
+            { ru: 'Гамбия', en: 'Gambia', tz: 'Africa/Banjul' },
+            { ru: 'Гана', en: 'Ghana', tz: 'Africa/Accra' },
+            { ru: 'Гватемала', en: 'Guatemala', tz: 'America/Guatemala' },
+            { ru: 'Гвинея', en: 'Guinea', tz: 'Africa/Conakry' },
+            { ru: 'Германия', en: 'Germany', tz: 'Europe/Berlin' },
+            { ru: 'Гондурас', en: 'Honduras', tz: 'America/Tegucigalpa' },
+            { ru: 'Гренада', en: 'Grenada', tz: 'America/Grenada' },
+            { ru: 'Греция', en: 'Greece', tz: 'Europe/Athens' },
+            { ru: 'Грузия', en: 'Georgia', tz: 'Asia/Tbilisi' },
+            { ru: 'Дания', en: 'Denmark', tz: 'Europe/Copenhagen' },
+            { ru: 'Джибути', en: 'Djibouti', tz: 'Africa/Djibouti' },
+            { ru: 'Доминикана', en: 'Dominican Republic', tz: 'America/Santo_Domingo' },
+            { ru: 'Египет', en: 'Egypt', tz: 'Africa/Cairo' },
+            { ru: 'Замбия', en: 'Zambia', tz: 'Africa/Lusaka' },
+            { ru: 'Зимбабве', en: 'Zimbabwe', tz: 'Africa/Harare' },
+            { ru: 'Израиль', en: 'Israel', tz: 'Asia/Jerusalem' },
+            { ru: 'Индия', en: 'India', tz: 'Asia/Kolkata' },
+            { ru: 'Индонезия', en: 'Indonesia', tz: 'Asia/Jakarta' },
+            { ru: 'Иордания', en: 'Jordan', tz: 'Asia/Amman' },
+            { ru: 'Ирак', en: 'Iraq', tz: 'Asia/Baghdad' },
+            { ru: 'Иран', en: 'Iran', tz: 'Asia/Tehran' },
+            { ru: 'Ирландия', en: 'Ireland', tz: 'Europe/Dublin' },
+            { ru: 'Исландия', en: 'Iceland', tz: 'Atlantic/Reykjavik' },
+            { ru: 'Испания', en: 'Spain', tz: 'Europe/Madrid' },
+            { ru: 'Италия', en: 'Italy', tz: 'Europe/Rome' },
+            { ru: 'Йемен', en: 'Yemen', tz: 'Asia/Aden' },
+            { ru: 'Казахстан', en: 'Kazakhstan', tz: 'Asia/Almaty' },
+            { ru: 'Камбоджа', en: 'Cambodia', tz: 'Asia/Phnom_Penh' },
+            { ru: 'Камерун', en: 'Cameroon', tz: 'Africa/Douala' },
+            { ru: 'Канада', en: 'Canada', tz: 'America/Toronto' },
+            { ru: 'Катар', en: 'Qatar', tz: 'Asia/Qatar' },
+            { ru: 'Кения', en: 'Kenya', tz: 'Africa/Nairobi' },
+            { ru: 'Кипр', en: 'Cyprus', tz: 'Asia/Nicosia' },
+            { ru: 'Киргизия', en: 'Kyrgyzstan', tz: 'Asia/Bishkek' },
+            { ru: 'Китай', en: 'China', tz: 'Asia/Shanghai' },
+            { ru: 'Колумбия', en: 'Colombia', tz: 'America/Bogota' },
+            { ru: 'Конго', en: 'Congo', tz: 'Africa/Brazzaville' },
+            { ru: 'Корея', en: 'South Korea', tz: 'Asia/Seoul' },
+            { ru: 'Коста-Рика', en: 'Costa Rica', tz: 'America/Costa_Rica' },
+            { ru: 'Кот-д’Ивуар', en: 'Ivory Coast', tz: 'Africa/Abidjan' },
+            { ru: 'Куба', en: 'Cuba', tz: 'America/Havana' },
+            { ru: 'Кувейт', en: 'Kuwait', tz: 'Asia/Kuwait' },
+            { ru: 'Лаос', en: 'Laos', tz: 'Asia/Vientiane' },
+            { ru: 'Латвия', en: 'Latvia', tz: 'Europe/Riga' },
+            { ru: 'Ливан', en: 'Lebanon', tz: 'Asia/Beirut' },
+            { ru: 'Ливия', en: 'Libya', tz: 'Africa/Tripoli' },
+            { ru: 'Литва', en: 'Lithuania', tz: 'Europe/Vilnius' },
+            { ru: 'Люксембург', en: 'Luxembourg', tz: 'Europe/Luxembourg' },
+            { ru: 'Маврикий', en: 'Mauritius', tz: 'Indian/Mauritius' },
+            { ru: 'Мавритания', en: 'Mauritania', tz: 'Africa/Nouakchott' },
+            { ru: 'Мадагаскар', en: 'Madagascar', tz: 'Indian/Antananarivo' },
+            { ru: 'Малави', en: 'Malawi', tz: 'Africa/Blantyre' },
+            { ru: 'Малайзия', en: 'Malaysia', tz: 'Asia/Kuala_Lumpur' },
+            { ru: 'Мали', en: 'Mali', tz: 'Africa/Bamako' },
+            { ru: 'Мальдивы', en: 'Maldives', tz: 'Indian/Maldives' },
+            { ru: 'Мальта', en: 'Malta', tz: 'Europe/Malta' },
+            { ru: 'Марокко', en: 'Morocco', tz: 'Africa/Casablanca' },
+            { ru: 'Мексика', en: 'Mexico', tz: 'America/Mexico_City' },
+            { ru: 'Мозамбик', en: 'Mozambique', tz: 'Africa/Maputo' },
+            { ru: 'Молдова', en: 'Moldova', tz: 'Europe/Chisinau' },
+            { ru: 'Монголия', en: 'Mongolia', tz: 'Asia/Ulaanbaatar' },
+            { ru: 'Мьянма', en: 'Myanmar', tz: 'Asia/Yangon' },
+            { ru: 'Намибия', en: 'Namibia', tz: 'Africa/Windhoek' },
+            { ru: 'Непал', en: 'Nepal', tz: 'Asia/Kathmandu' },
+            { ru: 'Нигерия', en: 'Nigeria', tz: 'Africa/Lagos' },
+            { ru: 'Нидерланды', en: 'Netherlands', tz: 'Europe/Amsterdam' },
+            { ru: 'Никарагуа', en: 'Nicaragua', tz: 'America/Managua' },
+            { ru: 'Новая Зеландия', en: 'New Zealand', tz: 'Pacific/Auckland' },
+            { ru: 'Норвегия', en: 'Norway', tz: 'Europe/Oslo' },
+            { ru: 'ОАЭ', en: 'UAE', tz: 'Asia/Dubai' },
+            { ru: 'Оман', en: 'Oman', tz: 'Asia/Muscat' },
+            { ru: 'Пакистан', en: 'Pakistan', tz: 'Asia/Karachi' },
+            { ru: 'Панама', en: 'Panama', tz: 'America/Panama' },
+            { ru: 'Парагвай', en: 'Paraguay', tz: 'America/Asuncion' },
+            { ru: 'Перу', en: 'Peru', tz: 'America/Lima' },
+            { ru: 'Польша', en: 'Poland', tz: 'Europe/Warsaw' },
+            { ru: 'Португалия', en: 'Portugal', tz: 'Europe/Lisbon' },
+            { ru: 'Россия', en: 'Russia', tz: 'Europe/Moscow' },
+            { ru: 'Румыния', en: 'Romania', tz: 'Europe/Bucharest' },
+            { ru: 'Сальвадор', en: 'El Salvador', tz: 'America/El_Salvador' },
+            { ru: 'Саудовская Аравия', en: 'Saudi Arabia', tz: 'Asia/Riyadh' },
+            { ru: 'Северная Македония', en: 'North Macedonia', tz: 'Europe/Skopje' },
+            { ru: 'Сенегал', en: 'Senegal', tz: 'Africa/Dakar' },
+            { ru: 'Сербия', en: 'Serbia', tz: 'Europe/Belgrade' },
+            { ru: 'Сингапур', en: 'Singapore', tz: 'Asia/Singapore' },
+            { ru: 'Сирия', en: 'Syria', tz: 'Asia/Damascus' },
+            { ru: 'Словакия', en: 'Slovakia', tz: 'Europe/Bratislava' },
+            { ru: 'Словения', en: 'Slovenia', tz: 'Europe/Ljubljana' },
+            { ru: 'Сомали', en: 'Somalia', tz: 'Africa/Mogadishu' },
+            { ru: 'Судан', en: 'Sudan', tz: 'Africa/Khartoum' },
+            { ru: 'США', en: 'USA', tz: 'America/New_York' },
+            { ru: 'Сьерра-Леоне', en: 'Sierra Leone', tz: 'Africa/Freetown' },
+            { ru: 'Таджикистан', en: 'Tajikistan', tz: 'Asia/Dushanbe' },
+            { ru: 'Таиланд', en: 'Thailand', tz: 'Asia/Bangkok' },
+            { ru: 'Танзания', en: 'Tanzania', tz: 'Africa/Dar_es_Salaam' },
+            { ru: 'Тунис', en: 'Tunisia', tz: 'Africa/Tunis' },
+            { ru: 'Туркменистан', en: 'Turkmenistan', tz: 'Asia/Ashgabat' },
+            { ru: 'Турция', en: 'Turkey', tz: 'Europe/Istanbul' },
+            { ru: 'Уганда', en: 'Uganda', tz: 'Africa/Kampala' },
+            { ru: 'Узбекистан', en: 'Uzbekistan', tz: 'Asia/Tashkent' },
+            { ru: 'Украина', en: 'Ukraine', tz: 'Europe/Kyiv' },
+            { ru: 'Уругвай', en: 'Uruguay', tz: 'America/Montevideo' },
+            { ru: 'Филиппины', en: 'Philippines', tz: 'Asia/Manila' },
+            { ru: 'Финляндия', en: 'Finland', tz: 'Europe/Helsinki' },
+            { ru: 'Франция', en: 'France', tz: 'Europe/Paris' },
+            { ru: 'Хорватия', en: 'Croatia', tz: 'Europe/Zagreb' },
+            { ru: 'Черногория', en: 'Montenegro', tz: 'Europe/Podgorica' },
+            { ru: 'Чехия', en: 'Czech Republic', tz: 'Europe/Prague' },
+            { ru: 'Чили', en: 'Chile', tz: 'America/Santiago' },
+            { ru: 'Швейцария', en: 'Switzerland', tz: 'Europe/Zurich' },
+            { ru: 'Швеция', en: 'Sweden', tz: 'Europe/Stockholm' },
+            { ru: 'Эквадор', en: 'Ecuador', tz: 'America/Guayaquil' },
+            { ru: 'Эстония', en: 'Estonia', tz: 'Europe/Tallinn' },
+            { ru: 'Эфиопия', en: 'Ethiopia', tz: 'Africa/Addis_Ababa' },
+            { ru: 'ЮАР', en: 'South Africa', tz: 'Africa/Johannesburg' },
+            { ru: 'Ямайка', en: 'Jamaica', tz: 'America/Jamaica' },
+            { ru: 'Япония', en: 'Japan', tz: 'Asia/Tokyo' }
+        ];
+
+        // Россия по умолчанию (МСК)
+        let selectedCountry = countries.find(c => c.ru === 'Россия') || countries[0];
+
+        // ===== ФУНКЦИИ =====
+        function updateClock() {
+            const now = new Date();
+            const timeStr = new Date(now.toLocaleString('en-US', { timeZone: selectedCountry.tz }));
+            const hours = String(timeStr.getHours()).padStart(2, '0');
+            const minutes = String(timeStr.getMinutes()).padStart(2, '0');
+            const seconds = String(timeStr.getSeconds()).padStart(2, '0');
+            document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+        }
+
+        // ===== ОБРАТНЫЙ ТАЙМЕР =====
+        let remainingSeconds = null; // Изначально null, берём с сервера
+
+        async function fetchRemainingTime() {
+            try {
+                const response = await fetch('/api/maintenance-time');
+                const data = await response.json();
+                if (data.remaining !== undefined) {
+                    remainingSeconds = data.remaining;
+                }
+            } catch (error) {
+                console.error('Не удалось получить время с сервера');
+            }
+        }
+
+        function updateCountdown() {
+            if (remainingSeconds === null) {
+                document.getElementById('countdown').textContent = '--:--:--';
+                return;
+            }
+
+            if (remainingSeconds <= 0) {
+                document.getElementById('countdown').textContent = '00:00:00';
+                return;
+            }
+
+            const hours = Math.floor(remainingSeconds / 3600);
+            const minutes = Math.floor((remainingSeconds % 3600) / 60);
+            const seconds = remainingSeconds % 60;
+
+            const formatted = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            document.getElementById('countdown').textContent = formatted;
+
+            remainingSeconds--;
+        }
+
+        // ===== ОБНОВЛЕНИЕ ТЕКСТА =====
+        function updateText() {
+            const t = translations[currentLang];
+            document.getElementById('searchInput').placeholder = t.searchPlaceholder;
+            document.getElementById('clockLabel').textContent = currentLang === 'ru' ? selectedCountry.ru.toUpperCase() : selectedCountry.en.toUpperCase();
+            document.getElementById('countdown').previousElementSibling.textContent = t.countdownTitle;
+            document.getElementById('maintenanceTitle').textContent = t.maintenanceTitle;
+            document.getElementById('maintenanceWork').textContent = t.maintenanceWork;
+            document.getElementById('maintenanceSorry').textContent = t.maintenanceSorry;
+        }
+
+        // ===== ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА =====
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                currentLang = this.dataset.lang;
+                document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                updateText();
+            });
+        });
+
+        // ===== ПОИСК =====
+        const searchInput = document.getElementById('searchInput');
+        const searchDropdown = document.getElementById('searchDropdown');
+
+        function renderSuggestions() {
+            const query = searchInput.value.trim().toLowerCase();
+            let filtered = countries;
+
+            if (query.length > 0) {
+                filtered = countries.filter(c => {
+                    const name = currentLang === 'ru' ? c.ru : c.en;
+                    return name.toLowerCase().includes(query);
+                });
+            }
+
+            if (filtered.length === 0) {
+                searchDropdown.innerHTML = '<div style="padding: 10px; color: #7ea87e;">Не найдено</div>';
+            } else {
+                searchDropdown.innerHTML = filtered.map(c => `<div class="country-item" data-ru="${c.ru}" data-en="${c.en}" data-tz="${c.tz}">${currentLang === 'ru' ? c.ru : c.en}</div>`).join('');
+            }
+
+            searchDropdown.style.display = 'block';
+            
+            document.querySelectorAll('.country-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    selectedCountry = {
+                        ru: this.dataset.ru,
+                        en: this.dataset.en,
+                        tz: this.dataset.tz
+                    };
+                    searchInput.value = '';
+                    searchDropdown.style.display = 'none';
+                    updateClock();
+                    updateText();
+                });
+            });
+        }
+
+        searchInput.addEventListener('input', renderSuggestions);
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.search-box')) {
+                searchDropdown.style.display = 'none';
+            }
+        });
+
+        // ===== ЗВЕЗДОПАД =====
+        function createStars() {
+            const container = document.getElementById('starContainer');
+            const starCount = 60;
+
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                const size = Math.random() * 4 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                star.style.left = `${Math.random() * 100}vw`;
+                star.style.top = `-${Math.random() * 20}vh`;
+                
+                const duration = Math.random() * 3 + 2;
+                star.style.animationDuration = `${duration}s`;
+                
+                const delay = Math.random() * 5;
+                star.style.animationDelay = `${delay}s`;
+                
+                container.appendChild(star);
+            }
+        }
+
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchRemainingTime(); // Забираем время с сервера
+            
+            updateClock();
+            setInterval(updateClock, 1000);
+            
+            setInterval(updateCountdown, 1000); // Обновляем раз в секунду
+            
+            updateText();
+            createStars();
+        });
+    </script>
+
+</body>
+</html>
