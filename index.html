@@ -1,512 +1,45 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EMERALD Market</title>
-    
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; font-family: 'Inter', sans-serif; background: #0b0c10; color: #e4e6eb; overflow-x: hidden; }
-        
-        .rain-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
-        .rain { position: absolute; width: 2px; background: linear-gradient(to bottom, rgba(46,204,113,0.1), rgba(46,204,113,0.3)); animation: rainFall linear infinite; }
-        @keyframes rainFall { 0% { transform: translateY(-100vh) rotate(10deg); opacity: 0.3; } 100% { transform: translateY(100vh) rotate(10deg); opacity: 0.8; } }
-        .rain-slow { animation-duration: 3s; }
-        .rain-medium { animation-duration: 2s; }
-        .rain-fast { animation-duration: 1.2s; }
-
-        .wrapper { display: flex; flex-direction: column; min-height: 100vh; position: relative; z-index: 1; }
-        .content { flex: 1; }
-        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
-
-        .header { background: #111318; border-bottom: 1px solid #26282f; padding: 12px 0; position: sticky; top: 0; z-index: 100; }
-        .header-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-        .logo { font-size: 24px; font-weight: 800; color: #2ecc71; cursor: pointer; display: flex; align-items: center; gap: 10px; text-decoration: none; }
-        .logo span { color: #8a8d99; font-weight: 400; }
-        .nav { display: flex; gap: 28px; font-weight: 600; font-size: 15px; flex-wrap: wrap; }
-        .nav a { color: #b2b4bb; cursor: pointer; padding: 4px 0; border-bottom: 2px solid transparent; text-decoration: none; transition: 0.2s; }
-        .nav a:hover { color: #2ecc71; }
-        .nav a.active { color: #2ecc71; border-bottom-color: #2ecc71; }
-        .header-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-
-        .btn { background: #2ecc71; color: #0b0c10 !important; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; border: none; cursor: pointer; transition: 0.2s; }
-        .btn:hover { background: #27ae60; }
-        .btn-outline { background: transparent; color: #b2b4bb !important; border: 1px solid #3a3c46; padding: 7px 18px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; }
-        .btn-outline:hover { border-color: #2ecc71; color: #2ecc71 !important; }
-        .btn-steam { background: #171a21; color: #fff; border: 1px solid #66c0f4; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; }
-
-        .steam-user { display: flex; align-items: center; gap: 10px; background: #1c1d23; padding: 4px 12px 4px 4px; border-radius: 30px; border: 1px solid #2c2e36; cursor: pointer; }
-        .steam-user:hover { border-color: #2ecc71; }
-        .steam-avatar { width: 32px; height: 32px; border-radius: 50%; background-size: cover; background-position: center; flex-shrink: 0; }
-        .steam-name { font-size: 14px; font-weight: 600; color: #e4e6eb; }
-        .steam-logout { background: none; border: none; color: #8a8d99; font-size: 14px; padding: 0 4px; }
-
-        .page { display: none; padding: 30px 0 60px; }
-        .page.active { display: block; }
-
-        /* ===== ПРОДАЖА ===== */
-        .sell-title { text-align: center; font-size: 30px; font-weight: 800; color: #fff; margin-bottom: 30px; }
-        .sell-layout { display: flex; gap: 24px; }
-        .sell-left { flex: 1; }
-        .sell-right { width: 380px; min-width: 380px; background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px; }
-
-        .filters-row { display: flex; gap: 12px; margin-bottom: 20px; align-items: center; }
-        .filter-select { background: #14161c; border: 1px solid #26282f; border-radius: 8px; padding: 10px 12px; color: #e4e6eb; font-size: 14px; outline: none; width: 120px; }
-        .filter-search { flex: 1; display: flex; align-items: center; background: #14161c; border: 1px solid #26282f; border-radius: 8px; padding: 10px 12px; }
-        .filter-search input { flex: 1; background: transparent; border: none; outline: none; color: #e4e6eb; font-size: 14px; }
-        .filter-search svg { width: 18px; height: 18px; fill: #8a8d99; }
-        .select-all-btn { background: #1c1d23; border: 1px solid #26282f; border-radius: 8px; padding: 10px 16px; color: #e4e6eb; font-size: 13px; cursor: pointer; }
-        .trade-url-btn { background: #2ecc71; color: #0b0c10; border: none; border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-        .refresh-btn { background: transparent; border: none; color: #8a8d99; font-size: 20px; cursor: pointer; }
-
-        .skins-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-        .skin-card { background: #14161c; border: 1px solid #26282f; border-radius: 8px; padding: 10px; position: relative; cursor: pointer; }
-        .skin-card:hover { border-color: #2ecc71; }
-        .skin-card .badge { position: absolute; top: 8px; right: 8px; background: #a855f7; color: #fff; font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 700; }
-        .skin-card .badge.unavailable { background: #ff9800; }
-        .skin-card .image { height: 90px; display: flex; align-items: center; justify-content: center; }
-        .skin-card .image img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .skin-card .name { font-size: 12px; font-weight: 600; color: #e4e6eb; text-align: center; margin-top: 6px; }
-        .skin-card .price { font-size: 14px; font-weight: 700; color: #2ecc71; text-align: center; margin-top: 4px; }
-        .skin-card.selected { border-color: #2ecc71; }
-        .skin-card.selected::after { content: '✓'; position: absolute; top: 8px; left: 8px; background: #2ecc71; color: #0b0c10; width: 20px; height: 20px; border-radius: 50%; font-size: 12px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
-
-        .sell-right h3 { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 20px; }
-        .promo-input { display: flex; gap: 8px; margin-bottom: 20px; }
-        .promo-input input { flex: 1; background: #0b0c10; border: 1px solid #26282f; border-radius: 8px; padding: 12px; color: #e4e6eb; font-size: 14px; }
-        .promo-input button { background: #2ecc71; color: #0b0c10; border: none; border-radius: 8px; padding: 12px 20px; font-weight: 700; font-size: 14px; cursor: pointer; }
-
-        .payment-methods { display: flex; gap: 8px; margin-bottom: 20px; }
-        .pay-method { flex: 1; background: #1c1d23; border: 1px solid #26282f; border-radius: 8px; padding: 12px; text-align: center; cursor: pointer; }
-        .pay-method.active { border-color: #2ecc71; }
-        .pay-method .icon { font-size: 24px; margin-bottom: 6px; }
-        .pay-method .label { font-size: 12px; color: #b2b4bb; }
-
-        .sum-box { background: #1c1d23; border: 1px solid #26282f; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
-        .sum-box .total { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .sum-box .total .label { color: #8a8d99; font-size: 13px; }
-        .sum-box .total .value { color: #2ecc71; font-size: 18px; font-weight: 700; }
-        .sum-box .final { display: flex; justify-content: space-between; align-items: center; }
-        .sum-box .final .label { color: #8a8d99; font-size: 13px; }
-        .sum-box .final .value { color: #2ecc71; font-size: 14px; font-weight: 700; }
-
-        .sell-btn { width: 100%; background: #2ecc71; color: #0b0c10; border: none; border-radius: 8px; padding: 16px; font-size: 16px; font-weight: 800; cursor: pointer; }
-        .sell-btn:hover { background: #27ae60; }
-
-        /* ПРОФИЛЬ */
-        .profile-login-box { max-width: 500px; margin: 40px auto; background: #14161c; border: 1px solid #26282f; border-radius: 16px; padding: 48px 40px; text-align: center; }
-        .profile-login-box .icon { font-size: 64px; margin-bottom: 16px; }
-        .profile-login-box h2 { color: #e4e6eb; font-size: 24px; margin-bottom: 8px; }
-        .profile-login-box p { color: #8a8d99; font-size: 16px; margin-bottom: 24px; }
-        .profile-layout { display: flex; gap: 24px; }
-        .profile-left { width: 300px; min-width: 300px; display: flex; flex-direction: column; gap: 16px; }
-        .profile-avatar-box { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 20px; text-align: center; }
-        .profile-avatar { width: 96px; height: 96px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 700; color: #0b0c10; flex-shrink: 0; background-size: cover; background-position: center; margin: 0 auto 12px; }
-        .profile-name { font-size: 18px; font-weight: 700; color: #fff; }
-        .profile-balance { font-size: 20px; font-weight: 800; color: #2ecc71; margin-top: 8px; }
-        .trade-url-btn-blue { background: #2ecc71; color: #0b0c10; border: none; border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; }
-        .trade-url-btn-blue:hover { background: #27ae60; }
-        .profile-tabs { background: #14161c; border: 1px solid #26282f; border-radius: 12px; overflow: hidden; }
-        .profile-tab { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #b2b4bb; font-size: 14px; cursor: pointer; border-bottom: 1px solid #1c1d23; transition: 0.2s; }
-        .profile-tab .icon { font-size: 18px; }
-        .profile-tab:hover { background: #1c1d23; color: #fff; }
-        .profile-tab.active { background: #2ecc71; color: #0b0c10; }
-        .profile-right { flex: 1; }
-        .profile-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-        .profile-card { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 20px; text-align: center; }
-        .profile-card .icon { font-size: 32px; margin-bottom: 8px; }
-        .profile-card .value { font-size: 18px; font-weight: 700; color: #fff; }
-        .profile-card .label { color: #8a8d99; font-size: 12px; margin-top: 4px; }
-        .profile-content-section { display: none; }
-        .profile-content-section.active { display: block; }
-        .profile-transactions { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 24px; }
-        .profile-transactions h3 { margin-bottom: 16px; font-size: 18px; }
-        .transaction-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-        .transaction-table th, .transaction-table td { text-align: left; padding: 12px; border-bottom: 1px solid #1c1d23; font-size: 13px; color: #b2b4bb; }
-        .transaction-table th { color: #fff; }
-
-        .footer { background: #101116; border-top: 1px solid #26282f; padding: 40px 0 24px; }
-        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 30px; }
-        .footer-grid .col h4 { color: #e4e6eb; margin-bottom: 12px; font-size: 16px; }
-        .footer-grid .col a { display: block; color: #8a8d99; font-size: 14px; padding: 4px 0; cursor: pointer; }
-        .footer-grid .col a:hover { color: #2ecc71; }
-        .footer-bottom { text-align: center; margin-top: 32px; padding-top: 20px; border-top: 1px solid #1c1d23; color: #6a6d7a; font-size: 14px; }
-
-        @media (max-width: 992px) { .sell-layout { flex-direction: column; } .sell-right { width: 100%; min-width: unset; } .skins-grid { grid-template-columns: repeat(3, 1fr); } .profile-layout { flex-direction: column; } .profile-left { width: 100%; min-width: unset; } .profile-cards { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 600px) { .skins-grid { grid-template-columns: repeat(2, 1fr); } }
-    </style>
-</head>
-<body>
-
-<div class="rain-container" id="rainContainer"></div>
-
-<div class="wrapper">
-
-<header class="header">
-    <div class="container header-inner">
-        <a href="#" class="logo" id="logoLink">EMERALD<span>Market</span></a>
-        <nav class="nav">
-            <a class="active" data-page="sell">Продать скины</a>
-            <a data-page="market">Купить скины</a>
-            <a data-page="profile">Профиль</a>
-        </nav>
-        <div class="header-actions" id="headerActions">
-            <a href="/auth/steam" class="btn btn-steam">Войти через Steam</a>
-        </div>
-    </div>
-</header>
-
-<div class="content">
-
-<!-- СТРАНИЦА ПРОДАЖИ -->
-<div class="page active" id="sellPage">
-    <div class="container">
-        <h1 class="sell-title">Продавайте скины CS2 мгновенно</h1>
-        
-        <div class="sell-layout">
-            <div class="sell-left">
-                <div class="filters-row">
-                    <select class="filter-select">
-                        <option>CS2</option>
-                        <option>CS:GO</option>
-                    </select>
-                    <div class="filter-search">
-                        <input type="text" id="marketSearch" placeholder="Поиск по названию">
-                        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-                    </div>
-                    <select class="filter-select">
-                        <option>Сначала дороже</option>
-                        <option>Сначала дешевле</option>
-                    </select>
-                    <button class="select-all-btn">Выбрать все</button>
-                    <button class="trade-url-btn" onclick="toggleTradeUrlInput()">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                        Trade URL
-                    </button>
-                    <button class="refresh-btn" onclick="loadSteamInventory()">⟳</button>
-                </div>
-                
-                <div class="skins-grid" id="sellSkinGrid">
-                    <div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">
-                        Введите Trade URL и скины появятся здесь
-                    </div>
-                </div>
-            </div>
-            
-            <div class="sell-right">
-                <h3>Выбрано <span id="selectedCount">0</span> скинов на <span id="selectedPrice">0,00 ₽</span></h3>
-                
-                <div class="promo-input">
-                    <input type="text" placeholder="Введите промокод">
-                    <button>Применить</button>
-                </div>
-                
-                <p style="color:#8a8d99; font-size:13px; margin-bottom:12px;">Выберите метод вывода</p>
-                <div class="payment-methods">
-                    <div class="pay-method active">
-                        <div class="icon">💳</div>
-                        <div class="label">МИР</div>
-                    </div>
-                    <div class="pay-method">
-                        <div class="icon">💳</div>
-                        <div class="label">VISA</div>
-                    </div>
-                    <div class="pay-method">
-                        <div class="icon">💵</div>
-                        <div class="label">СБП</div>
-                    </div>
-                    <div class="pay-method">
-                        <div class="icon">🪙</div>
-                        <div class="label">USDT</div>
-                    </div>
-                </div>
-                
-                <div class="sum-box">
-                    <div class="total">
-                        <span class="label">Общая стоимость предметов</span>
-                        <span class="value">0,00 ₽</span>
-                    </div>
-                    <div class="final">
-                        <span class="label">Всего к выплате</span>
-                        <span class="value">0,00 ₽</span>
-                    </div>
-                </div>
-                
-                <button class="sell-btn">Выплатить</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- СТРАНИЦА ПРОФИЛЯ -->
-<div class="page" id="profilePage">
-    <div class="container">
-        <div id="profileLoginBox" style="display:block;">
-            <div class="profile-login-box">
-                <div class="icon" style="font-size: 64px;">🎮</div>
-                <h2>Войдите через Steam</h2>
-                <p>Чтобы получить доступ к этой странице</p>
-                <a href="/auth/steam" class="btn btn-steam" style="margin-top:10px;">Войти через Steam</a>
-            </div>
-        </div>
-        <div id="profileContent" style="display:none;">
-            <div class="profile-layout">
-                <div class="profile-left">
-                    <div class="profile-avatar-box">
-                        <div class="profile-avatar" id="profileAvatar"></div>
-                        <div class="profile-name" id="profileName"></div>
-                        <div class="profile-balance">0,00 ₽</div>
-                    </div>
-                    <button class="trade-url-btn-blue" onclick="toggleTradeUrlInput()">🔗 Trade URL</button>
-                    <div class="profile-tabs">
-                        <div class="profile-tab active" data-tab="transactions">
-                            <span class="icon">📄</span>
-                            Транзакции
-                        </div>
-                        <div class="profile-tab" data-tab="exchanges">
-                            <span class="icon">📦</span>
-                            Обмены
-                        </div>
-                        <div class="profile-tab" data-tab="verification">
-                            <span class="icon">🛡️</span>
-                            Верификация
-                        </div>
-                        <div class="profile-tab" data-tab="sessions">
-                            <span class="icon">🔒</span>
-                            Сессии
-                        </div>
-                        <div class="profile-tab" data-tab="referral">
-                            <span class="icon">🔗</span>
-                            Реферальная система
-                        </div>
-                        <div class="profile-tab" data-tab="api">
-                            <span class="icon">💻</span>
-                            API
-                        </div>
-                    </div>
-                </div>
-
-                <div class="profile-right">
-                    <div class="profile-cards">
-                        <div class="profile-card">
-                            <div class="icon">🛒</div>
-                            <div class="value">0,00 ₽</div>
-                            <div class="label">Продано на сумму</div>
-                        </div>
-                        <div class="profile-card">
-                            <div class="icon">🛍️</div>
-                            <div class="value">0,00 ₽</div>
-                            <div class="label">Куплено на сумму</div>
-                        </div>
-                        <div class="profile-card">
-                            <div class="icon">⏰</div>
-                            <div class="value">0 дня</div>
-                            <div class="label">Времени на сайте</div>
-                        </div>
-                        <div class="profile-card">
-                            <div class="icon">🛡️</div>
-                            <div class="value">Отсутствует</div>
-                            <div class="label">КУС верификация</div>
-                        </div>
-                    </div>
-
-                    <div class="profile-content-section active" id="section-transactions">
-                        <div class="profile-transactions">
-                            <h3>Транзакции</h3>
-                            <table class="transaction-table">
-                                <thead>
-                                    <tr>
-                                        <th>Сервис</th>
-                                        <th>Дата</th>
-                                        <th>Сумма</th>
-                                        <th>Статус</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td colspan="4" style="text-align: center; padding: 30px; color: #6a6d7a;">Нет транзакций</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="profile-content-section" id="section-exchanges">
-                        <div class="profile-transactions">
-                            <h3>Обмены</h3>
-                            <p style="color:#8a8d99; text-align:center; padding: 40px;">У вас пока нет предметов</p>
-                        </div>
-                    </div>
-
-                    <div class="profile-content-section" id="section-verification">
-                        <div class="profile-transactions">
-                            <h3>Верификация</h3>
-                            <p style="color:#8a8d99;">К сожалению, вы не можете пройти верификацию.</p>
-                        </div>
-                    </div>
-
-                    <div class="profile-content-section" id="section-sessions">
-                        <div class="profile-transactions">
-                            <h3>Сессии</h3>
-                            <p style="color:#8a8d99;">Информация о сессиях появится позже</p>
-                        </div>
-                    </div>
-
-                    <div class="profile-content-section" id="section-referral">
-                        <div class="profile-transactions">
-                            <h3>Реферальная система</h3>
-                            <p style="color:#8a8d99;">Здесь будет ваша реферальная ссылка</p>
-                        </div>
-                    </div>
-
-                    <div class="profile-content-section" id="section-api">
-                        <div class="profile-transactions">
-                            <h3>API</h3>
-                            <p style="color:#8a8d99;">Здесь будет ваш API ключ</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ДРУГИЕ СТРАНИЦЫ -->
-<div class="page" id="marketPage">
-    <div class="container">
-        <h2 style="font-size: 24px; font-weight: 700;">Купить скины</h2>
-        <p style="color:#8a8d99; margin-bottom:20px;">Здесь будут ваши скины</p>
-    </div>
-</div>
-
-</div>
-
-</div>
-
 <script>
-// ===== ЛОГИКА STEAM =====
 let currentUser = null;
 let userInventory = [];
 let selectedSteamSkins = [];
 
+// 1. Получаем авторизацию
 async function fetchUser() {
     const response = await fetch('/api/user');
     const data = await response.json();
     if (data.loggedIn) {
-        currentUser = { id: data.user.id, name: data.user.name, avatar: data.user.avatar };
+        currentUser = data.user;
         updateUserUI();
-        renderProfile();
-        loadTradeUrl();
-    } else {
-        currentUser = null;
-        updateUserUI();
-        renderProfile();
+        loadTradeUrl(); // Проверяем сохранённую ссылку
     }
 }
 
-function logoutUser() { window.location.href = '/logout'; }
-
-function updateUserUI() {
-    const actions = document.getElementById('headerActions');
-    if (currentUser) {
-        actions.innerHTML = `
-            <div class="steam-user" style="cursor:pointer;" onclick="navigateTo('profile')">
-                <div class="steam-avatar" style="background-image:url('${currentUser.avatar}');"></div>
-                <span class="steam-name">${currentUser.name}</span>
-                <button class="steam-logout" onclick="event.stopPropagation(); logoutUser()">✕</button>
-            </div>
-        `;
-    } else {
-        actions.innerHTML = `<a href="/auth/steam" class="btn btn-steam">Войти через Steam</a>`;
-    }
-}
-
-// ===== TRADE URL =====
-let tradeUrlInput = null;
-
-function toggleTradeUrlInput() {
-    if (!tradeUrlInput) {
-        tradeUrlInput = document.createElement('input');
-        tradeUrlInput.type = 'text';
-        tradeUrlInput.placeholder = 'https://steamcommunity.com/tradeoffer/new/?...';
-        tradeUrlInput.style.cssText = 'flex:1; background:#0b0c10; border:1px solid #2ecc71; border-radius:8px; padding:10px 12px; color:#e4e6eb; font-size:14px; outline:none;';
-        tradeUrlInput.addEventListener('blur', async function() {
-            if (this.value.trim()) {
-                await fetch('/api/save-trade-url', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ tradeUrl: this.value.trim() })
-                });
-                
-                // Самое важное: ГРУЗИМ ИНВЕНТАРЬ НАПРЯМУЮ ИЗ БРАУЗЕРА
-                loadDirectInventory(this.value.trim());
-            }
-        });
-        document.querySelector('.filters-row').insertBefore(tradeUrlInput, document.querySelector('.refresh-btn'));
-    } else {
-        tradeUrlInput.remove();
-        tradeUrlInput = null;
-    }
-}
-
-async function loadTradeUrl() {
-    const response = await fetch('/api/get-trade-url');
-    const data = await response.json();
-    if (data.tradeUrl) {
-        loadDirectInventory(data.tradeUrl);
-    }
-}
-
-// ===== ИНВЕНТАРЬ НАПРЯМУЮ ИЗ STEAM (через браузер) =====
-async function loadDirectInventory(tradeUrl) {
+// 2. Загрузка инвентаря (ВСЕГДА через сервер!)
+async function loadSteamInventory() {
+    if (!currentUser) { alert('Сначала войди через Steam!'); return; }
+    
     const grid = document.getElementById('sellSkinGrid');
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">⏳ Загружаем ваш инвентарь...</div>';
-
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">⏳ Загружаем... (обычно занимает 5-10 секунд)</div>';
+    
     try {
-        // Достаём Steam ID из ссылки
-        const match = tradeUrl.match(/partner=(\d+)/);
-        if (!match) {
-            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">Ошибка: Неверная Trade URL</div>';
-            return;
-        }
-        
-        const steamId = BigInt(match[1]) + 76561197960265728n;
-        
-        // Запрос к Steam напрямую
-        const response = await fetch(`https://steamcommunity.com/inventory/${steamId}/730/2?l=english&count=1000`, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-            }
+        // Сервер делает запрос, обходя CORS и баны
+        const response = await fetch('/api/get-inventory', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
         });
         
         const data = await response.json();
+        if (data.error) { alert(data.error); return; }
         
-        if (!data.assets || data.assets.length === 0) {
+        userInventory = data.items || [];
+        if (userInventory.length === 0) {
             grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">Инвентарь пуст или скрыт.</div>';
             return;
         }
         
-        const items = [];
-        const descriptions = {};
-        data.descriptions.forEach(desc => { descriptions[`${desc.classid}_${desc.instanceid}`] = desc; });
-        
-        data.assets.forEach(asset => {
-            const key = `${asset.classid}_${asset.instanceid}`;
-            const desc = descriptions[key];
-            if (desc) {
-                items.push({
-                    assetid: asset.assetid,
-                    name: desc.market_hash_name || desc.name,
-                    image: desc.icon_url ? `https://community.akamai.steamstatic.com/economy/image/${desc.icon_url}` : '',
-                    type: desc.type || ''
-                });
-            }
-        });
-        
-        userInventory = items;
-        
-        grid.innerHTML = items.map((item, index) => `
+        // Отображаем скины
+        grid.innerHTML = userInventory.map((item, index) => `
             <div class="skin-card" onclick="toggleSkinSelection(${index})">
                 <div class="badge">${item.type || 'Скин'}</div>
                 <div class="image">${item.image ? `<img src="${item.image}">` : ''}</div>
@@ -514,108 +47,30 @@ async function loadDirectInventory(tradeUrl) {
                 <div class="price">0,00 ₽</div>
             </div>
         `).join('');
-        
-    } catch (error) {
-        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">Ошибка: Попробуй позже. Проверь ссылку.</div>';
+    } catch (e) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#8a8d99;">Ошибка связи с сервером.</div>';
     }
 }
 
-function toggleSkinSelection(index) {
-    const item = userInventory[index];
-    const idx = selectedSteamSkins.findIndex(id => id === item.assetid);
-    if (idx > -1) {
-        selectedSteamSkins.splice(idx, 1);
-        const cards = document.querySelectorAll('.skin-card');
-        cards[index].classList.remove('selected');
-    } else {
-        selectedSteamSkins.push(item.assetid);
-        const cards = document.querySelectorAll('.skin-card');
-        cards[index].classList.add('selected');
-    }
+// 3. Сохранение и авто-загрузка
+document.addEventListener('DOMContentLoaded', async function() {
+    await fetchUser();
     
-    document.getElementById('selectedCount').textContent = selectedSteamSkins.length;
-}
-
-// ===== НАВИГАЦИЯ =====
-function navigateTo(page) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    const target = document.getElementById(page + 'Page');
-    if (target) target.classList.add('active');
-    document.querySelectorAll('.nav a').forEach(a => {
-        if (a.dataset.page === page) {
-            a.classList.add('active');
-        } else {
-            a.classList.remove('active');
+    document.getElementById('tradeUrlInput').addEventListener('blur', async function() {
+        const url = this.value.trim();
+        if (url) {
+            // Сохраняем на сервере
+            await fetch('/api/save-trade-url', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tradeUrl: url })
+            });
+            // Сразу грузим
+            loadSteamInventory();
         }
-    });
-}
-
-// ===== ПРОФИЛЬ =====
-function renderProfile() {
-    if (currentUser) {
-        document.getElementById('profileLoginBox').style.display = 'none';
-        document.getElementById('profileContent').style.display = 'block';
-        document.getElementById('profileName').textContent = currentUser.name;
-        if (currentUser.avatar) {
-            document.getElementById('profileAvatar').style.backgroundImage = `url('${currentUser.avatar}')`;
-            document.getElementById('profileAvatar').style.backgroundSize = 'cover';
-            document.getElementById('profileAvatar').style.backgroundPosition = 'center';
-            document.getElementById('profileAvatar').textContent = '';
-        } else {
-            document.getElementById('profileAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
-        }
-    } else {
-        document.getElementById('profileLoginBox').style.display = 'block';
-        document.getElementById('profileContent').style.display = 'none';
-    }
-}
-
-// Табы профиля
-document.querySelectorAll('.profile-tab').forEach(tab => {
-    tab.addEventListener('click', function() {
-        const tabName = this.dataset.tab;
-        document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
-        this.classList.add('active');
-        
-        document.querySelectorAll('.profile-content-section').forEach(section => {
-            section.classList.remove('active');
-        });
-        document.getElementById('section-' + tabName).classList.add('active');
     });
 });
 
-// ===== ИНИЦИАЛИЗАЦИЯ =====
-document.addEventListener('DOMContentLoaded', function() {
-    fetchUser();
-    
-    document.querySelectorAll('.nav a').forEach(el => {
-        el.addEventListener('click', function(e) {
-            e.preventDefault();
-            const page = this.dataset.page;
-            if (page) navigateTo(page);
-        });
-    });
-    document.getElementById('logoLink').addEventListener('click', function(e) {
-        e.preventDefault();
-        navigateTo('sell');
-    });
-
-    navigateTo('sell');
-    
-    // Дождик
-    const container = document.getElementById('rainContainer');
-    for (let i = 0; i < 80; i++) {
-        const drop = document.createElement('div');
-        drop.className = 'rain';
-        const speed = ['rain-slow', 'rain-medium', 'rain-fast'][Math.floor(Math.random() * 3)];
-        drop.classList.add(speed);
-        drop.style.left = Math.random() * 100 + '%';
-        drop.style.height = (10 + Math.random() * 30) + 'px';
-        drop.style.animationDelay = Math.random() * 3 + 's';
-        drop.style.animationDuration = (1.2 + Math.random() * 2) + 's';
-        container.appendChild(drop);
-    }
-});
+function updateUserUI() { /* ... существующий код ... */ }
+function toggleSkinSelection(index) { /* ... существующий код ... */ }
 </script>
-</body>
-</html>
