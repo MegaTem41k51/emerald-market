@@ -262,7 +262,7 @@
                 <div class="filters-row">
                     <select class="filter-select">
                         <option>CS2</option>
-                        <option>CS:GO</option>
+                        <option></option>
                     </select>
                     <input type="text" class="filter-input" placeholder="Поиск по названию">
                     <select class="filter-select">
@@ -291,8 +291,6 @@
                     <input type="text" id="sellTradeUrl" placeholder="https://steamcommunity.com/tradeoffer/new/?pa...">
                     <button class="btn" style="width: 100%; margin-top: 8px;" onclick="saveTradeUrl()">Сохранить</button>
                 </div>
-
-                <!-- ПРОМОКОД УБРАН -->
 
                 <div class="sidebar-section">
                     <label>Выберите метод вывода</label>
@@ -389,7 +387,6 @@
                         </div>
                     </div>
 
-                    <!-- ТРАНЗАКЦИИ: таблица, остальное В РАЗРАБОТКЕ -->
                     <div class="profile-content-section active" id="section-transactions">
                         <div class="profile-transactions">
                             <h3>Транзакции</h3>
@@ -416,15 +413,15 @@
                     </div>
 
                     <div class="profile-content-section" id="section-verification">
-                        <div class="in-development">В РАЗРАБОТКЕ</div>
+                        <div class="in-development"></div>
                     </div>
 
                     <div class="profile-content-section" id="section-sessions">
-                        <div class="in-development">В РАЗРАБОТКЕ</div>
+                        <div class="in-development"></div>
                     </div>
 
                     <div class="profile-content-section" id="section-api">
-                        <div class="in-development">В РАЗРАБОТКЕ</div>
+                        <div class="in-development"></div>
                     </div>
                 </div>
             </div>
@@ -437,7 +434,7 @@
     <div class="container">
         <div style="text-align: center; padding: 150px 0;">
             <h2 style="font-size: 36px; font-weight: 900; color: #2ecc71; margin-bottom: 16px;">На данный момент</h2>
-            <p style="font-size: 24px; color: #8a8d99;">Скинов для продажи нет!</p>
+            <p style="font-size: 24px; color: #8a8d99;">Скинов для продажи нет</p>
         </div>
     </div>
 </div>
@@ -668,19 +665,17 @@ function setAnimation(on) {
 document.addEventListener('DOMContentLoaded', function() {
     fetchUser();
     
-    const savedTheme = localStorage.getItem('emeraldTheme');
-    const savedRain = localStorage.getItem('emeraldRain');
-    
-    if (savedTheme === 'light') {
+    // ЗАГРУЗКА НАСТРОЕК (автоматически применяем сохраненные)
+    if (localStorage.getItem('emeraldTheme') === 'light') {
         setTheme('light');
     } else {
-        setTheme('dark');
+        setTheme('dark'); // По умолчанию темная
     }
     
-    if (savedRain === 'off') {
+    if (localStorage.getItem('emeraldRain') === 'off') {
         setAnimation(false);
     } else {
-        setAnimation(true);
+        setAnimation(true); // По умолчанию включена
     }
     
     const container = document.getElementById('rainContainer');
