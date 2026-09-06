@@ -19,6 +19,22 @@
     <noscript><div><img src="https://mc.yandex.ru/watch/112295525" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
     <!-- /Yandex.Metrika counter -->
 
+    <!-- Start of Tawk.to Script -->
+    <script type="text/javascript">
+        var Tawk_API = Tawk_API || {},
+            Tawk_LoadStart = new Date();
+        (function() {
+            var s1 = document.createElement("script"),
+                s0 = document.getElementsByTagName("script")[0];
+            s1.async = true;
+            s1.src = 'https://embed.tawk.to/6a9de15e27a69434428b83c0/1k1sbgm7r';
+            s1.charset = 'UTF-8';
+            s1.setAttribute('crossorigin', '*');
+            s0.parentNode.insertBefore(s1, s0);
+        })();
+    </script>
+    <!-- End of Tawk.to Script -->
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; font-family: 'Inter', sans-serif; background: #0a0f0d; color: #e4e6eb; overflow-x: hidden; }
@@ -359,9 +375,6 @@
             font-weight: 600;
         }
 
-        @media (max-width: 992px) { .sell-layout { flex-direction: column; } .sell-sidebar { width: 100%; min-width: unset; position: static; } .skin-grid-sell { grid-template-columns: repeat(3, 1fr); } .profile-layout { flex-direction: column; } .profile-left { width: 100%; min-width: unset; } .profile-cards { grid-template-columns: repeat(2, 1fr); } .support-channels { grid-template-columns: 1fr; } .policy-container { padding: 25px 20px; } }
-        @media (max-width: 600px) { .skin-grid-sell { grid-template-columns: repeat(2, 1fr); } }
-
         /* ===== КНОПКА TELEGRAM В УГЛУ ===== */
         .telegram-float {
             position: fixed;
@@ -393,6 +406,35 @@
             height: 36px;
             fill: #fff;
         }
+
+        /* Стили для корректного отображения Tawk.to рядом с кнопкой Telegram */
+        .tawk-min-container {
+            bottom: 100px !important;
+            right: 30px !important;
+        }
+        /* Если виджет использует iframe, смещаем его вверх */
+        iframe[src*="tawk.to"] {
+            bottom: 100px !important;
+        }
+        /* Для мобильных устройств */
+        @media (max-width: 600px) {
+            .telegram-float {
+                bottom: 20px;
+                right: 20px;
+                width: 54px;
+                height: 54px;
+            }
+            .tawk-min-container {
+                bottom: 85px !important;
+                right: 20px !important;
+            }
+            iframe[src*="tawk.to"] {
+                bottom: 85px !important;
+            }
+        }
+
+        @media (max-width: 992px) { .sell-layout { flex-direction: column; } .sell-sidebar { width: 100%; min-width: unset; position: static; } .skin-grid-sell { grid-template-columns: repeat(3, 1fr); } .profile-layout { flex-direction: column; } .profile-left { width: 100%; min-width: unset; } .profile-cards { grid-template-columns: repeat(2, 1fr); } .support-channels { grid-template-columns: 1fr; } .policy-container { padding: 25px 20px; } }
+        @media (max-width: 600px) { .skin-grid-sell { grid-template-columns: repeat(2, 1fr); } }
     </style>
 </head>
 <body>
