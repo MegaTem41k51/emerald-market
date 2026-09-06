@@ -449,104 +449,225 @@ function isSkinItem(desc) {
 }
 
 // =====================================================
-// API ПОЛУЧЕНИЯ CS2 ИНВЕНТАРЯ
+// КЭШ ИНВЕНТАРЯ
+// =====================================================
+
+const inventoryCache = new Map();
+
+const INVENTORY_CACHE_TIME = 5 * 60 * 1000; // 5 минут
+
+function getCachedInventory(steamId) {
+    const cached = inventoryCache.get(steamId);
+
+    if (!cached) {
+        return null;
+    }
+
+    const age = Date.now() - cached.timestamp;
+
+    if (age > INVENTORY_CACHE_TIME) {
+        inventoryCache.delete(steamId);
+        return null;
+    }
+
+    return cached.items;
+}
+
+function setCachedInventory(steamId, items) {
+    inventoryCache.set(steamId, {
+        timestamp: Date.now(),
+        items
+    });
+}
+
+
+// =====================================================
+// ПОСЛЕДНИЙ ЗАПРОС К STEAM
+// =====================================================
+
+let lastSteamInventoryRequest = 0;
+
+const STEAM_REQUEST_DELAY = 5000;
+
+
+// =====================================================
+// CS2 INVENTORY
 // =====================================================
 
 app.post('/api/get-inventory', async (req, res) => {
 
     if (!req.user) {
-
         return res.status(401).json({
-            error:
-                'Войдите через Steam'
+            error: 'Войдите через Steam'
         });
     }
 
-    const steamId =
-        String(req.user.id);
+    const steamId = String(req.user.id);
 
-    console.log(
-        `📦 Запрос инвентаря CS2: ${steamId}`
-    );
+    // -----------------------------------------------
+    // Сначала проверяем кэш
+    // -----------------------------------------------
+
+    const cachedItems = getCachedInventory(steamId);
+
+    if (cachedItems) {
+
+        console.log(
+            `📦 Используем кэш инвентаря ${steamId}`
+        );
+
+        return res.json({
+            success: true,
+            cached: true,
+            items: cachedItems
+        });
+    }
+
+
+    // -----------------------------------------------
+    // Защита от слишком частых запросов
+    // -----------------------------------------------
+
+    const now = Date.now();
+
+    const timeSinceLastRequest =
+        now - lastSteamInventoryRequest;
+
+    if (
+        timeSinceLastRequest <
+        STEAM_REQUEST_DELAY
+    ) {
+
+        const wait =
+            Math.ceil(
+                (
+                    STEAM_REQUEST_DELAY -
+                    timeSinceLastRequest
+                ) / 1000
+            );
+
+        return res.status(429).json({
+            error:
+                `Подождите ${wait} сек. перед повторной загрузкой инвентаря.`
+        });
+    }
+
+    lastSteamInventoryRequest = now;
+
 
     try {
 
-        let allAssets = [];
-        let allDescriptions = [];
+        console.log(
+            `📦 Запрашиваем CS2 inventory: ${steamId}`
+        );
 
-        let startAssetId = '';
 
-        // Ограничиваем количество страниц,
-        // чтобы случайно не создать слишком много запросов
-        const MAX_PAGES = 5;
+        // -----------------------------------------------
+        // ОДИН запрос к Steam
+        // -----------------------------------------------
 
-        for (
-            let page = 0;
-            page < MAX_PAGES;
-            page++
-        ) {
+        const inventoryUrl =
+            `https://steamcommunity.com/inventory/${steamId}/730/2` +
+            `?l=english&count=2000`;
 
-            console.log(
-                `📦 Steam inventory page ${page + 1}`
+
+        const response =
+            await axios.get(
+                inventoryUrl,
+                {
+                    timeout: 20000,
+
+                    headers: {
+                        'User-Agent':
+                            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
+
+                        'Accept':
+                            'application/json,text/plain,*/*',
+
+                        'Accept-Language':
+                            'en-US,en;q=0.9',
+
+                        'Referer':
+                            'https://steamcommunity.com/'
+                    },
+
+                    validateStatus:
+                        () => true
+                }
             );
 
-            const inventory =
-                await getSteamInventory(
-                    steamId,
-                    startAssetId
-                );
 
-            if (
-                !inventory ||
-                inventory.success === false
-            ) {
+        console.log(
+            `Steam inventory response: ${response.status}`
+        );
 
-                return res.status(400).json({
-                    error:
-                        'Не удалось получить инвентарь Steam. Проверьте, что ваш инвентарь открыт.'
-                });
-            }
 
-            if (
-                Array.isArray(
-                    inventory.assets
-                )
-            ) {
+        // -----------------------------------------------
+        // 429
+        // -----------------------------------------------
 
-                allAssets =
-                    allAssets.concat(
-                        inventory.assets
-                    );
-            }
+        if (
+            response.status === 429
+        ) {
 
-            if (
-                Array.isArray(
-                    inventory.descriptions
-                )
-            ) {
+            console.error(
+                '❌ Steam вернул 429 Too Many Requests'
+            );
 
-                allDescriptions =
-                    allDescriptions.concat(
-                        inventory.descriptions
-                    );
-            }
-
-            // Steam сообщает, есть ли ещё предметы
-            if (
-                !inventory.more_items ||
-                !inventory.last_assetid
-            ) {
-                break;
-            }
-
-            startAssetId =
-                inventory.last_assetid;
+            return res.status(429).json({
+                error:
+                    'Steam временно ограничил запросы к инвентарю. Подождите немного и попробуйте позже.'
+            });
         }
 
-        // Если Steam ничего не вернул
+
+        // -----------------------------------------------
+        // Другие ошибки
+        // -----------------------------------------------
+
         if (
-            allAssets.length === 0 ||
-            allDescriptions.length === 0
+            response.status !== 200
+        ) {
+
+            console.error(
+                '❌ Steam HTTP:',
+                response.status
+            );
+
+            return res.status(502).json({
+                error:
+                    'Steam временно не отвечает на запрос инвентаря.'
+            });
+        }
+
+
+        const inventory =
+            response.data;
+
+
+        // -----------------------------------------------
+        // Проверка ответа
+        // -----------------------------------------------
+
+        if (
+            !inventory ||
+            inventory.success === false
+        ) {
+
+            return res.status(400).json({
+                error:
+                    'Steam не разрешил получить инвентарь. Проверьте настройки приватности Steam.'
+            });
+        }
+
+
+        if (
+            !Array.isArray(
+                inventory.assets
+            ) ||
+            !Array.isArray(
+                inventory.descriptions
+            )
         ) {
 
             return res.json({
@@ -555,14 +676,17 @@ app.post('/api/get-inventory', async (req, res) => {
             });
         }
 
-        // =================================================
-        // СОЗДАЁМ ТАБЛИЦУ DESCRIPTIONS
-        // =================================================
+
+        // -----------------------------------------------
+        // DESCRIPTION MAP
+        // -----------------------------------------------
 
         const descriptions = {};
 
+
         for (
-            const desc of allDescriptions
+            const desc
+            of inventory.descriptions
         ) {
 
             const key =
@@ -572,42 +696,102 @@ app.post('/api/get-inventory', async (req, res) => {
                 desc;
         }
 
-        // =================================================
-        // СОБИРАЕМ СКИНЫ
-        // =================================================
+
+        // -----------------------------------------------
+        // ITEMS
+        // -----------------------------------------------
 
         const items = [];
 
+
         for (
-            const asset of allAssets
+            const asset
+            of inventory.assets
         ) {
 
             const key =
                 `${asset.classid}_${asset.instanceid}`;
 
+
             const desc =
                 descriptions[key];
+
 
             if (!desc) {
                 continue;
             }
 
-            if (!isSkinItem(desc)) {
-                continue;
-            }
 
             const name =
                 desc.market_hash_name ||
                 desc.name ||
-                'Неизвестный предмет';
+                '';
 
-            let image = '';
 
-            if (desc.icon_url) {
-
-                image =
-                    `https://community.akamai.steamstatic.com/economy/image/${desc.icon_url}`;
+            if (!name) {
+                continue;
             }
+
+
+            const lowerName =
+                name.toLowerCase();
+
+
+            // -------------------------------------------
+            // Исключаем мусор
+            // -------------------------------------------
+
+            if (
+                lowerName.includes('case') ||
+                lowerName.includes('crate') ||
+                lowerName.includes('capsule') ||
+                lowerName.includes('sticker') ||
+                lowerName.includes('graffiti') ||
+                lowerName.includes('music kit') ||
+                lowerName.includes('souvenir package') ||
+                lowerName.includes('charm')
+            ) {
+                continue;
+            }
+
+
+            // -------------------------------------------
+            // Проверяем, что предмет похож на скин
+            // -------------------------------------------
+
+            let isSkin = false;
+
+
+            // Большинство обычных CS2 скинов
+            if (
+                name.includes('|')
+            ) {
+                isSkin = true;
+            }
+
+
+            // Ножи / перчатки
+            if (
+                lowerName.includes('knife') ||
+                lowerName.includes('karambit') ||
+                lowerName.includes('bayonet') ||
+                lowerName.includes('butterfly') ||
+                lowerName.includes('gloves')
+            ) {
+                isSkin = true;
+            }
+
+
+            if (!isSkin) {
+                continue;
+            }
+
+
+            const image =
+                desc.icon_url
+                    ? `https://community.akamai.steamstatic.com/economy/image/${desc.icon_url}`
+                    : '';
+
 
             items.push({
 
@@ -627,60 +811,58 @@ app.post('/api/get-inventory', async (req, res) => {
                     image,
 
                 type:
-                    desc.type || 'Скин',
-
-                marketable:
-                    desc.marketable === 1,
+                    desc.type ||
+                    'Скин',
 
                 tradable:
-                    desc.tradable === 1
+                    desc.tradable === 1,
+
+                marketable:
+                    desc.marketable === 1
 
             });
         }
+
+
+        // -----------------------------------------------
+        // КЭШ
+        // -----------------------------------------------
+
+        setCachedInventory(
+            steamId,
+            items
+        );
+
 
         console.log(
             `✅ ${steamId}: найдено ${items.length} скинов`
         );
 
-        res.json({
+
+        return res.json({
 
             success: true,
+
+            cached: false,
 
             items: items
 
         });
+
 
     } catch (error) {
 
         console.error(
             '❌ Ошибка Steam inventory:',
             error.response?.status ||
+            error.code ||
             error.message
         );
 
-        if (
-            error.response?.status === 403
-        ) {
 
-            return res.status(403).json({
-                error:
-                    'Steam запретил доступ к инвентарю. Убедитесь, что инвентарь открыт.'
-            });
-        }
-
-        if (
-            error.response?.status === 429
-        ) {
-
-            return res.status(429).json({
-                error:
-                    'Steam временно ограничил запросы. Подождите немного и попробуйте снова.'
-            });
-        }
-
-        res.status(500).json({
+        return res.status(500).json({
             error:
-                'Не удалось получить инвентарь Steam. Попробуйте ещё раз через некоторое время.'
+                'Ошибка соединения со Steam. Попробуйте позже.'
         });
     }
 });
