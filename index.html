@@ -26,36 +26,123 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; font-family: 'Inter', sans-serif; background: #0a0f0d; color: #e4e6eb; overflow-x: hidden; }
 
+        /* ===== СВЕТЛАЯ ТЕМА ===== */
         body.light { background: #f0f5f1; color: #1a1a2e; }
 
-        body.light .header { background: #e0f0e4; border-bottom-color: #d0d4da; }
+        body.light .header { background: #ffffff; border-bottom-color: #d0d4da; }
         body.light .nav a { color: #555; }
-        body.light .nav a.active { color: #2ecc71; }
+        body.light .nav a.active { color: #2ecc71; border-bottom-color: #2ecc71; }
         body.light .logo span { color: #888; }
         body.light .steam-user { background: #ffffff; border-color: #d0d4da; }
         body.light .steam-name { color: #333; }
         body.light .sell-hero h1 { color: #333; }
+
+        body.light .sell-skin-card { background: #ffffff; border-color: #d0d4da; }
+        body.light .sell-skin-card .image { background: #f5f6fa; }
+        body.light .sell-skin-card .skin-full-name { color: #333; }
+        body.light .sell-skin-card .skin-quality { color: #66c0f4; }
+        body.light .sell-skin-card.selected { border-color: #2ecc71; }
+
+        body.light .sell-sidebar { background: #ffffff; border-color: #d0d4da; }
+        body.light .sell-sidebar h3 { color: #333; }
+        body.light .sell-sidebar .total-label { color: #888; }
+        body.light .sell-sidebar .total-price { color: #2ecc71; }
+        body.light .sidebar-section label { color: #888; }
+        body.light .sidebar-section input[type="text"],
+        body.light .sidebar-section input[type="number"],
+        body.light .sidebar-section select { background: #f5f6fa; border-color: #d0d4da; color: #333; }
+        body.light .sidebar-section input[type="text"]:focus,
+        body.light .sidebar-section input[type="number"]:focus,
+        body.light .sidebar-section select:focus { border-color: #2ecc71; }
+        body.light .sidebar-section select option { background: #ffffff; color: #333; }
+
+        body.light .pay-btn { background: #f5f6fa; border-color: #d0d4da; color: #555; }
+        body.light .pay-btn:hover { border-color: #2ecc71; }
+        body.light .pay-btn.active { background: #2ecc71; border-color: #2ecc71; color: #fff; }
+
+        body.light .info-box { background: #f5f6fa; border-color: #d0d4da; color: #555; }
+        body.light .info-box strong { color: #333; }
+        body.light .info-box div { color: #333; }
+
+        body.light .requisites-block { background: #f5f6fa; border-color: #d0d4da; }
+        body.light .requisites-block .req-row label { color: #888; }
+        body.light .requisites-block .req-row input,
+        body.light .requisites-block .req-row select { background: #ffffff; border-color: #d0d4da; color: #333; }
+        body.light .requisites-block .req-row input:focus,
+        body.light .requisites-block .req-row select:focus { border-color: #2ecc71; }
+
+        body.light .sell-final-btn { background: #2ecc71; color: #fff; }
+        body.light .sell-final-btn:hover { background: #27ae60; }
+
+        body.light .filter-select,
+        body.light .filter-input { background: #ffffff; border-color: #d0d4da; color: #333; }
+        body.light .filter-select option { background: #ffffff; }
+
+        body.light .btn-outline { color: #555 !important; border-color: #d0d4da; }
+        body.light .btn-outline:hover { border-color: #2ecc71; color: #2ecc71 !important; }
+
+        body.light .profile-login-box { background: #ffffff; border-color: #d0d4da; }
+        body.light .profile-login-box h2 { color: #333; }
+        body.light .profile-login-box p { color: #555; }
+
         body.light .profile-avatar-box { background: #ffffff; border-color: #d0d4da; }
         body.light .profile-avatar-box div { color: #333; }
+        body.light .profile-name { color: #333; }
         body.light .profile-balance { color: #2ecc71; }
+
         body.light .profile-tabs { background: #ffffff; border-color: #d0d4da; }
         body.light .profile-tab { color: #555; border-bottom-color: #e0e4ea; }
+        body.light .profile-tab:hover { background: #f5f6fa; color: #333; }
         body.light .profile-tab.active { background: #2ecc71; color: #ffffff; }
+
         body.light .profile-card { background: #ffffff; border-color: #d0d4da; }
         body.light .profile-card .value { color: #333; }
+        body.light .profile-card .label { color: #888; }
+
         body.light .profile-transactions { background: #ffffff; border-color: #d0d4da; }
-        body.light .transaction-table th, body.light .transaction-table td { border-bottom-color: #e0e4ea; color: #666; }
+        body.light .profile-transactions h3 { color: #333; }
+        body.light .transaction-table th,
+        body.light .transaction-table td { border-bottom-color: #e0e4ea; color: #666; }
         body.light .transaction-table th { color: #333; }
-        body.light .footer { background: #e0f0e4; border-top-color: #d0d4da; }
-        body.light .footer-grid .col a { color: #555; }
-        body.light .footer-bottom { color: #999; }
+
         body.light .profile-settings { background: #ffffff; border-color: #d0d4da; }
         body.light .setting-row input[type="text"] { background: #f5f6fa; border-color: #d0d4da; color: #333; }
         body.light .setting-row .toggle-btn { background: #f5f6fa; border-color: #d0d4da; color: #555; }
         body.light .setting-row .toggle-btn.active { background: #2ecc71; border-color: #2ecc71; color: #ffffff; }
+
         body.light .faq-item { background: #ffffff; border-color: #d0d4da; }
         body.light .faq-question { color: #333; }
+        body.light .faq-question:hover { background: #f5f6fa; }
         body.light .faq-answer { color: #555; border-top-color: #e0e4ea; }
+
+        body.light .support-card { background: #ffffff; border-color: #d0d4da; }
+        body.light .support-card h2 { color: #333; }
+        body.light .support-card p { color: #555; }
+
+        body.light .support-channel { background: #f5f6fa; border-color: #d0d4da; }
+        body.light .support-channel .channel-name { color: #333; }
+        body.light .support-channel .channel-desc { color: #777; }
+        body.light .support-channel:hover { border-color: #2ecc71; }
+
+        body.light .policy-container { background: #ffffff; border-color: #d0d4da; }
+        body.light .policy-container h1 { color: #333; }
+        body.light .policy-container h2 { color: #333; }
+        body.light .policy-container h3 { color: #444; }
+        body.light .policy-container p { color: #555; }
+        body.light .policy-container ul { color: #555; }
+
+        body.light .footer { background: #ffffff; border-top-color: #d0d4da; }
+        body.light .footer-grid .col h4 { color: #333; }
+        body.light .footer-grid .col a { color: #555; }
+        body.light .footer-grid .col a:hover { color: #2ecc71; }
+        body.light .footer-bottom { color: #999; border-top-color: #d0d4da; }
+
+        body.light .in-development { color: #2ecc71; text-shadow: none; }
+        body.light .modal-content { background: #ffffff; border-color: #2ecc71; color: #333; }
+        body.light .modal-content h2 { color: #2ecc71; }
+        body.light .modal-content p { color: #555; }
+
+        body.light .rain { background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5)); }
 
         .wrapper { display: flex; flex-direction: column; min-height: 100vh; position: relative; z-index: 1; }
         .content { flex: 1; }
@@ -63,7 +150,6 @@
 
         .rain-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
         .rain { position: absolute; width: 2px; background: linear-gradient(to bottom, rgba(46, 204, 113, 0.1), rgba(46, 204, 113, 0.5)); animation: rainFall linear infinite; }
-        body.light .rain { background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5)); }
         @keyframes rainFall { 0% { transform: translateY(-100vh) rotate(10deg); opacity: 0.3; } 100% { transform: translateY(100vh) rotate(10deg); opacity: 0.8; } }
         .rain-slow { animation-duration: 3s; }
         .rain-medium { animation-duration: 2s; }
@@ -79,7 +165,6 @@
         .nav a { color: #b2b4bb; cursor: pointer; padding: 4px 0; border-bottom: 2px solid transparent; text-decoration: none; transition: 0.2s; }
         .nav a:hover { color: #2ecc71; }
         .nav a.active { color: #ffffff; border-bottom-color: #2ecc71; }
-        body.light .nav a.active { color: #2ecc71; border-bottom-color: #2ecc71; }
         .header-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 
         .btn { background: #2ecc71; color: #0b0c10 !important; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; border: none; cursor: pointer; transition: 0.2s; }
@@ -87,12 +172,13 @@
         .btn-outline { background: transparent; color: #b2b4bb !important; border: 1px solid #2c2e36; padding: 7px 18px; border-radius: 6px; font-weight: 500; font-size: 13px; cursor: pointer; }
         .btn-outline:hover { border-color: #2ecc71; color: #2ecc71 !important; }
         .btn-steam { background: #171a21; color: #fff; border: 1px solid #66c0f4; padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; }
+        body.light .btn-steam { background: #e8ecf1; color: #333; border-color: #d0d4da; }
 
         .steam-user { display: flex; align-items: center; gap: 10px; background: #1c1d23; padding: 4px 12px 4px 4px; border-radius: 30px; border: 1px solid #2c2e36; cursor: pointer; }
         .steam-user:hover { border-color: #2ecc71; }
         .steam-avatar { width: 32px; height: 32px; border-radius: 50%; background-size: cover; background-position: center; flex-shrink: 0; }
         .steam-name { font-size: 13px; font-weight: 500; color: #e4e6eb; }
-        .steam-logout { background: none; border: none; color: #8a8d99; font-size: 14px; padding: 0 4px; }
+        .steam-logout { background: none; border: none; color: #8a8d99; font-size: 14px; padding: 0 4px; cursor: pointer; }
 
         .page { display: none; padding: 30px 0 60px; }
         .page.active { display: block; }
@@ -211,7 +297,6 @@
             text-transform: uppercase;
             text-shadow: 0 0 15px rgba(46, 204, 113, 0.5);
         }
-        body.light .in-development { color: #2ecc71; text-shadow: none; }
 
         /* ===== МОДАЛКИ ===== */
         .modal-overlay {
@@ -234,9 +319,7 @@
             text-align: center;
             box-shadow: 0 0 40px rgba(46, 204, 113, 0.4);
         }
-        body.light .modal-content { background: #ffffff; border-color: #2ecc71; color: #333; }
         .modal-content h2 { font-size: 26px; font-weight: 900; margin-bottom: 12px; color: #fff; }
-        body.light .modal-content h2 { color: #2ecc71; }
         .modal-content p { font-size: 16px; margin-bottom: 24px; color: #b2b4bb; }
         .modal-content .btn { width: 100%; }
 
@@ -289,17 +372,17 @@
             margin-bottom: 24px;
             text-align: center;
         }
-        body.light .support-card { background: #ffffff; border-color: #d0d4da; }
         .support-card .icon-big { font-size: 56px; margin-bottom: 16px; }
         .support-card h2 { font-size: 24px; font-weight: 700; margin-bottom: 12px; color: #fff; }
-        body.light .support-card h2 { color: #333; }
         .support-card p { color: #b2b4bb; font-size: 16px; line-height: 1.7; }
-        body.light .support-card p { color: #555; }
         .support-channels {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 16px;
             margin-top: 24px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
         }
         .support-channel {
             background: #1c1d23;
@@ -313,13 +396,10 @@
             color: inherit;
             display: block;
         }
-        body.light .support-channel { background: #f5f6fa; border-color: #d0d4da; }
         .support-channel:hover { border-color: #2ecc71; transform: translateY(-2px); }
         .support-channel .channel-icon { font-size: 32px; margin-bottom: 8px; }
         .support-channel .channel-name { font-weight: 600; font-size: 16px; color: #fff; }
-        body.light .support-channel .channel-name { color: #333; }
         .support-channel .channel-desc { font-size: 13px; color: #8a8d99; margin-top: 4px; }
-        body.light .support-channel .channel-desc { color: #777; }
 
         /* ===== СТРАНИЦА ПОЛИТИКИ КОНФИДЕНЦИАЛЬНОСТИ ===== */
         .policy-container {
@@ -330,7 +410,6 @@
             border-radius: 16px;
             padding: 40px 50px;
         }
-        body.light .policy-container { background: #ffffff; border-color: #d0d4da; }
         .policy-container h1 {
             font-size: 32px;
             font-weight: 800;
@@ -338,7 +417,6 @@
             text-align: center;
             margin-bottom: 8px;
         }
-        body.light .policy-container h1 { color: #333; }
         .policy-container h1 span { color: #2ecc71; }
         .policy-container .subtitle {
             text-align: center;
@@ -352,21 +430,18 @@
             color: #fff;
             margin: 28px 0 12px;
         }
-        body.light .policy-container h2 { color: #333; }
         .policy-container h3 {
             font-size: 16px;
             font-weight: 600;
             color: #e4e6eb;
             margin: 18px 0 8px;
         }
-        body.light .policy-container h3 { color: #444; }
         .policy-container p {
             color: #b2b4bb;
             font-size: 15px;
             line-height: 1.8;
             margin-bottom: 12px;
         }
-        body.light .policy-container p { color: #555; }
         .policy-container ul {
             color: #b2b4bb;
             font-size: 15px;
@@ -374,14 +449,13 @@
             padding-left: 24px;
             margin-bottom: 12px;
         }
-        body.light .policy-container ul { color: #555; }
         .policy-container ul li { margin-bottom: 4px; }
         .policy-container .highlight {
             color: #2ecc71;
             font-weight: 600;
         }
 
-        @media (max-width: 992px) { .sell-layout { flex-direction: column; } .sell-sidebar { width: 100%; min-width: unset; position: static; } .skin-grid-sell { grid-template-columns: repeat(3, 1fr); } .profile-layout { flex-direction: column; } .profile-left { width: 100%; min-width: unset; } .profile-cards { grid-template-columns: repeat(2, 1fr); } .support-channels { grid-template-columns: 1fr; } .policy-container { padding: 25px 20px; } }
+        @media (max-width: 992px) { .sell-layout { flex-direction: column; } .sell-sidebar { width: 100%; min-width: unset; position: static; } .skin-grid-sell { grid-template-columns: repeat(3, 1fr); } .profile-layout { flex-direction: column; } .profile-left { width: 100%; min-width: unset; } .profile-cards { grid-template-columns: repeat(2, 1fr); } .support-channels { grid-template-columns: 1fr; max-width: 300px; } .policy-container { padding: 25px 20px; } }
         @media (max-width: 600px) { .skin-grid-sell { grid-template-columns: repeat(2, 1fr); } }
     </style>
 </head>
@@ -545,7 +619,7 @@
 
                 <div class="info-box">
                     <label>Общая стоимость предметов</label>
-                    <div style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px;" id="totalPriceDisplay">0,00 ₽</div>
+                    <div style="font-size: 16px; font-weight: 700; margin-bottom: 4px;" id="totalPriceDisplay">0,00 ₽</div>
                     <label>Всего к выплате</label>
                     <div style="font-size: 16px; font-weight: 700; color: #2ecc71;" id="payoutDisplay">0,00 ₽</div>
                 </div>
@@ -795,8 +869,7 @@
                 <div class="icon-big">💬</div>
                 <h2>Как связаться с нами?</h2>
                 <p>
-                    Выберите удобный для вас способ связи. Наши специалисты ответят на все ваши вопросы
-                    в кратчайшие сроки. Мы работаем ежедневно с 10:00 до 22:00 по МСК.
+                    Свяжитесь с нами через Telegram — самый быстрый способ получить ответ на ваш вопрос.
                 </p>
                 <div class="support-channels">
                     <a href="https://t.me/ikiawka" target="_blank" class="support-channel">
@@ -804,7 +877,11 @@
                         <div class="channel-name">Telegram</div>
                         <div class="channel-desc">Быстрый ответ</div>
                     </a>
-    
+                    <a href="mailto:emerald-market.p.tawkto.email" class="support-channel">
+                        <div class="channel-icon">📧</div>
+                        <div class="channel-name">Email</div>
+                        <div class="channel-desc">emerald-market.p.tawkto.email</div>
+                    </a>
                 </div>
             </div>
 
@@ -817,12 +894,6 @@
                 </p>
                 <p style="color: #8a8d99; font-size: 14px;">
                     Среднее время ответа: 5-15 минут
-                </p>
-            </div>
-
-            <div class="support-card">
-                
-                    Вне рабочего времени ответ может занять до 24 часов
                 </p>
             </div>
         </div>
@@ -984,7 +1055,6 @@ function formatPhone(input) {
     input.value = formatted;
 }
 
-// Инициализация телефона с +7 при фокусе
 document.addEventListener('DOMContentLoaded', function() {
     const phoneInput = document.getElementById('sbp-phone');
     phoneInput.addEventListener('focus', function() {
@@ -1003,7 +1073,6 @@ document.addEventListener('DOMContentLoaded', function() {
 let currentUser = null;
 let userInventory = [];
 let selectedSteamSkins = [];
-let currentPayoutPercent = 80;
 
 // ===== КЭШ ЦЕН С CSGOMARKET =====
 let marketPriceCache = {};
@@ -1164,19 +1233,19 @@ function processSale() {
     
     const selectedItems = selectedSteamSkins.map(idx => userInventory[idx]);
     
-    // Формируем текст скинов в формате "Оружие | Название Качество"
+    // Формируем текст скинов в формате "Оружие | Название Качество" (без цены)
     const skinList = selectedItems.map(item => {
-        const fullName = `${item.weapon || 'CS2'} | ${item.skinName || item.name} ${item.quality || 'Field-Tested'}`;
-        return fullName;
+        return `${item.weapon || 'CS2'} | ${item.skinName || item.name} ${item.quality || 'Field-Tested'}`;
     }).join('\n');
     
+    // Формируем текст с реквизитами (без года и CVV для VISA/МИР)
     let reqText = '';
     switch(requisites.method) {
         case 'VISA':
-            reqText = `VISA\nКарта: ${requisites.card}\nГод: ${requisites.year}\nCVV: ${requisites.cvv}`;
+            reqText = `VISA\nКарта: ${requisites.card}`;
             break;
         case 'МИР':
-            reqText = `МИР\nКарта: ${requisites.card}\nГод: ${requisites.year}\nCVV: ${requisites.cvv}`;
+            reqText = `МИР\nКарта: ${requisites.card}`;
             break;
         case 'СБП':
             reqText = `СБП\nТелефон: ${requisites.phone}\nБанк: ${requisites.bank}`;
