@@ -19,21 +19,8 @@
     <noscript><div><img src="https://mc.yandex.ru/watch/112295525" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
     <!-- /Yandex.Metrika counter -->
 
-    <!-- Start of Tawk.to Script -->
-    <script type="text/javascript">
-        var Tawk_API = Tawk_API || {},
-            Tawk_LoadStart = new Date();
-        (function() {
-            var s1 = document.createElement("script"),
-                s0 = document.getElementsByTagName("script")[0];
-            s1.async = true;
-            s1.src = 'https://embed.tawk.to/6a9de15e27a69434428b83c0/1k1sbgm7r';
-            s1.charset = 'UTF-8';
-            s1.setAttribute('crossorigin', '*');
-            s0.parentNode.insertBefore(s1, s0);
-        })();
-    </script>
-    <!-- End of Tawk.to Script -->
+    <!-- JivoSite -->
+    <script src="//code.jivo.ru/widget/17WdOr1rnX" async></script>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -892,7 +879,6 @@ let marketPriceCache = {};
 
 async function fetchMarketPrices() {
     try {
-        // Прокси-запрос к CSGOMarket API
         const response = await fetch('/api/csgomarket/prices');
         if (!response.ok) throw new Error('Ошибка загрузки цен');
         const data = await response.json();
@@ -904,7 +890,6 @@ async function fetchMarketPrices() {
         return false;
     } catch (error) {
         console.warn('⚠️ Не удалось загрузить цены с CSGOMarket:', error.message);
-        // Используем тестовые данные для демонстрации
         marketPriceCache = {
             'M4A1-S | Electrum (Field-Tested)': { price: 76.92, float: 0.3593, weapon: 'M4A1-S', skinName: 'Electrum' },
             'AK-47 | Redline (Field-Tested)': { price: 142.50, float: 0.2814, weapon: 'AK-47', skinName: 'Redline' },
@@ -918,11 +903,9 @@ async function fetchMarketPrices() {
 }
 
 function getMarketPrice(itemName) {
-    // Ищем точное совпадение
     if (marketPriceCache[itemName]) {
         return marketPriceCache[itemName];
     }
-    // Ищем частичное совпадение по ключевым словам
     const normalized = itemName.toLowerCase().trim();
     for (const [key, value] of Object.entries(marketPriceCache)) {
         if (key.toLowerCase().includes(normalized) || normalized.includes(key.toLowerCase())) {
@@ -933,12 +916,10 @@ function getMarketPrice(itemName) {
 }
 
 function parseSkinName(fullName) {
-    // Парсим название скина: "M4A1-S | Electrum (Field-Tested)"
     const parts = fullName.split('|');
     if (parts.length === 2) {
         const weapon = parts[0].trim();
         const rest = parts[1].trim();
-        // Пытаемся выделить качество в скобках
         const qualityMatch = rest.match(/\(([^)]+)\)/);
         const quality = qualityMatch ? qualityMatch[1] : 'Field-Tested';
         const skinName = rest.replace(/\([^)]+\)/, '').trim();
@@ -968,7 +949,6 @@ async function fetchUser() {
             renderProfile();
             loadTradeUrl();
             loadSettings();
-            // Загружаем цены после входа
             await fetchMarketPrices();
         } else {
             currentUser = null;
@@ -1156,14 +1136,10 @@ async function loadSteamInventory() {
             return;
         }
 
-        // Обогащаем данные скинов информацией с CSGOMarket
         userInventory = userInventory.map((item) => {
-            // Парсим название
             const parsed = parseSkinName(item.name);
-            // Ищем цену в кэше
             const marketData = getMarketPrice(item.name);
             
-            // Определяем цену
             let price = 0;
             let floatValue = '0.00';
             let weapon = parsed.weapon;
@@ -1177,7 +1153,6 @@ async function loadSteamInventory() {
                 skinName = marketData.skinName || parsed.skinName;
             }
 
-            // Определяем доступность (цена > 5 RUB и предмет торгуемый)
             const available = item.tradable !== false && price >= 5;
 
             return {
@@ -1192,7 +1167,6 @@ async function loadSteamInventory() {
             };
         });
 
-        // Сортируем: сначала доступные, потом недоступные
         userInventory.sort((a, b) => {
             if (a.available && !b.available) return -1;
             if (!a.available && b.available) return 1;
@@ -1241,7 +1215,6 @@ async function loadSteamInventory() {
         }).join('');
 
         console.log('✅ Загружено скинов:', userInventory.length);
-        console.log('📊 Доступно для продажи:', userInventory.filter(i => i.available).length);
 
     } catch (error) {
         console.error('Ошибка загрузки инвентаря:', error);
@@ -1361,7 +1334,6 @@ function toggleFaq(element) {
 
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
-    // Создаём дождь
     const container = document.getElementById('rainContainer');
     for (let i = 0; i < 80; i++) {
         const drop = document.createElement('div');
@@ -1375,7 +1347,6 @@ document.addEventListener('DOMContentLoaded', function() {
         container.appendChild(drop);
     }
 
-    // Навигация
     document.querySelectorAll('.nav a').forEach(el => {
         el.addEventListener('click', function(e) {
             e.preventDefault();
@@ -1388,10 +1359,8 @@ document.addEventListener('DOMContentLoaded', function() {
         navigateTo('sell');
     });
 
-    // Загружаем пользователя
     fetchUser();
 
-    // Обработчик для кнопки "Выбрать все"
     document.querySelector('.btn-outline')?.addEventListener('click', function() {
         const availableItems = userInventory
             .map((item, index) => item.available ? index : -1)
