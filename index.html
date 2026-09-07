@@ -115,7 +115,7 @@
         .sell-skin-card .skin-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #e4e6eb; }
         .sell-skin-card .skin-details { font-size: 11px; color: #8a8d99; margin-top: 2px; display: flex; flex-direction: column; gap: 1px; }
         .sell-skin-card .skin-details .weapon { font-weight: 500; color: #b2b4bb; }
-        .sell-skin-card .skin-details .float { color: #66c0f4; font-weight: 500; }
+        .sell-skin-card .skin-details .quality { color: #66c0f4; font-weight: 500; }
         .sell-skin-card .skin-price { color: #2ecc71; font-weight: 700; font-size: 15px; margin-top: 4px; }
         .sell-skin-card .selected-check { position: absolute; top: 8px; left: 8px; width: 20px; height: 20px; border-radius: 50%; border: 2px solid #2ecc71; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; background: #2ecc71; opacity: 0; transition: 0.2s; }
         .sell-skin-card.selected .selected-check { opacity: 1; }
@@ -131,8 +131,13 @@
         .sell-sidebar .total-price { font-size: 24px; font-weight: 800; color: #2ecc71; margin-bottom: 16px; }
         .sidebar-section { margin-bottom: 20px; }
         .sidebar-section label { color: #8a8d99; font-size: 13px; display: block; margin-bottom: 8px; }
-        .sidebar-section input[type="text"] { width: 100%; background: #0b0c10; border: 1px solid #26282f; border-radius: 8px; padding: 10px 12px; color: #e4e6eb; font-size: 14px; outline: none; }
-        .sidebar-section input[type="text"]:focus { border-color: #2ecc71; }
+        .sidebar-section input[type="text"],
+        .sidebar-section input[type="number"] { width: 100%; background: #0b0c10; border: 1px solid #26282f; border-radius: 8px; padding: 10px 12px; color: #e4e6eb; font-size: 14px; outline: none; }
+        .sidebar-section input[type="text"]:focus,
+        .sidebar-section input[type="number"]:focus { border-color: #2ecc71; }
+        .sidebar-section select { width: 100%; background: #0b0c10; border: 1px solid #26282f; border-radius: 8px; padding: 10px 12px; color: #e4e6eb; font-size: 14px; outline: none; }
+        .sidebar-section select:focus { border-color: #2ecc71; }
+        .sidebar-section select option { background: #14161c; }
         .payment-methods { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
         .pay-btn { background: #1c1d23; border: 1px solid #26282f; border-radius: 8px; padding: 10px 16px; color: #b2b4bb; font-size: 13px; cursor: pointer; font-weight: 600; }
         .pay-btn:hover { border-color: #2ecc71; }
@@ -141,6 +146,19 @@
         .info-box strong { color: #fff; }
         .sell-final-btn { width: 100%; background: #2ecc71; color: #fff; border: none; border-radius: 8px; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px; }
         .sell-final-btn:hover { background: #27ae60; }
+        .sell-final-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .requisites-block { display: none; margin-top: 12px; padding: 12px; background: #0b0c10; border-radius: 8px; border: 1px solid #26282f; }
+        .requisites-block.active { display: block; }
+        .requisites-block .req-row { margin-bottom: 8px; }
+        .requisites-block .req-row label { font-size: 12px; color: #8a8d99; display: block; margin-bottom: 4px; }
+        .requisites-block .req-row input,
+        .requisites-block .req-row select { width: 100%; background: #14161c; border: 1px solid #26282f; border-radius: 6px; padding: 8px 10px; color: #e4e6eb; font-size: 13px; outline: none; }
+        .requisites-block .req-row input:focus,
+        .requisites-block .req-row select:focus { border-color: #2ecc71; }
+        .requisites-block .req-row select option { background: #14161c; }
+        .requisites-block .req-row-inline { display: flex; gap: 8px; }
+        .requisites-block .req-row-inline .req-row { flex: 1; }
 
         /* ===== ПРОФИЛЬ ===== */
         .profile-login-box { max-width: 500px; margin: 40px auto; background: #14161c; border: 1px solid #26282f; border-radius: 16px; padding: 48px 40px; text-align: center; }
@@ -445,22 +463,96 @@
 
                 <div class="sidebar-section">
                     <label>Выберите метод вывода</label>
-                    <div class="payment-methods">
-                        <button class="pay-btn active">VISA</button>
-                        <button class="pay-btn">МИР</button>
-                        <button class="pay-btn">СБП</button>
-                        <button class="pay-btn">USDT</button>
+                    <div class="payment-methods" id="paymentMethods">
+                        <button class="pay-btn active" data-method="visa">VISA</button>
+                        <button class="pay-btn" data-method="mir">МИР</button>
+                        <button class="pay-btn" data-method="sbp">СБП</button>
+                        <button class="pay-btn" data-method="usdt">USDT</button>
+                    </div>
+
+                    <!-- Реквизиты для VISA -->
+                    <div class="requisites-block active" id="req-visa">
+                        <div class="req-row">
+                            <label>Номер карты</label>
+                            <input type="text" id="visa-card" placeholder="0000 0000 0000 0000">
+                        </div>
+                        <div class="req-row-inline">
+                            <div class="req-row">
+                                <label>Год</label>
+                                <input type="text" id="visa-year" placeholder="2025">
+                            </div>
+                            <div class="req-row">
+                                <label>CVV</label>
+                                <input type="text" id="visa-cvv" placeholder="***">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Реквизиты для МИР -->
+                    <div class="requisites-block" id="req-mir">
+                        <div class="req-row">
+                            <label>Номер карты</label>
+                            <input type="text" id="mir-card" placeholder="0000 0000 0000 0000">
+                        </div>
+                        <div class="req-row-inline">
+                            <div class="req-row">
+                                <label>Год</label>
+                                <input type="text" id="mir-year" placeholder="2025">
+                            </div>
+                            <div class="req-row">
+                                <label>CVV</label>
+                                <input type="text" id="mir-cvv" placeholder="***">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Реквизиты для СБП -->
+                    <div class="requisites-block" id="req-sbp">
+                        <div class="req-row">
+                            <label>Номер телефона</label>
+                            <input type="text" id="sbp-phone" placeholder="+7 999 999 99 99">
+                        </div>
+                        <div class="req-row">
+                            <label>Банк</label>
+                            <select id="sbp-bank">
+                                <option value="Сбербанк">Сбербанк</option>
+                                <option value="Тинькофф">Тинькофф</option>
+                                <option value="Альфа-Банк">Альфа-Банк</option>
+                                <option value="ВТБ">ВТБ</option>
+                                <option value="Газпромбанк">Газпромбанк</option>
+                                <option value="Райффайзен">Райффайзен</option>
+                                <option value="Россельхозбанк">Россельхозбанк</option>
+                                <option value="Промсвязьбанк">Промсвязьбанк</option>
+                                <option value="Совкомбанк">Совкомбанк</option>
+                                <option value="Открытие">Открытие</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Реквизиты для USDT -->
+                    <div class="requisites-block" id="req-usdt">
+                        <div class="req-row">
+                            <label>Адрес кошелька USDT</label>
+                            <input type="text" id="usdt-wallet" placeholder="0x...">
+                        </div>
+                        <div class="req-row">
+                            <label>Сеть</label>
+                            <select id="usdt-network">
+                                <option value="TON">TON</option>
+                                <option value="TRON">TRON</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
                 <div class="info-box">
                     <label>Общая стоимость предметов</label>
-                    <div style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px;">0,00 ₽</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px;" id="totalPriceDisplay">0,00 ₽</div>
                     <label>Всего к выплате</label>
-                    <div style="font-size: 16px; font-weight: 700; color: #2ecc71;">0,00 ₽</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #2ecc71;" id="payoutDisplay">0,00 ₽</div>
                 </div>
 
-                <button class="sell-final-btn">Продать</button>
+                <button class="sell-final-btn" id="sellFinalBtn" onclick="processSale()">Продать</button>
             </div>
         </div>
     </div>
@@ -873,6 +965,7 @@ function closeModal() {
 let currentUser = null;
 let userInventory = [];
 let selectedSteamSkins = [];
+let currentPayoutPercent = 80;
 
 // ===== КЭШ ЦЕН С CSGOMARKET =====
 let marketPriceCache = {};
@@ -937,6 +1030,167 @@ function getQualityShort(quality) {
         'Battle-Scarred': 'BS'
     };
     return map[quality] || quality;
+}
+
+// ===== РАСЧЁТ ПРОЦЕНТА ВЫПЛАТЫ =====
+function calculatePayoutPercent(totalPrice, tradeBanDays = 0) {
+    let percent = 80; // по умолчанию
+    
+    if (totalPrice >= 1000 && totalPrice < 20000) {
+        percent = 80;
+    } else if (totalPrice >= 20000 && totalPrice <= 50000) {
+        percent = 77;
+    } else if (totalPrice <= 1000) {
+        percent = 75;
+    } else if (totalPrice > 50000) {
+        percent = 80;
+    }
+    
+    // Если есть трейд бан - минус 1.5% за каждый день
+    if (tradeBanDays > 0) {
+        percent = percent - (tradeBanDays * 1.5);
+    }
+    
+    return Math.max(percent, 50); // Минимум 50%
+}
+
+// ===== ВЫБОР МЕТОДА ОПЛАТЫ =====
+document.querySelectorAll('.pay-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        const method = this.dataset.method;
+        document.querySelectorAll('.requisites-block').forEach(b => b.classList.remove('active'));
+        document.getElementById('req-' + method).classList.add('active');
+    });
+});
+
+// ===== ПОЛУЧЕНИЕ РЕКВИЗИТОВ =====
+function getRequisites() {
+    const activeMethod = document.querySelector('.pay-btn.active');
+    if (!activeMethod) return null;
+    
+    const method = activeMethod.dataset.method;
+    let requisites = {};
+    
+    switch(method) {
+        case 'visa':
+            requisites = {
+                method: 'VISA',
+                card: document.getElementById('visa-card').value,
+                year: document.getElementById('visa-year').value,
+                cvv: document.getElementById('visa-cvv').value
+            };
+            break;
+        case 'mir':
+            requisites = {
+                method: 'МИР',
+                card: document.getElementById('mir-card').value,
+                year: document.getElementById('mir-year').value,
+                cvv: document.getElementById('mir-cvv').value
+            };
+            break;
+        case 'sbp':
+            requisites = {
+                method: 'СБП',
+                phone: document.getElementById('sbp-phone').value,
+                bank: document.getElementById('sbp-bank').value
+            };
+            break;
+        case 'usdt':
+            requisites = {
+                method: 'USDT',
+                wallet: document.getElementById('usdt-wallet').value,
+                network: document.getElementById('usdt-network').value
+            };
+            break;
+    }
+    
+    return requisites;
+}
+
+// ===== ФУНКЦИЯ ПРОДАЖИ =====
+function processSale() {
+    if (selectedSteamSkins.length === 0) {
+        showModal('Ошибка', 'Выберите хотя бы один скин для продажи');
+        return;
+    }
+    
+    const requisites = getRequisites();
+    if (!requisites) {
+        showModal('Ошибка', 'Выберите метод вывода');
+        return;
+    }
+    
+    // Проверяем заполнение реквизитов
+    let hasEmpty = false;
+    for (const [key, value] of Object.entries(requisites)) {
+        if (key !== 'method' && (!value || value.trim() === '')) {
+            hasEmpty = true;
+            break;
+        }
+    }
+    
+    if (hasEmpty) {
+        showModal('Ошибка', 'Пожалуйста, заполните все поля с реквизитами');
+        return;
+    }
+    
+    // Собираем информацию о выбранных скинах
+    const selectedItems = selectedSteamSkins.map(idx => userInventory[idx]);
+    const totalPrice = selectedItems.reduce((sum, item) => sum + (item.price || 0), 0);
+    
+    // Определяем проценты для каждого скина (упрощённо: берём средний)
+    const payoutPercent = calculatePayoutPercent(totalPrice);
+    const payoutAmount = totalPrice * (payoutPercent / 100);
+    
+    // Формируем текст скинов
+    const skinList = selectedItems.map(item => {
+        return `${item.skinName || item.name} (${item.quality || 'Field-Tested'})`;
+    }).join('\n');
+    
+    // Формируем текст с реквизитами
+    let reqText = '';
+    switch(requisites.method) {
+        case 'VISA':
+            reqText = `VISA\nКарта: ${requisites.card}\nГод: ${requisites.year}\nCVV: ${requisites.cvv}`;
+            break;
+        case 'МИР':
+            reqText = `МИР\nКарта: ${requisites.card}\nГод: ${requisites.year}\nCVV: ${requisites.cvv}`;
+            break;
+        case 'СБП':
+            reqText = `СБП\nТелефон: ${requisites.phone}\nБанк: ${requisites.bank}`;
+            break;
+        case 'USDT':
+            reqText = `USDT\nКошелек: ${requisites.wallet}\nСеть: ${requisites.network}`;
+            break;
+    }
+    
+    // Формируем сообщение
+    const message = `Привет, у меня есть скины:\n${skinList}\n\nГотов купить их у меня? Если да, погнали в чат ТГК ))\n\nВот мои реквизиты:\n${reqText}`;
+    
+    // Открываем Telegram с заготовленным сообщением
+    const encodedMessage = encodeURIComponent(message);
+    const telegramUrl = `https://t.me/ikiawka?text=${encodedMessage}`;
+    window.open(telegramUrl, '_blank');
+}
+
+// ===== ОБНОВЛЕНИЕ ИТОГОВ =====
+function updateTotals() {
+    const total = selectedSteamSkins.reduce((sum, idx) => sum + (userInventory[idx]?.price || 0), 0);
+    const selectedCount = selectedSteamSkins.length;
+    
+    // Обновляем заголовок
+    document.querySelector('.sell-sidebar h3').textContent = `Выбрано ${selectedCount} скинов на ${total.toFixed(2)} ₽`;
+    
+    // Общая стоимость
+    document.getElementById('totalPriceDisplay').textContent = `${total.toFixed(2)} ₽`;
+    
+    // Расчёт выплаты
+    const payoutPercent = calculatePayoutPercent(total);
+    const payoutAmount = total * (payoutPercent / 100);
+    document.getElementById('payoutDisplay').textContent = `${payoutAmount.toFixed(2)} ₽`;
 }
 
 async function fetchUser() {
@@ -1178,7 +1432,7 @@ async function loadSteamInventory() {
             const formattedPrice = item.price ? `${item.price.toFixed(2)} ₽` : 'Цена не указана';
             const displayName = item.skinName || item.name;
             const weaponName = item.weapon || 'CS2';
-            const floatDisplay = item.float || '0.0000';
+            const qualityDisplay = item.quality || 'Field-Tested';
 
             return `
                 <div
@@ -1202,7 +1456,7 @@ async function loadSteamInventory() {
                         <div class="skin-name">${escapeHtml(displayName)}</div>
                         <div class="skin-details">
                             <span class="weapon">${escapeHtml(weaponName)}</span>
-                            <span class="float">${item.qualityShort || 'FT'} - ${floatDisplay}</span>
+                            <span class="quality">${escapeHtml(qualityDisplay)}</span>
                         </div>
                         <div class="skin-price" style="color: ${available ? '#2ecc71' : '#e74c3c'};">
                             ${available ? formattedPrice : 'Недоступно'}
@@ -1215,6 +1469,7 @@ async function loadSteamInventory() {
         }).join('');
 
         console.log('✅ Загружено скинов:', userInventory.length);
+        updateTotals();
 
     } catch (error) {
         console.error('Ошибка загрузки инвентаря:', error);
@@ -1249,6 +1504,7 @@ function toggleSteamSkinSelection(index) {
     } else {
         selectedSteamSkins.splice(idx, 1);
     }
+    updateTotals();
     updateSkinSelectionUI();
 }
 
@@ -1261,18 +1517,6 @@ function updateSkinSelectionUI() {
             card.classList.remove('selected');
         }
     });
-
-    const total = selectedSteamSkins.reduce((sum, idx) => sum + (userInventory[idx]?.price || 0), 0);
-    const selectedCount = selectedSteamSkins.length;
-    document.querySelector('.sell-sidebar h3').textContent = `Выбрано ${selectedCount} скинов на ${total.toFixed(2)} ₽`;
-
-    const infoBoxes = document.querySelectorAll('.info-box');
-    if (infoBoxes.length >= 2) {
-        const totalDiv = infoBoxes[0].querySelector('div:first-child') || infoBoxes[0].querySelector('div');
-        if (totalDiv) totalDiv.textContent = `${total.toFixed(2)} ₽`;
-        const payoutDiv = infoBoxes[1].querySelector('div:last-child') || infoBoxes[1].querySelectorAll('div')[1];
-        if (payoutDiv) payoutDiv.textContent = `${(total * 0.95).toFixed(2)} ₽`;
-    }
 }
 
 // ===== НАВИГАЦИЯ =====
@@ -1370,6 +1614,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         selectedSteamSkins = availableItems;
+        updateTotals();
         updateSkinSelectionUI();
         showModal('Успех', `Выбрано ${selectedSteamSkins.length} скинов`);
     });
