@@ -112,10 +112,8 @@
         .sell-skin-card .image { background: #1c1d23; border-radius: 6px; height: 80px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .sell-skin-card .image img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .sell-skin-card .skin-info { margin-top: 8px; }
-        .sell-skin-card .skin-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #e4e6eb; }
-        .sell-skin-card .skin-details { font-size: 11px; color: #8a8d99; margin-top: 2px; display: flex; flex-direction: column; gap: 1px; }
-        .sell-skin-card .skin-details .weapon { font-weight: 500; color: #b2b4bb; }
-        .sell-skin-card .skin-details .quality { color: #66c0f4; font-weight: 500; }
+        .sell-skin-card .skin-full-name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #e4e6eb; }
+        .sell-skin-card .skin-quality { font-size: 11px; color: #66c0f4; font-weight: 500; margin-top: 1px; }
         .sell-skin-card .skin-price { color: #2ecc71; font-weight: 700; font-size: 15px; margin-top: 4px; }
         .sell-skin-card .selected-check { position: absolute; top: 8px; left: 8px; width: 20px; height: 20px; border-radius: 50%; border: 2px solid #2ecc71; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; background: #2ecc71; opacity: 0; transition: 0.2s; }
         .sell-skin-card.selected .selected-check { opacity: 1; }
@@ -474,16 +472,16 @@
                     <div class="requisites-block active" id="req-visa">
                         <div class="req-row">
                             <label>Номер карты</label>
-                            <input type="text" id="visa-card" placeholder="0000 0000 0000 0000">
+                            <input type="text" id="visa-card" placeholder="0000 0000 0000 0000" maxlength="19" oninput="formatCardNumber(this)">
                         </div>
                         <div class="req-row-inline">
                             <div class="req-row">
-                                <label>Год</label>
-                                <input type="text" id="visa-year" placeholder="2025">
+                                <label>Год (ММ/ГГ)</label>
+                                <input type="text" id="visa-year" placeholder="03/35" maxlength="5" oninput="formatYear(this)">
                             </div>
                             <div class="req-row">
                                 <label>CVV</label>
-                                <input type="text" id="visa-cvv" placeholder="***">
+                                <input type="text" id="visa-cvv" placeholder="***" maxlength="3" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
                             </div>
                         </div>
                     </div>
@@ -492,16 +490,16 @@
                     <div class="requisites-block" id="req-mir">
                         <div class="req-row">
                             <label>Номер карты</label>
-                            <input type="text" id="mir-card" placeholder="0000 0000 0000 0000">
+                            <input type="text" id="mir-card" placeholder="0000 0000 0000 0000" maxlength="19" oninput="formatCardNumber(this)">
                         </div>
                         <div class="req-row-inline">
                             <div class="req-row">
-                                <label>Год</label>
-                                <input type="text" id="mir-year" placeholder="2025">
+                                <label>Год (ММ/ГГ)</label>
+                                <input type="text" id="mir-year" placeholder="03/35" maxlength="5" oninput="formatYear(this)">
                             </div>
                             <div class="req-row">
                                 <label>CVV</label>
-                                <input type="text" id="mir-cvv" placeholder="***">
+                                <input type="text" id="mir-cvv" placeholder="***" maxlength="3" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
                             </div>
                         </div>
                     </div>
@@ -510,7 +508,7 @@
                     <div class="requisites-block" id="req-sbp">
                         <div class="req-row">
                             <label>Номер телефона</label>
-                            <input type="text" id="sbp-phone" placeholder="+7 999 999 99 99">
+                            <input type="text" id="sbp-phone" placeholder="+7 999 999 99 99" maxlength="16" oninput="formatPhone(this)">
                         </div>
                         <div class="req-row">
                             <label>Банк</label>
@@ -806,11 +804,7 @@
                         <div class="channel-name">Telegram</div>
                         <div class="channel-desc">Быстрый ответ</div>
                     </a>
-                    <a href="mailto:emerald-market.p.tawkto.email" class="support-channel">
-                        <div class="channel-icon">📧</div>
-                        <div class="channel-name">Email</div>
-                        <div class="channel-desc">emerald-market.p.tawkto.email</div>
-                    </a>
+    
                 </div>
             </div>
 
@@ -827,13 +821,7 @@
             </div>
 
             <div class="support-card">
-                <div class="icon-big">🕐</div>
-                <h2>Время работы</h2>
-                <p>
-                    <strong style="color: #fff;">Пн-Пт:</strong> 10:00 - 22:00 (МСК)<br>
-                    <strong style="color: #fff;">Сб-Вс:</strong> 12:00 - 20:00 (МСК)
-                </p>
-                <p style="margin-top: 12px; color: #8a8d99; font-size: 14px;">
+                
                     Вне рабочего времени ответ может занять до 24 часов
                 </p>
             </div>
@@ -961,6 +949,56 @@ function closeModal() {
     document.getElementById('modalOverlay').classList.remove('show');
 }
 
+// ===== ФОРМАТИРОВАНИЕ ПОЛЕЙ =====
+function formatCardNumber(input) {
+    let value = input.value.replace(/[^0-9]/g, '');
+    if (value.length > 16) value = value.slice(0, 16);
+    let formatted = '';
+    for (let i = 0; i < value.length; i++) {
+        if (i > 0 && i % 4 === 0) formatted += ' ';
+        formatted += value[i];
+    }
+    input.value = formatted;
+}
+
+function formatYear(input) {
+    let value = input.value.replace(/[^0-9]/g, '');
+    if (value.length > 4) value = value.slice(0, 4);
+    if (value.length >= 2) {
+        input.value = value.slice(0, 2) + '/' + value.slice(2);
+    } else {
+        input.value = value;
+    }
+}
+
+function formatPhone(input) {
+    let value = input.value.replace(/[^0-9]/g, '');
+    if (value.length > 10) value = value.slice(0, 10);
+    let formatted = '+7';
+    if (value.length > 0) {
+        if (value.length >= 1) formatted += ' ' + value.slice(0, 3);
+        if (value.length >= 4) formatted += ' ' + value.slice(3, 6);
+        if (value.length >= 7) formatted += ' ' + value.slice(6, 8);
+        if (value.length >= 9) formatted += ' ' + value.slice(8, 10);
+    }
+    input.value = formatted;
+}
+
+// Инициализация телефона с +7 при фокусе
+document.addEventListener('DOMContentLoaded', function() {
+    const phoneInput = document.getElementById('sbp-phone');
+    phoneInput.addEventListener('focus', function() {
+        if (!this.value || this.value === '+7' || this.value === '+7 ') {
+            this.value = '+7 ';
+        }
+    });
+    phoneInput.addEventListener('blur', function() {
+        if (this.value === '+7 ' || this.value === '+7') {
+            this.value = '';
+        }
+    });
+});
+
 // ===== ЛОГИКА STEAM =====
 let currentUser = null;
 let userInventory = [];
@@ -1021,20 +1059,9 @@ function parseSkinName(fullName) {
     return { weapon: 'CS2', skinName: fullName, quality: 'Field-Tested' };
 }
 
-function getQualityShort(quality) {
-    const map = {
-        'Factory New': 'FN',
-        'Minimal Wear': 'MW',
-        'Field-Tested': 'FT',
-        'Well-Worn': 'WW',
-        'Battle-Scarred': 'BS'
-    };
-    return map[quality] || quality;
-}
-
 // ===== РАСЧЁТ ПРОЦЕНТА ВЫПЛАТЫ =====
 function calculatePayoutPercent(totalPrice, tradeBanDays = 0) {
-    let percent = 80; // по умолчанию
+    let percent = 80;
     
     if (totalPrice >= 1000 && totalPrice < 20000) {
         percent = 80;
@@ -1046,12 +1073,11 @@ function calculatePayoutPercent(totalPrice, tradeBanDays = 0) {
         percent = 80;
     }
     
-    // Если есть трейд бан - минус 1.5% за каждый день
     if (tradeBanDays > 0) {
         percent = percent - (tradeBanDays * 1.5);
     }
     
-    return Math.max(percent, 50); // Минимум 50%
+    return Math.max(percent, 50);
 }
 
 // ===== ВЫБОР МЕТОДА ОПЛАТЫ =====
@@ -1123,7 +1149,6 @@ function processSale() {
         return;
     }
     
-    // Проверяем заполнение реквизитов
     let hasEmpty = false;
     for (const [key, value] of Object.entries(requisites)) {
         if (key !== 'method' && (!value || value.trim() === '')) {
@@ -1137,20 +1162,14 @@ function processSale() {
         return;
     }
     
-    // Собираем информацию о выбранных скинах
     const selectedItems = selectedSteamSkins.map(idx => userInventory[idx]);
-    const totalPrice = selectedItems.reduce((sum, item) => sum + (item.price || 0), 0);
     
-    // Определяем проценты для каждого скина (упрощённо: берём средний)
-    const payoutPercent = calculatePayoutPercent(totalPrice);
-    const payoutAmount = totalPrice * (payoutPercent / 100);
-    
-    // Формируем текст скинов
+    // Формируем текст скинов в формате "Оружие | Название Качество"
     const skinList = selectedItems.map(item => {
-        return `${item.skinName || item.name} (${item.quality || 'Field-Tested'})`;
+        const fullName = `${item.weapon || 'CS2'} | ${item.skinName || item.name} ${item.quality || 'Field-Tested'}`;
+        return fullName;
     }).join('\n');
     
-    // Формируем текст с реквизитами
     let reqText = '';
     switch(requisites.method) {
         case 'VISA':
@@ -1167,10 +1186,8 @@ function processSale() {
             break;
     }
     
-    // Формируем сообщение
     const message = `Привет, у меня есть скины:\n${skinList}\n\nГотов купить их у меня? Если да, погнали в чат ТГК ))\n\nВот мои реквизиты:\n${reqText}`;
     
-    // Открываем Telegram с заготовленным сообщением
     const encodedMessage = encodeURIComponent(message);
     const telegramUrl = `https://t.me/ikiawka?text=${encodedMessage}`;
     window.open(telegramUrl, '_blank');
@@ -1181,13 +1198,9 @@ function updateTotals() {
     const total = selectedSteamSkins.reduce((sum, idx) => sum + (userInventory[idx]?.price || 0), 0);
     const selectedCount = selectedSteamSkins.length;
     
-    // Обновляем заголовок
     document.querySelector('.sell-sidebar h3').textContent = `Выбрано ${selectedCount} скинов на ${total.toFixed(2)} ₽`;
-    
-    // Общая стоимость
     document.getElementById('totalPriceDisplay').textContent = `${total.toFixed(2)} ₽`;
     
-    // Расчёт выплаты
     const payoutPercent = calculatePayoutPercent(total);
     const payoutAmount = total * (payoutPercent / 100);
     document.getElementById('payoutDisplay').textContent = `${payoutAmount.toFixed(2)} ₽`;
@@ -1395,14 +1408,12 @@ async function loadSteamInventory() {
             const marketData = getMarketPrice(item.name);
             
             let price = 0;
-            let floatValue = '0.00';
             let weapon = parsed.weapon;
             let skinName = parsed.skinName;
             let quality = parsed.quality;
 
             if (marketData) {
                 price = marketData.price || 0;
-                floatValue = marketData.float ? marketData.float.toFixed(4) : '0.0000';
                 weapon = marketData.weapon || parsed.weapon;
                 skinName = marketData.skinName || parsed.skinName;
             }
@@ -1412,11 +1423,9 @@ async function loadSteamInventory() {
             return {
                 ...item,
                 price: price,
-                float: floatValue,
                 weapon: weapon,
                 skinName: skinName,
                 quality: quality,
-                qualityShort: getQualityShort(quality),
                 available: available
             };
         });
@@ -1430,8 +1439,7 @@ async function loadSteamInventory() {
         grid.innerHTML = userInventory.map((item, index) => {
             const available = item.available;
             const formattedPrice = item.price ? `${item.price.toFixed(2)} ₽` : 'Цена не указана';
-            const displayName = item.skinName || item.name;
-            const weaponName = item.weapon || 'CS2';
+            const fullName = `${item.weapon || 'CS2'} | ${item.skinName || item.name}`;
             const qualityDisplay = item.quality || 'Field-Tested';
 
             return `
@@ -1446,18 +1454,15 @@ async function loadSteamInventory() {
 
                     <div class="image">
                         ${item.image ? `
-                            <img src="${item.image}" alt="${escapeHtml(displayName)}" loading="lazy">
+                            <img src="${item.image}" alt="${escapeHtml(fullName)}" loading="lazy">
                         ` : `
                             <span style="color:#666; font-size:30px;">🎮</span>
                         `}
                     </div>
 
                     <div class="skin-info">
-                        <div class="skin-name">${escapeHtml(displayName)}</div>
-                        <div class="skin-details">
-                            <span class="weapon">${escapeHtml(weaponName)}</span>
-                            <span class="quality">${escapeHtml(qualityDisplay)}</span>
-                        </div>
+                        <div class="skin-full-name">${escapeHtml(fullName)}</div>
+                        <div class="skin-quality">${escapeHtml(qualityDisplay)}</div>
                         <div class="skin-price" style="color: ${available ? '#2ecc71' : '#e74c3c'};">
                             ${available ? formattedPrice : 'Недоступно'}
                         </div>
