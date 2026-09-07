@@ -120,13 +120,16 @@
         .filter-select, .filter-input { background: #14161c; border: 1px solid #26282f; border-radius: 8px; padding: 8px 12px; color: #e4e6eb; font-size: 14px; outline: none; }
         .filter-input { flex: 1; min-width: 200px; }
         .skin-grid-sell { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
-        .sell-skin-card { background: #14161c; border: 1px solid #26282f; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; cursor: pointer; position: relative; }
+        .sell-skin-card { background: #14161c; border: 1px solid #26282f; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; cursor: pointer; position: relative; transition: border-color 0.2s; }
         .sell-skin-card:hover { border-color: #2ecc71; }
-        .sell-badge { background: rgba(46, 204, 113, 0.15); color: #2ecc71; font-size: 11px; padding: 2px 8px; border-radius: 6px; position: absolute; top: 8px; right: 8px; font-weight: 600; }
         .sell-skin-card .image { background: #1c1d23; border-radius: 6px; height: 80px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .sell-skin-card .image img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .sell-skin-card .name { font-size: 13px; font-weight: 600; margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .sell-skin-card .price { color: #2ecc71; font-weight: 700; font-size: 15px; margin-top: 4px; }
+        .sell-skin-card .skin-info { margin-top: 8px; }
+        .sell-skin-card .skin-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #e4e6eb; }
+        .sell-skin-card .skin-details { font-size: 11px; color: #8a8d99; margin-top: 2px; display: flex; flex-direction: column; gap: 1px; }
+        .sell-skin-card .skin-details .weapon { font-weight: 500; color: #b2b4bb; }
+        .sell-skin-card .skin-details .float { color: #66c0f4; font-weight: 500; }
+        .sell-skin-card .skin-price { color: #2ecc71; font-weight: 700; font-size: 15px; margin-top: 4px; }
         .sell-skin-card .selected-check { position: absolute; top: 8px; left: 8px; width: 20px; height: 20px; border-radius: 50%; border: 2px solid #2ecc71; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; background: #2ecc71; opacity: 0; transition: 0.2s; }
         .sell-skin-card.selected .selected-check { opacity: 1; }
         .sell-skin-card.unavailable { cursor: not-allowed; opacity: 0.5; }
@@ -744,7 +747,15 @@
                 </p>
             </div>
 
-           
+            <div class="support-card">
+                <div class="icon-big">🕐</div>
+                <h2>Время работы</h2>
+                <p>
+                    <strong style="color: #fff;">Пн-Пт:</strong> 10:00 - 22:00 (МСК)<br>
+                    <strong style="color: #fff;">Сб-Вс:</strong> 12:00 - 20:00 (МСК)
+                </p>
+                <p style="margin-top: 12px; color: #8a8d99; font-size: 14px;">
+                    Вне рабочего времени ответ может занять до 24 часов
                 </p>
             </div>
         </div>
@@ -876,6 +887,38 @@ let currentUser = null;
 let userInventory = [];
 let selectedSteamSkins = [];
 
+// ===== ЦЕНЫ С CSGOMARKET =====
+let marketPrices = {};
+
+async function fetchMarketPrices() {
+    try {
+        // Прокси-запрос к CSGOMarket API (примерный эндпоинт)
+        const response = await fetch('/api/csgomarket/prices');
+        const data = await response.json();
+        if (data && data.items) {
+            marketPrices = data.items;
+        }
+    } catch (error) {
+        console.warn('Не удалось загрузить цены с CSGOMarket, используем локальные цены');
+    }
+}
+
+function getMarketPrice(itemName) {
+    // Ищем цену в полученных данных
+    // Формат: { "M4A1-S | Electrum (Field-Tested)": { price: 76.92, float: 0.3593 } }
+    const normalizedName = itemName.trim();
+    if (marketPrices[normalizedName]) {
+        return marketPrices[normalizedName];
+    }
+    // Пробуем найти частичное совпадение
+    for (const [key, value] of Object.entries(marketPrices)) {
+        if (key.includes(itemName) || itemName.includes(key)) {
+            return value;
+        }
+    }
+    return null;
+}
+
 async function fetchUser() {
     const response = await fetch('/api/user');
     const data = await response.json();
@@ -885,6 +928,7 @@ async function fetchUser() {
         renderProfile();
         loadTradeUrl();
         loadSettings();
+        await fetchMarketPrices(); // Загружаем цены после входа
     } else {
         currentUser = null;
         updateUserUI();
@@ -994,6 +1038,7 @@ async function saveTradeUrl() {
         body: JSON.stringify({ tradeUrl: url })
     });
     showModal('Успех', 'Trade URL сохранен! Сейчас загрузим скины...');
+    await fetchMarketPrices();
     loadSteamInventory();
 }
 
@@ -1008,6 +1053,7 @@ async function saveProfileTradeUrl() {
         body: JSON.stringify({ tradeUrl: url })
     });
     showModal('Успех', 'Trade URL сохранен! Сейчас загрузим скины...');
+    await fetchMarketPrices();
     loadSteamInventory();
 }
 
@@ -1015,19 +1061,11 @@ async function saveProfileTradeUrl() {
 async function loadSteamInventory() {
 
     if (!currentUser) {
-
-        showModal(
-            'Ошибка',
-            'Пожалуйста, войдите через Steam!'
-        );
-
+        showModal('Ошибка', 'Пожалуйста, войдите через Steam!');
         return;
     }
 
-    const grid =
-        document.getElementById(
-            'sellSkinGrid'
-        );
+    const grid = document.getElementById('sellSkinGrid');
 
     grid.innerHTML = `
         <div style="
@@ -1042,29 +1080,15 @@ async function loadSteamInventory() {
 
     try {
 
-        const response =
-            await fetch(
-                '/api/get-inventory',
-                {
-                    method: 'POST',
+        const response = await fetch('/api/get-inventory', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+        });
 
-                    headers: {
-                        'Content-Type':
-                            'application/json'
-                    },
+        const data = await response.json();
 
-                    body: JSON.stringify({})
-                }
-            );
-
-        const data =
-            await response.json();
-
-        if (
-            !response.ok ||
-            data.error
-        ) {
-
+        if (!response.ok || data.error) {
             grid.innerHTML = `
                 <div style="
                     grid-column: 1/-1;
@@ -1072,25 +1096,16 @@ async function loadSteamInventory() {
                     padding: 60px;
                     color: #e74c3c;
                 ">
-                    ❌ ${escapeHtml(
-                        data.error ||
-                        'Не удалось загрузить инвентарь'
-                    )}
+                    ❌ ${escapeHtml(data.error || 'Не удалось загрузить инвентарь')}
                 </div>
             `;
-
             return;
         }
 
-        userInventory =
-            data.items || [];
-
+        userInventory = data.items || [];
         selectedSteamSkins = [];
 
-        if (
-            userInventory.length === 0
-        ) {
-
+        if (userInventory.length === 0) {
             grid.innerHTML = `
                 <div style="
                     grid-column: 1/-1;
@@ -1098,179 +1113,80 @@ async function loadSteamInventory() {
                     padding: 60px;
                     color: #8a8d99;
                 ">
-                    <div style="
-                        font-size: 40px;
-                        margin-bottom: 15px;
-                    ">
-                        📦
-                    </div>
-
-                    <div style="
-                        font-size: 16px;
-                        color: #fff;
-                        margin-bottom: 8px;
-                    ">
-                        Скины не найдены
-                    </div>
-
-                    <div>
-                        Убедитесь, что ваш инвентарь Steam открыт.
-                    </div>
+                    <div style="font-size: 40px; margin-bottom: 15px;">📦</div>
+                    <div style="font-size: 16px; color: #fff; margin-bottom: 8px;">Скины не найдены</div>
+                    <div>Убедитесь, что ваш инвентарь Steam открыт.</div>
                 </div>
             `;
-
             return;
         }
 
-        /*
-         * ВРЕМЕННЫЕ ЦЕНЫ.
-         *
-         * Пока оставляем их для проверки
-         * отображения инвентаря.
-         *
-         * Позже подключим реальные цены.
-         */
-
-        userInventory =
-            userInventory.map(
-                (item, index) => ({
-
+        // Обогащаем данные скинов ценами с CSGOMarket
+        userInventory = userInventory.map((item) => {
+            const marketData = getMarketPrice(item.name);
+            if (marketData) {
+                return {
                     ...item,
+                    price: marketData.price || (item.price || 0),
+                    float: marketData.float || item.float || '0.00',
+                    weapon: marketData.weapon || item.weapon || item.name.split('|')[0]?.trim() || 'CS2',
+                    skinName: marketData.skinName || item.skinName || item.name.split('|')[1]?.trim() || item.name
+                };
+            }
+            // Если цена не найдена, пытаемся извлечь из названия
+            const parts = item.name.split('|');
+            return {
+                ...item,
+                weapon: parts[0]?.trim() || 'CS2',
+                skinName: parts[1]?.trim() || item.name,
+                price: item.price || 0,
+                float: item.float || '0.00'
+            };
+        });
 
-                    price:
-                        (index + 1) *
-                        0.5 +
-                        1
+        grid.innerHTML = userInventory.map((item, index) => {
+            const available = item.tradable !== false && item.price >= 5;
+            const formattedPrice = item.price ? `${item.price.toFixed(2)} ₽` : 'Цена не указана';
+            const floatValue = item.float || '0.00';
 
-                })
-            );
+            return `
+                <div
+                    class="sell-skin-card ${!available ? 'unavailable' : ''}"
+                    onclick="${available ? `toggleSteamSkinSelection(${index})` : ''}"
+                >
+                    ${!available ? `
+                        <div class="unavailable-badge">Недоступно</div>
+                        <div class="unavailable-tooltip">Этот предмет сейчас недоступен для продажи</div>
+                    ` : ''}
 
-        grid.innerHTML =
-            userInventory
-                .map(
-                    (item, index) => {
+                    <div class="image">
+                        ${item.image ? `
+                            <img src="${item.image}" alt="${escapeHtml(item.name)}" loading="lazy">
+                        ` : `
+                            <span style="color:#666; font-size:30px;">🎮</span>
+                        `}
+                    </div>
 
-                        const available =
-                            item.tradable !== false &&
-                            item.price >= 5;
+                    <div class="skin-info">
+                        <div class="skin-name">${escapeHtml(item.skinName || item.name)}</div>
+                        <div class="skin-details">
+                            <span class="weapon">${escapeHtml(item.weapon || 'CS2')}</span>
+                            <span class="float">FT - ${floatValue}</span>
+                        </div>
+                        <div class="skin-price" style="color: ${available ? '#2ecc71' : '#e74c3c'};">
+                            ${available ? formattedPrice : 'Недоступно'}
+                        </div>
+                    </div>
 
-                        return `
-                            <div
-                                class="
-                                    sell-skin-card
-                                    ${
-                                        !available
-                                            ? 'unavailable'
-                                            : ''
-                                    }
-                                "
-                                onclick="
-                                    toggleSteamSkinSelection(
-                                        ${index}
-                                    )
-                                "
-                            >
+                    <div class="selected-check">✓</div>
+                </div>
+            `;
+        }).join('');
 
-                                ${
-                                    !available
-                                        ? `
-                                            <div class="
-                                                unavailable-badge
-                                            ">
-                                                Недоступно
-                                            </div>
-
-                                            <div class="
-                                                unavailable-tooltip
-                                            ">
-                                                Этот предмет сейчас недоступен для продажи                                            </div>
-                                        `
-                                        : `
-                                            <div class="
-                                                sell-badge
-                                            ">
-                                                ${
-                                                    escapeHtml(
-                                                        item.type ||
-                                                        'Скин'
-                                                    )
-                                                }
-                                            </div>
-                                        `
-                                }
-
-                                <div class="image">
-
-                                    ${
-                                        item.image
-                                            ? `
-                                                <img
-                                                    src="${item.image}"
-                                                    alt="${escapeHtml(item.name)}"
-                                                    loading="lazy"
-                                                >
-                                            `
-                                            : `
-                                                <span style="
-                                                    color:#666;
-                                                    font-size:30px;
-                                                ">
-                                                    🎮
-                                                </span>
-                                            `
-                                    }
-
-                                </div>
-
-                                <div class="name">
-                                    ${escapeHtml(
-                                        item.name
-                                    )}
-                                </div>
-
-                                <div
-                                    class="price"
-                                    style="
-                                        color:
-                                            ${
-                                                available
-                                                    ? '#2ecc71'
-                                                    : '#e74c3c'
-                                            };
-                                    "
-                                >
-                                    ${
-                                        available
-                                            ? '$' +
-                                              item.price.toFixed(2)
-                                            : 'Недоступно'
-                                    }
-                                </div>
-
-                                <div class="
-                                    selected-check
-                                ">
-                                    ✓
-                                </div>
-
-                            </div>
-                        `;
-                    }
-                )
-                .join('');
-
-        console.log(
-            'Загружено скинов:',
-            userInventory.length
-        );
+        console.log('Загружено скинов:', userInventory.length);
 
     } catch (error) {
-
-        console.error(
-            'Ошибка загрузки инвентаря:',
-            error
-        );
-
+        console.error('Ошибка загрузки инвентаря:', error);
         grid.innerHTML = `
             <div style="
                 grid-column: 1/-1;
@@ -1285,16 +1201,47 @@ async function loadSteamInventory() {
 }
 
 function escapeHtml(text) {
-
     return String(text)
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
-
 }
 
+// ===== ВЫБОР СКИНОВ =====
+function toggleSteamSkinSelection(index) {
+    const item = userInventory[index];
+    if (!item || !item.tradable || item.price < 5) return;
+
+    const idx = selectedSteamSkins.indexOf(index);
+    if (idx === -1) {
+        selectedSteamSkins.push(index);
+    } else {
+        selectedSteamSkins.splice(idx, 1);
+    }
+    updateSkinSelectionUI();
+}
+
+function updateSkinSelectionUI() {
+    const cards = document.querySelectorAll('.sell-skin-card');
+    cards.forEach((card, i) => {
+        if (selectedSteamSkins.includes(i)) {
+            card.classList.add('selected');
+        } else {
+            card.classList.remove('selected');
+        }
+    });
+
+    const total = selectedSteamSkins.reduce((sum, idx) => sum + (userInventory[idx]?.price || 0), 0);
+    document.querySelector('.sell-sidebar h3').textContent = `Выбрано ${selectedSteamSkins.length} скинов на ${total.toFixed(2)} ₽`;
+
+    const infoBoxes = document.querySelectorAll('.info-box');
+    if (infoBoxes.length >= 2) {
+        infoBoxes[0].querySelector('div:first-child').textContent = `${total.toFixed(2)} ₽`;
+        infoBoxes[1].querySelector('div:last-child').textContent = `${(total * 0.95).toFixed(2)} ₽`;
+    }
+}
 
 // ===== НАВИГАЦИЯ =====
 function navigateTo(page) {
@@ -1348,7 +1295,6 @@ function toggleFaq(element) {
     const item = element.closest('.faq-item');
     const isOpen = item.classList.contains('open');
 
-    // Закрываем все
     document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('open'));
 
     if (!isOpen) {
