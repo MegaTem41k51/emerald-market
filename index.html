@@ -375,64 +375,6 @@
             font-weight: 600;
         }
 
-        /* ===== КНОПКА TELEGRAM В УГЛУ ===== */
-        .telegram-float {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 999;
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            background: #0088cc;
-            color: #fff;
-            box-shadow: 0 4px 20px rgba(0, 136, 204, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            transition: 0.3s;
-            font-size: 34px;
-        }
-        .telegram-float:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 30px rgba(0, 136, 204, 0.7);
-        }
-        body.light .telegram-float {
-            box-shadow: 0 4px 20px rgba(0, 136, 204, 0.3);
-        }
-        .telegram-float svg {
-            width: 36px;
-            height: 36px;
-            fill: #fff;
-        }
-
-        /* Стили для корректного отображения Tawk.to рядом с кнопкой Telegram */
-        .tawk-min-container {
-            bottom: 100px !important;
-            right: 30px !important;
-        }
-        /* Если виджет использует iframe, смещаем его вверх */
-        iframe[src*="tawk.to"] {
-            bottom: 100px !important;
-        }
-        /* Для мобильных устройств */
-        @media (max-width: 600px) {
-            .telegram-float {
-                bottom: 20px;
-                right: 20px;
-                width: 54px;
-                height: 54px;
-            }
-            .tawk-min-container {
-                bottom: 85px !important;
-                right: 20px !important;
-            }
-            iframe[src*="tawk.to"] {
-                bottom: 85px !important;
-            }
-        }
-
         @media (max-width: 992px) { .sell-layout { flex-direction: column; } .sell-sidebar { width: 100%; min-width: unset; position: static; } .skin-grid-sell { grid-template-columns: repeat(3, 1fr); } .profile-layout { flex-direction: column; } .profile-left { width: 100%; min-width: unset; } .profile-cards { grid-template-columns: repeat(2, 1fr); } .support-channels { grid-template-columns: 1fr; } .policy-container { padding: 25px 20px; } }
         @media (max-width: 600px) { .skin-grid-sell { grid-template-columns: repeat(2, 1fr); } }
     </style>
@@ -449,6 +391,26 @@
         <button class="btn" onclick="closeModal()">ОК</button>
     </div>
 </div>
+
+<div class="wrapper">
+
+<header class="header">
+    <div class="container header-inner">
+        <a href="#" class="logo" id="logoLink">EMERALD<span>Market</span></a>
+        <nav class="nav">
+            <a class="active" data-page="sell">Продать скины</a>
+            <a data-page="market">Купить скины</a>
+            <a data-page="profile">Профиль</a>
+            <a data-page="faq">FAQ</a>
+            <a data-page="support">Поддержка</a>
+        </nav>
+        <div class="header-actions" id="headerActions">
+            <a href="/auth/steam" class="btn btn-steam">Войти через Steam</a>
+        </div>
+    </div>
+</header>
+
+<div class="content">
 
 <!-- СТРАНИЦА ПРОДАЖИ -->
 <div class="page active" id="sellPage">
@@ -783,9 +745,14 @@
             </div>
 
             <div class="support-card">
-                <div class="icon-big"></div>
-                <h2></h2>
-                
+                <div class="icon-big">🕐</div>
+                <h2>Время работы</h2>
+                <p>
+                    <strong style="color: #fff;">Пн-Пт:</strong> 10:00 - 22:00 (МСК)<br>
+                    <strong style="color: #fff;">Сб-Вс:</strong> 12:00 - 20:00 (МСК)
+                </p>
+                <p style="margin-top: 12px; color: #8a8d99; font-size: 14px;">
+                    Вне рабочего времени ответ может занять до 24 часов
                 </p>
             </div>
         </div>
@@ -807,7 +774,7 @@
             <h3>1.1 Информация, которую вы предоставляете нам</h3>
             <ul>
                 <li><span class="highlight">Информация об учетной записи:</span> Когда вы регистрируете учетную запись, мы можем собирать личную информацию, такую как ваше имя, адрес электронной почты, имя пользователя и Steam ID.</li>
-                <li><span class="highlight">Платежная информация:</span> Если вы покупаете или продаете скины, мы собираем платежные данные, такие как способ оплаты (например,VISA,МИР,СБП,USDT, информация о кредитной карте) и любую другую информацию, необходимую для завершения транзакции.</li>
+                <li><span class="highlight">Платежная информация:</span> Если вы покупаете или продаете скины, мы собираем платежные данные, такие как способ оплаты (например, VISA, МИР, СБП, USDT, информация о кредитной карте) и любую другую информацию, необходимую для завершения транзакции.</li>
                 <li><span class="highlight">Информация о коммуникациях:</span> Если вы обращаетесь к нам за поддержкой или по другим вопросам, мы можем собирать любую предоставленную вами информацию, такую как ваше имя, адрес электронной почты и содержание ваших сообщений.</li>
             </ul>
 
@@ -861,8 +828,8 @@
             <h2>8. Свяжитесь с нами</h2>
             <p>Если у вас есть какие-либо вопросы или опасения относительно этой Политики конфиденциальности или наших практик работы с данными, пожалуйста, свяжитесь с нами:</p>
             <ul>
-                <li>Email:emerald-market.p.tawkto.email</li>
-                <li>Telegram: <a href="https://t.me/ikiawka" target="_blank" style="color: #2ecc71; text-decoration: none;">@ikiawka</a></li>
+                <li>Email: emerald-market.p.tawkto.email</li>
+                <li>Telegram: @ikiawka</li>
             </ul>
         </div>
     </div>
@@ -886,7 +853,7 @@
             <div class="col">
                 <h4>Контакты</h4>
                 <a href="https://t.me/ikiawka" target="_blank">Telegram</a>
-                <a href="#"></a>
+                <a href="#">VK</a>
             </div>
             <div class="col">
                 <h4>Информация</h4>
@@ -894,7 +861,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            © 2026 EMERALD Market. Все права защищены.
+            © 2025 EMERALD Market. Все права защищены.
         </div>
     </div>
 </footer>
