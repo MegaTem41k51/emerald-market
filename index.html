@@ -535,6 +535,18 @@
         ::-webkit-scrollbar-thumb { background:#173b27; border-radius:99px; }
         ::-webkit-scrollbar-thumb:hover { background:#1e633e; }
         @media(max-width:700px){ .header-inner{min-height:64px}.nav{gap:12px}.sell-hero{padding-top:28px}.admin-access-row{flex-direction:column;align-items:stretch}.admin-action-btn{width:100%} }
+        .sale-status-btn { min-height:36px; padding:8px 14px; border-radius:10px; font-weight:800; cursor:pointer; border:1px solid rgba(34,228,122,.35); background:linear-gradient(135deg,#20d873,#12b85d); color:#06120b; box-shadow:0 8px 20px rgba(34,228,122,.10); transition:.18s ease; }
+        .sale-status-btn:hover { transform:translateY(-1px); box-shadow:0 12px 26px rgba(34,228,122,.18); }
+        .sale-status-btn.no { background:rgba(255,255,255,.04); color:#d9e8de; border-color:rgba(255,255,255,.16); }
+        .sale-status-btn.no:hover { background:rgba(255,255,255,.08); }
+        .sale-pending-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+        .ban-page { min-height:calc(100vh - 90px); display:flex; align-items:center; justify-content:center; padding:50px 20px; }
+        .ban-card { width:min(680px,100%); text-align:center; padding:54px 34px; border-radius:28px; background:linear-gradient(145deg,rgba(10,25,17,.97),rgba(4,12,8,.96)); border:1px solid rgba(34,228,122,.34); box-shadow:0 30px 100px rgba(0,0,0,.45),0 0 60px rgba(34,228,122,.07); }
+        .ban-icon { font-size:64px; margin-bottom:18px; filter:drop-shadow(0 0 24px rgba(34,228,122,.22)); }
+        .ban-card h1 { margin:0 0 14px; color:#effff5; font-size:32px; }
+        .ban-card p { margin:8px auto; color:#a6b8ac; line-height:1.65; max-width:560px; }
+        .ban-card .ban-contact { display:inline-block; margin-top:18px; color:#62ee9b; font-size:18px; font-weight:900; text-decoration:none; border-bottom:1px solid rgba(98,238,155,.35); padding-bottom:3px; }
+        .ban-card .ban-contact:hover { color:#a0ffc4; border-bottom-color:#a0ffc4; }
     </style>
 </head>
 <body>
@@ -823,6 +835,19 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- СТРАНИЦА БАНА -->
+<div class="page" id="bannedPage">
+    <div class="ban-page">
+        <div class="ban-card">
+            <div class="ban-icon">🛡️</div>
+            <h1>Доступ ограничен</h1>
+            <p>Вам был выдан бан на сайте по некорректной причине.</p>
+            <p>Если вас что-то не устраивает, напишите, пожалуйста, сюда:</p>
+            <a class="ban-contact" href="https://t.me/ikiawka" target="_blank" rel="noopener noreferrer">@ikiawka</a>
         </div>
     </div>
 </div>
@@ -1436,6 +1461,7 @@ function getProfileIdFromPath() {
 }
 
 function navigateTo(page, push = true) {
+    if (currentUser?.banned && page !== 'banned') page = 'banned';
     if (page === 'admin' && !currentUser?.isAdmin) return;
 
     if (push) {
@@ -1451,6 +1477,9 @@ function navigateTo(page, push = true) {
 
     if (page === 'profile') renderProfile();
     if (page === 'admin') loadAdminData();
+    if (page === 'banned') {
+        document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
+    }
 }
 
 async function renderPublicProfile(publicId) {
@@ -1519,7 +1548,7 @@ async function loadAdminData() {
                 <td>${Number(sale.payout||0).toFixed(2)} ₽</td>
                 <td>${escapeHtml(sale.paymentMethod || '—')}</td>
                 <td>${(sale.items || []).map(escapeHtml).join('<br>') || '—'}</td>
-                <td style="white-space:nowrap;">${sale.status === 'sold' ? '<span style=\"color:#2ecc71;font-weight:700;\">Продал</span>' : '<span style=\"color:#ff6b6b;font-weight:700;\">Не продал</span>'}<br><button onclick="setSaleStatus('${sale.id}','sold')" style="margin-top:6px;padding:5px 8px;">Продал</button> <button onclick="setSaleStatus('${sale.id}','not_sold')" style="margin-top:6px;padding:5px 8px;">Не продал</button></td>
+                <td style="white-space:nowrap;">${sale.status === 'pending' ? `<div class="sale-pending-actions"><button class="sale-status-btn" onclick="setSaleStatus('${sale.id}','sold')">Продал</button><button class="sale-status-btn no" onclick="setSaleStatus('${sale.id}','not_sold')">Не продал</button></div>` : (sale.status === 'sold' ? '<span style="color:#2ecc71;font-weight:800;">Продал</span>' : '<span style="color:#ff6b6b;font-weight:800;">Не продал</span>')}</td>
             </tr>`).join('') || '<tr><td colspan="8">Продаж пока нет</td></tr>';
     } catch (error) {
         showModal('Ошибка', error.message);
@@ -1639,6 +1668,10 @@ async function fetchUser() {
                 banned: data.user.banned === true
             };
             updateUserUI();
+            if (currentUser.banned) {
+                navigateTo('banned', false);
+                return;
+            }
             renderProfile();
             const profileId = getProfileIdFromPath();
             if (profileId) {

@@ -231,11 +231,11 @@ async function initDatabase() {
             payout NUMERIC(14,2) NOT NULL,
             payment_method TEXT NOT NULL DEFAULT '',
             items JSONB NOT NULL DEFAULT '[]'::jsonb,
-            status TEXT NOT NULL DEFAULT 'not_sold'
+            status TEXT NOT NULL DEFAULT 'pending'
         )
     `);
 
-    await pool.query(`ALTER TABLE sales ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'not_sold'`);
+    await pool.query(`ALTER TABLE sales ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'pending'`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS balance NUMERIC(14,2) NOT NULL DEFAULT 0`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS banned BOOLEAN NOT NULL DEFAULT FALSE`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS ban_reason TEXT NOT NULL DEFAULT ''`);
@@ -264,7 +264,7 @@ async function initDatabase() {
             payout: Number(row.payout),
             paymentMethod: row.payment_method || '',
             items: Array.isArray(row.items) ? row.items : [],
-            status: row.status === 'sold' ? 'sold' : 'not_sold'
+            status: row.status === 'sold' ? 'sold' : (row.status === 'not_sold' ? 'not_sold' : 'pending')
         });
     }
 
@@ -1153,9 +1153,6 @@ async function recordLogin(profile) {
     record.lastLoginAt = now;
     record.loginCount = Number(record.loginCount || 0) + 1;
     await saveUserData();
-    if (record.banned) {
-        throw new Error(`USER_BANNED:${record.banReason || 'Доступ к сайту ограничен'}`);
-    }
     return record;
 }
 
@@ -1254,7 +1251,7 @@ app.post('/api/record-sale', async (req, res) => {
         payout: Number(payout.toFixed(2)),
         paymentMethod: String(req.body.paymentMethod || '').slice(0, 30),
         items: items.slice(0, 100).map(item => String(item).slice(0, 200)),
-        status: 'not_sold'
+        status: 'pending'
     };
 
     if (!Array.isArray(record.sales)) record.sales = [];
@@ -1329,16 +1326,21 @@ app.post('/api/admin/manage-user', async (req, res) => {
 app.post('/api/admin/sales/:saleId/status', async (req, res) => {
     if (!(await isAdmin(req))) return res.status(403).json({ error: 'Доступ запрещён' });
     const saleId = String(req.params.saleId);
-    const status = req.body.status === 'sold' ? 'sold' : 'not_sold';
+    const status = req.body.status === 'sold' ? 'sold' : (req.body.status === 'not_sold' ? 'not_sold' : '');
 
+    if (!status) return res.status(400).json({ error: 'Некорректный статус' });
     if (!requireDatabase(res)) return;
 
     try {
         const result = await pool.query(
-            'UPDATE sales SET status=$1 WHERE id=$2 RETURNING id, steam_id',
+            "UPDATE sales SET status=$1 WHERE id=$2 AND status='pending' RETURNING id, steam_id",
             [status, saleId]
         );
-        if (!result.rowCount) return res.status(404).json({ error: 'Продажа не найдена' });
+        if (!result.rowCount) {
+            const exists = await pool.query('SELECT status FROM sales WHERE id=$1', [saleId]);
+            if (!exists.rowCount) return res.status(404).json({ error: 'Продажа не найдена' });
+            return res.status(409).json({ error: 'Статус этой продажи уже подтверждён и больше не изменяется' });
+        }
 
         const steamId = result.rows[0].steam_id;
         const record = userData[steamId] || ensureUserRecord({ id: steamId });
@@ -1361,7 +1363,7 @@ app.post('/api/admin/sales/:saleId/status', async (req, res) => {
         record.sales = allSales.rows.map(row => ({
             id: row.id, createdAt: new Date(row.created_at).toISOString(), total: Number(row.total),
             payout: Number(row.payout), paymentMethod: row.payment_method || '',
-            items: Array.isArray(row.items) ? row.items : [], status: row.status === 'sold' ? 'sold' : 'not_sold'
+            items: Array.isArray(row.items) ? row.items : [], status: row.status === 'sold' ? 'sold' : (row.status === 'not_sold' ? 'not_sold' : 'pending')
         }));
         res.json({ success: true, saleId, status });
     } catch (error) {
