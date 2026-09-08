@@ -287,39 +287,6 @@
         .footer-grid .col a:hover { color: #2ecc71; }
         .footer-bottom { text-align: center; margin-top: 32px; padding-top: 20px; border-top: 1px solid #1c1d23; color: #6a6d7a; font-size: 14px; }
 
-
-        /* ===== ПРОФИЛЬ: РАЗДЕЛЫ ===== */
-        .profile-panel { background: #141a17; border: 1px solid rgba(46,204,113,.20); border-radius: 14px; padding: 24px; }
-        .profile-panel-header { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px; }
-        .profile-panel-title { display:flex; align-items:center; gap:10px; font-size:20px; font-weight:800; color:#f2f7f4; }
-        .profile-panel-subtitle { color:#8fa096; font-size:13px; line-height:1.45; }
-        .exchange-toggle { display:flex; gap:8px; }
-        .exchange-toggle button { border:1px solid #303a35; background:#0d1210; color:#8f9a95; border-radius:10px; padding:10px 18px; font-weight:800; cursor:pointer; }
-        .exchange-toggle button.active { border-color:#6174ff; color:#8fa0ff; background:#151a2b; }
-        .empty-items { min-height:220px; border-radius:12px; background:#101613; display:flex; align-items:center; justify-content:center; color:#f0f3f2; font-size:17px; font-weight:700; }
-        .verify-card { background:#141a17; border:1px solid rgba(46,204,113,.18); border-radius:14px; padding:22px; }
-        .verify-head { display:flex; align-items:center; gap:10px; font-size:18px; font-weight:800; margin-bottom:16px; }
-        .verify-badge { display:inline-flex; align-items:center; padding:7px 12px; border-radius:10px; background:#5b461e; color:#ffbf45; font-weight:800; font-size:12px; }
-        .verify-text { color:#8fa096; font-size:13px; line-height:1.5; margin-bottom:18px; }
-        .verify-note { margin-top:16px; padding:18px; border-radius:12px; background:#5b461e; color:#ffbf45; font-size:13px; line-height:1.45; }
-        .sessions-list { display:flex; flex-direction:column; gap:12px; }
-        .session-row { display:grid; grid-template-columns: 1.2fr 1fr 1fr .8fr auto; gap:16px; align-items:center; padding:18px; border:1px solid #2a3630; background:#101613; border-radius:12px; }
-        .session-label { color:#8fa096; font-size:12px; margin-bottom:5px; }
-        .session-value { color:#eaf0ec; font-weight:700; font-size:14px; word-break:break-word; }
-        .session-online { color:#2ecc71; font-weight:800; }
-        .session-current { color:#8fa0ff; font-weight:700; font-size:12px; }
-        .session-logout { border:1px solid rgba(255,107,107,.35); background:rgba(255,107,107,.08); color:#ff8a8a; border-radius:9px; padding:9px 12px; cursor:pointer; font-weight:800; }
-        .session-logout:hover { background:rgba(255,107,107,.15); }
-        .api-key-box { display:flex; gap:10px; }
-        .api-key-box input { flex:1; min-width:0; background:#101613; border:1px solid #2a3630; border-radius:10px; padding:14px; color:#eaf0ec; outline:none; }
-        .api-key-box input:focus { border-color:#2ecc71; }
-        .api-help { margin-top:14px; padding:15px; border-radius:11px; background:#151d19; color:#9aa7a0; font-size:13px; line-height:1.45; }
-        .api-link { color:#2ecc71; text-decoration:none; font-weight:700; }
-        @media (max-width: 900px) {
-            .session-row { grid-template-columns: 1fr 1fr; }
-            .session-row > :last-child { grid-column:1/-1; }
-            .profile-panel-header { align-items:flex-start; flex-direction:column; }
-        }
         /* ===== В РАЗРАБОТКЕ ===== */
         .in-development {
             font-size: 48px;
@@ -587,6 +554,42 @@
         .ban-card p { margin:8px auto; color:#a6b8ac; line-height:1.65; max-width:560px; }
         .ban-card .ban-contact { display:inline-block; margin-top:18px; color:#62ee9b; font-size:18px; font-weight:900; text-decoration:none; border-bottom:1px solid rgba(98,238,155,.35); padding-bottom:3px; }
         .ban-card .ban-contact:hover { color:#a0ffc4; border-bottom-color:#a0ffc4; }
+
+        /* ===== ПРОФИЛЬ: РАЗДЕЛЫ ПО МАКЕТУ ===== */
+        .profile-section-card { background:linear-gradient(145deg,#111a15,#0b120e); border:1px solid rgba(34,228,122,.22); border-radius:16px; padding:22px; }
+        .profile-section-head { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:16px; }
+        .profile-section-title { display:flex; align-items:center; gap:10px; font-size:18px; font-weight:800; color:#effff5; }
+        .profile-section-muted { color:#81948a; font-size:12px; line-height:1.5; }
+        .exchange-toggle { display:flex; gap:8px; }
+        .exchange-toggle button { min-width:78px; padding:8px 14px; border-radius:9px; border:1px solid rgba(255,255,255,.12); background:#0b100d; color:#8c9a93; font-weight:800; cursor:pointer; }
+        .exchange-toggle button.active { border-color:#526dff; color:#8090ff; box-shadow:0 0 0 1px rgba(82,109,255,.12) inset; }
+        .exchange-empty { min-height:165px; border-radius:12px; background:rgba(3,9,6,.42); display:flex; align-items:center; justify-content:center; color:#effff5; font-weight:800; }
+        .verify-status { display:inline-flex; align-items:center; padding:7px 11px; border-radius:9px; background:rgba(174,123,27,.35); color:#ffbe36; font-size:12px; font-weight:900; }
+        .verify-text { color:#91a39a; font-size:12px; line-height:1.55; margin-bottom:14px; }
+        .verify-warning { padding:15px 16px; border-radius:12px; background:rgba(121,88,28,.58); color:#ffbf3e; font-size:12px; line-height:1.5; }
+        .email-box { margin-top:18px; padding:16px; border:1px solid rgba(34,228,122,.13); border-radius:12px; background:rgba(4,11,7,.42); }
+        .email-row { display:flex; gap:10px; flex-wrap:wrap; }
+        .email-row input { flex:1; min-width:220px; background:#080e0b; border:1px solid rgba(255,255,255,.1); border-radius:9px; padding:11px 12px; color:#effff5; outline:none; }
+        .email-row input:focus { border-color:#22e47a; }
+        .email-code-row { display:none; margin-top:10px; gap:10px; }
+        .email-code-row.show { display:flex; }
+        .email-code-row input { flex:1; background:#080e0b; border:1px solid rgba(255,255,255,.1); border-radius:9px; padding:11px 12px; color:#effff5; outline:none; }
+        .verify-ok { color:#53ef97; font-weight:800; }
+        .sessions-list { display:flex; flex-direction:column; gap:10px; }
+        .session-row { display:grid; grid-template-columns:1.15fr 1fr .8fr .75fr auto; gap:16px; align-items:center; padding:14px 16px; border:1px solid rgba(255,255,255,.12); border-radius:12px; background:rgba(6,13,9,.42); }
+        .session-label { color:#7e9087; font-size:10px; margin-bottom:4px; }
+        .session-value { color:#eaf5ee; font-size:12px; font-weight:800; word-break:break-word; }
+        .session-status { color:#20e47a; font-weight:900; font-size:12px; }
+        .session-current { color:#8da2ff; font-size:11px; font-weight:800; }
+        .session-kill { background:transparent; border:1px solid rgba(255,90,90,.28); color:#ff8e8e; padding:7px 10px; border-radius:8px; cursor:pointer; font-weight:800; }
+        .session-kill:hover { background:rgba(255,90,90,.08); }
+        .api-card { padding:18px; border-radius:13px; background:rgba(4,11,7,.42); }
+        .api-key-row { display:flex; gap:10px; margin-top:14px; }
+        .api-key-row input { flex:1; background:#080e0b; border:1px solid rgba(255,255,255,.1); border-radius:9px; padding:12px 14px; color:#eaf5ee; font-family:monospace; letter-spacing:.06em; }
+        .api-doc { color:#45e991; font-weight:800; text-decoration:none; }
+        .api-note { margin-top:14px; color:#8c9d94; font-size:11px; line-height:1.5; }
+        @media(max-width:900px){ .session-row{grid-template-columns:1fr 1fr;} .session-kill{grid-column:1/-1; justify-self:start;} }
+        @media(max-width:600px){ .session-row{grid-template-columns:1fr;} .email-row,.email-code-row,.api-key-row{flex-direction:column;} }
     </style>
 </head>
 <body>
@@ -900,64 +903,70 @@
                     </div>
 
                     <div class="profile-content-section" id="section-exchanges">
-                        <div class="profile-panel">
-                            <div class="profile-panel-header">
-                                <div class="profile-panel-title">🔫 Обмены</div>
+                        <div class="profile-section-card">
+                            <div class="profile-section-head">
+                                <div class="profile-section-title"><span>🔫</span> Обмены</div>
                                 <div class="exchange-toggle">
-                                    <button class="active" type="button">Покупки</button>
-                                    <button type="button">Продажи</button>
+                                    <button class="active" type="button" onclick="switchExchangeTab(this, 'purchases')">Покупки</button>
+                                    <button type="button" onclick="switchExchangeTab(this, 'sales')">Продажи</button>
                                 </div>
                             </div>
-                            <div class="empty-items">У вас пока нет предметов</div>
+                            <div class="exchange-empty" id="exchangePurchases">У вас пока нет предметов</div>
+                            <div class="exchange-empty" id="exchangeSales" style="display:none;">У вас пока нет предметов</div>
                         </div>
                     </div>
 
                     <div class="profile-content-section" id="section-verification">
-                        <div class="verify-card">
-                            <div class="verify-head">
-                                <span>①</span>
-                                <span>Верификация</span>
-                                <span class="verify-badge">Отсутствует</span>
+                        <div class="profile-section-card">
+                            <div class="profile-section-head" style="justify-content:flex-start;">
+                                <div class="profile-section-title"><span>ⓘ</span> Верификация</div>
+                                <span class="verify-status">Отсутствует</span>
                             </div>
-                            <div class="verify-text">
-                                Статус верификации пока не подтверждён. Если в будущем для аккаунта будет доступна верификация, требования и необходимые действия будут показаны здесь.
-                            </div>
-                            <div class="verify-note">
-                                ⚠️ Проверка личности предназначена для повышения безопасности платформы и доступна только пользователям, которые соответствуют требованиям сервиса.
+                            <div class="verify-text">Статус верификации пока не подтвержден. Если в будущем для аккаунта будет доступна верификация, требования и необходимые действия будут показаны здесь.</div>
+                            <div class="verify-warning">⚠️ &nbsp; Проверка личности предназначена для повышения безопасности платформы и доступна только пользователям, которые соответствуют требованиям сервиса.</div>
+
+                            <div class="email-box">
+                                <div class="profile-section-title" style="font-size:15px; margin-bottom:8px;">✉️ Email <span id="emailVerifyStatus" class="verify-status">Не подтвержден</span></div>
+                                <div class="verify-text">Укажите свой Email и подтвердите его кодом из письма.</div>
+                                <div class="email-row">
+                                    <input id="profileEmail" type="email" placeholder="Введите вашу почту" autocomplete="email">
+                                    <button class="btn" type="button" onclick="requestEmailCode()">Подтвердить</button>
+                                </div>
+                                <div class="email-code-row" id="emailCodeRow">
+                                    <input id="profileEmailCode" type="text" inputmode="numeric" maxlength="6" placeholder="Код из письма">
+                                    <button class="btn" type="button" onclick="verifyEmailCode()">Подтвердить код</button>
+                                </div>
+                                <div id="emailVerifyMessage" class="profile-section-muted" style="margin-top:10px;"></div>
                             </div>
                         </div>
                     </div>
 
                     <div class="profile-content-section" id="section-sessions">
-                        <div class="profile-panel">
-                            <div class="profile-panel-header">
-                                <div>
-                                    <div class="profile-panel-title">🔒 Ваши сессии</div>
-                                    <div class="profile-panel-subtitle">Здесь отображаются активные входы в ваш аккаунт. IP-адрес виден только владельцу аккаунта.</div>
-                                </div>
+                        <div class="profile-section-card">
+                            <div class="profile-section-head" style="display:block;">
+                                <div class="profile-section-title">🔒 Ваши сессии</div>
+                                <div class="profile-section-muted">Здесь отображаются активные входы в ваш аккаунт. IP-адрес виден только владельцу аккаунта.</div>
                             </div>
                             <div class="sessions-list" id="profileSessionsList">
-                                <div class="empty-items">Загрузка сессий...</div>
+                                <div class="profile-section-muted">Загрузка сессий...</div>
                             </div>
                         </div>
                     </div>
 
                     <div class="profile-content-section" id="section-api">
-                        <div class="profile-panel">
-                            <div class="profile-panel-header">
+                        <div class="profile-section-card">
+                            <div class="profile-section-head">
                                 <div>
-                                    <div class="profile-panel-title">Ваш API Key</div>
-                                    <div class="profile-panel-subtitle">Используйте ключ только в своих приложениях и никому его не передавайте.</div>
+                                    <div class="profile-section-title">Ваш API Key</div>
+                                    <div class="profile-section-muted">Используйте ключ только в своих приложениях и никому его не передавайте.</div>
                                 </div>
-                                <a class="api-link" href="#" onclick="event.preventDefault(); showModal('Документация', 'Документация API будет доступна позже.')">Перейти к документации</a>
+                                <a class="api-doc" href="#" onclick="return false;">Перейти к документации</a>
                             </div>
-                            <div class="api-key-box">
-                                <input id="profileApiKey" type="text" readonly placeholder="Не сгенерирован">
+                            <div class="api-key-row">
+                                <input id="profileApiKey" type="text" readonly placeholder="Не сгенерирован" maxlength="17">
                                 <button class="btn" type="button" onclick="generateProfileApiKey()">Сгенерировать</button>
                             </div>
-                            <div class="api-help">
-                                🔐 API-ключ является секретом вашего аккаунта. Если вы больше не хотите его использовать, сгенерируйте новый — старый будет заменён.
-                            </div>
+                            <div class="api-note">🔐 API-ключ является секретом вашего аккаунта. Если вы больше не хотите его использовать, сгенерируйте новый — старый будет заменён.</div>
                         </div>
                     </div>
                 </div>
@@ -1811,7 +1820,9 @@ async function fetchUser() {
                 totalSold: Number(data.user.totalSold || 0),
                 totalPayout: Number(data.user.totalPayout || 0),
                 balance: Number(data.user.balance || 0),
-                banned: data.user.banned === true
+                banned: data.user.banned === true,
+                email: data.user.email || '',
+                emailVerified: data.user.emailVerified === true
             };
             updateUserUI();
             if (currentUser.banned) {
@@ -2161,107 +2172,118 @@ function renderProfile() {
         if (soldEl) soldEl.textContent = `${Number(currentUser.totalSold || 0).toFixed(2)} ₽`;
         if (balanceEl) balanceEl.textContent = `💰 ${Number(currentUser.balance || 0).toFixed(2)} ₽`;
         const publicIdEl = document.getElementById('profilePublicId');
-        if (publicIdEl) {
-            publicIdEl.textContent = `ID: ${currentUser.publicId || '—'}`;
-        }
+        if (publicIdEl) publicIdEl.textContent = `ID: ${currentUser.publicId || '—'}`;
+        const avatar = document.getElementById('profileAvatar');
         if (currentUser.avatar) {
-            document.getElementById('profileAvatar').style.backgroundImage = `url('${currentUser.avatar}')`;
-            document.getElementById('profileAvatar').style.backgroundSize = 'cover';
-            document.getElementById('profileAvatar').style.backgroundPosition = 'center';
-            document.getElementById('profileAvatar').textContent = '';
-        } else {
-            document.getElementById('profileAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
-        }
+            avatar.style.backgroundImage = `url('${currentUser.avatar}')`;
+            avatar.style.backgroundSize = 'cover';
+            avatar.style.backgroundPosition = 'center';
+            avatar.textContent = '';
+        } else avatar.textContent = currentUser.name.charAt(0).toUpperCase();
+        loadProfileSections();
     } else {
         document.getElementById('profileLoginBox').style.display = 'block';
         document.getElementById('profileContent').style.display = 'none';
     }
 }
 
-// ===== РАЗДЕЛЫ ПРОФИЛЯ =====
+async function loadProfileSections() {
+    await Promise.allSettled([loadEmailVerification(), loadProfileSessions(), loadProfileApiKey()]);
+}
+
+function switchExchangeTab(button, tab) {
+    document.querySelectorAll('.exchange-toggle button').forEach(b => b.classList.remove('active'));
+    button.classList.add('active');
+    document.getElementById('exchangePurchases').style.display = tab === 'purchases' ? 'flex' : 'none';
+    document.getElementById('exchangeSales').style.display = tab === 'sales' ? 'flex' : 'none';
+}
+
+async function loadEmailVerification() {
+    try {
+        const r = await fetch('/api/profile/email');
+        const d = await r.json();
+        const input = document.getElementById('profileEmail');
+        const status = document.getElementById('emailVerifyStatus');
+        if (!input || !status) return;
+        input.value = d.email || '';
+        status.textContent = d.verified ? 'Подтвержден' : 'Не подтвержден';
+        status.className = d.verified ? 'verify-status verify-ok' : 'verify-status';
+    } catch(e) {}
+}
+
+async function requestEmailCode() {
+    const email = document.getElementById('profileEmail').value.trim();
+    const msg = document.getElementById('emailVerifyMessage');
+    msg.textContent = '⏳ Отправляем код...';
+    try {
+        const r = await fetch('/api/profile/email/request', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email})});
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || 'Не удалось отправить код');
+        document.getElementById('emailCodeRow').classList.add('show');
+        msg.textContent = '✓ Код отправлен на указанную почту. Он действует 10 минут.';
+    } catch(e) { msg.textContent = `✕ ${e.message}`; }
+}
+
+async function verifyEmailCode() {
+    const code = document.getElementById('profileEmailCode').value.trim();
+    const msg = document.getElementById('emailVerifyMessage');
+    try {
+        const r = await fetch('/api/profile/email/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({code})});
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || 'Не удалось подтвердить Email');
+        document.getElementById('emailVerifyStatus').textContent = 'Подтвержден';
+        document.getElementById('emailVerifyStatus').className = 'verify-status verify-ok';
+        document.getElementById('emailCodeRow').classList.remove('show');
+        msg.textContent = `✓ Email ${d.email} подтвержден.`;
+    } catch(e) { msg.textContent = `✕ ${e.message}`; }
+}
+
 async function loadProfileSessions() {
     const box = document.getElementById('profileSessionsList');
     if (!box) return;
-    box.innerHTML = '<div class="empty-items">Загрузка сессий...</div>';
-
     try {
-        const response = await fetch('/api/profile/sessions');
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Не удалось загрузить сессии');
-
-        if (!Array.isArray(data.sessions) || !data.sessions.length) {
-            box.innerHTML = '<div class="empty-items">Активных сессий нет</div>';
-            return;
-        }
-
-        box.innerHTML = data.sessions.map(session => `
+        const r = await fetch('/api/profile/sessions');
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || 'Не удалось загрузить сессии');
+        if (!d.sessions?.length) { box.innerHTML = '<div class="profile-section-muted">Активных сессий нет.</div>'; return; }
+        box.innerHTML = d.sessions.map(s => `
             <div class="session-row">
-                <div>
-                    <div class="session-label">Устройство</div>
-                    <div class="session-value">${escapeHtml(session.device)}</div>
-                </div>
-                <div>
-                    <div class="session-label">Местоположение</div>
-                    <div class="session-value">${escapeHtml(session.country || '—')}</div>
-                </div>
-                <div>
-                    <div class="session-label">IP-Адрес</div>
-                    <div class="session-value">${escapeHtml(session.ip || '—')}</div>
-                </div>
-                <div>
-                    <div class="session-label">Статус</div>
-                    <div class="${session.current ? 'session-current' : 'session-online'}">${session.current ? 'Текущая' : 'Онлайн'}</div>
-                </div>
-                <div>
-                    ${session.current
-                        ? '<span class="session-current">Эта сессия</span>'
-                        : `<button class="session-logout" type="button" onclick="logoutProfileSession('${encodeURIComponent(session.id)}')">Выйти</button>`}
-                </div>
-            </div>
-        `).join('');
-    } catch (error) {
-        box.innerHTML = `<div class="empty-items">${escapeHtml(error.message)}</div>`;
-    }
+                <div><div class="session-label">Устройство</div><div class="session-value">${escapeHtml(s.device)}</div></div>
+                <div><div class="session-label">Местоположение</div><div class="session-value">${escapeHtml(s.country)}</div></div>
+                <div><div class="session-label">IP-Адрес</div><div class="session-value">${escapeHtml(s.ip)}</div></div>
+                <div><div class="session-label">Статус</div><div class="session-status">${escapeHtml(s.status)}</div></div>
+                <div>${s.current ? '<span class="session-current">Эта сессия</span>' : `<button class="session-kill" onclick="terminateProfileSession('${encodeURIComponent(s.id)}')">Выйти</button>`}</div>
+            </div>`).join('');
+    } catch(e) { box.innerHTML = `<div class="profile-section-muted">✕ ${escapeHtml(e.message)}</div>`; }
 }
 
-async function logoutProfileSession(encodedSessionId) {
+async function terminateProfileSession(id) {
     try {
-        const response = await fetch(`/api/profile/sessions/${encodedSessionId}`, { method: 'DELETE' });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Не удалось завершить сессию');
+        const r = await fetch(`/api/profile/sessions/${id}`, {method:'DELETE'});
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || 'Не удалось завершить сессию');
         await loadProfileSessions();
-    } catch (error) {
-        showModal('Ошибка', error.message);
-    }
+    } catch(e) { showModal('Ошибка', e.message); }
 }
 
 async function loadProfileApiKey() {
     const input = document.getElementById('profileApiKey');
-    if (!input || !currentUser) return;
+    if (!input) return;
     try {
-        const response = await fetch('/api/profile/api-key');
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Не удалось загрузить API key');
-        input.value = data.apiKey || '';
-        input.placeholder = data.apiKey ? '' : 'Не сгенерирован';
-    } catch (error) {
-        input.placeholder = error.message;
-    }
+        const r = await fetch('/api/profile/api-key');
+        const d = await r.json();
+        if (r.ok) input.value = d.apiKey || '';
+    } catch(e) {}
 }
 
 async function generateProfileApiKey() {
-    const input = document.getElementById('profileApiKey');
     try {
-        const response = await fetch('/api/profile/api-key/generate', { method: 'POST' });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Не удалось сгенерировать API key');
-        if (input) {
-            input.value = data.apiKey || '';
-            input.placeholder = '';
-        }
-    } catch (error) {
-        showModal('Ошибка', error.message);
-    }
+        const r = await fetch('/api/profile/api-key/generate', {method:'POST'});
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || 'Не удалось сгенерировать API Key');
+        document.getElementById('profileApiKey').value = d.apiKey;
+        showModal('Успех', 'Новый API Key сгенерирован. Старый ключ больше недействителен.');
+    } catch(e) { showModal('Ошибка', e.message); }
 }
 
 // ===== ВКЛАДКИ ПРОФИЛЯ =====
@@ -2274,8 +2296,6 @@ document.querySelectorAll('.profile-tab').forEach(tab => {
             section.classList.remove('active');
         });
         document.getElementById('section-' + tabName).classList.add('active');
-        if (tabName === 'sessions') loadProfileSessions();
-        if (tabName === 'api') loadProfileApiKey();
     });
 });
 

@@ -6,10 +6,11 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const { Pool } = require('pg');
+const nodemailer = require('nodemailer');
 
 const app = express();
-app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
 
 // =====================================================
@@ -73,6 +74,28 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Сохраняем активную сессию в PostgreSQL для раздела «Сессии».
+app.use((req, res, next) => {
+    if (!req.user || !pool || !dbReady || !req.sessionID) return next();
+    const sessionId = String(req.sessionID);
+    const steamId = String(req.user.id);
+    const userAgent = String(req.get('user-agent') || '').slice(0, 500);
+    const forwarded = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
+    const ip = forwarded || req.ip || req.socket?.remoteAddress || '';
+    const country = String(req.headers['cf-ipcountry'] || req.headers['x-vercel-ip-country'] || '').slice(0, 8);
+    pool.query(`
+        INSERT INTO user_sessions (session_id, steam_id, user_agent, ip_address, country, created_at, last_seen_at)
+        VALUES ($1,$2,$3,$4,$5,NOW(),NOW())
+        ON CONFLICT (session_id) DO UPDATE SET
+            steam_id=EXCLUDED.steam_id,
+            user_agent=EXCLUDED.user_agent,
+            ip_address=EXCLUDED.ip_address,
+            country=EXCLUDED.country,
+            last_seen_at=NOW()
+    `, [sessionId, steamId, userAgent, ip, country]).catch(err => console.error('⚠️ Сессия:', err.message));
+    next();
+});
+
 // =====================================================
 // STEAM AUTH
 // =====================================================
@@ -124,16 +147,9 @@ app.get(
 );
 
 // Выход
-app.get('/logout', async (req, res) => {
-    try {
-        if (pool && dbReady && req.sessionID && req.user) {
-            await pool.query('DELETE FROM user_sessions WHERE session_id=$1 AND steam_id=$2', [String(req.sessionID), String(req.user.id)]);
-        }
-    } catch (error) {
-        console.error('⚠️ Ошибка удаления сессии:', error.message);
-    }
+app.get('/logout', (req, res) => {
     req.logout(() => {
-        req.session.destroy(() => res.redirect('/'));
+        res.redirect('/');
     });
 });
 
@@ -161,6 +177,8 @@ app.get('/api/user', async (req, res) => {
             totalPayout: Number(ensureUserRecord(req.user).totalPayout || 0),
             balance: Number(ensureUserRecord(req.user).balance || 0),
             banned: ensureUserRecord(req.user).banned === true,
+            email: ensureUserRecord(req.user).email || '',
+            emailVerified: ensureUserRecord(req.user).emailVerified === true,
 
             name:
                 req.user.displayName ||
@@ -201,86 +219,6 @@ console.log(`🔎 PostgreSQL env: ${DATABASE_URL ? 'URL найден' : 'URL Н�
 let userData = {};
 let dbReady = false;
 
-// =====================================================
-// СЕССИИ ПОЛЬЗОВАТЕЛЕЙ
-// =====================================================
-
-function getClientIp(req) {
-    const forwarded = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
-    return forwarded || req.ip || req.socket?.remoteAddress || '';
-}
-
-function getClientCountry(req) {
-    return String(
-        req.headers['cf-ipcountry'] ||
-        req.headers['x-country-code'] ||
-        req.headers['x-vercel-ip-country'] ||
-        '—'
-    ).slice(0, 8).toUpperCase();
-}
-
-function getDeviceName(userAgent) {
-    const ua = String(userAgent || '');
-    const browser =
-        /Edg\/([\d.]+)/i.test(ua) ? `Edge ${ua.match(/Edg\/([\d.]+)/i)[1].split('.')[0]}` :
-        /Chrome\/([\d.]+)/i.test(ua) ? `Chrome ${ua.match(/Chrome\/([\d.]+)/i)[1].split('.')[0]}` :
-        /Firefox\/([\d.]+)/i.test(ua) ? `Firefox ${ua.match(/Firefox\/([\d.]+)/i)[1].split('.')[0]}` :
-        /Safari\/([\d.]+)/i.test(ua) && !/Chrome/i.test(ua) ? 'Safari' :
-        'Браузер';
-    const os =
-        /Windows NT/i.test(ua) ? 'Windows' :
-        /Android/i.test(ua) ? 'Android' :
-        /iPhone|iPad|iPod/i.test(ua) ? 'iOS' :
-        /Mac OS X/i.test(ua) ? 'macOS' :
-        /Linux/i.test(ua) ? 'Linux' :
-        'Устройство';
-    return `${os} (${browser})`;
-}
-
-app.use(async (req, res, next) => {
-    if (!req.user || !pool || !dbReady || !req.sessionID) return next();
-
-    const sessionId = String(req.sessionID);
-    const steamId = String(req.user.id);
-    const userAgent = String(req.headers['user-agent'] || '').slice(0, 500);
-    const ip = String(getClientIp(req)).slice(0, 100);
-    const country = getClientCountry(req);
-
-    try {
-        const existing = await pool.query(
-            'SELECT 1 FROM user_sessions WHERE session_id=$1 AND steam_id=$2',
-            [sessionId, steamId]
-        );
-
-        if (!existing.rowCount) {
-            await pool.query(
-                `INSERT INTO user_sessions
-                    (session_id, steam_id, user_agent, ip_address, country)
-                 VALUES ($1,$2,$3,$4,$5)
-                 ON CONFLICT (session_id) DO UPDATE SET
-                    steam_id=EXCLUDED.steam_id,
-                    user_agent=EXCLUDED.user_agent,
-                    ip_address=EXCLUDED.ip_address,
-                    country=EXCLUDED.country,
-                    last_seen_at=NOW()`,
-                [sessionId, steamId, userAgent, ip, country]
-            );
-        } else {
-            await pool.query(
-                `UPDATE user_sessions
-                 SET user_agent=$1, ip_address=$2, country=$3, last_seen_at=NOW()
-                 WHERE session_id=$4 AND steam_id=$5`,
-                [userAgent, ip, country, sessionId, steamId]
-            );
-        }
-    } catch (error) {
-        console.error('⚠️ Не удалось обновить сессию:', error.message);
-    }
-
-    next();
-});
-
-
 async function initDatabase() {
     if (!pool) return;
     try { await pool.query('SELECT 1'); }
@@ -307,7 +245,10 @@ async function initDatabase() {
             balance NUMERIC(14,2) NOT NULL DEFAULT 0,
             banned BOOLEAN NOT NULL DEFAULT FALSE,
             ban_reason TEXT NOT NULL DEFAULT '',
-            api_key TEXT NOT NULL DEFAULT ''
+            email TEXT NOT NULL DEFAULT '',
+            email_verified BOOLEAN NOT NULL DEFAULT FALSE,
+            email_verification_code TEXT NOT NULL DEFAULT '',
+            email_verification_expires_at TIMESTAMPTZ
         )
     `);
 
@@ -328,15 +269,18 @@ async function initDatabase() {
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS balance NUMERIC(14,2) NOT NULL DEFAULT 0`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS banned BOOLEAN NOT NULL DEFAULT FALSE`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS ban_reason TEXT NOT NULL DEFAULT ''`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email TEXT NOT NULL DEFAULT ''`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NULL DEFAULT FALSE`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verification_code TEXT NOT NULL DEFAULT ''`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verification_expires_at TIMESTAMPTZ`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS api_key TEXT NOT NULL DEFAULT ''`);
-
     await pool.query(`
         CREATE TABLE IF NOT EXISTS user_sessions (
             session_id TEXT PRIMARY KEY,
             steam_id TEXT NOT NULL REFERENCES users(steam_id) ON DELETE CASCADE,
             user_agent TEXT NOT NULL DEFAULT '',
             ip_address TEXT NOT NULL DEFAULT '',
-            country TEXT NOT NULL DEFAULT '—',
+            country TEXT NOT NULL DEFAULT '',
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
             last_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         )
@@ -412,6 +356,8 @@ function dbRowToUser(row) {
         balance: Number(row.balance || 0),
         banned: row.banned === true,
         banReason: row.ban_reason || '',
+        email: row.email || '',
+        emailVerified: row.email_verified === true,
         apiKey: row.api_key || '',
         sales: []
     };
@@ -422,8 +368,8 @@ async function upsertUserToDb(record) {
     await pool.query(`
         INSERT INTO users
             (steam_id, public_id, username, avatar, trade_url, created_at, last_login_at,
-             login_count, total_sold, total_payout, last_sale_at, theme, rain, balance, banned, ban_reason, api_key)
-        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
+             login_count, total_sold, total_payout, last_sale_at, theme, rain, balance, banned, ban_reason, email, email_verified, api_key)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)
         ON CONFLICT (steam_id) DO UPDATE SET
             public_id=EXCLUDED.public_id,
             username=EXCLUDED.username,
@@ -440,13 +386,16 @@ async function upsertUserToDb(record) {
             balance=EXCLUDED.balance,
             banned=EXCLUDED.banned,
             ban_reason=EXCLUDED.ban_reason,
+            email=EXCLUDED.email,
+            email_verified=EXCLUDED.email_verified,
             api_key=EXCLUDED.api_key
     `, [
         String(record.steamId), Number(record.publicId), record.username || 'Steam User', record.avatar || '',
         record.tradeUrl || '', record.createdAt || new Date().toISOString(), record.lastLoginAt || null,
         Number(record.loginCount || 0), Number(record.totalSold || 0), Number(record.totalPayout || 0),
         record.lastSaleAt || null, record.theme === 'light' ? 'light' : 'dark', record.rain !== false,
-        Number(record.balance || 0), record.banned === true, record.banReason || '', record.apiKey || ''
+        Number(record.balance || 0), record.banned === true, record.banReason || '',
+        record.email || '', record.emailVerified === true, record.apiKey || ''
     ]);
 }
 
@@ -1262,32 +1211,54 @@ async function recordLogin(profile) {
 }
 
 
-// Личные сессии: доступны только владельцу текущего аккаунта.
+// =====================================================
+// ПРОФИЛЬ: СЕССИИ / API / EMAIL
+// =====================================================
+
+function makeApiKey() {
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let key = '';
+    const bytes = crypto.randomBytes(17);
+    for (let i = 0; i < 17; i++) key += alphabet[bytes[i] % alphabet.length];
+    return key;
+}
+
+function getMailer() {
+    const host = process.env.EMAIL_HOST;
+    const user = process.env.EMAIL_USER;
+    const pass = process.env.EMAIL_PASS;
+    if (!host || !user || !pass) return null;
+    return nodemailer.createTransport({
+        host,
+        port: Number(process.env.EMAIL_PORT || 587),
+        secure: String(process.env.EMAIL_SECURE || '').toLowerCase() === 'true',
+        auth: { user, pass }
+    });
+}
+
+function deviceName(userAgent) {
+    const ua = String(userAgent || '');
+    const browser = /Edg\//i.test(ua) ? 'Edge' : /Chrome\//i.test(ua) ? 'Chrome' : /Firefox\//i.test(ua) ? 'Firefox' : /Safari\//i.test(ua) ? 'Safari' : 'Браузер';
+    const os = /Windows/i.test(ua) ? 'Windows' : /Android/i.test(ua) ? 'Android' : /iPhone|iPad/i.test(ua) ? 'iOS' : /Mac OS/i.test(ua) ? 'macOS' : /Linux/i.test(ua) ? 'Linux' : 'Устройство';
+    const version = (ua.match(new RegExp(browser === 'Chrome' ? 'Chrome\\/([\\d.]+)' : browser === 'Edge' ? 'Edg\\/([\\d.]+)' : browser === 'Firefox' ? 'Firefox\\/([\\d.]+)' : browser === 'Safari' ? 'Version\\/([\\d.]+)' : '')) || [])[1];
+    return `${os} (${browser}${version ? ' ' + version.split('.')[0] : ''})`;
+}
+
 app.get('/api/profile/sessions', async (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
     if (!requireDatabase(res)) return;
-
     try {
-        const result = await pool.query(
-            `SELECT session_id, user_agent, ip_address, country, created_at, last_seen_at
-             FROM user_sessions
-             WHERE steam_id=$1
-             ORDER BY last_seen_at DESC`,
-            [String(req.user.id)]
-        );
-
-        res.json({
-            sessions: result.rows.map(row => ({
-                id: row.session_id,
-                device: getDeviceName(row.user_agent),
-                userAgent: row.user_agent,
-                ip: row.ip_address || '—',
-                country: row.country || '—',
-                createdAt: new Date(row.created_at).toISOString(),
-                lastSeenAt: new Date(row.last_seen_at).toISOString(),
-                current: String(row.session_id) === String(req.sessionID)
-            }))
-        });
+        const result = await pool.query(`SELECT session_id, user_agent, ip_address, country, created_at, last_seen_at FROM user_sessions WHERE steam_id=$1 ORDER BY last_seen_at DESC`, [String(req.user.id)]);
+        res.json({ sessions: result.rows.map(row => ({
+            id: row.session_id,
+            device: deviceName(row.user_agent),
+            country: row.country || '—',
+            ip: row.ip_address || '—',
+            status: String(row.session_id) === String(req.sessionID) ? 'Текущая' : 'Онлайн',
+            current: String(row.session_id) === String(req.sessionID),
+            createdAt: row.created_at,
+            lastSeenAt: row.last_seen_at
+        })) });
     } catch (error) {
         console.error('Ошибка загрузки сессий:', error.message);
         res.status(500).json({ error: 'Не удалось загрузить сессии' });
@@ -1297,58 +1268,93 @@ app.get('/api/profile/sessions', async (req, res) => {
 app.delete('/api/profile/sessions/:sessionId', async (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
     if (!requireDatabase(res)) return;
-
     const sessionId = String(req.params.sessionId || '');
     if (!sessionId || sessionId.length > 300) return res.status(400).json({ error: 'Некорректная сессия' });
-
     try {
-        const result = await pool.query(
-            'DELETE FROM user_sessions WHERE session_id=$1 AND steam_id=$2 RETURNING session_id',
-            [sessionId, String(req.user.id)]
-        );
+        const result = await pool.query('DELETE FROM user_sessions WHERE session_id=$1 AND steam_id=$2 RETURNING session_id', [sessionId, String(req.user.id)]);
         if (!result.rowCount) return res.status(404).json({ error: 'Сессия не найдена' });
-
         if (sessionId === String(req.sessionID)) {
-            req.logout(() => {
-                req.session.destroy(() => res.json({ success: true, loggedOut: true }));
-            });
-            return;
+            return req.logout(() => req.session.destroy(() => res.json({ success: true, loggedOut: true })));
         }
-
+        if (req.sessionStore?.destroy) req.sessionStore.destroy(sessionId, () => {});
         res.json({ success: true, loggedOut: false });
     } catch (error) {
-        console.error('Ошибка выхода из сессии:', error.message);
+        console.error('Ошибка удаления сессии:', error.message);
         res.status(500).json({ error: 'Не удалось завершить сессию' });
     }
 });
 
-// API-ключ пользователя.
 app.get('/api/profile/api-key', async (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
     if (!requireDatabase(res)) return;
     try {
-        const record = ensureUserRecord(req.user);
-        res.json({ apiKey: record.apiKey || '' });
-    } catch (error) {
-        res.status(500).json({ error: 'Не удалось загрузить API key' });
-    }
+        const row = await pool.query('SELECT api_key FROM users WHERE steam_id=$1', [String(req.user.id)]);
+        res.json({ apiKey: row.rows[0]?.api_key || '' });
+    } catch (error) { res.status(500).json({ error: 'Не удалось загрузить API Key' }); }
 });
 
 app.post('/api/profile/api-key/generate', async (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
     if (!requireDatabase(res)) return;
-
     try {
-        const crypto = require('crypto');
+        const apiKey = makeApiKey();
         const record = ensureUserRecord(req.user);
-        const apiKey = `emk_${crypto.randomBytes(24).toString('hex')}`;
         record.apiKey = apiKey;
         await upsertUserToDb(record);
-        userData[String(req.user.id)] = record;
         res.json({ success: true, apiKey });
     } catch (error) {
-        console.error('Ошибка генерации API key:', error.message);
-        res.status(500).json({ error: 'Не удалось сгенерировать API key' });
+        console.error('Ошибка генерации API Key:', error.message);
+        res.status(500).json({ error: 'Не удалось сгенерировать API Key' });
+    }
+});
+
+app.get('/api/profile/email', async (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+    if (!requireDatabase(res)) return;
+    const row = await pool.query('SELECT email, email_verified FROM users WHERE steam_id=$1', [String(req.user.id)]);
+    res.json({ email: row.rows[0]?.email || '', verified: row.rows[0]?.email_verified === true });
+});
+
+app.post('/api/profile/email/request', async (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+    if (!requireDatabase(res)) return;
+    const email = String(req.body.email || '').trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: 'Введите корректный Email' });
+    const mailer = getMailer();
+    if (!mailer) return res.status(503).json({ error: 'Email-сервис не настроен на сервере' });
+    const code = String(crypto.randomInt(100000, 1000000));
+    const expires = new Date(Date.now() + 10 * 60 * 1000);
+    try {
+        await pool.query('UPDATE users SET email=$1, email_verified=FALSE, email_verification_code=$2, email_verification_expires_at=$3 WHERE steam_id=$4', [email, code, expires, String(req.user.id)]);
+        await mailer.sendMail({
+            from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+            to: email,
+            subject: 'EMERALD Market — подтверждение Email',
+            text: `Ваш код подтверждения: ${code}. Код действует 10 минут.`
+        });
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Ошибка отправки Email:', error.message);
+        res.status(500).json({ error: 'Не удалось отправить код подтверждения' });
+    }
+});
+
+app.post('/api/profile/email/verify', async (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+    if (!requireDatabase(res)) return;
+    const code = String(req.body.code || '').trim();
+    try {
+        const result = await pool.query('SELECT email, email_verification_code, email_verification_expires_at FROM users WHERE steam_id=$1', [String(req.user.id)]);
+        const row = result.rows[0];
+        if (!row?.email) return res.status(400).json({ error: 'Сначала укажите Email' });
+        if (!row.email_verification_code || row.email_verification_code !== code || !row.email_verification_expires_at || new Date(row.email_verification_expires_at).getTime() < Date.now()) {
+            return res.status(400).json({ error: 'Неверный или просроченный код' });
+        }
+        await pool.query('UPDATE users SET email_verified=TRUE, email_verification_code=\'\', email_verification_expires_at=NULL WHERE steam_id=$1', [String(req.user.id)]);
+        res.json({ success: true, email: row.email });
+    } catch (error) {
+        console.error('Ошибка подтверждения Email:', error.message);
+        res.status(500).json({ error: 'Не удалось подтвердить Email' });
     }
 });
 
