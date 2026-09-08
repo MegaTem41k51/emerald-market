@@ -1,6 +1,5 @@
 const express = require('express');
 const session = require('express-session');
-const FileStore = require('session-file-store')(session);
 const passport = require('passport');
 const SteamStrategy = require('passport-steam').Strategy;
 const axios = require('axios');
@@ -11,227 +10,903 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const STEAM_API_KEY = process.env.STEAM_API_KEY;
-const SESSION_SECRET = process.env.SESSION_SECRET || 'my_secret_123';
-const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
+// =====================================================
+// НАСТРОЙКИ
+// =====================================================
 
-app.use(bodyParser.json());
+const STEAM_API_KEY = process.env.STEAM_API_KEY;
+const SESSION_SECRET = process.env.SESSION_SECRET || 'supersecret';
+
+const BASE_URL =
+    process.env.BASE_URL ||
+    'https://emerald-market-2.onrender.com';
+
+// =====================================================
+// MIDDLEWARE
+// =====================================================
+
 app.use(express.static(__dirname));
 
+app.use(bodyParser.json());
+
+app.use(express.urlencoded({
+    extended: true
+}));
+
 app.use(session({
-    store: new FileStore({ logErrors: false, retries: 0 }),
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 * 7 }
+
+    cookie: {
+        secure: false,
+        maxAge: 1000 * 60 * 60 * 24 * 7
+    }
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.serializeUser((user, done) => done(null, user));
-passport.deserializeUser((obj, done) => done(null, obj));
+// =====================================================
+// STEAM AUTH
+// =====================================================
 
-passport.use(new SteamStrategy({
-    returnURL: `${BASE_URL}/auth/steam/return`,
-    realm: BASE_URL,
-    apiKey: STEAM_API_KEY
-}, (identifier, profile, done) => done(null, profile)));
+passport.serializeUser((user, done) => {
+    done(null, user);
+});
 
-app.get('/auth/steam', passport.authenticate('steam', { failureRedirect: '/' }));
-app.get('/auth/steam/return', passport.authenticate('steam', { failureRedirect: '/' }), (req, res) => res.redirect('/'));
+passport.deserializeUser((user, done) => {
+    done(null, user);
+});
+
+passport.use(
+    new SteamStrategy(
+        {
+            returnURL: `${BASE_URL}/auth/steam/return`,
+            realm: BASE_URL,
+            apiKey: STEAM_API_KEY
+        },
+
+        (identifier, profile, done) => {
+            return done(null, profile);
+        }
+    )
+);
+
+// Вход через Steam
+app.get(
+    '/auth/steam',
+    passport.authenticate('steam', {
+        failureRedirect: '/'
+    })
+);
+
+// Возврат после Steam
+app.get(
+    '/auth/steam/return',
+    passport.authenticate('steam', {
+        failureRedirect: '/'
+    }),
+    (req, res) => {
+        res.redirect('/');
+    }
+);
+
+// Выход
 app.get('/logout', (req, res) => {
-    req.logout(() => res.redirect('/'));
+    req.logout(() => {
+        res.redirect('/');
+    });
 });
 
-// ==========================================
-// ТЕХРАБОТЫ: ХРАНЕНИЕ ДАТЫ ОКОНЧАНИЯ
-// ==========================================
-const DB_FILE = path.join(__dirname, 'maintenance.json');
-let maintenanceEndTime = null;
+// =====================================================
+// API: ТЕКУЩИЙ ПОЛЬЗОВАТЕЛЬ
+// =====================================================
 
-function loadMaintenance() {
-    try {
-        if (fs.existsSync(DB_FILE)) {
-            const data = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
-            maintenanceEndTime = data.endTime;
+app.get('/api/user', (req, res) => {
+
+    if (!req.user) {
+        return res.json({
+            loggedIn: false
+        });
+    }
+
+    res.json({
+        loggedIn: true,
+
+        user: {
+            id: String(req.user.id),
+
+            name:
+                req.user.displayName ||
+                req.user.username ||
+                'Steam User',
+
+            avatar:
+                req.user.photos?.[2]?.value ||
+                req.user.photos?.[1]?.value ||
+                req.user.photos?.[0]?.value ||
+                ''
         }
-    } catch(e) {
-        maintenanceEndTime = null;
-    }
-}
-
-function saveMaintenance() {
-    fs.writeFileSync(DB_FILE, JSON.stringify({ endTime: maintenanceEndTime }));
-}
-
-function initMaintenance() {
-    loadMaintenance();
-
-    // Если техработы ещё не запускались, запускаем их на 12 часов.
-    if (!maintenanceEndTime || maintenanceEndTime < Date.now()) {
-        maintenanceEndTime = Date.now() + 12 * 60 * 60 * 1000; // + 12 часов
-        saveMaintenance();
-    }
-}
-
-// Эндпоинт, который возвращает оставшееся время
-app.get('/api/maintenance-time', (req, res) => {
-    const remaining = Math.max(0, Math.floor((maintenanceEndTime - Date.now()) / 1000));
-    res.json({ remaining });
+    });
 });
 
-// ==========================================
-// ДАННЫЕ ПОЛЬЗОВАТЕЛЯ (Trade URL + API Key)
-// ==========================================
-const USER_DB_FILE = path.join(__dirname, 'userData.json');
+// =====================================================
+// ХРАНЕНИЕ ДАННЫХ ПОЛЬЗОВАТЕЛЕЙ
+// =====================================================
+
+const DB_FILE = path.join(
+    __dirname,
+    'userData.json'
+);
+
 let userData = {};
-function loadUserData() {
+
+if (fs.existsSync(DB_FILE)) {
+
     try {
-        if (fs.existsSync(USER_DB_FILE)) {
-            userData = JSON.parse(fs.readFileSync(USER_DB_FILE, 'utf8'));
-        }
-    } catch(e) { userData = {}; }
+
+        userData = JSON.parse(
+            fs.readFileSync(DB_FILE, 'utf8')
+        );
+
+    } catch (error) {
+
+        console.error(
+            'Ошибка чтения userData.json:',
+            error.message
+        );
+
+        userData = {};
+    }
 }
+
 function saveUserData() {
-    fs.writeFileSync(USER_DB_FILE, JSON.stringify(userData, null, 2));
+
+    try {
+
+        fs.writeFileSync(
+            DB_FILE,
+            JSON.stringify(userData, null, 2),
+            'utf8'
+        );
+
+    } catch (error) {
+
+        console.error(
+            'Ошибка сохранения userData.json:',
+            error.message
+        );
+    }
 }
-loadUserData();
+
+// =====================================================
+// НАСТРОЙКИ ПОЛЬЗОВАТЕЛЯ
+// =====================================================
+
+app.post('/api/save-settings', (req, res) => {
+
+    if (!req.user) {
+        return res.status(401).json({
+            error: 'Войдите через Steam'
+        });
+    }
+
+    const steamId = String(req.user.id);
+
+    if (!userData[steamId]) {
+        userData[steamId] = {};
+    }
+
+    userData[steamId].theme =
+        req.body.theme === 'light'
+            ? 'light'
+            : 'dark';
+
+    userData[steamId].rain =
+        req.body.rain !== false;
+
+    saveUserData();
+
+    res.json({
+        success: true
+    });
+});
+
+app.get('/api/get-settings', (req, res) => {
+
+    if (!req.user) {
+
+        return res.json({
+            theme: 'dark',
+            rain: true
+        });
+    }
+
+    const steamId = String(req.user.id);
+
+    res.json({
+
+        theme:
+            userData[steamId]?.theme ||
+            'dark',
+
+        rain:
+            userData[steamId]?.rain !== false
+
+    });
+});
+
+// =====================================================
+// TRADE URL
+// =====================================================
+
+function isValidTradeUrl(url) {
+
+    if (!url || typeof url !== 'string') {
+        return false;
+    }
+
+    try {
+
+        const parsed = new URL(url);
+
+        if (parsed.hostname !== 'steamcommunity.com') {
+            return false;
+        }
+
+        if (
+            parsed.pathname !==
+            '/tradeoffer/new/'
+        ) {
+            return false;
+        }
+
+        const partner =
+            parsed.searchParams.get('partner');
+
+        const token =
+            parsed.searchParams.get('token');
+
+        return Boolean(partner && token);
+
+    } catch (error) {
+
+        return false;
+    }
+}
 
 app.post('/api/save-trade-url', (req, res) => {
-    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+
+    if (!req.user) {
+
+        return res.status(401).json({
+            error: 'Войдите через Steam'
+        });
+    }
+
     const steamId = String(req.user.id);
-    const tradeUrl = req.body.tradeUrl;
-    if (!userData[steamId]) userData[steamId] = { tradeUrl: '', apiKey: '' };
-    userData[steamId].tradeUrl = tradeUrl;
+
+    const tradeUrl =
+        String(req.body.tradeUrl || '').trim();
+
+    if (!isValidTradeUrl(tradeUrl)) {
+
+        return res.status(400).json({
+            error:
+                'Неверная Trade URL. Вставьте ссылку из Steam.'
+        });
+    }
+
+    if (!userData[steamId]) {
+        userData[steamId] = {};
+    }
+
+    userData[steamId].tradeUrl =
+        tradeUrl;
+
     saveUserData();
-    res.json({ success: true });
+
+    res.json({
+        success: true
+    });
 });
 
 app.get('/api/get-trade-url', (req, res) => {
-    if (!req.user) return res.json({ tradeUrl: '' });
+
+    if (!req.user) {
+
+        return res.json({
+            tradeUrl: ''
+        });
+    }
+
     const steamId = String(req.user.id);
-    res.json({ tradeUrl: userData[steamId] ? userData[steamId].tradeUrl : '' });
+
+    res.json({
+        tradeUrl:
+            userData[steamId]?.tradeUrl ||
+            ''
+    });
 });
 
-app.post('/api/generate-api-key', (req, res) => {
-    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
-    const steamId = String(req.user.id);
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let key = '';
-    for (let i = 0; i < 17; i++) key += chars.charAt(Math.floor(Math.random() * chars.length));
-    
-    if (!userData[steamId]) userData[steamId] = { tradeUrl: '', apiKey: '' };
-    userData[steamId].apiKey = key;
-    saveUserData();
-    res.json({ apiKey: key });
-});
+// =====================================================
+// STEAM INVENTORY
+// =====================================================
 
-app.get('/api/get-api-key', (req, res) => {
-    if (!req.user) return res.json({ apiKey: '' });
-    const steamId = String(req.user.id);
-    res.json({ apiKey: userData[steamId] ? userData[steamId].apiKey : '' });
-});
+async function getSteamInventory(
+    steamId,
+    startAssetId = ''
+) {
 
-// ==========================================
-// ИНВЕНТАРЬ
-// ==========================================
-const DEFAULT_SKINS = [
-    'usp-s', 'glock-18', 'p250', 'deagle', 'five-seven', 'tec-9', 'cz75-auto',
-    'ak-47', 'm4a4', 'm4a1-s', 'famas', 'galil ar', 'ssg 08', 'awp', 'scar-20',
-    'g3sg1', 'mp9', 'mac-10', 'mp7', 'ump-45', 'p90', 'pp-bizon', 'mp5-sd',
-    'nova', 'xm1014', 'mag-7', 'sawed-off', 'm249', 'negev', 'knife', 'taser'
-];
+    let url =
+        `https://steamcommunity.com/inventory/${steamId}/730/2` +
+        `?l=english&count=2000`;
 
-const MIN_PRICE = 5;
+    if (startAssetId) {
+        url += `&start_assetid=${startAssetId}`;
+    }
+
+    const response = await axios.get(
+        url,
+        {
+            timeout: 15000,
+
+            headers: {
+                'User-Agent':
+                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
+
+                'Accept':
+                    'application/json, text/plain, */*',
+
+                'Referer':
+                    'https://steamcommunity.com/'
+            }
+        }
+    );
+
+    return response.data;
+}
+
+// Проверяем, является ли предмет скином/оружием
+function isSkinItem(desc) {
+
+    const name =
+        String(
+            desc.market_hash_name ||
+            desc.name ||
+            ''
+        );
+
+    const lowerName =
+        name.toLowerCase();
+
+    // Кейсы
+    if (
+        lowerName.includes('case') ||
+        lowerName.includes('crate') ||
+        lowerName.includes('capsule') ||
+        lowerName.includes('package') ||
+        lowerName.includes('container')
+    ) {
+        return false;
+    }
+
+    // Стикеры
+    if (
+        lowerName.includes('sticker')
+    ) {
+        return false;
+    }
+
+    // Graffiti
+    if (
+        lowerName.includes('graffiti')
+    ) {
+        return false;
+    }
+
+    // Музыкальные наборы
+    if (
+        lowerName.includes('music kit')
+    ) {
+        return false;
+    }
+
+    // Чармы
+    if (
+        lowerName.includes('charm')
+    ) {
+        return false;
+    }
+
+    // Скины обычно имеют разделитель |
+    if (name.includes('|')) {
+        return true;
+    }
+
+    // Дополнительно проверяем категории Steam
+    if (Array.isArray(desc.tags)) {
+
+        const categories =
+            desc.tags.map(tag =>
+                String(
+                    tag.category ||
+                    ''
+                ).toLowerCase()
+            );
+
+        if (
+            categories.includes('weapon') ||
+            categories.includes('knife') ||
+            categories.includes('gloves')
+        ) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// =====================================================
+// КЭШ ИНВЕНТАРЯ
+// =====================================================
+
+const inventoryCache = new Map();
+
+const INVENTORY_CACHE_TIME = 5 * 60 * 1000; // 5 минут
+
+function getCachedInventory(steamId) {
+    const cached = inventoryCache.get(steamId);
+
+    if (!cached) {
+        return null;
+    }
+
+    const age = Date.now() - cached.timestamp;
+
+    if (age > INVENTORY_CACHE_TIME) {
+        inventoryCache.delete(steamId);
+        return null;
+    }
+
+    return cached.items;
+}
+
+function setCachedInventory(steamId, items) {
+    inventoryCache.set(steamId, {
+        timestamp: Date.now(),
+        items
+    });
+}
+
+
+// =====================================================
+// ПОСЛЕДНИЙ ЗАПРОС К STEAM
+// =====================================================
+
+let lastSteamInventoryRequest = 0;
+
+const STEAM_REQUEST_DELAY = 5000;
+
+
+// =====================================================
+// CS2 INVENTORY
+// =====================================================
 
 app.post('/api/get-inventory', async (req, res) => {
-    if (!req.user) return res.status(401).json({ error: 'Пожалуйста, войдите через Steam' });
+
+    if (!req.user) {
+        return res.status(401).json({
+            error: 'Войдите через Steam'
+        });
+    }
+
     const steamId = String(req.user.id);
 
-    try {
-        const inventoryUrl = `https://steamcommunity.com/inventory/${steamId}/730/2?l=english&count=1000`;
-        const inventoryResponse = await axios.get(inventoryUrl, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                'Referer': 'https://steamcommunity.com/'
-            }
-        });
+    // -----------------------------------------------
+    // Сначала проверяем кэш
+    // -----------------------------------------------
 
-        const inventory = inventoryResponse.data;
-        if (!inventory.assets || inventory.assets.length === 0) return res.json({ success: true, items: [] });
+    const cachedItems = getCachedInventory(steamId);
+
+    if (cachedItems) {
+
+        console.log(
+            `📦 Используем кэш инвентаря ${steamId}`
+        );
+
+        return res.json({
+            success: true,
+            cached: true,
+            items: cachedItems
+        });
+    }
+
+
+    // -----------------------------------------------
+    // Защита от слишком частых запросов
+    // -----------------------------------------------
+
+    const now = Date.now();
+
+    const timeSinceLastRequest =
+        now - lastSteamInventoryRequest;
+
+    if (
+        timeSinceLastRequest <
+        STEAM_REQUEST_DELAY
+    ) {
+
+        const wait =
+            Math.ceil(
+                (
+                    STEAM_REQUEST_DELAY -
+                    timeSinceLastRequest
+                ) / 1000
+            );
+
+        return res.status(429).json({
+            error:
+                `Подождите ${wait} сек. перед повторной загрузкой инвентаря.`
+        });
+    }
+
+    lastSteamInventoryRequest = now;
+
+
+    try {
+
+        console.log(
+            `📦 Запрашиваем CS2 inventory: ${steamId}`
+        );
+
+
+        // -----------------------------------------------
+        // ОДИН запрос к Steam
+        // -----------------------------------------------
+
+        const inventoryUrl =
+            `https://steamcommunity.com/inventory/${steamId}/730/2` +
+            `?l=english&count=2000`;
+
+
+        const response =
+            await axios.get(
+                inventoryUrl,
+                {
+                    timeout: 20000,
+
+                    headers: {
+                        'User-Agent':
+                            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
+
+                        'Accept':
+                            'application/json,text/plain,*/*',
+
+                        'Accept-Language':
+                            'en-US,en;q=0.9',
+
+                        'Referer':
+                            'https://steamcommunity.com/'
+                    },
+
+                    validateStatus:
+                        () => true
+                }
+            );
+
+
+        console.log(
+            `Steam inventory response: ${response.status}`
+        );
+
+
+        // -----------------------------------------------
+        // 429
+        // -----------------------------------------------
+
+        if (
+            response.status === 429
+        ) {
+
+            console.error(
+                '❌ Steam вернул 429 Too Many Requests'
+            );
+
+            return res.status(429).json({
+                error:
+                    'Steam временно ограничил запросы к инвентарю. Подождите немного и попробуйте позже.'
+            });
+        }
+
+
+        // -----------------------------------------------
+        // Другие ошибки
+        // -----------------------------------------------
+
+        if (
+            response.status !== 200
+        ) {
+
+            console.error(
+                '❌ Steam HTTP:',
+                response.status
+            );
+
+            return res.status(502).json({
+                error:
+                    'Steam временно не отвечает на запрос инвентаря.'
+            });
+        }
+
+
+        const inventory =
+            response.data;
+
+
+        // -----------------------------------------------
+        // Проверка ответа
+        // -----------------------------------------------
+
+        if (
+            !inventory ||
+            inventory.success === false
+        ) {
+
+            return res.status(400).json({
+                error:
+                    'Steam не разрешил получить инвентарь. Проверьте настройки приватности Steam.'
+            });
+        }
+
+
+        if (
+            !Array.isArray(
+                inventory.assets
+            ) ||
+            !Array.isArray(
+                inventory.descriptions
+            )
+        ) {
+
+            return res.json({
+                success: true,
+                items: []
+            });
+        }
+
+
+        // -----------------------------------------------
+        // DESCRIPTION MAP
+        // -----------------------------------------------
+
+        const descriptions = {};
+
+
+        for (
+            const desc
+            of inventory.descriptions
+        ) {
+
+            const key =
+                `${desc.classid}_${desc.instanceid}`;
+
+            descriptions[key] =
+                desc;
+        }
+
+
+        // -----------------------------------------------
+        // ITEMS
+        // -----------------------------------------------
 
         const items = [];
-        const descriptions = {};
-        inventory.descriptions.forEach(desc => { descriptions[`${desc.classid}_${desc.instanceid}`] = desc; });
 
-        inventory.assets.forEach(asset => {
-            const key = `${asset.classid}_${asset.instanceid}`;
-            const desc = descriptions[key];
-            if (desc) {
-                const name = desc.market_hash_name || desc.name;
-                const weapon = (name.split('|')[0] || '').toLowerCase().trim();
-                const isDefault = DEFAULT_SKINS.includes(weapon) || desc.tags?.some(tag => tag.internal_name === 'normal');
-                if (!isDefault && !name.toLowerCase().includes('case') && !name.toLowerCase().includes('crate')) {
-                    items.push({
-                        assetid: asset.assetid,
-                        name: name,
-                        image: desc.icon_url ? `https://community.akamai.steamstatic.com/economy/image/${desc.icon_url}` : '',
-                        type: desc.type || '',
-                        minPrice: MIN_PRICE
-                    });
-                }
+
+        for (
+            const asset
+            of inventory.assets
+        ) {
+
+            const key =
+                `${asset.classid}_${asset.instanceid}`;
+
+
+            const desc =
+                descriptions[key];
+
+
+            if (!desc) {
+                continue;
             }
-        });
 
-        res.json({ success: true, items });
-    } catch (error) {
-        res.status(500).json({ error: 'Не удалось получить инвентарь. Подожди 2 минуты и попробуй снова.' });
-    }
-});
 
-// ==========================================
-// РЫНОК
-// ==========================================
-const MARKET_FILE = path.join(__dirname, 'marketData.json');
-let marketData = [];
+            const name =
+                desc.market_hash_name ||
+                desc.name ||
+                '';
 
-function loadMarket() {
-    try {
-        if (fs.existsSync(MARKET_FILE)) {
-            marketData = JSON.parse(fs.readFileSync(MARKET_FILE, 'utf8'));
+
+            if (!name) {
+                continue;
+            }
+
+
+            const lowerName =
+                name.toLowerCase();
+
+
+            // -------------------------------------------
+            // Исключаем мусор
+            // -------------------------------------------
+
+            if (
+                lowerName.includes('case') ||
+                lowerName.includes('crate') ||
+                lowerName.includes('capsule') ||
+                lowerName.includes('sticker') ||
+                lowerName.includes('graffiti') ||
+                lowerName.includes('music kit') ||
+                lowerName.includes('souvenir package') ||
+                lowerName.includes('charm')
+            ) {
+                continue;
+            }
+
+
+            // -------------------------------------------
+            // Проверяем, что предмет похож на скин
+            // -------------------------------------------
+
+            let isSkin = false;
+
+
+            // Большинство обычных CS2 скинов
+            if (
+                name.includes('|')
+            ) {
+                isSkin = true;
+            }
+
+
+            // Ножи / перчатки
+            if (
+                lowerName.includes('knife') ||
+                lowerName.includes('karambit') ||
+                lowerName.includes('bayonet') ||
+                lowerName.includes('butterfly') ||
+                lowerName.includes('gloves')
+            ) {
+                isSkin = true;
+            }
+
+
+            if (!isSkin) {
+                continue;
+            }
+
+
+            const image =
+                desc.icon_url
+                    ? `https://community.akamai.steamstatic.com/economy/image/${desc.icon_url}`
+                    : '';
+
+
+            items.push({
+
+                assetid:
+                    String(asset.assetid),
+
+                classid:
+                    String(asset.classid),
+
+                instanceid:
+                    String(asset.instanceid),
+
+                name:
+                    name,
+
+                image:
+                    image,
+
+                type:
+                    desc.type ||
+                    'Скин',
+
+                tradable:
+                    desc.tradable === 1,
+
+                marketable:
+                    desc.marketable === 1
+
+            });
         }
-    } catch(e) { marketData = []; }
-}
-function saveMarket() {
-    fs.writeFileSync(MARKET_FILE, JSON.stringify(marketData, null, 2));
-}
-loadMarket();
 
-app.get('/api/market', (req, res) => { res.json(marketData); });
-app.post('/api/market/save', (req, res) => {
-    if (!req.user) return res.status(401).json({ error: 'Нет доступа' });
-    marketData = req.body.skins;
-    saveMarket();
-    res.json({ success: true });
-});
 
-app.get('/api/user', (req, res) => {
-    if (req.user) {
-        res.json({ 
-            loggedIn: true, 
-            user: { 
-                id: String(req.user.id), 
-                name: req.user.displayName, 
-                avatar: req.user.photos && req.user.photos[2] ? req.user.photos[2].value : ''
-            } 
+        // -----------------------------------------------
+        // КЭШ
+        // -----------------------------------------------
+
+        setCachedInventory(
+            steamId,
+            items
+        );
+
+
+        console.log(
+            `✅ ${steamId}: найдено ${items.length} скинов`
+        );
+
+
+        return res.json({
+
+            success: true,
+
+            cached: false,
+
+            items: items
+
         });
-    } else {
-        res.json({ loggedIn: false });
+
+
+    } catch (error) {
+
+        console.error(
+            '❌ Ошибка Steam inventory:',
+            error.response?.status ||
+            error.code ||
+            error.message
+        );
+
+
+        return res.status(500).json({
+            error:
+                'Ошибка соединения со Steam. Попробуйте позже.'
+        });
     }
 });
 
-app.listen(PORT, () => {
-    initMaintenance(); // Запускаем техработы при старте сервера
-    console.log(`✅ Сервер запущен на порту ${PORT}`);
+// =====================================================
+// ГЛАВНАЯ
+// =====================================================
+
+app.get('/', (req, res) => {
+
+    res.sendFile(
+        path.join(
+            __dirname,
+            'index.html'
+        )
+    );
 });
+
+// =====================================================
+// ЗАПУСК
+// =====================================================
+
+app.listen(
+    PORT,
+    () => {
+
+        console.log(
+            `====================================`
+        );
+
+        console.log(
+            `✅ EMERALD Market запущен`
+        );
+
+        console.log(
+            `🌐 PORT: ${PORT}`
+        );
+
+        console.log(
+            `🌐 BASE_URL: ${BASE_URL}`
+        );
+
+        console.log(
+            `====================================`
+        );
+    }
+);
