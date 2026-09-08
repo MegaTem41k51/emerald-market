@@ -6,6 +6,7 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
+const { Pool } = require('pg');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,6 +21,8 @@ const SESSION_SECRET = process.env.SESSION_SECRET || 'supersecret';
 const BASE_URL =
     process.env.BASE_URL ||
     'https://emerald-market-2.onrender.com';
+
+const DATABASE_URL = process.env.DATABASE_URL;
 
 // =====================================================
 // ВНУТРЕННИЕ ID / ПРИВАТНЫЙ ДОСТУП
@@ -151,122 +154,166 @@ app.get('/api/user', (req, res) => {
 });
 
 // =====================================================
-// ХРАНЕНИЕ ДАННЫХ ПОЛЬЗОВАТЕЛЕЙ
+// ПОСТОЯННАЯ БАЗА ДАННЫХ (PostgreSQL)
 // =====================================================
 
-const DB_FILE = path.join(
-    __dirname,
-    'userData.json'
-);
+if (!DATABASE_URL) {
+    console.warn('⚠️ DATABASE_URL не задан. Для Render добавьте PostgreSQL и переменную DATABASE_URL.');
+}
+
+const pool = DATABASE_URL
+    ? new Pool({
+        connectionString: DATABASE_URL,
+        ssl: { rejectUnauthorized: false },
+        max: 5
+    })
+    : null;
 
 let userData = {};
+let dbReady = false;
 
-if (fs.existsSync(DB_FILE)) {
+async function initDatabase() {
+    if (!pool) return;
 
-    try {
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS users (
+            steam_id TEXT PRIMARY KEY,
+            public_id INTEGER UNIQUE NOT NULL,
+            username TEXT NOT NULL DEFAULT 'Steam User',
+            avatar TEXT NOT NULL DEFAULT '',
+            trade_url TEXT NOT NULL DEFAULT '',
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            last_login_at TIMESTAMPTZ,
+            login_count INTEGER NOT NULL DEFAULT 0,
+            total_sold NUMERIC(14,2) NOT NULL DEFAULT 0,
+            total_payout NUMERIC(14,2) NOT NULL DEFAULT 0,
+            last_sale_at TIMESTAMPTZ,
+            theme TEXT NOT NULL DEFAULT 'dark',
+            rain BOOLEAN NOT NULL DEFAULT TRUE
+        )
+    `);
 
-        userData = JSON.parse(
-            fs.readFileSync(DB_FILE, 'utf8')
-        );
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS sales (
+            id TEXT PRIMARY KEY,
+            steam_id TEXT NOT NULL REFERENCES users(steam_id) ON DELETE CASCADE,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            total NUMERIC(14,2) NOT NULL,
+            payout NUMERIC(14,2) NOT NULL,
+            payment_method TEXT NOT NULL DEFAULT '',
+            items JSONB NOT NULL DEFAULT '[]'::jsonb
+        )
+    `);
 
-    } catch (error) {
-
-        console.error(
-            'Ошибка чтения userData.json:',
-            error.message
-        );
-
-        userData = {};
+    const users = await pool.query('SELECT * FROM users ORDER BY public_id');
+    for (const row of users.rows) {
+        userData[row.steam_id] = dbRowToUser(row);
     }
+
+    const sales = await pool.query('SELECT * FROM sales ORDER BY created_at');
+    for (const row of sales.rows) {
+        if (!userData[row.steam_id]) continue;
+        if (!Array.isArray(userData[row.steam_id].sales)) userData[row.steam_id].sales = [];
+        userData[row.steam_id].sales.push({
+            id: row.id,
+            createdAt: new Date(row.created_at).toISOString(),
+            total: Number(row.total),
+            payout: Number(row.payout),
+            paymentMethod: row.payment_method || '',
+            items: Array.isArray(row.items) ? row.items : []
+        });
+    }
+
+    // Однократная миграция старых userData.json, если он существует и БД ещё пустая.
+    const legacyFile = path.join(__dirname, 'userData.json');
+    if (users.rows.length === 0 && fs.existsSync(legacyFile)) {
+        try {
+            const legacy = JSON.parse(fs.readFileSync(legacyFile, 'utf8'));
+            for (const record of Object.values(legacy)) {
+                if (!record?.steamId || !Number.isInteger(Number(record.publicId))) continue;
+                await upsertUserToDb(record);
+                for (const sale of (Array.isArray(record.sales) ? record.sales : [])) {
+                    await insertSaleToDb(record.steamId, sale);
+                }
+                userData[record.steamId] = { ...record };
+            }
+            console.log('✅ Старые данные userData.json перенесены в PostgreSQL');
+        } catch (error) {
+            console.error('⚠️ Ошибка миграции userData.json:', error.message);
+        }
+    }
+
+    dbReady = true;
+    console.log(`🗄️ PostgreSQL подключён. Пользователей: ${Object.keys(userData).length}`);
+}
+
+function dbRowToUser(row) {
+    return {
+        steamId: row.steam_id,
+        publicId: Number(row.public_id),
+        username: row.username,
+        avatar: row.avatar,
+        tradeUrl: row.trade_url || '',
+        createdAt: row.created_at ? new Date(row.created_at).toISOString() : null,
+        lastLoginAt: row.last_login_at ? new Date(row.last_login_at).toISOString() : null,
+        loginCount: Number(row.login_count || 0),
+        totalSold: Number(row.total_sold || 0),
+        totalPayout: Number(row.total_payout || 0),
+        lastSaleAt: row.last_sale_at ? new Date(row.last_sale_at).toISOString() : null,
+        theme: row.theme || 'dark',
+        rain: row.rain !== false,
+        sales: []
+    };
+}
+
+async function upsertUserToDb(record) {
+    if (!pool || !record?.steamId) return;
+    await pool.query(`
+        INSERT INTO users
+            (steam_id, public_id, username, avatar, trade_url, created_at, last_login_at,
+             login_count, total_sold, total_payout, last_sale_at, theme, rain)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+        ON CONFLICT (steam_id) DO UPDATE SET
+            public_id=EXCLUDED.public_id,
+            username=EXCLUDED.username,
+            avatar=EXCLUDED.avatar,
+            trade_url=EXCLUDED.trade_url,
+            created_at=EXCLUDED.created_at,
+            last_login_at=EXCLUDED.last_login_at,
+            login_count=EXCLUDED.login_count,
+            total_sold=EXCLUDED.total_sold,
+            total_payout=EXCLUDED.total_payout,
+            last_sale_at=EXCLUDED.last_sale_at,
+            theme=EXCLUDED.theme,
+            rain=EXCLUDED.rain
+    `, [
+        String(record.steamId), Number(record.publicId), record.username || 'Steam User', record.avatar || '',
+        record.tradeUrl || '', record.createdAt || new Date().toISOString(), record.lastLoginAt || null,
+        Number(record.loginCount || 0), Number(record.totalSold || 0), Number(record.totalPayout || 0),
+        record.lastSaleAt || null, record.theme === 'light' ? 'light' : 'dark', record.rain !== false
+    ]);
+}
+
+async function insertSaleToDb(steamId, sale) {
+    if (!pool || !sale?.id) return;
+    await pool.query(`
+        INSERT INTO sales (id, steam_id, created_at, total, payout, payment_method, items)
+        VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb)
+        ON CONFLICT (id) DO NOTHING
+    `, [sale.id, String(steamId), sale.createdAt || new Date().toISOString(), Number(sale.total || 0),
+        Number(sale.payout || 0), sale.paymentMethod || '', JSON.stringify(Array.isArray(sale.items) ? sale.items : [])]);
 }
 
 function saveUserData() {
-
-    try {
-
-        fs.writeFileSync(
-            DB_FILE,
-            JSON.stringify(userData, null, 2),
-            'utf8'
-        );
-
-    } catch (error) {
-
-        console.error(
-            'Ошибка сохранения userData.json:',
-            error.message
-        );
-    }
+    if (!pool) return;
+    const records = Object.values(userData);
+    Promise.all(records.map(record => upsertUserToDb(record)))
+        .catch(error => console.error('Ошибка сохранения пользователя в PostgreSQL:', error.message));
 }
 
-// Выдаём постоянный внутренний ID пользователю.
-function getNextPublicId() {
-    const used = new Set();
-
-    for (const data of Object.values(userData)) {
-        const id = Number(data?.publicId);
-        if (Number.isInteger(id) && id >= MIN_PUBLIC_ID && id <= MAX_PUBLIC_ID) {
-            used.add(id);
-        }
-    }
-
-    // 666 зарезервирован только за владельцем.
-    for (let id = MIN_PUBLIC_ID; id <= MAX_PUBLIC_ID; id++) {
-        if (id === OWNER_PUBLIC_ID) continue;
-        if (!used.has(id)) return id;
-    }
-
-    return null;
-}
-
-function ensureUserRecord(profile) {
-    const steamId = String(profile.id);
-    const isOwner = steamId === OWNER_STEAM_ID;
-
-    if (!userData[steamId]) {
-        userData[steamId] = {};
-    }
-
-    const record = userData[steamId];
-
-    // Владелец всегда получает ID 666. Если 666 раньше ошибочно был
-    // выдан другому аккаунту, переносим того пользователя на свободный ID.
-    if (isOwner) {
-        for (const [otherSteamId, otherRecord] of Object.entries(userData)) {
-            if (otherSteamId === steamId) continue;
-            if (Number(otherRecord?.publicId) === OWNER_PUBLIC_ID) {
-                const replacementId = getNextPublicId();
-                if (replacementId === null) {
-                    throw new Error('Невозможно освободить ID 666: свободные ID закончились');
-                }
-                otherRecord.publicId = replacementId;
-            }
-        }
-        record.publicId = OWNER_PUBLIC_ID;
-    } else if (Number(record.publicId) === OWNER_PUBLIC_ID) {
-        // Не даём другому Steam-аккаунту занять 666.
-        record.publicId = getNextPublicId();
-    } else if (!Number.isInteger(Number(record.publicId))) {
-        const nextId = getNextPublicId();
-        if (nextId === null) throw new Error('Свободные внутренние ID закончились');
-        record.publicId = nextId;
-    }
-
-    record.steamId = steamId;
-    record.username = profile.displayName || profile.username || record.username || 'Steam User';
-    record.avatar =
-        profile.photos?.[2]?.value ||
-        profile.photos?.[1]?.value ||
-        profile.photos?.[0]?.value ||
-        record.avatar ||
-        '';
-
-    saveUserData();
-    return record;
-}
-
-function isOwner(req) {
-    return Boolean(req.user) && String(req.user.id) === OWNER_STEAM_ID;
+async function waitForDatabase() {
+    if (!pool) return;
+    while (!dbReady) await new Promise(resolve => setTimeout(resolve, 50));
 }
 
 // =====================================================
@@ -282,10 +329,7 @@ app.post('/api/save-settings', (req, res) => {
     }
 
     const steamId = String(req.user.id);
-
-    if (!userData[steamId]) {
-        userData[steamId] = {};
-    }
+    ensureUserRecord(req.user);
 
     userData[steamId].theme =
         req.body.theme === 'light'
@@ -313,6 +357,7 @@ app.get('/api/get-settings', (req, res) => {
     }
 
     const steamId = String(req.user.id);
+    ensureUserRecord(req.user);
 
     res.json({
 
@@ -377,6 +422,7 @@ app.post('/api/save-trade-url', (req, res) => {
     }
 
     const steamId = String(req.user.id);
+    ensureUserRecord(req.user);
 
     const tradeUrl =
         String(req.body.tradeUrl || '').trim();
@@ -1075,28 +1121,17 @@ app.get('/', (req, res) => {
 // ЗАПУСК
 // =====================================================
 
-app.listen(
-    PORT,
-    () => {
-
-        console.log(
-            `====================================`
-        );
-
-        console.log(
-            `✅ EMERALD Market запущен`
-        );
-
-        console.log(
-            `🌐 PORT: ${PORT}`
-        );
-
-        console.log(
-            `🌐 BASE_URL: ${BASE_URL}`
-        );
-
-        console.log(
-            `====================================`
-        );
-    }
-);
+initDatabase()
+    .then(() => {
+        app.listen(PORT, () => {
+            console.log('====================================');
+            console.log('✅ EMERALD Market запущен');
+            console.log(`🌐 PORT: ${PORT}`);
+            console.log(`🌐 BASE_URL: ${BASE_URL}`);
+            console.log('====================================');
+        });
+    })
+    .catch(error => {
+        console.error('❌ Не удалось запустить базу данных:', error.message);
+        process.exit(1);
+    });
