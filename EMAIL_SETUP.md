@@ -1,29 +1,26 @@
-# Настройка подтверждения Email
+# Email verification on Render Free
 
-Сайт генерирует одноразовый 6-значный код, сохраняет его в PostgreSQL на 10 минут и отправляет на указанную пользователем почту. После правильного ввода код помечает Email как подтверждённый.
+The project now supports sending verification emails through the Brevo HTTPS API. This avoids direct SMTP connections from Render Free.
 
-## Render Environment
+## Render Environment Variables
 
-Добавьте в Web Service:
+Add:
 
-- `EMAIL_USER` — адрес почты, с которой будут отправляться письма
-- `EMAIL_PASS` — пароль SMTP / App Password этой почты
+```text
+BREVO_API_KEY=xkeysib-...
+EMAIL_FROM=your-verified-sender@example.com
+EMAIL_FROM_NAME=EMERALD Market
+```
 
-Для Gmail по умолчанию используется:
+`EMAIL_FROM` must be a sender verified in Brevo. The existing `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_SECURE`, `EMAIL_USER`, and `EMAIL_PASS` variables can remain, but when `BREVO_API_KEY` is present the server uses Brevo first and does not use SMTP for verification emails.
 
-- `EMAIL_HOST=smtp.gmail.com`
-- `EMAIL_PORT=465`
-- `EMAIL_SECURE=true`
+## Brevo
 
-Их можно не добавлять, если используется Gmail.
+1. Create a Brevo account.
+2. Add/verify the sender email in the transactional email settings.
+3. Create an API key.
+4. Put the API key into Render as `BREVO_API_KEY`.
+5. Put the verified sender address into `EMAIL_FROM`.
+6. Redeploy the Render service.
 
-Для другого почтового сервиса задайте дополнительно:
-
-- `EMAIL_HOST`
-- `EMAIL_PORT`
-- `EMAIL_SECURE` (`true` или `false`)
-- `EMAIL_FROM` — необязательно; если не задан, используется `EMAIL_USER`
-
-## Важно
-
-Не помещайте пароль почты в исходный код и не отправляйте его в чат. Храните его только в Render Environment.
+The server calls `https://api.brevo.com/v3/smtp/email` over HTTPS. If `BREVO_API_KEY` is absent, the old SMTP path remains available for hosting where SMTP is allowed.

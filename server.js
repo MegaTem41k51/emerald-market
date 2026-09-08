@@ -1228,9 +1228,7 @@ function getMailer() {
     const pass = process.env.EMAIL_PASS;
     if (!user || !pass) return null;
 
-    // По умолчанию поддерживаем Gmail. Для другого почтового сервиса
-    // достаточно указать EMAIL_HOST / EMAIL_PORT / EMAIL_SECURE в Render.
-    const host = process.env.EMAIL_HOST || 'smtp.gmail.com';
+    const host = process.env.EMAIL_HOST || 'smtp.mail.ru';
     const port = Number(process.env.EMAIL_PORT || 465);
     const secure = process.env.EMAIL_SECURE
         ? String(process.env.EMAIL_SECURE).toLowerCase() === 'true'
@@ -1245,6 +1243,74 @@ function getMailer() {
         greetingTimeout: 15000,
         socketTimeout: 20000
     });
+}
+
+// На Render Free исходящие SMTP-порты могут быть недоступны.
+// Поэтому при наличии BREVO_API_KEY отправляем письмо через HTTPS API Brevo.
+// SMTP остаётся резервным вариантом для платного/другого хостинга.
+async function sendVerificationEmail(to, code) {
+    const subject = 'EMERALD Market — подтверждение Email';
+    const text = `Ваш код подтверждения: ${code}. Код действует 10 минут.`;
+    const html = `
+        <div style="font-family:Arial,sans-serif;line-height:1.5;color:#111">
+            <h2>EMERALD Market</h2>
+            <p>Ваш код подтверждения Email:</p>
+            <div style="font-size:32px;font-weight:700;letter-spacing:8px;margin:18px 0">${code}</div>
+            <p>Код действует <b>10 минут</b>.</p>
+            <p style="color:#666;font-size:13px">Если вы не запрашивали этот код, просто проигнорируйте письмо.</p>
+        </div>
+    `;
+
+    const brevoKey = String(process.env.BREVO_API_KEY || '').trim();
+    if (brevoKey) {
+        const senderEmail = String(process.env.EMAIL_FROM || process.env.EMAIL_USER || '').trim();
+        const senderName = String(process.env.EMAIL_FROM_NAME || 'EMERALD Market').trim();
+        if (!senderEmail) throw new Error('EMAIL_FROM не задан для Brevo');
+
+        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+            method: 'POST',
+            headers: {
+                'accept': 'application/json',
+                'api-key': brevoKey,
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify({
+                sender: { email: senderEmail, name: senderName },
+                to: [{ email: to }],
+                subject,
+                htmlContent: html,
+                textContent: text
+            }),
+            signal: AbortSignal.timeout(15000)
+        });
+
+        const raw = await response.text();
+        let data = {};
+        try { data = raw ? JSON.parse(raw) : {}; } catch (_) {}
+
+        if (!response.ok) {
+            const detail = data?.message || data?.code || raw || `HTTP ${response.status}`;
+            throw new Error(`Brevo API ${response.status}: ${detail}`);
+        }
+
+        console.log('Email отправлен через Brevo:', data?.messageId || 'OK');
+        return data;
+    }
+
+    const mailer = getMailer();
+    if (!mailer) {
+        throw new Error('Email-сервис не настроен: добавьте BREVO_API_KEY или SMTP-переменные');
+    }
+
+    const info = await mailer.sendMail({
+        from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+        to,
+        subject,
+        text,
+        html
+    });
+    console.log('Email отправлен через SMTP:', info.messageId || 'OK');
+    return info;
 }
 
 function deviceName(userAgent) {
@@ -1331,18 +1397,11 @@ app.post('/api/profile/email/request', async (req, res) => {
     if (!requireDatabase(res)) return;
     const email = String(req.body.email || '').trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: 'Введите корректный Email' });
-    const mailer = getMailer();
-    if (!mailer) return res.status(503).json({ error: 'Email-сервис не настроен на сервере' });
     const code = String(crypto.randomInt(100000, 1000000));
     const expires = new Date(Date.now() + 10 * 60 * 1000);
     try {
+        await sendVerificationEmail(email, code);
         await pool.query('UPDATE users SET email=$1, email_verified=FALSE, email_verification_code=$2, email_verification_expires_at=$3 WHERE steam_id=$4', [email, code, expires, String(req.user.id)]);
-        await mailer.sendMail({
-            from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
-            to: email,
-            subject: 'EMERALD Market — подтверждение Email',
-            text: `Ваш код подтверждения: ${code}. Код действует 10 минут.`
-        });
         res.json({ success: true });
     } catch (error) {
         console.error('Ошибка отправки Email:', error.message);
