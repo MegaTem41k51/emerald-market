@@ -354,14 +354,16 @@ function isValidTradeUrl(url) {
 
         const parsed = new URL(url);
 
-        if (parsed.hostname !== 'steamcommunity.com') {
+        // Steam может присылать URL как с завершающим /, так и без него,
+        // а иногда ссылка открывается через www.steamcommunity.com.
+        const hostname = parsed.hostname.toLowerCase().replace(/^www\./, '');
+        const pathname = parsed.pathname.replace(/\/+$/, '');
+
+        if (hostname !== 'steamcommunity.com') {
             return false;
         }
 
-        if (
-            parsed.pathname !==
-            '/tradeoffer/new/'
-        ) {
+        if (pathname !== '/tradeoffer/new') {
             return false;
         }
 
@@ -1117,18 +1119,4 @@ app.listen(
 
         console.log(
             `✅ EMERALD Market запущен`
-        );
-
-        console.log(
-            `🌐 PORT: ${PORT}`
-        );
-
-        console.log(
-            `🌐 BASE_URL: ${BASE_URL}`
-        );
-
-        console.log(
-            `====================================`
-        );
-    }
-);
+    
