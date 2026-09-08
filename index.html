@@ -455,15 +455,6 @@
             font-weight: 600;
         }
 
-        /* ===== НОВЫЙ СТИЛЬ ДЛЯ КНОПКИ ЗАГРУЗКИ ПО ID ===== */
-        .btn-load-id {
-            background: #3498db;
-            color: #fff !important;
-        }
-        .btn-load-id:hover {
-            background: #2980b9;
-        }
-
         @media (max-width: 992px) { .sell-layout { flex-direction: column; } .sell-sidebar { width: 100%; min-width: unset; position: static; } .skin-grid-sell { grid-template-columns: repeat(3, 1fr); } .profile-layout { flex-direction: column; } .profile-left { width: 100%; min-width: unset; } .profile-cards { grid-template-columns: repeat(2, 1fr); } .support-channels { grid-template-columns: 1fr; max-width: 300px; } .policy-container { padding: 25px 20px; } }
         @media (max-width: 600px) { .skin-grid-sell { grid-template-columns: repeat(2, 1fr); } }
     </style>
@@ -525,7 +516,7 @@
                 <div class="skin-grid-sell" id="sellSkinGrid">
                     <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #8a8d99;">
                         Введите Trade URL в панели справа и нажмите «Сохранить»<br>
-                        или введите Steam ID другого пользователя и нажмите «Загрузить инвентарь»
+                        После этого здесь появятся скины.
                     </div>
                 </div>
             </div>
@@ -536,23 +527,11 @@
                 <!-- Trade URL -->
                 <div class="sidebar-section">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <label style="margin-bottom: 0;">🔗 Trade URL (ваш)</label>
+                        <label style="margin-bottom: 0;">🔗 Trade URL</label>
                         <a href="https://steamcommunity.com/id/me/tradeoffers/privacy#trade_offer_access_url" target="_blank" style="color: #2ecc71; font-size: 13px; text-decoration: none;">Где взять?</a>
                     </div>
                     <input type="text" id="sellTradeUrl" placeholder="https://steamcommunity.com/tradeoffer/new/?pa...">
-                    <button class="btn" style="width: 100%; margin-top: 8px;" onclick="saveTradeUrl()">Сохранить и загрузить мой инвентарь</button>
-                </div>
-
-                <!-- НОВОЕ: Steam ID для загрузки чужого инвентаря -->
-                <div class="sidebar-section" style="border-top: 1px solid #26282f; padding-top: 16px;">
-                    <label>👤 Steam ID или кастомный URL (чужой аккаунт)</label>
-                    <input type="text" id="steamIdInput" placeholder="76561198000000000 или /id/username">
-                    <button class="btn btn-load-id" style="width: 100%; margin-top: 8px;" onclick="loadInventoryById()">
-                        🔍 Загрузить инвентарь по ID
-                    </button>
-                    <div style="font-size: 11px; color: #6a6d7a; margin-top: 6px;">
-                        Инвентарь должен быть публичным
-                    </div>
+                    <button class="btn" style="width: 100%; margin-top: 8px;" onclick="saveTradeUrl()">Сохранить и загрузить инвентарь</button>
                 </div>
 
                 <div class="sidebar-section">
@@ -1091,7 +1070,7 @@ let currentUser = null;
 let userInventory = [];
 let selectedSteamSkins = [];
 
-// ===== КЭШ ЦЕН С CSGOMARKET =====
+// ===== КЭШ ЦЕН =====
 let marketPriceCache = {};
 
 async function fetchMarketPrices() {
@@ -1101,12 +1080,12 @@ async function fetchMarketPrices() {
         const data = await response.json();
         if (data && data.items) {
             marketPriceCache = data.items;
-            console.log('✅ Цены с CSGOMarket загружены:', Object.keys(marketPriceCache).length, 'предметов');
+            console.log('✅ Цены загружены:', Object.keys(marketPriceCache).length, 'предметов');
             return true;
         }
         return false;
     } catch (error) {
-        console.warn('⚠️ Не удалось загрузить цены с CSGOMarket:', error.message);
+        console.warn('⚠️ Не удалось загрузить цены:', error.message);
         marketPriceCache = {
             'M4A1-S | Electrum (Field-Tested)': { price: 76.92, float: 0.3593, weapon: 'M4A1-S', skinName: 'Electrum' },
             'AK-47 | Redline (Field-Tested)': { price: 142.50, float: 0.2814, weapon: 'AK-47', skinName: 'Redline' },
@@ -1250,12 +1229,10 @@ function processSale() {
     
     const selectedItems = selectedSteamSkins.map(idx => userInventory[idx]);
     
-    // Формируем текст скинов в формате "Оружие | Название Качество" (без цены)
     const skinList = selectedItems.map(item => {
         return `${item.weapon || 'CS2'} | ${item.skinName || item.name} ${item.quality || 'Field-Tested'}`;
     }).join('\n');
     
-    // Формируем текст с реквизитами (без года и CVV для VISA/МИР)
     let reqText = '';
     switch(requisites.method) {
         case 'VISA':
@@ -1414,7 +1391,10 @@ async function loadTradeUrl() {
 
 async function saveTradeUrl() {
     const url = document.getElementById('sellTradeUrl').value.trim();
-    if (!url) { showModal('Ошибка', 'Введите Trade URL!'); return; }
+    if (!url) { 
+        showModal('Ошибка', 'Введите Trade URL!'); 
+        return; 
+    }
 
     document.getElementById('profileTradeUrl').value = url;
     await fetch('/api/save-trade-url', {
@@ -1422,14 +1402,17 @@ async function saveTradeUrl() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tradeUrl: url })
     });
-    showModal('Успех', 'Trade URL сохранен! Сейчас загрузим скины...');
+    
     await fetchMarketPrices();
     loadSteamInventory();
 }
 
 async function saveProfileTradeUrl() {
     const url = document.getElementById('profileTradeUrl').value.trim();
-    if (!url) { showModal('Ошибка', 'Введите Trade URL!'); return; }
+    if (!url) { 
+        showModal('Ошибка', 'Введите Trade URL!'); 
+        return; 
+    }
 
     document.getElementById('sellTradeUrl').value = url;
     await fetch('/api/save-trade-url', {
@@ -1437,9 +1420,114 @@ async function saveProfileTradeUrl() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tradeUrl: url })
     });
-    showModal('Успех', 'Trade URL сохранен! Сейчас загрузим скины...');
+    
     await fetchMarketPrices();
     loadSteamInventory();
+}
+
+// ===== ЗАГРУЗКА ИНВЕНТАРЯ ПО TRADE URL =====
+async function loadSteamInventory() {
+    const tradeUrl = document.getElementById('sellTradeUrl').value.trim();
+    if (!tradeUrl) {
+        showModal('Ошибка', 'Введите Trade URL!');
+        return;
+    }
+
+    // Парсим SteamID из Trade URL
+    let steamId = null;
+    const match = tradeUrl.match(/partner=(\d+)/);
+    if (match) {
+        steamId = match[1];
+    } else {
+        showModal('Ошибка', 'Не удалось извлечь SteamID из Trade URL!\nУбедитесь, что ссылка корректна.');
+        return;
+    }
+
+    const grid = document.getElementById('sellSkinGrid');
+    grid.innerHTML = `
+        <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #8a8d99;">
+            ⏳ Загружаем инвентарь...
+        </div>
+    `;
+
+    try {
+        const response = await fetch('/api/get-inventory-by-id', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ steamId: steamId })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || data.error) {
+            grid.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #e74c3c;">
+                    ❌ ${escapeHtml(data.error || 'Не удалось загрузить инвентарь')}
+                    <div style="font-size: 13px; margin-top: 10px; color: #8a8d99;">
+                        Возможно инвентарь скрыт в настройках приватности.
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        userInventory = data.items || [];
+        selectedSteamSkins = [];
+        processInventoryItems();
+        renderInventoryGrid(grid);
+        updateTotals();
+
+        if (userInventory.length > 0) {
+            showModal('Успех', `Загружено ${userInventory.length} скинов`);
+        }
+
+    } catch (error) {
+        console.error('Ошибка загрузки инвентаря:', error);
+        grid.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #e74c3c;">
+                ❌ Ошибка подключения к серверу.
+                <div style="font-size: 13px; margin-top: 10px; color: #8a8d99;">
+                    ${escapeHtml(error.message || 'Попробуйте обновить страницу')}
+                </div>
+            </div>
+        `;
+    }
+}
+
+// ===== ОБРАБОТКА ИНВЕНТАРЯ =====
+function processInventoryItems() {
+    userInventory = userInventory.map((item) => {
+        const parsed = parseSkinName(item.name);
+        const marketData = getMarketPrice(item.name);
+        
+        let price = 0;
+        let weapon = parsed.weapon;
+        let skinName = parsed.skinName;
+        let quality = parsed.quality;
+
+        if (marketData) {
+            price = marketData.price || 0;
+            weapon = marketData.weapon || parsed.weapon;
+            skinName = marketData.skinName || parsed.skinName;
+        }
+
+        const available = item.tradable !== false && price >= 5;
+
+        return {
+            ...item,
+            price: price,
+            weapon: weapon,
+            skinName: skinName,
+            quality: quality,
+            available: available
+        };
+    });
+
+    userInventory.sort((a, b) => {
+        if (a.available && !b.available) return -1;
+        if (!a.available && b.available) return 1;
+        return 0;
+    });
 }
 
 // ===== РЕНДЕРИНГ ИНВЕНТАРЯ =====
@@ -1493,151 +1581,6 @@ function renderInventoryGrid(grid) {
             </div>
         `;
     }).join('');
-}
-
-// ===== ЗАГРУЗКА ИНВЕНТАРЯ СВОЕГО АККАУНТА =====
-async function loadSteamInventory() {
-    if (!currentUser) {
-        showModal('Ошибка', 'Пожалуйста, войдите через Steam!');
-        return;
-    }
-
-    const grid = document.getElementById('sellSkinGrid');
-    grid.innerHTML = `
-        <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #8a8d99;">
-            ⏳ Загружаем ваш инвентарь CS2...
-        </div>
-    `;
-
-    try {
-        const response = await fetch('/api/get-inventory', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({})
-        });
-
-        const data = await response.json();
-
-        if (!response.ok || data.error) {
-            grid.innerHTML = `
-                <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #e74c3c;">
-                    ❌ ${escapeHtml(data.error || 'Не удалось загрузить инвентарь')}
-                </div>
-            `;
-            return;
-        }
-
-        userInventory = data.items || [];
-        selectedSteamSkins = [];
-        processInventoryItems();
-        renderInventoryGrid(grid);
-        updateTotals();
-
-    } catch (error) {
-        console.error('Ошибка загрузки инвентаря:', error);
-        grid.innerHTML = `
-            <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #e74c3c;">
-                ❌ Ошибка подключения к серверу.
-                <div style="font-size: 13px; margin-top: 10px; color: #8a8d99;">
-                    ${escapeHtml(error.message || 'Попробуйте обновить страницу')}
-                </div>
-            </div>
-        `;
-    }
-}
-
-// ===== НОВАЯ ФУНКЦИЯ: ЗАГРУЗКА ИНВЕНТАРЯ ПО STEAM ID =====
-async function loadInventoryById() {
-    const steamId = document.getElementById('steamIdInput').value.trim();
-    if (!steamId) {
-        showModal('Ошибка', 'Введите Steam ID или кастомный URL');
-        return;
-    }
-
-    const grid = document.getElementById('sellSkinGrid');
-    grid.innerHTML = `
-        <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #8a8d99;">
-            ⏳ Загружаем инвентарь пользователя...
-        </div>
-    `;
-
-    try {
-        const response = await fetch('/api/get-inventory-by-id', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ steamId: steamId })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok || data.error) {
-            grid.innerHTML = `
-                <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #e74c3c;">
-                    ❌ ${escapeHtml(data.error || 'Не удалось загрузить инвентарь')}
-                    <div style="font-size: 13px; margin-top: 10px; color: #8a8d99;">
-                        Убедитесь, что ID введён верно и инвентарь публичный.
-                    </div>
-                </div>
-            `;
-            return;
-        }
-
-        userInventory = data.items || [];
-        selectedSteamSkins = [];
-        processInventoryItems();
-        renderInventoryGrid(grid);
-        updateTotals();
-
-        showModal('Успех', `Загружено ${userInventory.length} скинов пользователя`);
-
-    } catch (error) {
-        console.error('Ошибка загрузки инвентаря по ID:', error);
-        grid.innerHTML = `
-            <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #e74c3c;">
-                ❌ Ошибка подключения к серверу.
-                <div style="font-size: 13px; margin-top: 10px; color: #8a8d99;">
-                    ${escapeHtml(error.message || 'Попробуйте обновить страницу')}
-                </div>
-            </div>
-        `;
-    }
-}
-
-// ===== ОБРАБОТКА ИНВЕНТАРЯ (общая логика) =====
-function processInventoryItems() {
-    userInventory = userInventory.map((item) => {
-        const parsed = parseSkinName(item.name);
-        const marketData = getMarketPrice(item.name);
-        
-        let price = 0;
-        let weapon = parsed.weapon;
-        let skinName = parsed.skinName;
-        let quality = parsed.quality;
-
-        if (marketData) {
-            price = marketData.price || 0;
-            weapon = marketData.weapon || parsed.weapon;
-            skinName = marketData.skinName || parsed.skinName;
-        }
-
-        const available = item.tradable !== false && price >= 5;
-
-        return {
-            ...item,
-            price: price,
-            weapon: weapon,
-            skinName: skinName,
-            quality: quality,
-            available: available
-        };
-    });
-
-    // Сортируем: сначала доступные
-    userInventory.sort((a, b) => {
-        if (a.available && !b.available) return -1;
-        if (!a.available && b.available) return 1;
-        return 0;
-    });
 }
 
 function escapeHtml(text) {
