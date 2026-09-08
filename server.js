@@ -80,13 +80,12 @@ passport.use(
         },
 
         (identifier, profile, done) => {
-            try {
-                recordLogin(profile);
-                return done(null, profile);
-            } catch (error) {
-                console.error('Ошибка выдачи внутреннего ID:', error.message);
-                return done(error);
-            }
+            recordLogin(profile)
+                .then(() => done(null, profile))
+                .catch(error => {
+                    console.error('Ошибка выдачи внутреннего ID:', error.message);
+                    done(error);
+                });
         }
     )
 );
@@ -121,7 +120,7 @@ app.get('/logout', (req, res) => {
 // API: ТЕКУЩИЙ ПОЛЬЗОВАТЕЛЬ
 // =====================================================
 
-app.get('/api/user', (req, res) => {
+app.get('/api/user', async (req, res) => {
 
     if (!req.user) {
         return res.json({
@@ -136,6 +135,7 @@ app.get('/api/user', (req, res) => {
             id: String(req.user.id),
             publicId: ensureUserRecord(req.user).publicId,
             isOwner: isOwner(req),
+            isAdmin: await isAdmin(req),
             totalSold: Number(ensureUserRecord(req.user).totalSold || 0),
             totalPayout: Number(ensureUserRecord(req.user).totalPayout || 0),
 
@@ -207,6 +207,14 @@ async function initDatabase() {
     `);
 
     await pool.query(`ALTER TABLE sales ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'not_sold'`);
+
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS admin_grants (
+            steam_id TEXT PRIMARY KEY REFERENCES users(steam_id) ON DELETE CASCADE,
+            granted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            granted_by TEXT NOT NULL
+        )
+    `);
 
     const users = await pool.query('SELECT * FROM users ORDER BY public_id');
     for (const row of users.rows) {
@@ -311,29 +319,39 @@ async function insertSaleToDb(steamId, sale) {
         sale.status === 'sold' ? 'sold' : 'not_sold']);
 }
 
-function saveUserData() {
-    if (!pool) return;
+async function saveUserData() {
+    if (!pool || !dbReady) return;
     const records = Object.values(userData);
-    Promise.all(records.map(record => upsertUserToDb(record)))
-        .catch(error => console.error('Ошибка сохранения пользователя в PostgreSQL:', error.message));
+    await Promise.all(records.map(record => upsertUserToDb(record)));
 }
 
 async function waitForDatabase() {
-    if (!pool) return;
+    if (!pool) return false;
     while (!dbReady) await new Promise(resolve => setTimeout(resolve, 50));
+    return true;
+}
+
+function requireDatabase(res) {
+    if (!pool || !dbReady) {
+        res.status(503).json({ error: 'База данных не подключена. Добавьте DATABASE_URL в Render → Environment.' });
+        return false;
+    }
+    return true;
 }
 
 // =====================================================
 // НАСТРОЙКИ ПОЛЬЗОВАТЕЛЯ
 // =====================================================
 
-app.post('/api/save-settings', (req, res) => {
+app.post('/api/save-settings', async (req, res) => {
 
     if (!req.user) {
         return res.status(401).json({
             error: 'Войдите через Steam'
         });
     }
+
+    if (!requireDatabase(res)) return;
 
     const steamId = String(req.user.id);
     ensureUserRecord(req.user);
@@ -346,7 +364,7 @@ app.post('/api/save-settings', (req, res) => {
     userData[steamId].rain =
         req.body.rain !== false;
 
-    saveUserData();
+    await saveUserData();
 
     res.json({
         success: true
@@ -419,7 +437,7 @@ function isValidTradeUrl(url) {
     }
 }
 
-app.post('/api/save-trade-url', (req, res) => {
+app.post('/api/save-trade-url', async (req, res) => {
 
     if (!req.user) {
 
@@ -427,6 +445,8 @@ app.post('/api/save-trade-url', (req, res) => {
             error: 'Войдите через Steam'
         });
     }
+
+    if (!requireDatabase(res)) return;
 
     const steamId = String(req.user.id);
     ensureUserRecord(req.user);
@@ -449,7 +469,7 @@ app.post('/api/save-trade-url', (req, res) => {
     userData[steamId].tradeUrl =
         tradeUrl;
 
-    saveUserData();
+    await saveUserData();
 
     res.json({
         success: true
@@ -1047,7 +1067,6 @@ function ensureUserRecord(profile) {
                     throw new Error('Невозможно освободить ID 666: свободные ID закончились');
                 }
                 otherRecord.publicId = replacementId;
-                saveUserData();
             }
         }
         record.publicId = OWNER_PUBLIC_ID;
@@ -1073,7 +1092,6 @@ function ensureUserRecord(profile) {
     if (!record.theme) record.theme = 'dark';
     if (typeof record.rain !== 'boolean') record.rain = true;
 
-    saveUserData();
     return record;
 }
 
@@ -1081,13 +1099,21 @@ function isOwner(req) {
     return Boolean(req.user) && String(req.user.id) === OWNER_STEAM_ID;
 }
 
-function recordLogin(profile) {
+async function isAdmin(req) {
+    if (!req.user) return false;
+    if (isOwner(req)) return true;
+    if (!pool || !dbReady) return false;
+    const result = await pool.query('SELECT 1 FROM admin_grants WHERE steam_id=$1', [String(req.user.id)]);
+    return result.rowCount > 0;
+}
+
+async function recordLogin(profile) {
     const record = ensureUserRecord(profile);
     const now = new Date().toISOString();
     if (!record.createdAt) record.createdAt = now;
     record.lastLoginAt = now;
     record.loginCount = Number(record.loginCount || 0) + 1;
-    saveUserData();
+    await saveUserData();
     return record;
 }
 
@@ -1105,8 +1131,12 @@ app.get('/api/profile/:publicId', (req, res) => {
 });
 
 // Владелец 666 видит внутренние данные пользователей и историю продаж.
-app.get('/api/admin/data', (req, res) => {
-    if (!isOwner(req)) return res.status(403).json({ error: 'Доступ запрещён' });
+app.get('/api/admin/data', async (req, res) => {
+    if (!(await isAdmin(req))) return res.status(403).json({ error: 'Доступ запрещён' });
+    if (!requireDatabase(res)) return;
+
+    const grantsResult = await pool.query('SELECT steam_id FROM admin_grants');
+    const grantedAdmins = new Set(grantsResult.rows.map(row => String(row.steam_id)));
 
     const users = Object.values(userData)
         .map(record => ({
@@ -1120,23 +1150,47 @@ app.get('/api/admin/data', (req, res) => {
             loginCount: Number(record.loginCount || 0),
             totalSold: Number(record.totalSold || 0),
             totalPayout: Number(record.totalPayout || 0),
+            isAdmin: String(record.steamId || '') === OWNER_STEAM_ID || grantedAdmins.has(String(record.steamId || '')),
             sales: Array.isArray(record.sales) ? record.sales : []
         }))
         .sort((a, b) => a.publicId - b.publicId);
 
     const sales = users.flatMap(user => user.sales.map(sale => ({
-        ...sale,
-        publicId: user.publicId,
-        username: user.username,
-        steamId: user.steamId
+        ...sale, publicId: user.publicId, username: user.username, steamId: user.steamId
     }))).sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
 
     res.json({ users, sales });
 });
 
+// Владелец 666 может выдавать и отзывать админ-доступ по публичному ID.
+app.post('/api/admin/grants', async (req, res) => {
+    if (!isOwner(req)) return res.status(403).json({ error: 'Только владелец 666 может управлять доступом' });
+    if (!requireDatabase(res)) return;
+    const publicId = Number(req.body.publicId);
+    if (!Number.isInteger(publicId) || publicId <= 0) return res.status(400).json({ error: 'Введите корректный ID' });
+    const target = Object.values(userData).find(item => Number(item?.publicId) === publicId);
+    if (!target) return res.status(404).json({ error: 'Пользователь с таким ID не найден' });
+    if (String(target.steamId) === OWNER_STEAM_ID) return res.status(400).json({ error: 'ID 666 уже является владельцем' });
+    await pool.query('INSERT INTO admin_grants (steam_id, granted_by) VALUES ($1,$2) ON CONFLICT (steam_id) DO NOTHING', [String(target.steamId), OWNER_STEAM_ID]);
+    res.json({ success: true, publicId });
+});
+
+app.delete('/api/admin/grants/:publicId', async (req, res) => {
+    if (!isOwner(req)) return res.status(403).json({ error: 'Только владелец 666 может управлять доступом' });
+    if (!requireDatabase(res)) return;
+    const publicId = Number(req.params.publicId);
+    const target = Object.values(userData).find(item => Number(item?.publicId) === publicId);
+    if (!target) return res.status(404).json({ error: 'Пользователь с таким ID не найден' });
+    if (String(target.steamId) === OWNER_STEAM_ID) return res.status(400).json({ error: 'Нельзя забрать доступ у владельца' });
+    await pool.query('DELETE FROM admin_grants WHERE steam_id=$1', [String(target.steamId)]);
+    res.json({ success: true, publicId });
+});
+
 // Создаём заявку на продажу. Окончательный статус устанавливает владелец в админке.
 app.post('/api/record-sale', async (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+
+    if (!requireDatabase(res)) return;
 
     const steamId = String(req.user.id);
     const record = ensureUserRecord(req.user);
@@ -1178,11 +1232,11 @@ app.post('/api/record-sale', async (req, res) => {
 
 // Владелец меняет статус заявки: продажа остаётся в истории в любом случае.
 app.post('/api/admin/sales/:saleId/status', async (req, res) => {
-    if (!isOwner(req)) return res.status(403).json({ error: 'Доступ запрещён' });
+    if (!(await isAdmin(req))) return res.status(403).json({ error: 'Доступ запрещён' });
     const saleId = String(req.params.saleId);
     const status = req.body.status === 'sold' ? 'sold' : 'not_sold';
 
-    if (!pool) return res.status(500).json({ error: 'База данных не подключена' });
+    if (!requireDatabase(res)) return;
 
     try {
         const result = await pool.query(
@@ -1221,13 +1275,19 @@ app.post('/api/admin/sales/:saleId/status', async (req, res) => {
     }
 });
 
-app.get('/admin', (req, res) => {
-    if (!isOwner(req)) return res.status(403).send('Доступ запрещён');
+app.get('/admin', async (req, res) => {
+    if (!(await isAdmin(req))) return res.status(403).send('Доступ запрещён');
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.get('/profile', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/profile/:publicId', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+
+app.get('/api/health', async (req, res) => {
+    if (!pool) return res.status(503).json({ ok: false, database: false, error: 'DATABASE_URL не задан' });
+    try { await pool.query('SELECT 1'); res.json({ ok: true, database: true, dbReady }); }
+    catch (error) { res.status(503).json({ ok: false, database: false, error: error.message }); }
+});
 
 // =====================================================
 // ГЛАВНАЯ

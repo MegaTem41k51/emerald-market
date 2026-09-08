@@ -457,6 +457,69 @@
 
         @media (max-width: 992px) { .sell-layout { flex-direction: column; } .sell-sidebar { width: 100%; min-width: unset; position: static; } .skin-grid-sell { grid-template-columns: repeat(3, 1fr); } .profile-layout { flex-direction: column; } .profile-left { width: 100%; min-width: unset; } .profile-cards { grid-template-columns: repeat(2, 1fr); } .support-channels { grid-template-columns: 1fr; max-width: 300px; } .policy-container { padding: 25px 20px; } }
         @media (max-width: 600px) { .skin-grid-sell { grid-template-columns: repeat(2, 1fr); } }
+    
+        /* =====================================================
+           EMERALD 2.0 — PREMIUM GREEN UI
+           ===================================================== */
+        :root {
+            --emerald: #22e47a;
+            --emerald-2: #10b968;
+            --emerald-soft: rgba(34,228,122,.12);
+            --bg: #050806;
+            --panel: rgba(12,19,15,.82);
+            --panel-2: rgba(16,27,20,.9);
+            --line: rgba(63,255,145,.14);
+            --muted: #84948a;
+        }
+        html, body { background: radial-gradient(circle at 15% 0%, rgba(34,228,122,.09), transparent 30%), radial-gradient(circle at 90% 20%, rgba(0,255,128,.06), transparent 26%), var(--bg); }
+        body { color:#eef8f1; }
+        body::before { content:""; position:fixed; inset:0; pointer-events:none; background:linear-gradient(120deg,transparent 0%,rgba(34,228,122,.018) 45%,transparent 70%); z-index:-1; }
+        .header { background:rgba(5,9,7,.78)!important; backdrop-filter:blur(18px); border-bottom:1px solid var(--line)!important; box-shadow:0 12px 50px rgba(0,0,0,.35); }
+        .header-inner { min-height:76px; }
+        .logo { letter-spacing:-1.5px; text-shadow:0 0 28px rgba(34,228,122,.25); }
+        .logo span { color:var(--emerald)!important; }
+        .nav a { color:#94a79b!important; transition:.2s ease; }
+        .nav a:hover, .nav a.active { color:var(--emerald)!important; }
+        .nav a.active { text-shadow:0 0 18px rgba(34,228,122,.28); }
+        .btn, .btn-steam, .sell-final-btn { background:linear-gradient(135deg,#23e67d,#0db866)!important; border:1px solid rgba(133,255,185,.25)!important; box-shadow:0 10px 30px rgba(18,203,105,.2); transition:transform .18s ease,box-shadow .18s ease,filter .18s ease; }
+        .btn:hover, .btn-steam:hover, .sell-final-btn:hover { transform:translateY(-2px); filter:saturate(1.08); box-shadow:0 16px 38px rgba(18,203,105,.3); }
+        .btn-outline { background:rgba(34,228,122,.045)!important; border:1px solid rgba(34,228,122,.3)!important; color:#9af3bb!important; }
+        .btn-outline:hover { background:rgba(34,228,122,.1)!important; border-color:var(--emerald)!important; }
+        .sell-hero { padding:48px 0 32px; }
+        .sell-hero h1 { font-size:clamp(32px,5vw,58px); letter-spacing:-2.5px; text-shadow:0 10px 40px rgba(0,0,0,.35); }
+        .sell-hero h1 span { color:var(--emerald)!important; text-shadow:0 0 35px rgba(34,228,122,.22); }
+        .filters-row, .sell-sidebar, .profile-login-box, .profile-avatar-box, .profile-transactions, .profile-settings, .faq-item, .support-card, .policy-container, .profile-card, .admin-control-card { background:linear-gradient(145deg,rgba(14,24,18,.92),rgba(7,13,10,.88))!important; border:1px solid var(--line)!important; box-shadow:0 18px 55px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.025); }
+        .profile-card { border-radius:18px!important; padding:24px!important; transition:.2s ease; }
+        .profile-card:hover { transform:translateY(-3px); border-color:rgba(34,228,122,.28)!important; box-shadow:0 20px 60px rgba(0,0,0,.3),0 0 35px rgba(34,228,122,.05); }
+        .profile-card .value { color:#effff5!important; }
+        .profile-card .label { color:#7f9187!important; }
+        .profile-card .icon { filter:drop-shadow(0 0 12px rgba(34,228,122,.3)); }
+        .sell-skin-card { background:linear-gradient(145deg,#101a14,#09100c)!important; border-color:rgba(34,228,122,.11)!important; border-radius:16px!important; overflow:hidden; transition:.22s ease!important; }
+        .sell-skin-card:hover { transform:translateY(-4px); border-color:rgba(34,228,122,.36)!important; box-shadow:0 18px 45px rgba(0,0,0,.3),0 0 28px rgba(34,228,122,.08); }
+        .sell-skin-card.selected { border-color:var(--emerald)!important; box-shadow:0 0 0 1px var(--emerald),0 0 30px rgba(34,228,122,.12)!important; }
+        input, select, .filter-input, .filter-select, .setting-row input[type=text] { background:rgba(3,8,5,.7)!important; border:1px solid rgba(113,145,124,.2)!important; color:#ecf8ef!important; border-radius:11px!important; }
+        input:focus, select:focus { border-color:rgba(34,228,122,.65)!important; box-shadow:0 0 0 3px rgba(34,228,122,.08)!important; outline:none!important; }
+        .transaction-table { border-collapse:separate!important; border-spacing:0 8px!important; }
+        .transaction-table th { color:#6f8678!important; text-transform:uppercase; font-size:11px!important; letter-spacing:.09em; }
+        .transaction-table td { background:rgba(5,11,7,.55); border-bottom:0!important; padding:15px 12px!important; }
+        .transaction-table tr td:first-child { border-radius:10px 0 0 10px; }
+        .transaction-table tr td:last-child { border-radius:0 10px 10px 0; }
+        .transaction-table tbody tr:hover td { background:rgba(34,228,122,.055); }
+        .admin-control-card { padding:22px; border-radius:18px; }
+        .admin-control-title { font-size:19px; font-weight:800; color:#effff5; margin-bottom:5px; }
+        .admin-control-subtitle { color:#7f9487; font-size:13px; margin-bottom:15px; }
+        .admin-access-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+        .admin-access-row .filter-input { flex:1 1 220px; min-width:180px; }
+        .admin-action-btn { min-height:42px; }
+        .admin-grant-status { margin-top:12px; min-height:20px; color:#8deeb1; font-size:13px; }
+        .admin-badge { display:inline-flex; align-items:center; padding:3px 7px; margin-left:6px; border-radius:999px; background:rgba(34,228,122,.1); border:1px solid rgba(34,228,122,.25); color:#6df3a2; font-size:9px; font-weight:800; letter-spacing:.08em; }
+        .modal-overlay { backdrop-filter:blur(9px)!important; background:rgba(0,0,0,.65)!important; }
+        .modal-content { background:linear-gradient(145deg,#101a14,#080e0b)!important; border:1px solid rgba(34,228,122,.45)!important; box-shadow:0 25px 100px rgba(0,0,0,.6),0 0 55px rgba(34,228,122,.08)!important; border-radius:20px!important; }
+        ::-webkit-scrollbar { width:8px; height:8px; }
+        ::-webkit-scrollbar-track { background:#050806; }
+        ::-webkit-scrollbar-thumb { background:#173b27; border-radius:99px; }
+        ::-webkit-scrollbar-thumb:hover { background:#1e633e; }
+        @media(max-width:700px){ .header-inner{min-height:64px}.nav{gap:12px}.sell-hero{padding-top:28px}.admin-access-row{flex-direction:column;align-items:stretch}.admin-action-btn{width:100%} }
     </style>
 </head>
 <body>
@@ -759,6 +822,17 @@
             <div class="profile-card"><div class="icon">💰</div><div class="value" id="adminSoldTotal">0,00 ₽</div><div class="label">Продано на сумму</div></div>
             <div class="profile-card"><div class="icon">💸</div><div class="value" id="adminPayoutTotal">0,00 ₽</div><div class="label">Начислено пользователям</div></div>
         </div>
+        <div class="admin-control-card" id="adminAccessCard" style="display:none; margin-bottom:24px;">
+            <div class="admin-control-title">🛡️ Управление доступом</div>
+            <div class="admin-control-subtitle">Выдача и отзыв доступа к админке. Доступ выдаёт только владелец 666.</div>
+            <div class="admin-access-row">
+                <input id="adminGrantId" class="filter-input" type="number" min="1" placeholder="Введите ID пользователя">
+                <button class="btn admin-action-btn" onclick="grantAdminAccess()">Выдать админку</button>
+                <button class="btn-outline admin-action-btn" onclick="revokeAdminAccess()">Забрать</button>
+            </div>
+            <div id="adminGrantStatus" class="admin-grant-status"></div>
+        </div>
+
         <div class="profile-transactions" style="margin-bottom:24px;">
             <h3>Пользователи</h3>
             <div style="overflow:auto;"><table class="transaction-table"><thead><tr><th>ID</th><th>Steam ID</th><th>Имя</th><th>Trade URL</th><th>Последний вход</th><th>Продано</th><th>Выплачено</th></tr></thead><tbody id="adminUsersBody"></tbody></table></div>
@@ -1232,7 +1306,7 @@ function getRequisites() {
 }
 
 // ===== ФУНКЦИЯ ПРОДАЖИ =====
-function processSale() {
+async function processSale() {
     if (selectedSteamSkins.length === 0) {
         showModal('Ошибка', 'Выберите хотя бы один скин для продажи');
         return;
@@ -1288,16 +1362,23 @@ function processSale() {
     const payout = total * (payoutPercent / 100);
     const paymentMethod = requisites.method;
 
-    fetch('/api/record-sale', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            total,
-            payout,
-            paymentMethod,
-            items: selectedItems.map(item => `${item.weapon || 'CS2'} | ${item.skinName || item.name} ${item.quality || 'Field-Tested'}`)
-        })
-    }).catch(error => console.warn('Не удалось записать продажу:', error));
+    try {
+        const saleResponse = await fetch('/api/record-sale', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                total,
+                payout,
+                paymentMethod,
+                items: selectedItems.map(item => `${item.weapon || 'CS2'} | ${item.skinName || item.name} ${item.quality || 'Field-Tested'}`)
+            })
+        });
+        const saleData = await saleResponse.json();
+        if (!saleResponse.ok) throw new Error(saleData.error || 'Не удалось сохранить заявку');
+    } catch (error) {
+        showModal('Ошибка', error.message);
+        return;
+    }
 
     const encodedMessage = encodeURIComponent(message);
     const telegramUrl = `https://t.me/ikiawka?text=${encodedMessage}`;
@@ -1323,7 +1404,7 @@ function getProfileIdFromPath() {
 }
 
 function navigateTo(page, push = true) {
-    if (page === 'admin' && !currentUser?.isOwner) return;
+    if (page === 'admin' && !currentUser?.isAdmin) return;
 
     if (push) {
         if (page === 'admin') history.pushState({}, '', '/admin');
@@ -1378,6 +1459,8 @@ async function loadAdminData() {
 
         document.getElementById('adminUsersCount').textContent = data.users.length;
         document.getElementById('adminSalesCount').textContent = data.sales.length;
+        const accessCard = document.getElementById('adminAccessCard');
+        if (accessCard) accessCard.style.display = currentUser?.isOwner ? 'block' : 'none';
         const confirmedSales = data.sales.filter(x => x.status === 'sold');
         document.getElementById('adminSoldTotal').textContent = `${confirmedSales.reduce((s,x)=>s+Number(x.total||0),0).toFixed(2)} ₽`;
         document.getElementById('adminPayoutTotal').textContent = `${confirmedSales.reduce((s,x)=>s+Number(x.payout||0),0).toFixed(2)} ₽`;
@@ -1386,7 +1469,7 @@ async function loadAdminData() {
             <tr>
                 <td><a href="/profile/${user.publicId}" onclick="event.preventDefault(); history.pushState({}, '', this.href); navigateTo('profile', false); renderPublicProfile(${user.publicId});" style="color:#2ecc71;">${user.publicId}</a></td>
                 <td>${escapeHtml(user.steamId)}</td>
-                <td>${escapeHtml(user.username)}</td>
+                <td>${escapeHtml(user.username)} ${user.isAdmin ? '<span class=\"admin-badge\">ADMIN</span>' : ''}</td>
                 <td style="max-width:260px; word-break:break-all;">${escapeHtml(user.tradeUrl || '—')}</td>
                 <td>${formatAdminDate(user.lastLoginAt)}</td>
                 <td>${Number(user.totalSold||0).toFixed(2)} ₽</td>
@@ -1407,6 +1490,37 @@ async function loadAdminData() {
     } catch (error) {
         showModal('Ошибка', error.message);
     }
+}
+
+async function grantAdminAccess() {
+    if (!currentUser?.isOwner) return;
+    const id = Number(document.getElementById('adminGrantId').value);
+    const status = document.getElementById('adminGrantStatus');
+    status.textContent = '⏳ Сохраняем...';
+    try {
+        const response = await fetch('/api/admin/grants', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ publicId: id })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Не удалось выдать доступ');
+        status.textContent = `✓ ID ${id} теперь имеет доступ к админке`;
+        await loadAdminData();
+    } catch (error) { status.textContent = `✕ ${error.message}`; }
+}
+
+async function revokeAdminAccess() {
+    if (!currentUser?.isOwner) return;
+    const id = Number(document.getElementById('adminGrantId').value);
+    const status = document.getElementById('adminGrantStatus');
+    status.textContent = '⏳ Сохраняем...';
+    try {
+        const response = await fetch(`/api/admin/grants/${encodeURIComponent(id)}`, { method: 'DELETE' });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Не удалось забрать доступ');
+        status.textContent = `✓ Доступ у ID ${id} отозван`;
+        await loadAdminData();
+    } catch (error) { status.textContent = `✕ ${error.message}`; }
 }
 
 async function setSaleStatus(saleId, status) {
@@ -1443,6 +1557,7 @@ async function fetchUser() {
                 id: data.user.id,
                 publicId: Number(data.user.publicId),
                 isOwner: data.user.isOwner === true,
+                isAdmin: data.user.isAdmin === true,
                 name: data.user.name,
                 avatar: data.user.avatar,
                 totalSold: Number(data.user.totalSold || 0),
@@ -1496,7 +1611,7 @@ function updateUserUI() {
     }
 
     const adminLink = document.getElementById('adminNavLink');
-    if (adminLink) adminLink.style.display = currentUser?.isOwner ? 'block' : 'none';
+    if (adminLink) adminLink.style.display = currentUser?.isAdmin ? 'block' : 'none';
 }
 
 // ===== НАСТРОЙКИ =====
