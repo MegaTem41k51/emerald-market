@@ -556,6 +556,12 @@
         .ban-card .ban-contact:hover { color:#a0ffc4; border-bottom-color:#a0ffc4; }
 
         /* ===== ПРОФИЛЬ: РАЗДЕЛЫ ПО МАКЕТУ ===== */
+        .profile-content-section { display:none !important; }
+        .profile-content-section.active { display:block !important; }
+        .admin-danger-btn { min-height:36px; padding:8px 12px; border-radius:10px; font-weight:800; cursor:pointer; border:1px solid rgba(255,90,90,.35); background:rgba(255,70,70,.08); color:#ff8b8b; transition:.18s ease; }
+        .admin-danger-btn:hover { background:rgba(255,70,70,.16); transform:translateY(-1px); }
+        .admin-stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; }
+        .admin-stat-grid .filter-input { width:100%; }
         .profile-section-card { background:linear-gradient(145deg,#111a15,#0b120e); border:1px solid rgba(34,228,122,.22); border-radius:16px; padding:22px; }
         .profile-section-head { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:16px; }
         .profile-section-title { display:flex; align-items:center; gap:10px; font-size:18px; font-weight:800; color:#effff5; }
@@ -1010,7 +1016,9 @@
                 <select id="adminManageAction" class="filter-select" onchange="updateAdminActionFields()">
                     <option value="ban">🚫 Выдать бан</option>
                     <option value="unban">✅ Снять бан</option>
-                    <option value="balance_add">💰 Изменить баланс</option>
+                    <option value="balance_add">💰 Выдать баланс</option>
+                    <option value="balance_remove">💸 Убрать баланс</option>
+                    <option value="stats_set">📊 Изменить статистику</option>
                     <option value="change_id">🔢 Изменить ID</option>
                 </select>
                 <input id="adminManageId" class="filter-input" type="number" min="1" placeholder="ID пользователя">
@@ -1018,10 +1026,14 @@
                 <input id="adminManageNewId" class="filter-input" type="number" min="100000" max="999999" placeholder="Новый ID" style="display:none;">
                 <input id="adminManageReason" class="filter-input" type="text" maxlength="200" placeholder="Причина бана" style="display:none;">
             </div>
+            <div id="adminStatsFields" class="admin-stat-grid" style="display:none;">
+                <input id="adminManageTotalSold" class="filter-input" type="number" min="0" step="0.01" placeholder="Продано на сумму">
+                <input id="adminManageTotalPayout" class="filter-input" type="number" min="0" step="0.01" placeholder="Выплачено">
+            </div>
             <div class="admin-access-row" style="margin-top:12px;">
                 <button class="btn admin-action-btn" onclick="manageUser()">Применить действие</button>
             </div>
-            <div class="admin-management-help">Баланс можно изменить на положительную или отрицательную сумму. ID — случайный 6-значный диапазон 100000–999999, кроме 666.</div>
+            <div class="admin-management-help">Баланс можно выдать или убрать. Статистику «Продано» и «Выплачено» можно установить вручную. ID — случайный 6-значный диапазон 100000–999999, кроме 666.</div>
             <div id="adminGrantStatus" class="admin-grant-status"></div>
             <div id="adminManagementStatus" class="admin-management-status"></div>
         </div>
@@ -1703,7 +1715,7 @@ async function loadAdminData() {
                 <td>${Number(sale.payout||0).toFixed(2)} ₽</td>
                 <td>${escapeHtml(sale.paymentMethod || '—')}</td>
                 <td>${(sale.items || []).map(escapeHtml).join('<br>') || '—'}</td>
-                <td style="white-space:nowrap;">${sale.status === 'pending' ? `<div class="sale-pending-actions"><button class="sale-status-btn" onclick="setSaleStatus('${sale.id}','sold')">Продал</button><button class="sale-status-btn no" onclick="setSaleStatus('${sale.id}','not_sold')">Не продал</button></div>` : (sale.status === 'sold' ? '<span style="color:#2ecc71;font-weight:800;">Продал</span>' : '<span style="color:#ff6b6b;font-weight:800;">Не продал</span>')}</td>
+                <td style="white-space:nowrap;">${sale.status === 'pending' ? `<div class="sale-pending-actions"><button class="sale-status-btn" onclick="setSaleStatus('${sale.id}','sold')">Продал</button><button class="sale-status-btn no" onclick="setSaleStatus('${sale.id}','not_sold')">Не продал</button></div>` : (sale.status === 'sold' ? '<span style="color:#2ecc71;font-weight:800;">Продал</span>' : '<span style="color:#ff6b6b;font-weight:800;">Не продал</span>')}<button class="admin-danger-btn" style="margin-top:7px;" onclick="deleteUserFromSale('${sale.publicId}')">Удалить пользователя</button></td>
             </tr>`).join('') || '<tr><td colspan="8">Продаж пока нет</td></tr>';
     } catch (error) {
         showModal('Ошибка', error.message);
@@ -1746,10 +1758,12 @@ function updateAdminActionFields() {
     const amount = document.getElementById('adminManageAmount');
     const newId = document.getElementById('adminManageNewId');
     const reason = document.getElementById('adminManageReason');
-    if (!amount || !newId || !reason) return;
-    amount.style.display = action === 'balance_add' ? 'block' : 'none';
+    const stats = document.getElementById('adminStatsFields');
+    if (!amount || !newId || !reason || !stats) return;
+    amount.style.display = ['balance_add','balance_remove'].includes(action) ? 'block' : 'none';
     newId.style.display = action === 'change_id' ? 'block' : 'none';
     reason.style.display = action === 'ban' ? 'block' : 'none';
+    stats.style.display = action === 'stats_set' ? 'grid' : 'none';
 }
 
 async function manageUser() {
@@ -1762,8 +1776,12 @@ async function manageUser() {
         return;
     }
     const body = { action, publicId };
-    if (action === 'balance_add') body.amount = Number(document.getElementById('adminManageAmount').value);
+    if (action === 'balance_add' || action === 'balance_remove') body.amount = Number(document.getElementById('adminManageAmount').value);
     if (action === 'change_id') body.newPublicId = Number(document.getElementById('adminManageNewId').value);
+    if (action === 'stats_set') {
+        body.totalSold = Number(document.getElementById('adminManageTotalSold').value);
+        body.totalPayout = Number(document.getElementById('adminManageTotalPayout').value);
+    }
     if (action === 'ban') body.reason = document.getElementById('adminManageReason').value.trim();
     status.textContent = '⏳ Применяем...';
     try {
@@ -1773,7 +1791,9 @@ async function manageUser() {
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Не удалось применить действие');
         if (action === 'change_id') status.textContent = `✓ ID изменён на ${data.publicId}`;
-        else if (action === 'balance_add') status.textContent = `✓ Баланс обновлён: ${Number(data.balance || 0).toFixed(2)} ₽`;
+        else if (action === 'balance_add') status.textContent = `✓ Баланс выдан. Текущий баланс: ${Number(data.balance || 0).toFixed(2)} ₽`;
+        else if (action === 'balance_remove') status.textContent = `✓ Баланс уменьшен. Текущий баланс: ${Number(data.balance || 0).toFixed(2)} ₽`;
+        else if (action === 'stats_set') status.textContent = `✓ Статистика ID ${publicId} изменена`;
         else if (action === 'ban') status.textContent = `✓ Пользователь #${publicId} заблокирован`;
         else status.textContent = `✓ Пользователь #${publicId} разблокирован`;
         await loadAdminData();
@@ -1790,6 +1810,19 @@ async function setSaleStatus(saleId, status) {
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Ошибка изменения статуса');
+        await loadAdminData();
+    } catch (error) {
+        showModal('Ошибка', error.message);
+    }
+}
+
+async function deleteUserFromSale(publicId) {
+    if (!currentUser?.isOwner) return;
+    if (!confirm(`Удалить пользователя #${publicId} вместе с его продажами? Это действие нельзя отменить.`)) return;
+    try {
+        const response = await fetch(`/api/admin/users/${encodeURIComponent(publicId)}`, { method: 'DELETE' });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Не удалось удалить пользователя');
         await loadAdminData();
     } catch (error) {
         showModal('Ошибка', error.message);

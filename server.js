@@ -1507,6 +1507,26 @@ app.post('/api/record-sale', async (req, res) => {
     }
 });
 
+// Владелец может удалить пользователя из админки. Связанные продажи/сессии удаляются каскадно.
+app.delete('/api/admin/users/:publicId', async (req, res) => {
+    if (!isOwner(req)) return res.status(403).json({ error: 'Только владелец 666 может удалять пользователей' });
+    if (!requireDatabase(res)) return;
+    const publicId = Number(req.params.publicId);
+    if (!Number.isInteger(publicId) || publicId <= 0) return res.status(400).json({ error: 'Некорректный ID пользователя' });
+    try {
+        const targetResult = await pool.query('SELECT steam_id FROM users WHERE public_id=$1', [publicId]);
+        if (!targetResult.rowCount) return res.status(404).json({ error: 'Пользователь не найден' });
+        const steamId = String(targetResult.rows[0].steam_id);
+        if (steamId === OWNER_STEAM_ID) return res.status(400).json({ error: 'Нельзя удалить владельца 666' });
+        await pool.query('DELETE FROM users WHERE steam_id=$1', [steamId]);
+        delete userData[steamId];
+        res.json({ success: true, publicId });
+    } catch (error) {
+        console.error('Ошибка удаления пользователя:', error.message);
+        res.status(500).json({ error: 'Не удалось удалить пользователя' });
+    }
+});
+
 // Владелец управляет пользователями: бан, баланс и публичный ID.
 app.post('/api/admin/manage-user', async (req, res) => {
     if (!isOwner(req)) return res.status(403).json({ error: 'Только владелец 666 может управлять пользователями' });
@@ -1520,7 +1540,7 @@ app.post('/api/admin/manage-user', async (req, res) => {
 
     const target = Object.values(userData).find(item => Number(item?.publicId) === publicId);
     if (!target) return res.status(404).json({ error: 'Пользователь с таким ID не найден' });
-    if (String(target.steamId) === OWNER_STEAM_ID && action !== 'balance_add') {
+    if (String(target.steamId) === OWNER_STEAM_ID && !['balance_add','balance_remove','stats_set'].includes(action)) {
         return res.status(400).json({ error: 'Нельзя изменить доступ или ID владельца 666' });
     }
 
@@ -1531,12 +1551,21 @@ app.post('/api/admin/manage-user', async (req, res) => {
         } else if (action === 'unban') {
             target.banned = false;
             target.banReason = '';
-        } else if (action === 'balance_add') {
+        } else if (action === 'balance_add' || action === 'balance_remove') {
             const amount = Number(req.body.amount);
-            if (!Number.isFinite(amount) || amount === 0) return res.status(400).json({ error: 'Введите ненулевую сумму' });
-            const nextBalance = Number((Number(target.balance || 0) + amount).toFixed(2));
+            if (!Number.isFinite(amount) || amount <= 0) return res.status(400).json({ error: 'Введите положительную сумму' });
+            const delta = action === 'balance_add' ? amount : -amount;
+            const nextBalance = Number((Number(target.balance || 0) + delta).toFixed(2));
             if (nextBalance < 0) return res.status(400).json({ error: 'Баланс не может быть отрицательным' });
             target.balance = nextBalance;
+        } else if (action === 'stats_set') {
+            const totalSold = Number(req.body.totalSold);
+            const totalPayout = Number(req.body.totalPayout);
+            if (!Number.isFinite(totalSold) || totalSold < 0 || !Number.isFinite(totalPayout) || totalPayout < 0) {
+                return res.status(400).json({ error: 'Введите корректные значения статистики' });
+            }
+            target.totalSold = Number(totalSold.toFixed(2));
+            target.totalPayout = Number(totalPayout.toFixed(2));
         } else if (action === 'change_id') {
             const newId = Number(req.body.newPublicId);
             if (!Number.isInteger(newId) || newId < MIN_PUBLIC_ID || newId > MAX_PUBLIC_ID || newId === OWNER_PUBLIC_ID) {
