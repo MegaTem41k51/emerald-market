@@ -78,7 +78,7 @@ passport.use(
 
         (identifier, profile, done) => {
             try {
-                ensureUserRecord(profile);
+                recordLogin(profile);
                 return done(null, profile);
             } catch (error) {
                 console.error('Ошибка выдачи внутреннего ID:', error.message);
@@ -133,6 +133,8 @@ app.get('/api/user', (req, res) => {
             id: String(req.user.id),
             publicId: ensureUserRecord(req.user).publicId,
             isOwner: isOwner(req),
+            totalSold: Number(ensureUserRecord(req.user).totalSold || 0),
+            totalPayout: Number(ensureUserRecord(req.user).totalPayout || 0),
 
             name:
                 req.user.displayName ||
@@ -265,22 +267,6 @@ function ensureUserRecord(profile) {
 
 function isOwner(req) {
     return Boolean(req.user) && String(req.user.id) === OWNER_STEAM_ID;
-}
-
-function steam64FromTradeUrl(url) {
-    if (!isValidTradeUrl(url)) return null;
-
-    const parsed = new URL(url);
-    const partner = parsed.searchParams.get('partner');
-
-    if (!/^\d+$/.test(partner)) return null;
-
-    try {
-        const steam64 = 76561197960265728n + BigInt(partner);
-        return steam64.toString();
-    } catch {
-        return null;
-    }
 }
 
 // =====================================================
@@ -973,123 +959,103 @@ app.post('/api/get-inventory', async (req, res) => {
 });
 
 // =====================================================
-// ПРИВАТНЫЙ ПРОСМОТР ИНВЕНТАРЯ ПО ЧУЖОЙ TRADE URL
-// Доступен только владельцу (внутренний ID 666 + Steam ID).
+// ПРОФИЛИ / ТРАНЗАКЦИИ / АДМИНКА
 // =====================================================
 
-app.post('/api/get-inventory-by-trade-url', async (req, res) => {
+function recordLogin(profile) {
+    const record = ensureUserRecord(profile);
+    const now = new Date().toISOString();
+    if (!record.createdAt) record.createdAt = now;
+    record.lastLoginAt = now;
+    record.loginCount = Number(record.loginCount || 0) + 1;
+    saveUserData();
+    return record;
+}
 
-    if (!req.user) {
-        return res.status(401).json({
-            error: 'Войдите через Steam'
-        });
+// Публичный профиль возвращает только внутренний ID.
+app.get('/api/profile/:publicId', (req, res) => {
+    const publicId = Number(req.params.publicId);
+    if (!Number.isInteger(publicId) || publicId < MIN_PUBLIC_ID || publicId > MAX_PUBLIC_ID) {
+        return res.status(400).json({ error: 'Некорректный ID профиля' });
     }
 
-    if (!isOwner(req)) {
-        return res.status(403).json({
-            error: 'Доступ запрещён'
-        });
-    }
+    const entry = Object.values(userData).find(item => Number(item?.publicId) === publicId);
+    if (!entry) return res.status(404).json({ error: 'Профиль не найден' });
 
-    const tradeUrl = String(req.body.tradeUrl || '').trim();
-
-    if (!isValidTradeUrl(tradeUrl)) {
-        return res.status(400).json({
-            error: 'Неверная Trade URL. Вставьте ссылку из Steam.'
-        });
-    }
-
-    const targetSteamId = steam64FromTradeUrl(tradeUrl);
-
-    if (!targetSteamId) {
-        return res.status(400).json({
-            error: 'Не удалось определить Steam ID из Trade URL.'
-        });
-    }
-
-    try {
-        const inventory = await getSteamInventory(targetSteamId);
-
-        if (!inventory || inventory.success === false) {
-            return res.status(400).json({
-                error: 'Steam не разрешил получить инвентарь. Проверьте настройки приватности Steam.'
-            });
-        }
-
-        if (!Array.isArray(inventory.assets) || !Array.isArray(inventory.descriptions)) {
-            return res.json({
-                success: true,
-                targetSteamId,
-                items: []
-            });
-        }
-
-        const descriptions = {};
-        for (const desc of inventory.descriptions) {
-            descriptions[`${desc.classid}_${desc.instanceid}`] = desc;
-        }
-
-        const items = [];
-
-        for (const asset of inventory.assets) {
-            const desc = descriptions[`${asset.classid}_${asset.instanceid}`];
-            if (!desc) continue;
-
-            const name = desc.market_hash_name || desc.name || '';
-            if (!name) continue;
-
-            const lowerName = name.toLowerCase();
-            if (
-                lowerName.includes('case') ||
-                lowerName.includes('crate') ||
-                lowerName.includes('capsule') ||
-                lowerName.includes('sticker') ||
-                lowerName.includes('graffiti') ||
-                lowerName.includes('music kit') ||
-                lowerName.includes('souvenir package') ||
-                lowerName.includes('charm')
-            ) continue;
-
-            let isSkin = name.includes('|');
-            if (
-                lowerName.includes('knife') ||
-                lowerName.includes('karambit') ||
-                lowerName.includes('bayonet') ||
-                lowerName.includes('butterfly') ||
-                lowerName.includes('gloves')
-            ) isSkin = true;
-
-            if (!isSkin) continue;
-
-            const image = desc.icon_url
-                ? `https://community.akamai.steamstatic.com/economy/image/${desc.icon_url}`
-                : '';
-
-            items.push({
-                assetid: String(asset.assetid),
-                classid: String(asset.classid),
-                instanceid: String(asset.instanceid),
-                name,
-                image,
-                type: desc.type || 'Скин',
-                tradable: desc.tradable === 1,
-                marketable: desc.marketable === 1
-            });
-        }
-
-        return res.json({
-            success: true,
-            targetSteamId,
-            items
-        });
-
-    } catch (error) {
-        console.error('Ошибка чужого Steam inventory:', error.response?.status || error.code || error.message);
-        return res.status(500).json({
-            error: 'Ошибка соединения со Steam. Попробуйте позже.'
-        });
-    }
+    res.json({ publicId });
 });
+
+// Владелец 666 видит внутренние данные пользователей и историю продаж.
+app.get('/api/admin/data', (req, res) => {
+    if (!isOwner(req)) return res.status(403).json({ error: 'Доступ запрещён' });
+
+    const users = Object.values(userData)
+        .map(record => ({
+            publicId: Number(record.publicId),
+            steamId: String(record.steamId || ''),
+            username: record.username || 'Steam User',
+            avatar: record.avatar || '',
+            tradeUrl: record.tradeUrl || '',
+            createdAt: record.createdAt || null,
+            lastLoginAt: record.lastLoginAt || null,
+            loginCount: Number(record.loginCount || 0),
+            totalSold: Number(record.totalSold || 0),
+            totalPayout: Number(record.totalPayout || 0),
+            sales: Array.isArray(record.sales) ? record.sales : []
+        }))
+        .sort((a, b) => a.publicId - b.publicId);
+
+    const sales = users.flatMap(user => user.sales.map(sale => ({
+        ...sale,
+        publicId: user.publicId,
+        username: user.username,
+        steamId: user.steamId
+    }))).sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+
+    res.json({ users, sales });
+});
+
+// Фиксируем факт продажи и сумму. Платёжные реквизиты намеренно не сохраняются.
+app.post('/api/record-sale', (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+
+    const steamId = String(req.user.id);
+    const record = ensureUserRecord(req.user);
+    const total = Number(req.body.total);
+    const payout = Number(req.body.payout);
+    const items = Array.isArray(req.body.items) ? req.body.items : [];
+
+    if (!Number.isFinite(total) || total < 0 || !Number.isFinite(payout) || payout < 0) {
+        return res.status(400).json({ error: 'Некорректная сумма продажи' });
+    }
+
+    const sale = {
+        id: `sale_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        createdAt: new Date().toISOString(),
+        total: Number(total.toFixed(2)),
+        payout: Number(payout.toFixed(2)),
+        paymentMethod: String(req.body.paymentMethod || '').slice(0, 30),
+        items: items.slice(0, 100).map(item => String(item).slice(0, 200))
+    };
+
+    if (!Array.isArray(record.sales)) record.sales = [];
+    record.sales.push(sale);
+    record.totalSold = Number((Number(record.totalSold || 0) + sale.total).toFixed(2));
+    record.totalPayout = Number((Number(record.totalPayout || 0) + sale.payout).toFixed(2));
+    record.lastSaleAt = sale.createdAt;
+    userData[steamId] = record;
+    saveUserData();
+
+    res.json({ success: true, saleId: sale.id });
+});
+
+app.get('/admin', (req, res) => {
+    if (!isOwner(req)) return res.status(403).send('Доступ запрещён');
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/profile', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/profile/:publicId', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
 // =====================================================
 // ГЛАВНАЯ
@@ -1109,10 +1075,28 @@ app.get('/', (req, res) => {
 // ЗАПУСК
 // =====================================================
 
-app.listen(PORT, () => {
-    console.log('====================================');
-    console.log('✅ EMERALD Market запущен');
-    console.log(`🌐 PORT: ${PORT}`);
-    console.log(`🌐 BASE_URL: ${BASE_URL}`);
-    console.log('====================================');
-});
+app.listen(
+    PORT,
+    () => {
+
+        console.log(
+            `====================================`
+        );
+
+        console.log(
+            `✅ EMERALD Market запущен`
+        );
+
+        console.log(
+            `🌐 PORT: ${PORT}`
+        );
+
+        console.log(
+            `🌐 BASE_URL: ${BASE_URL}`
+        );
+
+        console.log(
+            `====================================`
+        );
+    }
+);

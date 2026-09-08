@@ -481,6 +481,7 @@
             <a class="active" data-page="sell">Продать скины</a>
             <a data-page="market">Купить скины</a>
             <a data-page="profile">Профиль</a>
+            <a data-page="admin" id="adminNavLink" style="display:none;">Админка</a>
             <a data-page="faq"></a>
             <a data-page="support"></a>
         </nav>
@@ -531,14 +532,6 @@
                     </div>
                     <input type="text" id="sellTradeUrl" placeholder="https://steamcommunity.com/tradeoffer/new/?pa...">
                     <button class="btn" style="width: 100%; margin-top: 8px;" onclick="saveTradeUrl()">Сохранить</button>
-                </div>
-
-                <div class="sidebar-section" id="ownerInventoryBox" style="display:none; border:1px solid #2ecc71;">
-                    <label style="color:#2ecc71;">🔐 Приватный просмотр инвентаря</label>
-                    <div style="font-size:12px; color:#8a8d99; margin-bottom:8px;">Только для внутреннего ID 666</div>
-                    <input type="text" id="ownerTradeUrl" placeholder="Trade URL другого пользователя">
-                    <button class="btn" style="width:100%; margin-top:8px;" onclick="loadExternalInventory()">Посмотреть скины</button>
-                    <div id="ownerInventoryStatus" style="font-size:12px; color:#8a8d99; margin-top:8px;"></div>
                 </div>
 
                 <div class="sidebar-section">
@@ -641,6 +634,13 @@
 <!-- СТРАНИЦА ПРОФИЛЯ -->
 <div class="page" id="profilePage">
     <div class="container">
+        <div id="publicProfileContent" style="display:none;">
+            <div class="profile-login-box" style="max-width:700px;">
+                <div class="icon" style="font-size:64px;">👤</div>
+                <h2>Профиль EMERALD Market</h2>
+                <div id="publicProfileId" style="font-size:24px; color:#2ecc71; font-weight:800; margin-top:12px;">ID: —</div>
+            </div>
+        </div>
         <div id="profileLoginBox" style="display:block;">
             <div class="profile-login-box">
                 <div class="icon" style="font-size: 64px;">🎮</div>
@@ -656,7 +656,7 @@
                         <div class="profile-avatar" id="profileAvatar"></div>
                         <div class="profile-name" id="profileName"></div>
                         <div id="profilePublicId" style="font-size:13px; color:#8a8d99; margin-top:4px;">ID: —</div>
-                        <div class="profile-balance">0,00 ₽</div>
+                        <div class="profile-balance" id="profileBalance">0,00 ₽</div>
                     </div>
 
                     <div class="profile-tabs">
@@ -687,7 +687,7 @@
                     <div class="profile-cards">
                         <div class="profile-card">
                             <div class="icon">🛒</div>
-                            <div class="value">0,00 ₽</div>
+                            <div class="value" id="profileSoldTotal">0,00 ₽</div>
                             <div class="label">Продано на сумму</div>
                         </div>
                         <div class="profile-card">
@@ -745,6 +745,27 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- АДМИНКА -->
+<div class="page" id="adminPage">
+    <div class="container">
+        <div class="sell-hero"><h1>Админка <span>EMERALD Market</span></h1></div>
+        <div class="profile-cards" style="margin-bottom:24px;">
+            <div class="profile-card"><div class="icon">👥</div><div class="value" id="adminUsersCount">0</div><div class="label">Пользователей</div></div>
+            <div class="profile-card"><div class="icon">🛒</div><div class="value" id="adminSalesCount">0</div><div class="label">Продаж</div></div>
+            <div class="profile-card"><div class="icon">💰</div><div class="value" id="adminSoldTotal">0,00 ₽</div><div class="label">Продано на сумму</div></div>
+            <div class="profile-card"><div class="icon">💸</div><div class="value" id="adminPayoutTotal">0,00 ₽</div><div class="label">Начислено пользователям</div></div>
+        </div>
+        <div class="profile-transactions" style="margin-bottom:24px;">
+            <h3>Пользователи</h3>
+            <div style="overflow:auto;"><table class="transaction-table"><thead><tr><th>ID</th><th>Steam ID</th><th>Имя</th><th>Trade URL</th><th>Последний вход</th><th>Продано</th><th>Выплачено</th></tr></thead><tbody id="adminUsersBody"></tbody></table></div>
+        </div>
+        <div class="profile-transactions">
+            <h3>Продажи</h3>
+            <div style="overflow:auto;"><table class="transaction-table"><thead><tr><th>Дата</th><th>ID</th><th>Пользователь</th><th>Сумма</th><th>Выплата</th><th>Метод</th><th>Скины</th></tr></thead><tbody id="adminSalesBody"></tbody></table></div>
         </div>
     </div>
 </div>
@@ -1262,6 +1283,22 @@ function processSale() {
     
     const message = `Привет, у меня есть скины:\n${skinList}\n\nГотов купить их у меня? Если да, погнали в чат ТГК ))\n\nВот мои реквизиты:\n${reqText}`;
     
+    const total = selectedItems.reduce((sum, item) => sum + (Number(item.price) || 0), 0);
+    const payoutPercent = calculatePayoutPercent(total);
+    const payout = total * (payoutPercent / 100);
+    const paymentMethod = requisites.method;
+
+    fetch('/api/record-sale', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            total,
+            payout,
+            paymentMethod,
+            items: selectedItems.map(item => `${item.weapon || 'CS2'} | ${item.skinName || item.name} ${item.quality || 'Field-Tested'}`)
+        })
+    }).catch(error => console.warn('Не удалось записать продажу:', error));
+
     const encodedMessage = encodeURIComponent(message);
     const telegramUrl = `https://t.me/ikiawka?text=${encodedMessage}`;
     window.open(telegramUrl, '_blank');
@@ -1280,6 +1317,105 @@ function updateTotals() {
     document.getElementById('payoutDisplay').textContent = `${payoutAmount.toFixed(2)} ₽`;
 }
 
+function getProfileIdFromPath() {
+    const match = window.location.pathname.match(/^\/profile\/?(\d+)?\/?$/);
+    return match && match[1] ? Number(match[1]) : null;
+}
+
+function navigateTo(page, push = true) {
+    if (page === 'admin' && !currentUser?.isOwner) return;
+
+    if (push) {
+        if (page === 'admin') history.pushState({}, '', '/admin');
+        else if (page === 'profile') history.pushState({}, '', '/profile');
+        else history.pushState({}, '', '/');
+    }
+
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav a').forEach(a => a.classList.toggle('active', a.dataset.page === page));
+    const target = document.getElementById(page + 'Page');
+    if (target) target.classList.add('active');
+
+    if (page === 'profile') renderProfile();
+    if (page === 'admin') loadAdminData();
+}
+
+async function renderPublicProfile(publicId) {
+    const publicBox = document.getElementById('publicProfileContent');
+    const loginBox = document.getElementById('profileLoginBox');
+    const ownContent = document.getElementById('profileContent');
+    if (!publicBox || !loginBox || !ownContent) return;
+
+    if (!publicId) {
+        publicBox.style.display = 'none';
+        if (currentUser) { loginBox.style.display = 'none'; ownContent.style.display = 'block'; }
+        else { loginBox.style.display = 'block'; ownContent.style.display = 'none'; }
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/profile/${publicId}`);
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Профиль не найден');
+        publicBox.style.display = 'block';
+        loginBox.style.display = 'none';
+        ownContent.style.display = 'none';
+        document.getElementById('publicProfileId').textContent = `ID: ${data.publicId}`;
+    } catch (error) {
+        publicBox.style.display = 'block';
+        loginBox.style.display = 'none';
+        ownContent.style.display = 'none';
+        document.getElementById('publicProfileId').textContent = error.message;
+    }
+}
+
+async function loadAdminData() {
+    if (!currentUser?.isOwner) return;
+    try {
+        const response = await fetch('/api/admin/data');
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Ошибка загрузки админки');
+
+        document.getElementById('adminUsersCount').textContent = data.users.length;
+        document.getElementById('adminSalesCount').textContent = data.sales.length;
+        document.getElementById('adminSoldTotal').textContent = `${data.sales.reduce((s,x)=>s+Number(x.total||0),0).toFixed(2)} ₽`;
+        document.getElementById('adminPayoutTotal').textContent = `${data.sales.reduce((s,x)=>s+Number(x.payout||0),0).toFixed(2)} ₽`;
+
+        document.getElementById('adminUsersBody').innerHTML = data.users.map(user => `
+            <tr>
+                <td><a href="/profile/${user.publicId}" onclick="event.preventDefault(); history.pushState({}, '', this.href); navigateTo('profile', false); renderPublicProfile(${user.publicId});" style="color:#2ecc71;">${user.publicId}</a></td>
+                <td>${escapeHtml(user.steamId)}</td>
+                <td>${escapeHtml(user.username)}</td>
+                <td style="max-width:260px; word-break:break-all;">${escapeHtml(user.tradeUrl || '—')}</td>
+                <td>${formatAdminDate(user.lastLoginAt)}</td>
+                <td>${Number(user.totalSold||0).toFixed(2)} ₽</td>
+                <td>${Number(user.totalPayout||0).toFixed(2)} ₽</td>
+            </tr>`).join('') || '<tr><td colspan="7">Пользователей нет</td></tr>';
+
+        document.getElementById('adminSalesBody').innerHTML = data.sales.map(sale => `
+            <tr>
+                <td>${formatAdminDate(sale.createdAt)}</td>
+                <td>${escapeHtml(sale.id)}</td>
+                <td><a href="/profile/${sale.publicId}" onclick="event.preventDefault(); history.pushState({}, '', this.href); navigateTo('profile', false); renderPublicProfile(${sale.publicId});" style="color:#2ecc71;">#${sale.publicId}</a> ${escapeHtml(sale.username)}</td>
+                <td>${Number(sale.total||0).toFixed(2)} ₽</td>
+                <td>${Number(sale.payout||0).toFixed(2)} ₽</td>
+                <td>${escapeHtml(sale.paymentMethod || '—')}</td>
+                <td>${(sale.items || []).map(escapeHtml).join('<br>') || '—'}</td>
+            </tr>`).join('') || '<tr><td colspan="7">Продаж пока нет</td></tr>';
+    } catch (error) {
+        showModal('Ошибка', error.message);
+    }
+}
+
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
+}
+function formatAdminDate(value) {
+    if (!value) return '—';
+    const d = new Date(value);
+    return Number.isNaN(d.getTime()) ? '—' : d.toLocaleString('ru-RU');
+}
+
 async function fetchUser() {
     try {
         const response = await fetch('/api/user');
@@ -1290,10 +1426,21 @@ async function fetchUser() {
                 publicId: Number(data.user.publicId),
                 isOwner: data.user.isOwner === true,
                 name: data.user.name,
-                avatar: data.user.avatar
+                avatar: data.user.avatar,
+                totalSold: Number(data.user.totalSold || 0),
+                totalPayout: Number(data.user.totalPayout || 0)
             };
             updateUserUI();
             renderProfile();
+            const profileId = getProfileIdFromPath();
+            if (profileId) {
+                navigateTo('profile', false);
+                await renderPublicProfile(profileId);
+            } else if (window.location.pathname === '/admin') {
+                navigateTo('admin', false);
+            } else {
+                navigateTo('sell', false);
+            }
             loadTradeUrl();
             loadSettings();
             await fetchMarketPrices();
@@ -1301,6 +1448,13 @@ async function fetchUser() {
             currentUser = null;
             updateUserUI();
             renderProfile();
+            const profileId = getProfileIdFromPath();
+            if (profileId) {
+                navigateTo('profile', false);
+                await renderPublicProfile(profileId);
+            } else {
+                navigateTo('sell', false);
+            }
         }
     } catch (error) {
         console.error('Ошибка загрузки пользователя:', error);
@@ -1323,10 +1477,8 @@ function updateUserUI() {
         actions.innerHTML = `<a href="/auth/steam" class="btn btn-steam">Войти через Steam</a>`;
     }
 
-    const ownerBox = document.getElementById('ownerInventoryBox');
-    if (ownerBox) {
-        ownerBox.style.display = currentUser?.isOwner ? 'block' : 'none';
-    }
+    const adminLink = document.getElementById('adminNavLink');
+    if (adminLink) adminLink.style.display = currentUser?.isOwner ? 'block' : 'none';
 }
 
 // ===== НАСТРОЙКИ =====
@@ -1574,109 +1726,6 @@ async function loadSteamInventory() {
     }
 }
 
-async function loadExternalInventory() {
-    if (!currentUser?.isOwner) {
-        showModal('Ошибка', 'Доступ запрещён');
-        return;
-    }
-
-    const input = document.getElementById('ownerTradeUrl');
-    const status = document.getElementById('ownerInventoryStatus');
-    const grid = document.getElementById('sellSkinGrid');
-    const tradeUrl = input.value.trim();
-
-    if (!tradeUrl) {
-        showModal('Ошибка', 'Введите Trade URL другого пользователя!');
-        return;
-    }
-
-    status.textContent = 'Загружаем инвентарь...';
-    grid.innerHTML = `
-        <div style="grid-column:1/-1; text-align:center; padding:60px; color:#8a8d99;">
-            ⏳ Загружаем чужой инвентарь CS2...
-        </div>
-    `;
-    selectedSteamSkins = [];
-
-    try {
-        const response = await fetch('/api/get-inventory-by-trade-url', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ tradeUrl })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok || data.error) {
-            status.textContent = '';
-            grid.innerHTML = `
-                <div style="grid-column:1/-1; text-align:center; padding:60px; color:#e74c3c;">
-                    ❌ ${escapeHtml(data.error || 'Не удалось загрузить инвентарь')}
-                </div>
-            `;
-            return;
-        }
-
-        const items = data.items || [];
-
-        if (!items.length) {
-            status.textContent = `Steam ID: ${data.targetSteamId || 'не определён'}`;
-            grid.innerHTML = `
-                <div style="grid-column:1/-1; text-align:center; padding:60px; color:#8a8d99;">
-                    <div style="font-size:40px; margin-bottom:15px;">📦</div>
-                    <div style="font-size:16px; margin-bottom:8px;">Скины не найдены</div>
-                    <div>Возможно, инвентарь закрыт или в нём нет подходящих предметов.</div>
-                </div>
-            `;
-            return;
-        }
-
-        const prepared = items.map((item) => {
-            const parsed = parseSkinName(item.name);
-            const marketData = getMarketPrice(item.name);
-            return {
-                ...item,
-                price: marketData?.price || 0,
-                weapon: marketData?.weapon || parsed.weapon,
-                skinName: marketData?.skinName || parsed.skinName,
-                quality: parsed.quality
-            };
-        });
-
-        status.textContent = `Steam ID: ${data.targetSteamId} • Найдено: ${prepared.length}`;
-
-        grid.innerHTML = prepared.map((item) => {
-            const fullName = `${item.weapon || 'CS2'} | ${item.skinName || item.name}`;
-            const price = item.price ? `${item.price.toFixed(2)} ₽` : 'Цена не указана';
-
-            return `
-                <div class="sell-skin-card" style="cursor:default;">
-                    <div class="image">
-                        ${item.image ? `
-                            <img src="${item.image}" alt="${escapeHtml(fullName)}" loading="lazy">
-                        ` : `
-                            <span style="color:#666; font-size:30px;">🎮</span>
-                        `}
-                    </div>
-                    <div class="skin-info">
-                        <div class="skin-full-name">${escapeHtml(fullName)}</div>
-                        <div class="skin-quality">${escapeHtml(item.quality || 'Field-Tested')}</div>
-                        <div class="skin-price">${escapeHtml(price)}</div>
-                    </div>
-                </div>
-            `;
-        }).join('');
-
-    } catch (error) {
-        status.textContent = '';
-        grid.innerHTML = `
-            <div style="grid-column:1/-1; text-align:center; padding:60px; color:#e74c3c;">
-                ❌ Ошибка подключения к серверу.
-            </div>
-        `;
-        console.error('Ошибка просмотра чужого инвентаря:', error);
-    }
-}
 
 function escapeHtml(text) {
     return String(text)
@@ -1713,33 +1762,19 @@ function updateSkinSelectionUI() {
     });
 }
 
-// ===== НАВИГАЦИЯ =====
-function navigateTo(page) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    const target = document.getElementById(page + 'Page');
-    if (target) target.classList.add('active');
-    document.querySelectorAll('.nav a').forEach(a => {
-        if (a.dataset.page === page) {
-            a.classList.add('active');
-        } else {
-            a.classList.remove('active');
-        }
-    });
-}
-
 // ===== ПРОФИЛЬ =====
 function renderProfile() {
     if (currentUser) {
         document.getElementById('profileLoginBox').style.display = 'none';
         document.getElementById('profileContent').style.display = 'block';
         document.getElementById('profileName').textContent = currentUser.name;
+        const soldEl = document.getElementById('profileSoldTotal');
+        const balanceEl = document.getElementById('profileBalance');
+        if (soldEl) soldEl.textContent = `${Number(currentUser.totalSold || 0).toFixed(2)} ₽`;
+        if (balanceEl) balanceEl.textContent = `${Number(currentUser.totalPayout || 0).toFixed(2)} ₽`;
         const publicIdEl = document.getElementById('profilePublicId');
         if (publicIdEl) {
             publicIdEl.textContent = `ID: ${currentUser.publicId || '—'}`;
-        }
-        const ownerBox = document.getElementById('ownerInventoryBox');
-        if (ownerBox) {
-            ownerBox.style.display = currentUser.isOwner ? 'block' : 'none';
         }
         if (currentUser.avatar) {
             document.getElementById('profileAvatar').style.backgroundImage = `url('${currentUser.avatar}')`;
@@ -1820,6 +1855,12 @@ document.addEventListener('DOMContentLoaded', function() {
         updateSkinSelectionUI();
         showModal('Успех', `Выбрано ${selectedSteamSkins.length} скинов`);
     });
+});
+window.addEventListener('popstate', async () => {
+    const profileId = getProfileIdFromPath();
+    if (profileId) { navigateTo('profile', false); await renderPublicProfile(profileId); }
+    else if (window.location.pathname === '/admin') navigateTo('admin', false);
+    else navigateTo('sell', false);
 });
 </script>
 </body>
