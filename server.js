@@ -1109,14 +1109,10 @@ app.get('/', (req, res) => {
 // ЗАПУСК
 // =====================================================
 
-app.listen(
-    PORT,
-    () => {
-
-        console.log(
-            `====================================`
-        );
-
-        console.log(
-            `✅ EMERALD Market запущен`
-    
+app.listen(PORT, () => {
+    console.log('====================================');
+    console.log('✅ EMERALD Market запущен');
+    console.log(`🌐 PORT: ${PORT}`);
+    console.log(`🌐 BASE_URL: ${BASE_URL}`);
+    console.log('====================================');
+});
