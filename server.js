@@ -1224,15 +1224,26 @@ function makeApiKey() {
 }
 
 function getMailer() {
-    const host = process.env.EMAIL_HOST;
     const user = process.env.EMAIL_USER;
     const pass = process.env.EMAIL_PASS;
-    if (!host || !user || !pass) return null;
+    if (!user || !pass) return null;
+
+    // По умолчанию поддерживаем Gmail. Для другого почтового сервиса
+    // достаточно указать EMAIL_HOST / EMAIL_PORT / EMAIL_SECURE в Render.
+    const host = process.env.EMAIL_HOST || 'smtp.gmail.com';
+    const port = Number(process.env.EMAIL_PORT || 465);
+    const secure = process.env.EMAIL_SECURE
+        ? String(process.env.EMAIL_SECURE).toLowerCase() === 'true'
+        : port === 465;
+
     return nodemailer.createTransport({
         host,
-        port: Number(process.env.EMAIL_PORT || 587),
-        secure: String(process.env.EMAIL_SECURE || '').toLowerCase() === 'true',
-        auth: { user, pass }
+        port,
+        secure,
+        auth: { user, pass },
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 20000
     });
 }
 
@@ -1587,6 +1598,51 @@ app.post('/api/admin/manage-user', async (req, res) => {
 });
 
 // Владелец меняет статус заявки: продажа остаётся в истории в любом случае.
+// Администратор может удалить только конкретную заявку продажи.
+// Пользователь при этом НЕ удаляется.
+app.delete('/api/admin/sales/:saleId', async (req, res) => {
+    if (!(await isAdmin(req))) return res.status(403).json({ error: 'Доступ запрещён' });
+    if (!requireDatabase(res)) return;
+
+    const saleId = String(req.params.saleId || '').trim();
+    if (!saleId || saleId.length > 200) return res.status(400).json({ error: 'Некорректный ID продажи' });
+
+    try {
+        const result = await pool.query(
+            'DELETE FROM sales WHERE id=$1 RETURNING id, steam_id',
+            [saleId]
+        );
+        if (!result.rowCount) return res.status(404).json({ error: 'Продажа не найдена' });
+
+        const steamId = String(result.rows[0].steam_id);
+        const record = userData[steamId];
+        if (record) {
+            const salesResult = await pool.query(
+                'SELECT * FROM sales WHERE steam_id=$1 ORDER BY created_at',
+                [steamId]
+            );
+            record.sales = salesResult.rows.map(row => ({
+                id: row.id,
+                createdAt: new Date(row.created_at).toISOString(),
+                total: Number(row.total),
+                payout: Number(row.payout),
+                paymentMethod: row.payment_method || '',
+                items: Array.isArray(row.items) ? row.items : [],
+                status: row.status === 'sold' ? 'sold' : (row.status === 'not_sold' ? 'not_sold' : 'pending')
+            }));
+            const soldRows = salesResult.rows.filter(row => row.status === 'sold');
+            record.totalSold = Number(soldRows.reduce((sum, row) => sum + Number(row.total || 0), 0).toFixed(2));
+            record.totalPayout = Number(soldRows.reduce((sum, row) => sum + Number(row.payout || 0), 0).toFixed(2));
+            await upsertUserToDb(record);
+        }
+
+        res.json({ success: true, saleId });
+    } catch (error) {
+        console.error('Ошибка удаления продажи:', error.message);
+        res.status(500).json({ error: 'Не удалось удалить продажу' });
+    }
+});
+
 app.post('/api/admin/sales/:saleId/status', async (req, res) => {
     if (!(await isAdmin(req))) return res.status(403).json({ error: 'Доступ запрещён' });
     const saleId = String(req.params.saleId);

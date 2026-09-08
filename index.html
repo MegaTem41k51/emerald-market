@@ -594,6 +594,16 @@
         .api-key-row input { flex:1; background:#080e0b; border:1px solid rgba(255,255,255,.1); border-radius:9px; padding:12px 14px; color:#eaf5ee; font-family:monospace; letter-spacing:.06em; }
         .api-doc { color:#45e991; font-weight:800; text-decoration:none; }
         .api-note { margin-top:14px; color:#8c9d94; font-size:11px; line-height:1.5; }
+        .email-code-modal { width:min(520px, calc(100vw - 32px)); padding:28px; border-radius:18px; background:linear-gradient(145deg,#1d2638,#172031); border:1px solid rgba(125,145,210,.22); box-shadow:0 30px 90px rgba(0,0,0,.5); text-align:center; }
+        .email-code-modal h2 { margin:0; color:#f5f7ff; font-size:21px; }
+        .email-code-modal p { margin:18px auto 24px; color:#aeb6c9; line-height:1.45; max-width:390px; }
+        .email-code-inputs { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin-bottom:18px; }
+        .email-code-input { width:100%; box-sizing:border-box; height:62px; border-radius:9px; border:1px solid #43506b; background:#2b354d; color:#f7f9ff; text-align:center; font-size:25px; font-weight:800; outline:none; }
+        .email-code-input:focus { border-color:#7283e8; box-shadow:0 0 0 2px rgba(114,131,232,.15); }
+        .email-modal-close { position:absolute; top:14px; right:14px; border:0; width:30px; height:30px; border-radius:8px; background:#2b354d; color:#aeb6c9; cursor:pointer; font-weight:900; }
+        .email-code-modal-wrap { position:relative; }
+        .sale-delete-btn { width:30px; height:30px; padding:0; margin-left:8px; border-radius:8px; border:1px solid rgba(255,90,90,.32); background:rgba(255,70,70,.07); color:#ff8d8d; font-size:18px; line-height:28px; font-weight:900; cursor:pointer; vertical-align:middle; }
+        .sale-delete-btn:hover { background:rgba(255,70,70,.16); transform:translateY(-1px); }
         @media(max-width:900px){ .session-row{grid-template-columns:1fr 1fr;} .session-kill{grid-column:1/-1; justify-self:start;} }
         @media(max-width:600px){ .session-row{grid-template-columns:1fr;} .email-row,.email-code-row,.api-key-row{flex-direction:column;} }
     </style>
@@ -608,6 +618,26 @@
         <h2 id="modalTitle">Заголовок</h2>
         <p id="modalText">Текст</p>
         <button class="btn" onclick="closeModal()">ОК</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="emailCodeModal" style="display:none;">
+    <div class="email-code-modal-wrap">
+        <div class="email-code-modal">
+            <button class="email-modal-close" type="button" onclick="closeEmailCodeModal()">×</button>
+            <h2>✉️ Подтверждение Email</h2>
+            <p>Мы отправили вам письмо с кодом на почтовый адрес<br><strong id="emailCodeTarget"></strong></p>
+            <div class="email-code-inputs" id="emailCodeInputs">
+                <input class="email-code-input" maxlength="1" inputmode="numeric" autocomplete="one-time-code">
+                <input class="email-code-input" maxlength="1" inputmode="numeric">
+                <input class="email-code-input" maxlength="1" inputmode="numeric">
+                <input class="email-code-input" maxlength="1" inputmode="numeric">
+                <input class="email-code-input" maxlength="1" inputmode="numeric">
+                <input class="email-code-input" maxlength="1" inputmode="numeric">
+            </div>
+            <button class="btn" type="button" style="width:100%;" onclick="verifyEmailCode(true)">Подтвердить</button>
+            <div id="emailModalMessage" class="profile-section-muted" style="margin-top:12px;"></div>
+        </div>
     </div>
 </div>
 
@@ -1715,7 +1745,7 @@ async function loadAdminData() {
                 <td>${Number(sale.payout||0).toFixed(2)} ₽</td>
                 <td>${escapeHtml(sale.paymentMethod || '—')}</td>
                 <td>${(sale.items || []).map(escapeHtml).join('<br>') || '—'}</td>
-                <td style="white-space:nowrap;">${sale.status === 'pending' ? `<div class="sale-pending-actions"><button class="sale-status-btn" onclick="setSaleStatus('${sale.id}','sold')">Продал</button><button class="sale-status-btn no" onclick="setSaleStatus('${sale.id}','not_sold')">Не продал</button></div>` : (sale.status === 'sold' ? '<span style="color:#2ecc71;font-weight:800;">Продал</span>' : '<span style="color:#ff6b6b;font-weight:800;">Не продал</span>')}<button class="admin-danger-btn" style="margin-top:7px;" onclick="deleteUserFromSale('${sale.publicId}')">Удалить пользователя</button></td>
+                <td style="white-space:nowrap;">${sale.status === 'pending' ? `<div class="sale-pending-actions"><button class="sale-status-btn" onclick="setSaleStatus('${sale.id}','sold')">Продал</button><button class="sale-status-btn no" onclick="setSaleStatus('${sale.id}','not_sold')">Не продал</button></div>` : (sale.status === 'sold' ? '<span style="color:#2ecc71;font-weight:800;">Продал</span>' : '<span style="color:#ff6b6b;font-weight:800;">Не продал</span>')}<button class="sale-delete-btn" title="Удалить продажу" onclick="deleteSale('${sale.id}')">×</button></td>
             </tr>`).join('') || '<tr><td colspan="8">Продаж пока нет</td></tr>';
     } catch (error) {
         showModal('Ошибка', error.message);
@@ -1816,13 +1846,13 @@ async function setSaleStatus(saleId, status) {
     }
 }
 
-async function deleteUserFromSale(publicId) {
+async function deleteSale(saleId) {
     if (!currentUser?.isOwner) return;
-    if (!confirm(`Удалить пользователя #${publicId} вместе с его продажами? Это действие нельзя отменить.`)) return;
+    if (!confirm('Удалить эту продажу? Пользователь и его аккаунт останутся.')) return;
     try {
-        const response = await fetch(`/api/admin/users/${encodeURIComponent(publicId)}`, { method: 'DELETE' });
+        const response = await fetch(`/api/admin/sales/${encodeURIComponent(saleId)}`, { method: 'DELETE' });
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Не удалось удалить пользователя');
+        if (!response.ok) throw new Error(data.error || 'Не удалось удалить продажу');
         await loadAdminData();
     } catch (error) {
         showModal('Ошибка', error.message);
@@ -2220,6 +2250,8 @@ function renderProfile() {
     }
 }
 
+setupEmailCodeInputs();
+
 async function loadProfileSections() {
     await Promise.allSettled([loadEmailVerification(), loadProfileSessions(), loadProfileApiKey()]);
 }
@@ -2244,6 +2276,43 @@ async function loadEmailVerification() {
     } catch(e) {}
 }
 
+function openEmailCodeModal(email) {
+    const modal = document.getElementById('emailCodeModal');
+    const target = document.getElementById('emailCodeTarget');
+    const msg = document.getElementById('emailModalMessage');
+    if (!modal) return;
+    target.textContent = email;
+    msg.textContent = '';
+    document.querySelectorAll('#emailCodeInputs .email-code-input').forEach(input => input.value = '');
+    modal.style.display = 'flex';
+    setTimeout(() => document.querySelector('#emailCodeInputs .email-code-input')?.focus(), 50);
+}
+
+function closeEmailCodeModal() {
+    const modal = document.getElementById('emailCodeModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function setupEmailCodeInputs() {
+    const inputs = [...document.querySelectorAll('#emailCodeInputs .email-code-input')];
+    inputs.forEach((input, index) => {
+        input.addEventListener('input', () => {
+            input.value = input.value.replace(/\D/g, '').slice(0, 1);
+            if (input.value && inputs[index + 1]) inputs[index + 1].focus();
+        });
+        input.addEventListener('keydown', event => {
+            if (event.key === 'Backspace' && !input.value && inputs[index - 1]) inputs[index - 1].focus();
+        });
+        input.addEventListener('paste', event => {
+            const pasted = (event.clipboardData?.getData('text') || '').replace(/\D/g, '').slice(0, 6);
+            if (!pasted) return;
+            event.preventDefault();
+            inputs.forEach((el, i) => el.value = pasted[i] || '');
+            inputs[Math.min(pasted.length, 6) - 1]?.focus();
+        });
+    });
+}
+
 async function requestEmailCode() {
     const email = document.getElementById('profileEmail').value.trim();
     const msg = document.getElementById('emailVerifyMessage');
@@ -2252,22 +2321,28 @@ async function requestEmailCode() {
         const r = await fetch('/api/profile/email/request', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email})});
         const d = await r.json();
         if (!r.ok) throw new Error(d.error || 'Не удалось отправить код');
-        document.getElementById('emailCodeRow').classList.add('show');
         msg.textContent = '✓ Код отправлен на указанную почту. Он действует 10 минут.';
+        openEmailCodeModal(email);
     } catch(e) { msg.textContent = `✕ ${e.message}`; }
 }
 
-async function verifyEmailCode() {
-    const code = document.getElementById('profileEmailCode').value.trim();
-    const msg = document.getElementById('emailVerifyMessage');
+async function verifyEmailCode(fromModal = false) {
+    const inputs = [...document.querySelectorAll('#emailCodeInputs .email-code-input')];
+    const code = fromModal ? inputs.map(x => x.value).join('') : document.getElementById('profileEmailCode')?.value.trim();
+    const msg = fromModal ? document.getElementById('emailModalMessage') : document.getElementById('emailVerifyMessage');
+    if (!/^\d{6}$/.test(code || '')) { msg.textContent = '✕ Введите 6-значный код'; return; }
     try {
         const r = await fetch('/api/profile/email/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({code})});
         const d = await r.json();
         if (!r.ok) throw new Error(d.error || 'Не удалось подтвердить Email');
         document.getElementById('emailVerifyStatus').textContent = 'Подтвержден';
         document.getElementById('emailVerifyStatus').className = 'verify-status verify-ok';
-        document.getElementById('emailCodeRow').classList.remove('show');
-        msg.textContent = `✓ Email ${d.email} подтвержден.`;
+        document.getElementById('emailCodeRow')?.classList.remove('show');
+        document.getElementById('emailVerifyMessage').textContent = `✓ Email ${d.email} подтвержден.`;
+        if (fromModal) {
+            msg.textContent = '✓ Email успешно подтвержден.';
+            setTimeout(closeEmailCodeModal, 700);
+        }
     } catch(e) { msg.textContent = `✕ ${e.message}`; }
 }
 
