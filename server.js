@@ -22,7 +22,12 @@ const BASE_URL =
     process.env.BASE_URL ||
     'https://emerald-market-2.onrender.com';
 
-const DATABASE_URL = process.env.DATABASE_URL;
+const DATABASE_URL = process.env.DATABASE_URL || (() => {
+    const { PGHOST, PGUSER, PGPASSWORD, PGDATABASE, PGPORT } = process.env;
+    if (!PGHOST || !PGUSER || !PGPASSWORD || !PGDATABASE) return '';
+    const port = PGPORT || '5432';
+    return `postgresql://${encodeURIComponent(PGUSER)}:${encodeURIComponent(PGPASSWORD)}@${PGHOST}:${port}/${PGDATABASE}`;
+})();
 
 // =====================================================
 // ВНУТРЕННИЕ ID / ПРИВАТНЫЙ ДОСТУП
@@ -158,7 +163,7 @@ app.get('/api/user', async (req, res) => {
 // =====================================================
 
 if (!DATABASE_URL) {
-    console.warn('⚠️ DATABASE_URL не задан. Для Render добавьте PostgreSQL и переменную DATABASE_URL.');
+    console.warn('⚠️ PostgreSQL не настроен. Добавьте DATABASE_URL в Render → Environment (или PGHOST/PGUSER/PGPASSWORD/PGDATABASE).');
 }
 
 const pool = DATABASE_URL
@@ -174,6 +179,11 @@ let dbReady = false;
 
 async function initDatabase() {
     if (!pool) return;
+    try { await pool.query('SELECT 1'); }
+    catch (error) {
+        console.error('❌ PostgreSQL: не удалось подключиться:', error.message);
+        throw error;
+    }
 
     await pool.query(`
         CREATE TABLE IF NOT EXISTS users (
@@ -333,7 +343,7 @@ async function waitForDatabase() {
 
 function requireDatabase(res) {
     if (!pool || !dbReady) {
-        res.status(503).json({ error: 'База данных не подключена. Добавьте DATABASE_URL в Render → Environment.' });
+        res.status(503).json({ error: 'База данных не подключена. В Render добавьте DATABASE_URL (Internal Database URL) и перезапустите сервис.' });
         return false;
     }
     return true;
