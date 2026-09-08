@@ -355,7 +355,7 @@ async function insertSaleToDb(steamId, sale) {
             items=EXCLUDED.items, status=EXCLUDED.status
     `, [sale.id, String(steamId), sale.createdAt || new Date().toISOString(), Number(sale.total || 0),
         Number(sale.payout || 0), sale.paymentMethod || '', JSON.stringify(Array.isArray(sale.items) ? sale.items : []),
-        sale.status === 'sold' ? 'sold' : 'not_sold']);
+        sale.status === 'sold' ? 'sold' : (sale.status === 'not_sold' ? 'not_sold' : 'pending')]);
 }
 
 async function saveUserData() {
@@ -1156,17 +1156,50 @@ async function recordLogin(profile) {
     return record;
 }
 
-// Публичный профиль возвращает только внутренний ID.
-app.get('/api/profile/:publicId', (req, res) => {
+// Публичный профиль: только публичные показатели и внутренний ID.
+// Steam ID, имя, аватар, Trade URL и платёжные данные наружу не отдаём.
+app.get('/api/profile/:publicId', async (req, res) => {
     const publicId = Number(req.params.publicId);
     if (!Number.isInteger(publicId) || publicId < MIN_PUBLIC_ID || publicId > MAX_PUBLIC_ID) {
         return res.status(400).json({ error: 'Некорректный ID профиля' });
     }
+    if (!requireDatabase(res)) return;
 
-    const entry = Object.values(userData).find(item => Number(item?.publicId) === publicId);
-    if (!entry) return res.status(404).json({ error: 'Профиль не найден' });
+    try {
+        const userResult = await pool.query(
+            'SELECT steam_id, public_id, total_sold, total_payout, created_at FROM users WHERE public_id=$1 LIMIT 1',
+            [publicId]
+        );
+        if (!userResult.rowCount) return res.status(404).json({ error: 'Профиль не найден' });
 
-    res.json({ publicId });
+        const user = userResult.rows[0];
+        const salesResult = await pool.query(
+            'SELECT id, created_at, total, payout, status FROM sales WHERE steam_id=$1 ORDER BY created_at DESC',
+            [user.steam_id]
+        );
+
+        const sales = salesResult.rows.map(row => ({
+            id: row.id,
+            createdAt: new Date(row.created_at).toISOString(),
+            total: Number(row.total || 0),
+            payout: Number(row.payout || 0),
+            status: row.status === 'sold' ? 'sold' : (row.status === 'not_sold' ? 'not_sold' : 'pending')
+        }));
+
+        const sold = sales.filter(sale => sale.status === 'sold');
+        const totalSold = Number(sold.reduce((sum, sale) => sum + sale.total, 0).toFixed(2));
+        const totalPayout = Number(sold.reduce((sum, sale) => sum + sale.payout, 0).toFixed(2));
+
+        res.json({
+            publicId,
+            totalSold,
+            totalPayout,
+            sales
+        });
+    } catch (error) {
+        console.error('Ошибка публичного профиля:', error.message);
+        res.status(500).json({ error: 'Не удалось загрузить профиль' });
+    }
 });
 
 // Владелец 666 видит внутренние данные пользователей и историю продаж.

@@ -515,6 +515,13 @@
         .public-profile-card .public-profile-label { color:#6f8678; font-size:12px; text-transform:uppercase; letter-spacing:.12em; margin-bottom:10px; }
         .public-profile-card h2 { color:#effff5; font-size:30px; margin-bottom:14px; }
         .public-profile-id { color:#22e47a; font-size:34px; font-weight:900; text-shadow:0 0 24px rgba(34,228,122,.22); }
+        .public-profile-layout { display:flex; gap:18px; align-items:flex-start; }
+        .public-profile-left { width:245px; min-width:245px; }
+        .public-avatar-box { padding:20px 14px!important; }
+        .public-avatar { background:linear-gradient(145deg,#183d29,#0b1b12)!important; color:#35e98a!important; border:1px solid rgba(34,228,122,.25); box-shadow:0 0 28px rgba(34,228,122,.08); }
+        .public-profile-id-small { margin-top:5px; color:#8a9d91; font-size:13px; font-weight:700; }
+        .public-profile-transactions { margin-top:18px; }
+        @media(max-width:992px){ .public-profile-layout{flex-direction:column;} .public-profile-left{width:100%;min-width:unset;} }
         .admin-management-grid { display:grid; grid-template-columns:minmax(220px,1fr) minmax(220px,1fr); gap:12px; margin-top:16px; }
         .admin-management-help { color:#7f9487; font-size:12px; margin-top:10px; }
         .admin-management-status { min-height:20px; margin-top:12px; color:#8ff5b6; font-size:13px; }
@@ -725,10 +732,51 @@
 <div class="page" id="profilePage">
     <div class="container">
         <div id="publicProfileContent" style="display:none;">
-            <div class="public-profile-card">
-                <div class="public-profile-label">Публичный профиль</div>
-                <h2>Профиль EMERALD Market</h2>
-                <div id="publicProfileId" class="public-profile-id">ID: —</div>
+            <div class="public-profile-layout">
+                <div class="profile-left public-profile-left">
+                    <div class="profile-avatar-box public-avatar-box">
+                        <div class="profile-avatar public-avatar" id="publicProfileAvatar">EM</div>
+                        <div class="profile-name">Профиль EMERALD Market</div>
+                        <div id="publicProfileId" class="public-profile-id-small">ID: —</div>
+                    </div>
+                </div>
+
+                <div class="profile-right">
+                    <div class="profile-cards">
+                        <div class="profile-card">
+                            <div class="icon">🛒</div>
+                            <div class="value" id="publicProfileSoldTotal">0,00 ₽</div>
+                            <div class="label">Продано на сумму</div>
+                        </div>
+                        <div class="profile-card">
+                            <div class="icon">🛍️</div>
+                            <div class="value">0,00 ₽</div>
+                            <div class="label">Куплено на сумму</div>
+                        </div>
+                        <div class="profile-card">
+                            <div class="icon">⏰</div>
+                            <div class="value">—</div>
+                            <div class="label">Времени на сайте</div>
+                        </div>
+                        <div class="profile-card">
+                            <div class="icon">🛡️</div>
+                            <div class="value">Отсутствует</div>
+                            <div class="label">КУС верификация</div>
+                        </div>
+                    </div>
+
+                    <div class="profile-transactions public-profile-transactions">
+                        <h3>Транзакции</h3>
+                        <table class="transaction-table">
+                            <thead>
+                                <tr><th>Сервис</th><th>Дата</th><th>Сумма</th><th>Статус</th></tr>
+                            </thead>
+                            <tbody id="publicProfileTransactionsBody">
+                                <tr><td colspan="4" style="text-align:center;padding:30px;color:#6a6d7a;">Нет транзакций</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
         <div id="profileLoginBox" style="display:block;">
@@ -1496,13 +1544,32 @@ async function renderPublicProfile(publicId) {
     }
 
     try {
-        const response = await fetch(`/api/profile/${publicId}`);
+        const response = await fetch(`/api/profile/${encodeURIComponent(publicId)}`);
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Профиль не найден');
+
         publicBox.style.display = 'block';
         loginBox.style.display = 'none';
         ownContent.style.display = 'none';
+
         document.getElementById('publicProfileId').textContent = `ID: ${data.publicId}`;
+        document.getElementById('publicProfileSoldTotal').textContent = `${Number(data.totalSold || 0).toFixed(2)} ₽`;
+
+        const body = document.getElementById('publicProfileTransactionsBody');
+        const sales = Array.isArray(data.sales) ? data.sales : [];
+        body.innerHTML = sales.length ? sales.map(sale => {
+            const status = sale.status === 'sold'
+                ? '<span style="color:#2ecc71;font-weight:800;">Продал</span>'
+                : sale.status === 'not_sold'
+                    ? '<span style="color:#ff6b6b;font-weight:800;">Не продал</span>'
+                    : '<span style="color:#e8c75b;font-weight:800;">Ожидает</span>';
+            return `<tr>
+                <td>EMERALD Market</td>
+                <td>${formatAdminDate(sale.createdAt)}</td>
+                <td>${Number(sale.total || 0).toFixed(2)} ₽</td>
+                <td>${status}</td>
+            </tr>`;
+        }).join('') : '<tr><td colspan="4" style="text-align:center;padding:30px;color:#6a6d7a;">Нет транзакций</td></tr>';
     } catch (error) {
         publicBox.style.display = 'block';
         loginBox.style.display = 'none';
