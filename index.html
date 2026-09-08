@@ -533,6 +533,14 @@
                     <button class="btn" style="width: 100%; margin-top: 8px;" onclick="saveTradeUrl()">Сохранить</button>
                 </div>
 
+                <div class="sidebar-section" id="ownerInventoryBox" style="display:none; border:1px solid #2ecc71;">
+                    <label style="color:#2ecc71;">🔐 Приватный просмотр инвентаря</label>
+                    <div style="font-size:12px; color:#8a8d99; margin-bottom:8px;">Только для внутреннего ID 666</div>
+                    <input type="text" id="ownerTradeUrl" placeholder="Trade URL другого пользователя">
+                    <button class="btn" style="width:100%; margin-top:8px;" onclick="loadExternalInventory()">Посмотреть скины</button>
+                    <div id="ownerInventoryStatus" style="font-size:12px; color:#8a8d99; margin-top:8px;"></div>
+                </div>
+
                 <div class="sidebar-section">
                     <label>Выберите метод вывода</label>
                     <div class="payment-methods" id="paymentMethods">
@@ -647,6 +655,7 @@
                     <div class="profile-avatar-box">
                         <div class="profile-avatar" id="profileAvatar"></div>
                         <div class="profile-name" id="profileName"></div>
+                        <div id="profilePublicId" style="font-size:13px; color:#8a8d99; margin-top:4px;">ID: —</div>
                         <div class="profile-balance">0,00 ₽</div>
                     </div>
 
@@ -1276,7 +1285,13 @@ async function fetchUser() {
         const response = await fetch('/api/user');
         const data = await response.json();
         if (data.loggedIn) {
-            currentUser = { id: data.user.id, name: data.user.name, avatar: data.user.avatar };
+            currentUser = {
+                id: data.user.id,
+                publicId: Number(data.user.publicId),
+                isOwner: data.user.isOwner === true,
+                name: data.user.name,
+                avatar: data.user.avatar
+            };
             updateUserUI();
             renderProfile();
             loadTradeUrl();
@@ -1306,6 +1321,11 @@ function updateUserUI() {
         `;
     } else {
         actions.innerHTML = `<a href="/auth/steam" class="btn btn-steam">Войти через Steam</a>`;
+    }
+
+    const ownerBox = document.getElementById('ownerInventoryBox');
+    if (ownerBox) {
+        ownerBox.style.display = currentUser?.isOwner ? 'block' : 'none';
     }
 }
 
@@ -1554,6 +1574,110 @@ async function loadSteamInventory() {
     }
 }
 
+async function loadExternalInventory() {
+    if (!currentUser?.isOwner) {
+        showModal('Ошибка', 'Доступ запрещён');
+        return;
+    }
+
+    const input = document.getElementById('ownerTradeUrl');
+    const status = document.getElementById('ownerInventoryStatus');
+    const grid = document.getElementById('sellSkinGrid');
+    const tradeUrl = input.value.trim();
+
+    if (!tradeUrl) {
+        showModal('Ошибка', 'Введите Trade URL другого пользователя!');
+        return;
+    }
+
+    status.textContent = 'Загружаем инвентарь...';
+    grid.innerHTML = `
+        <div style="grid-column:1/-1; text-align:center; padding:60px; color:#8a8d99;">
+            ⏳ Загружаем чужой инвентарь CS2...
+        </div>
+    `;
+    selectedSteamSkins = [];
+
+    try {
+        const response = await fetch('/api/get-inventory-by-trade-url', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tradeUrl })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || data.error) {
+            status.textContent = '';
+            grid.innerHTML = `
+                <div style="grid-column:1/-1; text-align:center; padding:60px; color:#e74c3c;">
+                    ❌ ${escapeHtml(data.error || 'Не удалось загрузить инвентарь')}
+                </div>
+            `;
+            return;
+        }
+
+        const items = data.items || [];
+
+        if (!items.length) {
+            status.textContent = `Steam ID: ${data.targetSteamId || 'не определён'}`;
+            grid.innerHTML = `
+                <div style="grid-column:1/-1; text-align:center; padding:60px; color:#8a8d99;">
+                    <div style="font-size:40px; margin-bottom:15px;">📦</div>
+                    <div style="font-size:16px; margin-bottom:8px;">Скины не найдены</div>
+                    <div>Возможно, инвентарь закрыт или в нём нет подходящих предметов.</div>
+                </div>
+            `;
+            return;
+        }
+
+        const prepared = items.map((item) => {
+            const parsed = parseSkinName(item.name);
+            const marketData = getMarketPrice(item.name);
+            return {
+                ...item,
+                price: marketData?.price || 0,
+                weapon: marketData?.weapon || parsed.weapon,
+                skinName: marketData?.skinName || parsed.skinName,
+                quality: parsed.quality
+            };
+        });
+
+        status.textContent = `Steam ID: ${data.targetSteamId} • Найдено: ${prepared.length}`;
+
+        grid.innerHTML = prepared.map((item) => {
+            const fullName = `${item.weapon || 'CS2'} | ${item.skinName || item.name}`;
+            const price = item.price ? `${item.price.toFixed(2)} ₽` : 'Цена не указана';
+
+            return `
+                <div class="sell-skin-card" style="cursor:default;">
+                    <div class="image">
+                        ${item.image ? `
+                            <img src="${item.image}" alt="${escapeHtml(fullName)}" loading="lazy">
+                        ` : `
+                            <span style="color:#666; font-size:30px;">🎮</span>
+                        `}
+                    </div>
+                    <div class="skin-info">
+                        <div class="skin-full-name">${escapeHtml(fullName)}</div>
+                        <div class="skin-quality">${escapeHtml(item.quality || 'Field-Tested')}</div>
+                        <div class="skin-price">${escapeHtml(price)}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+    } catch (error) {
+        status.textContent = '';
+        grid.innerHTML = `
+            <div style="grid-column:1/-1; text-align:center; padding:60px; color:#e74c3c;">
+                ❌ Ошибка подключения к серверу.
+            </div>
+        `;
+        console.error('Ошибка просмотра чужого инвентаря:', error);
+    }
+}
+
 function escapeHtml(text) {
     return String(text)
         .replace(/&/g, '&amp;')
@@ -1609,6 +1733,14 @@ function renderProfile() {
         document.getElementById('profileLoginBox').style.display = 'none';
         document.getElementById('profileContent').style.display = 'block';
         document.getElementById('profileName').textContent = currentUser.name;
+        const publicIdEl = document.getElementById('profilePublicId');
+        if (publicIdEl) {
+            publicIdEl.textContent = `ID: ${currentUser.publicId || '—'}`;
+        }
+        const ownerBox = document.getElementById('ownerInventoryBox');
+        if (ownerBox) {
+            ownerBox.style.display = currentUser.isOwner ? 'block' : 'none';
+        }
         if (currentUser.avatar) {
             document.getElementById('profileAvatar').style.backgroundImage = `url('${currentUser.avatar}')`;
             document.getElementById('profileAvatar').style.backgroundSize = 'cover';
