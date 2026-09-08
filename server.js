@@ -9,6 +9,7 @@ const path = require('path');
 const { Pool } = require('pg');
 
 const app = express();
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
 
 // =====================================================
@@ -123,9 +124,16 @@ app.get(
 );
 
 // Выход
-app.get('/logout', (req, res) => {
+app.get('/logout', async (req, res) => {
+    try {
+        if (pool && dbReady && req.sessionID && req.user) {
+            await pool.query('DELETE FROM user_sessions WHERE session_id=$1 AND steam_id=$2', [String(req.sessionID), String(req.user.id)]);
+        }
+    } catch (error) {
+        console.error('⚠️ Ошибка удаления сессии:', error.message);
+    }
     req.logout(() => {
-        res.redirect('/');
+        req.session.destroy(() => res.redirect('/'));
     });
 });
 
@@ -193,6 +201,86 @@ console.log(`🔎 PostgreSQL env: ${DATABASE_URL ? 'URL найден' : 'URL Н�
 let userData = {};
 let dbReady = false;
 
+// =====================================================
+// СЕССИИ ПОЛЬЗОВАТЕЛЕЙ
+// =====================================================
+
+function getClientIp(req) {
+    const forwarded = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
+    return forwarded || req.ip || req.socket?.remoteAddress || '';
+}
+
+function getClientCountry(req) {
+    return String(
+        req.headers['cf-ipcountry'] ||
+        req.headers['x-country-code'] ||
+        req.headers['x-vercel-ip-country'] ||
+        '—'
+    ).slice(0, 8).toUpperCase();
+}
+
+function getDeviceName(userAgent) {
+    const ua = String(userAgent || '');
+    const browser =
+        /Edg\/([\d.]+)/i.test(ua) ? `Edge ${ua.match(/Edg\/([\d.]+)/i)[1].split('.')[0]}` :
+        /Chrome\/([\d.]+)/i.test(ua) ? `Chrome ${ua.match(/Chrome\/([\d.]+)/i)[1].split('.')[0]}` :
+        /Firefox\/([\d.]+)/i.test(ua) ? `Firefox ${ua.match(/Firefox\/([\d.]+)/i)[1].split('.')[0]}` :
+        /Safari\/([\d.]+)/i.test(ua) && !/Chrome/i.test(ua) ? 'Safari' :
+        'Браузер';
+    const os =
+        /Windows NT/i.test(ua) ? 'Windows' :
+        /Android/i.test(ua) ? 'Android' :
+        /iPhone|iPad|iPod/i.test(ua) ? 'iOS' :
+        /Mac OS X/i.test(ua) ? 'macOS' :
+        /Linux/i.test(ua) ? 'Linux' :
+        'Устройство';
+    return `${os} (${browser})`;
+}
+
+app.use(async (req, res, next) => {
+    if (!req.user || !pool || !dbReady || !req.sessionID) return next();
+
+    const sessionId = String(req.sessionID);
+    const steamId = String(req.user.id);
+    const userAgent = String(req.headers['user-agent'] || '').slice(0, 500);
+    const ip = String(getClientIp(req)).slice(0, 100);
+    const country = getClientCountry(req);
+
+    try {
+        const existing = await pool.query(
+            'SELECT 1 FROM user_sessions WHERE session_id=$1 AND steam_id=$2',
+            [sessionId, steamId]
+        );
+
+        if (!existing.rowCount) {
+            await pool.query(
+                `INSERT INTO user_sessions
+                    (session_id, steam_id, user_agent, ip_address, country)
+                 VALUES ($1,$2,$3,$4,$5)
+                 ON CONFLICT (session_id) DO UPDATE SET
+                    steam_id=EXCLUDED.steam_id,
+                    user_agent=EXCLUDED.user_agent,
+                    ip_address=EXCLUDED.ip_address,
+                    country=EXCLUDED.country,
+                    last_seen_at=NOW()`,
+                [sessionId, steamId, userAgent, ip, country]
+            );
+        } else {
+            await pool.query(
+                `UPDATE user_sessions
+                 SET user_agent=$1, ip_address=$2, country=$3, last_seen_at=NOW()
+                 WHERE session_id=$4 AND steam_id=$5`,
+                [userAgent, ip, country, sessionId, steamId]
+            );
+        }
+    } catch (error) {
+        console.error('⚠️ Не удалось обновить сессию:', error.message);
+    }
+
+    next();
+});
+
+
 async function initDatabase() {
     if (!pool) return;
     try { await pool.query('SELECT 1'); }
@@ -218,7 +306,8 @@ async function initDatabase() {
             rain BOOLEAN NOT NULL DEFAULT TRUE,
             balance NUMERIC(14,2) NOT NULL DEFAULT 0,
             banned BOOLEAN NOT NULL DEFAULT FALSE,
-            ban_reason TEXT NOT NULL DEFAULT ''
+            ban_reason TEXT NOT NULL DEFAULT '',
+            api_key TEXT NOT NULL DEFAULT ''
         )
     `);
 
@@ -239,6 +328,20 @@ async function initDatabase() {
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS balance NUMERIC(14,2) NOT NULL DEFAULT 0`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS banned BOOLEAN NOT NULL DEFAULT FALSE`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS ban_reason TEXT NOT NULL DEFAULT ''`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS api_key TEXT NOT NULL DEFAULT ''`);
+
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS user_sessions (
+            session_id TEXT PRIMARY KEY,
+            steam_id TEXT NOT NULL REFERENCES users(steam_id) ON DELETE CASCADE,
+            user_agent TEXT NOT NULL DEFAULT '',
+            ip_address TEXT NOT NULL DEFAULT '',
+            country TEXT NOT NULL DEFAULT '—',
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            last_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    `);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_user_sessions_steam_id ON user_sessions(steam_id)`);
 
     await pool.query(`
         CREATE TABLE IF NOT EXISTS admin_grants (
@@ -309,6 +412,7 @@ function dbRowToUser(row) {
         balance: Number(row.balance || 0),
         banned: row.banned === true,
         banReason: row.ban_reason || '',
+        apiKey: row.api_key || '',
         sales: []
     };
 }
@@ -318,8 +422,8 @@ async function upsertUserToDb(record) {
     await pool.query(`
         INSERT INTO users
             (steam_id, public_id, username, avatar, trade_url, created_at, last_login_at,
-             login_count, total_sold, total_payout, last_sale_at, theme, rain, balance, banned, ban_reason)
-        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
+             login_count, total_sold, total_payout, last_sale_at, theme, rain, balance, banned, ban_reason, api_key)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
         ON CONFLICT (steam_id) DO UPDATE SET
             public_id=EXCLUDED.public_id,
             username=EXCLUDED.username,
@@ -335,13 +439,14 @@ async function upsertUserToDb(record) {
             rain=EXCLUDED.rain,
             balance=EXCLUDED.balance,
             banned=EXCLUDED.banned,
-            ban_reason=EXCLUDED.ban_reason
+            ban_reason=EXCLUDED.ban_reason,
+            api_key=EXCLUDED.api_key
     `, [
         String(record.steamId), Number(record.publicId), record.username || 'Steam User', record.avatar || '',
         record.tradeUrl || '', record.createdAt || new Date().toISOString(), record.lastLoginAt || null,
         Number(record.loginCount || 0), Number(record.totalSold || 0), Number(record.totalPayout || 0),
         record.lastSaleAt || null, record.theme === 'light' ? 'light' : 'dark', record.rain !== false,
-        Number(record.balance || 0), record.banned === true, record.banReason || ''
+        Number(record.balance || 0), record.banned === true, record.banReason || '', record.apiKey || ''
     ]);
 }
 
@@ -1155,6 +1260,97 @@ async function recordLogin(profile) {
     await saveUserData();
     return record;
 }
+
+
+// Личные сессии: доступны только владельцу текущего аккаунта.
+app.get('/api/profile/sessions', async (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+    if (!requireDatabase(res)) return;
+
+    try {
+        const result = await pool.query(
+            `SELECT session_id, user_agent, ip_address, country, created_at, last_seen_at
+             FROM user_sessions
+             WHERE steam_id=$1
+             ORDER BY last_seen_at DESC`,
+            [String(req.user.id)]
+        );
+
+        res.json({
+            sessions: result.rows.map(row => ({
+                id: row.session_id,
+                device: getDeviceName(row.user_agent),
+                userAgent: row.user_agent,
+                ip: row.ip_address || '—',
+                country: row.country || '—',
+                createdAt: new Date(row.created_at).toISOString(),
+                lastSeenAt: new Date(row.last_seen_at).toISOString(),
+                current: String(row.session_id) === String(req.sessionID)
+            }))
+        });
+    } catch (error) {
+        console.error('Ошибка загрузки сессий:', error.message);
+        res.status(500).json({ error: 'Не удалось загрузить сессии' });
+    }
+});
+
+app.delete('/api/profile/sessions/:sessionId', async (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+    if (!requireDatabase(res)) return;
+
+    const sessionId = String(req.params.sessionId || '');
+    if (!sessionId || sessionId.length > 300) return res.status(400).json({ error: 'Некорректная сессия' });
+
+    try {
+        const result = await pool.query(
+            'DELETE FROM user_sessions WHERE session_id=$1 AND steam_id=$2 RETURNING session_id',
+            [sessionId, String(req.user.id)]
+        );
+        if (!result.rowCount) return res.status(404).json({ error: 'Сессия не найдена' });
+
+        if (sessionId === String(req.sessionID)) {
+            req.logout(() => {
+                req.session.destroy(() => res.json({ success: true, loggedOut: true }));
+            });
+            return;
+        }
+
+        res.json({ success: true, loggedOut: false });
+    } catch (error) {
+        console.error('Ошибка выхода из сессии:', error.message);
+        res.status(500).json({ error: 'Не удалось завершить сессию' });
+    }
+});
+
+// API-ключ пользователя.
+app.get('/api/profile/api-key', async (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+    if (!requireDatabase(res)) return;
+    try {
+        const record = ensureUserRecord(req.user);
+        res.json({ apiKey: record.apiKey || '' });
+    } catch (error) {
+        res.status(500).json({ error: 'Не удалось загрузить API key' });
+    }
+});
+
+app.post('/api/profile/api-key/generate', async (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+    if (!requireDatabase(res)) return;
+
+    try {
+        const crypto = require('crypto');
+        const record = ensureUserRecord(req.user);
+        const apiKey = `emk_${crypto.randomBytes(24).toString('hex')}`;
+        record.apiKey = apiKey;
+        await upsertUserToDb(record);
+        userData[String(req.user.id)] = record;
+        res.json({ success: true, apiKey });
+    } catch (error) {
+        console.error('Ошибка генерации API key:', error.message);
+        res.status(500).json({ error: 'Не удалось сгенерировать API key' });
+    }
+});
 
 // Публичный профиль: только публичные показатели и внутренний ID.
 // Steam ID, имя, аватар, Trade URL и платёжные данные наружу не отдаём.

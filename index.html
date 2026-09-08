@@ -287,6 +287,39 @@
         .footer-grid .col a:hover { color: #2ecc71; }
         .footer-bottom { text-align: center; margin-top: 32px; padding-top: 20px; border-top: 1px solid #1c1d23; color: #6a6d7a; font-size: 14px; }
 
+
+        /* ===== ПРОФИЛЬ: РАЗДЕЛЫ ===== */
+        .profile-panel { background: #141a17; border: 1px solid rgba(46,204,113,.20); border-radius: 14px; padding: 24px; }
+        .profile-panel-header { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px; }
+        .profile-panel-title { display:flex; align-items:center; gap:10px; font-size:20px; font-weight:800; color:#f2f7f4; }
+        .profile-panel-subtitle { color:#8fa096; font-size:13px; line-height:1.45; }
+        .exchange-toggle { display:flex; gap:8px; }
+        .exchange-toggle button { border:1px solid #303a35; background:#0d1210; color:#8f9a95; border-radius:10px; padding:10px 18px; font-weight:800; cursor:pointer; }
+        .exchange-toggle button.active { border-color:#6174ff; color:#8fa0ff; background:#151a2b; }
+        .empty-items { min-height:220px; border-radius:12px; background:#101613; display:flex; align-items:center; justify-content:center; color:#f0f3f2; font-size:17px; font-weight:700; }
+        .verify-card { background:#141a17; border:1px solid rgba(46,204,113,.18); border-radius:14px; padding:22px; }
+        .verify-head { display:flex; align-items:center; gap:10px; font-size:18px; font-weight:800; margin-bottom:16px; }
+        .verify-badge { display:inline-flex; align-items:center; padding:7px 12px; border-radius:10px; background:#5b461e; color:#ffbf45; font-weight:800; font-size:12px; }
+        .verify-text { color:#8fa096; font-size:13px; line-height:1.5; margin-bottom:18px; }
+        .verify-note { margin-top:16px; padding:18px; border-radius:12px; background:#5b461e; color:#ffbf45; font-size:13px; line-height:1.45; }
+        .sessions-list { display:flex; flex-direction:column; gap:12px; }
+        .session-row { display:grid; grid-template-columns: 1.2fr 1fr 1fr .8fr auto; gap:16px; align-items:center; padding:18px; border:1px solid #2a3630; background:#101613; border-radius:12px; }
+        .session-label { color:#8fa096; font-size:12px; margin-bottom:5px; }
+        .session-value { color:#eaf0ec; font-weight:700; font-size:14px; word-break:break-word; }
+        .session-online { color:#2ecc71; font-weight:800; }
+        .session-current { color:#8fa0ff; font-weight:700; font-size:12px; }
+        .session-logout { border:1px solid rgba(255,107,107,.35); background:rgba(255,107,107,.08); color:#ff8a8a; border-radius:9px; padding:9px 12px; cursor:pointer; font-weight:800; }
+        .session-logout:hover { background:rgba(255,107,107,.15); }
+        .api-key-box { display:flex; gap:10px; }
+        .api-key-box input { flex:1; min-width:0; background:#101613; border:1px solid #2a3630; border-radius:10px; padding:14px; color:#eaf0ec; outline:none; }
+        .api-key-box input:focus { border-color:#2ecc71; }
+        .api-help { margin-top:14px; padding:15px; border-radius:11px; background:#151d19; color:#9aa7a0; font-size:13px; line-height:1.45; }
+        .api-link { color:#2ecc71; text-decoration:none; font-weight:700; }
+        @media (max-width: 900px) {
+            .session-row { grid-template-columns: 1fr 1fr; }
+            .session-row > :last-child { grid-column:1/-1; }
+            .profile-panel-header { align-items:flex-start; flex-direction:column; }
+        }
         /* ===== В РАЗРАБОТКЕ ===== */
         .in-development {
             font-size: 48px;
@@ -867,19 +900,65 @@
                     </div>
 
                     <div class="profile-content-section" id="section-exchanges">
-                        <div class="in-development">В РАЗРАБОТКЕ</div>
+                        <div class="profile-panel">
+                            <div class="profile-panel-header">
+                                <div class="profile-panel-title">🔫 Обмены</div>
+                                <div class="exchange-toggle">
+                                    <button class="active" type="button">Покупки</button>
+                                    <button type="button">Продажи</button>
+                                </div>
+                            </div>
+                            <div class="empty-items">У вас пока нет предметов</div>
+                        </div>
                     </div>
 
                     <div class="profile-content-section" id="section-verification">
-                        <div class="in-development"></div>
+                        <div class="verify-card">
+                            <div class="verify-head">
+                                <span>①</span>
+                                <span>Верификация</span>
+                                <span class="verify-badge">Отсутствует</span>
+                            </div>
+                            <div class="verify-text">
+                                Статус верификации пока не подтверждён. Если в будущем для аккаунта будет доступна верификация, требования и необходимые действия будут показаны здесь.
+                            </div>
+                            <div class="verify-note">
+                                ⚠️ Проверка личности предназначена для повышения безопасности платформы и доступна только пользователям, которые соответствуют требованиям сервиса.
+                            </div>
+                        </div>
                     </div>
 
                     <div class="profile-content-section" id="section-sessions">
-                        <div class="in-development"></div>
+                        <div class="profile-panel">
+                            <div class="profile-panel-header">
+                                <div>
+                                    <div class="profile-panel-title">🔒 Ваши сессии</div>
+                                    <div class="profile-panel-subtitle">Здесь отображаются активные входы в ваш аккаунт. IP-адрес виден только владельцу аккаунта.</div>
+                                </div>
+                            </div>
+                            <div class="sessions-list" id="profileSessionsList">
+                                <div class="empty-items">Загрузка сессий...</div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="profile-content-section" id="section-api">
-                        <div class="in-development"></div>
+                        <div class="profile-panel">
+                            <div class="profile-panel-header">
+                                <div>
+                                    <div class="profile-panel-title">Ваш API Key</div>
+                                    <div class="profile-panel-subtitle">Используйте ключ только в своих приложениях и никому его не передавайте.</div>
+                                </div>
+                                <a class="api-link" href="#" onclick="event.preventDefault(); showModal('Документация', 'Документация API будет доступна позже.')">Перейти к документации</a>
+                            </div>
+                            <div class="api-key-box">
+                                <input id="profileApiKey" type="text" readonly placeholder="Не сгенерирован">
+                                <button class="btn" type="button" onclick="generateProfileApiKey()">Сгенерировать</button>
+                            </div>
+                            <div class="api-help">
+                                🔐 API-ключ является секретом вашего аккаунта. Если вы больше не хотите его использовать, сгенерируйте новый — старый будет заменён.
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2099,6 +2178,92 @@ function renderProfile() {
     }
 }
 
+// ===== РАЗДЕЛЫ ПРОФИЛЯ =====
+async function loadProfileSessions() {
+    const box = document.getElementById('profileSessionsList');
+    if (!box) return;
+    box.innerHTML = '<div class="empty-items">Загрузка сессий...</div>';
+
+    try {
+        const response = await fetch('/api/profile/sessions');
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Не удалось загрузить сессии');
+
+        if (!Array.isArray(data.sessions) || !data.sessions.length) {
+            box.innerHTML = '<div class="empty-items">Активных сессий нет</div>';
+            return;
+        }
+
+        box.innerHTML = data.sessions.map(session => `
+            <div class="session-row">
+                <div>
+                    <div class="session-label">Устройство</div>
+                    <div class="session-value">${escapeHtml(session.device)}</div>
+                </div>
+                <div>
+                    <div class="session-label">Местоположение</div>
+                    <div class="session-value">${escapeHtml(session.country || '—')}</div>
+                </div>
+                <div>
+                    <div class="session-label">IP-Адрес</div>
+                    <div class="session-value">${escapeHtml(session.ip || '—')}</div>
+                </div>
+                <div>
+                    <div class="session-label">Статус</div>
+                    <div class="${session.current ? 'session-current' : 'session-online'}">${session.current ? 'Текущая' : 'Онлайн'}</div>
+                </div>
+                <div>
+                    ${session.current
+                        ? '<span class="session-current">Эта сессия</span>'
+                        : `<button class="session-logout" type="button" onclick="logoutProfileSession('${encodeURIComponent(session.id)}')">Выйти</button>`}
+                </div>
+            </div>
+        `).join('');
+    } catch (error) {
+        box.innerHTML = `<div class="empty-items">${escapeHtml(error.message)}</div>`;
+    }
+}
+
+async function logoutProfileSession(encodedSessionId) {
+    try {
+        const response = await fetch(`/api/profile/sessions/${encodedSessionId}`, { method: 'DELETE' });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Не удалось завершить сессию');
+        await loadProfileSessions();
+    } catch (error) {
+        showModal('Ошибка', error.message);
+    }
+}
+
+async function loadProfileApiKey() {
+    const input = document.getElementById('profileApiKey');
+    if (!input || !currentUser) return;
+    try {
+        const response = await fetch('/api/profile/api-key');
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Не удалось загрузить API key');
+        input.value = data.apiKey || '';
+        input.placeholder = data.apiKey ? '' : 'Не сгенерирован';
+    } catch (error) {
+        input.placeholder = error.message;
+    }
+}
+
+async function generateProfileApiKey() {
+    const input = document.getElementById('profileApiKey');
+    try {
+        const response = await fetch('/api/profile/api-key/generate', { method: 'POST' });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Не удалось сгенерировать API key');
+        if (input) {
+            input.value = data.apiKey || '';
+            input.placeholder = '';
+        }
+    } catch (error) {
+        showModal('Ошибка', error.message);
+    }
+}
+
 // ===== ВКЛАДКИ ПРОФИЛЯ =====
 document.querySelectorAll('.profile-tab').forEach(tab => {
     tab.addEventListener('click', function() {
@@ -2109,6 +2274,8 @@ document.querySelectorAll('.profile-tab').forEach(tab => {
             section.classList.remove('active');
         });
         document.getElementById('section-' + tabName).classList.add('active');
+        if (tabName === 'sessions') loadProfileSessions();
+        if (tabName === 'api') loadProfileApiKey();
     });
 });
 
