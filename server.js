@@ -1008,6 +1008,78 @@ app.post('/api/get-inventory', async (req, res) => {
 // ПРОФИЛИ / ТРАНЗАКЦИИ / АДМИНКА
 // =====================================================
 
+// Выдаём постоянный внутренний ID пользователю.
+function getNextPublicId() {
+    const used = new Set();
+
+    for (const data of Object.values(userData)) {
+        const id = Number(data?.publicId);
+        if (Number.isInteger(id) && id >= MIN_PUBLIC_ID && id <= MAX_PUBLIC_ID) {
+            used.add(id);
+        }
+    }
+
+    for (let id = MIN_PUBLIC_ID; id <= MAX_PUBLIC_ID; id++) {
+        if (id === OWNER_PUBLIC_ID) continue;
+        if (!used.has(id)) return id;
+    }
+
+    return null;
+}
+
+function ensureUserRecord(profile) {
+    const steamId = String(profile.id);
+    const owner = steamId === OWNER_STEAM_ID;
+
+    if (!userData[steamId]) {
+        userData[steamId] = {};
+    }
+
+    const record = userData[steamId];
+
+    if (owner) {
+        for (const [otherSteamId, otherRecord] of Object.entries(userData)) {
+            if (otherSteamId === steamId) continue;
+            if (Number(otherRecord?.publicId) === OWNER_PUBLIC_ID) {
+                const replacementId = getNextPublicId();
+                if (replacementId === null) {
+                    throw new Error('Невозможно освободить ID 666: свободные ID закончились');
+                }
+                otherRecord.publicId = replacementId;
+                saveUserData();
+            }
+        }
+        record.publicId = OWNER_PUBLIC_ID;
+    } else if (Number(record.publicId) === OWNER_PUBLIC_ID) {
+        const nextId = getNextPublicId();
+        if (nextId === null) throw new Error('Свободные внутренние ID закончились');
+        record.publicId = nextId;
+    } else if (!Number.isInteger(Number(record.publicId))) {
+        const nextId = getNextPublicId();
+        if (nextId === null) throw new Error('Свободные внутренние ID закончились');
+        record.publicId = nextId;
+    }
+
+    record.steamId = steamId;
+    record.username = profile.displayName || profile.username || record.username || 'Steam User';
+    record.avatar =
+        profile.photos?.[2]?.value ||
+        profile.photos?.[1]?.value ||
+        profile.photos?.[0]?.value ||
+        record.avatar || '';
+
+    if (!Array.isArray(record.sales)) record.sales = [];
+    if (!record.theme) record.theme = 'dark';
+    if (typeof record.rain !== 'boolean') record.rain = true;
+
+    saveUserData();
+    return record;
+}
+
+function isOwner(req) {
+    return Boolean(req.user) && String(req.user.id) === OWNER_STEAM_ID;
+}
+
 function recordLogin(profile) {
     const record = ensureUserRecord(profile);
     const now = new Date().toISOString();
