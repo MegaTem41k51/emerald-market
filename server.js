@@ -22,7 +22,15 @@ const BASE_URL =
     process.env.BASE_URL ||
     'https://emerald-market-2.onrender.com';
 
-const DATABASE_URL = process.env.DATABASE_URL || (() => {
+// Render может передавать URL под разными именами в зависимости от способа
+// подключения PostgreSQL. Берём первый непустой вариант.
+const DATABASE_URL = String(
+    process.env.DATABASE_URL ||
+    process.env.RENDER_DATABASE_URL ||
+    process.env.DATABASE_INTERNAL_URL ||
+    process.env.POSTGRES_URL ||
+    ''
+).trim() || (() => {
     const { PGHOST, PGUSER, PGPASSWORD, PGDATABASE, PGPORT } = process.env;
     if (!PGHOST || !PGUSER || !PGPASSWORD || !PGDATABASE) return '';
     const port = PGPORT || '5432';
@@ -143,6 +151,8 @@ app.get('/api/user', async (req, res) => {
             isAdmin: await isAdmin(req),
             totalSold: Number(ensureUserRecord(req.user).totalSold || 0),
             totalPayout: Number(ensureUserRecord(req.user).totalPayout || 0),
+            balance: Number(ensureUserRecord(req.user).balance || 0),
+            banned: ensureUserRecord(req.user).banned === true,
 
             name:
                 req.user.displayName ||
@@ -169,10 +179,16 @@ if (!DATABASE_URL) {
 const pool = DATABASE_URL
     ? new Pool({
         connectionString: DATABASE_URL,
+        // Для Render PostgreSQL SSL обычно нужен. Если конкретный URL
+        // явно задаёт sslmode=disable, pg сам использует параметры URL.
         ssl: { rejectUnauthorized: false },
-        max: 5
+        max: 5,
+        connectionTimeoutMillis: 10000,
+        idleTimeoutMillis: 30000
     })
     : null;
+
+console.log(`🔎 PostgreSQL env: ${DATABASE_URL ? 'URL найден' : 'URL НЕ найден'}`);
 
 let userData = {};
 let dbReady = false;
@@ -199,7 +215,10 @@ async function initDatabase() {
             total_payout NUMERIC(14,2) NOT NULL DEFAULT 0,
             last_sale_at TIMESTAMPTZ,
             theme TEXT NOT NULL DEFAULT 'dark',
-            rain BOOLEAN NOT NULL DEFAULT TRUE
+            rain BOOLEAN NOT NULL DEFAULT TRUE,
+            balance NUMERIC(14,2) NOT NULL DEFAULT 0,
+            banned BOOLEAN NOT NULL DEFAULT FALSE,
+            ban_reason TEXT NOT NULL DEFAULT ''
         )
     `);
 
@@ -217,6 +236,9 @@ async function initDatabase() {
     `);
 
     await pool.query(`ALTER TABLE sales ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'not_sold'`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS balance NUMERIC(14,2) NOT NULL DEFAULT 0`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS banned BOOLEAN NOT NULL DEFAULT FALSE`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS ban_reason TEXT NOT NULL DEFAULT ''`);
 
     await pool.query(`
         CREATE TABLE IF NOT EXISTS admin_grants (
@@ -284,6 +306,9 @@ function dbRowToUser(row) {
         lastSaleAt: row.last_sale_at ? new Date(row.last_sale_at).toISOString() : null,
         theme: row.theme || 'dark',
         rain: row.rain !== false,
+        balance: Number(row.balance || 0),
+        banned: row.banned === true,
+        banReason: row.ban_reason || '',
         sales: []
     };
 }
@@ -293,8 +318,8 @@ async function upsertUserToDb(record) {
     await pool.query(`
         INSERT INTO users
             (steam_id, public_id, username, avatar, trade_url, created_at, last_login_at,
-             login_count, total_sold, total_payout, last_sale_at, theme, rain)
-        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+             login_count, total_sold, total_payout, last_sale_at, theme, rain, balance, banned, ban_reason)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
         ON CONFLICT (steam_id) DO UPDATE SET
             public_id=EXCLUDED.public_id,
             username=EXCLUDED.username,
@@ -307,12 +332,16 @@ async function upsertUserToDb(record) {
             total_payout=EXCLUDED.total_payout,
             last_sale_at=EXCLUDED.last_sale_at,
             theme=EXCLUDED.theme,
-            rain=EXCLUDED.rain
+            rain=EXCLUDED.rain,
+            balance=EXCLUDED.balance,
+            banned=EXCLUDED.banned,
+            ban_reason=EXCLUDED.ban_reason
     `, [
         String(record.steamId), Number(record.publicId), record.username || 'Steam User', record.avatar || '',
         record.tradeUrl || '', record.createdAt || new Date().toISOString(), record.lastLoginAt || null,
         Number(record.loginCount || 0), Number(record.totalSold || 0), Number(record.totalPayout || 0),
-        record.lastSaleAt || null, record.theme === 'light' ? 'light' : 'dark', record.rain !== false
+        record.lastSaleAt || null, record.theme === 'light' ? 'light' : 'dark', record.rain !== false,
+        Number(record.balance || 0), record.banned === true, record.banReason || ''
     ]);
 }
 
@@ -1124,6 +1153,9 @@ async function recordLogin(profile) {
     record.lastLoginAt = now;
     record.loginCount = Number(record.loginCount || 0) + 1;
     await saveUserData();
+    if (record.banned) {
+        throw new Error(`USER_BANNED:${record.banReason || 'Доступ к сайту ограничен'}`);
+    }
     return record;
 }
 
@@ -1160,6 +1192,9 @@ app.get('/api/admin/data', async (req, res) => {
             loginCount: Number(record.loginCount || 0),
             totalSold: Number(record.totalSold || 0),
             totalPayout: Number(record.totalPayout || 0),
+            balance: Number(record.balance || 0),
+            banned: record.banned === true,
+            banReason: record.banReason || '',
             isAdmin: String(record.steamId || '') === OWNER_STEAM_ID || grantedAdmins.has(String(record.steamId || '')),
             sales: Array.isArray(record.sales) ? record.sales : []
         }))
@@ -1240,6 +1275,56 @@ app.post('/api/record-sale', async (req, res) => {
     }
 });
 
+// Владелец управляет пользователями: бан, баланс и публичный ID.
+app.post('/api/admin/manage-user', async (req, res) => {
+    if (!isOwner(req)) return res.status(403).json({ error: 'Только владелец 666 может управлять пользователями' });
+    if (!requireDatabase(res)) return;
+
+    const action = String(req.body.action || '');
+    const publicId = Number(req.body.publicId);
+    if (!Number.isInteger(publicId) || publicId <= 0) {
+        return res.status(400).json({ error: 'Введите корректный ID пользователя' });
+    }
+
+    const target = Object.values(userData).find(item => Number(item?.publicId) === publicId);
+    if (!target) return res.status(404).json({ error: 'Пользователь с таким ID не найден' });
+    if (String(target.steamId) === OWNER_STEAM_ID && action !== 'balance_add') {
+        return res.status(400).json({ error: 'Нельзя изменить доступ или ID владельца 666' });
+    }
+
+    try {
+        if (action === 'ban') {
+            target.banned = true;
+            target.banReason = String(req.body.reason || 'Нарушение правил').slice(0, 200);
+        } else if (action === 'unban') {
+            target.banned = false;
+            target.banReason = '';
+        } else if (action === 'balance_add') {
+            const amount = Number(req.body.amount);
+            if (!Number.isFinite(amount) || amount === 0) return res.status(400).json({ error: 'Введите ненулевую сумму' });
+            const nextBalance = Number((Number(target.balance || 0) + amount).toFixed(2));
+            if (nextBalance < 0) return res.status(400).json({ error: 'Баланс не может быть отрицательным' });
+            target.balance = nextBalance;
+        } else if (action === 'change_id') {
+            const newId = Number(req.body.newPublicId);
+            if (!Number.isInteger(newId) || newId < MIN_PUBLIC_ID || newId > MAX_PUBLIC_ID || newId === OWNER_PUBLIC_ID) {
+                return res.status(400).json({ error: `Новый ID должен быть от ${MIN_PUBLIC_ID} до ${MAX_PUBLIC_ID}, кроме 666` });
+            }
+            const occupied = Object.values(userData).find(item => Number(item?.publicId) === newId && item !== target);
+            if (occupied) return res.status(409).json({ error: 'Этот ID уже занят' });
+            target.publicId = newId;
+        } else {
+            return res.status(400).json({ error: 'Неизвестное действие' });
+        }
+
+        await upsertUserToDb(target);
+        res.json({ success: true, publicId: target.publicId, balance: Number(target.balance || 0), banned: target.banned === true });
+    } catch (error) {
+        console.error('Ошибка управления пользователем:', error.message);
+        res.status(500).json({ error: 'Не удалось применить действие' });
+    }
+});
+
 // Владелец меняет статус заявки: продажа остаётся в истории в любом случае.
 app.post('/api/admin/sales/:saleId/status', async (req, res) => {
     if (!(await isAdmin(req))) return res.status(403).json({ error: 'Доступ запрещён' });
@@ -1294,9 +1379,26 @@ app.get('/profile', (req, res) => res.sendFile(path.join(__dirname, 'index.html'
 app.get('/profile/:publicId', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
 app.get('/api/health', async (req, res) => {
-    if (!pool) return res.status(503).json({ ok: false, database: false, error: 'DATABASE_URL не задан' });
-    try { await pool.query('SELECT 1'); res.json({ ok: true, database: true, dbReady }); }
-    catch (error) { res.status(503).json({ ok: false, database: false, error: error.message }); }
+    if (!pool) {
+        return res.status(503).json({
+            ok: false,
+            database: false,
+            dbReady,
+            error: 'DATABASE_URL не найден в окружении Render'
+        });
+    }
+    try {
+        await pool.query('SELECT 1');
+        res.json({ ok: true, database: true, dbReady });
+    } catch (error) {
+        console.error('❌ /api/health PostgreSQL:', error.message);
+        res.status(503).json({
+            ok: false,
+            database: false,
+            dbReady,
+            error: error.message
+        });
+    }
 });
 
 // =====================================================
