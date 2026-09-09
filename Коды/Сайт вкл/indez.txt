@@ -457,7 +457,242 @@
 
         @media (max-width: 992px) { .sell-layout { flex-direction: column; } .sell-sidebar { width: 100%; min-width: unset; position: static; } .skin-grid-sell { grid-template-columns: repeat(3, 1fr); } .profile-layout { flex-direction: column; } .profile-left { width: 100%; min-width: unset; } .profile-cards { grid-template-columns: repeat(2, 1fr); } .support-channels { grid-template-columns: 1fr; max-width: 300px; } .policy-container { padding: 25px 20px; } }
         @media (max-width: 600px) { .skin-grid-sell { grid-template-columns: repeat(2, 1fr); } }
-    </style>
+    
+        /* =====================================================
+           EMERALD 2.0 — PREMIUM GREEN UI
+           ===================================================== */
+        :root {
+            --emerald: #22e47a;
+            --emerald-2: #10b968;
+            --emerald-soft: rgba(34,228,122,.12);
+            --bg: #050806;
+            --panel: rgba(12,19,15,.82);
+            --panel-2: rgba(16,27,20,.9);
+            --line: rgba(63,255,145,.14);
+            --muted: #84948a;
+        }
+        html, body { background: radial-gradient(circle at 15% 0%, rgba(34,228,122,.09), transparent 30%), radial-gradient(circle at 90% 20%, rgba(0,255,128,.06), transparent 26%), var(--bg); }
+        body { color:#eef8f1; }
+        body::before { content:""; position:fixed; inset:0; pointer-events:none; background:linear-gradient(120deg,transparent 0%,rgba(34,228,122,.018) 45%,transparent 70%); z-index:-1; }
+        .header { background:rgba(5,9,7,.78)!important; backdrop-filter:blur(18px); border-bottom:1px solid var(--line)!important; box-shadow:0 12px 50px rgba(0,0,0,.35); }
+        .header-inner { min-height:76px; }
+        .logo { letter-spacing:-1.5px; text-shadow:0 0 28px rgba(34,228,122,.25); }
+        .logo span { color:var(--emerald)!important; }
+        .nav a { color:#94a79b!important; transition:.2s ease; }
+        .nav a:hover, .nav a.active { color:var(--emerald)!important; }
+        .nav a.active { text-shadow:0 0 18px rgba(34,228,122,.28); }
+
+        .btn-steam, a.btn-steam { text-decoration:none!important; color:#f3fff8!important; }
+        .btn-steam:visited, a.btn-steam:visited { text-decoration:none!important; color:#f3fff8!important; }
+        .btn-steam:hover, a.btn-steam:hover { text-decoration:none!important; color:#ffffff!important; }
+        .btn, .btn-steam, .sell-final-btn { background:linear-gradient(135deg,#23e67d,#0db866)!important; border:1px solid rgba(133,255,185,.25)!important; box-shadow:0 10px 30px rgba(18,203,105,.2); transition:transform .18s ease,box-shadow .18s ease,filter .18s ease; }
+        .btn:hover, .btn-steam:hover, .sell-final-btn:hover { transform:translateY(-2px); filter:saturate(1.08); box-shadow:0 16px 38px rgba(18,203,105,.3); }
+        .btn-outline { background:rgba(34,228,122,.045)!important; border:1px solid rgba(34,228,122,.3)!important; color:#9af3bb!important; }
+        .btn-outline:hover { background:rgba(34,228,122,.1)!important; border-color:var(--emerald)!important; }
+        .sell-hero { padding:48px 0 32px; }
+        .sell-hero h1 { font-size:clamp(32px,5vw,58px); letter-spacing:-2.5px; text-shadow:0 10px 40px rgba(0,0,0,.35); }
+        .sell-hero h1 span { color:var(--emerald)!important; text-shadow:0 0 35px rgba(34,228,122,.22); }
+        .filters-row, .sell-sidebar, .profile-login-box, .profile-avatar-box, .profile-transactions, .profile-settings, .faq-item, .support-card, .policy-container, .profile-card, .admin-control-card { background:linear-gradient(145deg,rgba(14,24,18,.92),rgba(7,13,10,.88))!important; border:1px solid var(--line)!important; box-shadow:0 18px 55px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.025); }
+        .profile-card { border-radius:18px!important; padding:24px!important; transition:.2s ease; }
+        .profile-card:hover { transform:translateY(-3px); border-color:rgba(34,228,122,.28)!important; box-shadow:0 20px 60px rgba(0,0,0,.3),0 0 35px rgba(34,228,122,.05); }
+        .profile-card .value { color:#effff5!important; }
+        .profile-card .label { color:#7f9187!important; }
+        .profile-card .icon { filter:drop-shadow(0 0 12px rgba(34,228,122,.3)); }
+        .sell-skin-card { background:linear-gradient(145deg,#101a14,#09100c)!important; border-color:rgba(34,228,122,.11)!important; border-radius:16px!important; overflow:hidden; transition:.22s ease!important; }
+        .sell-skin-card:hover { transform:translateY(-4px); border-color:rgba(34,228,122,.36)!important; box-shadow:0 18px 45px rgba(0,0,0,.3),0 0 28px rgba(34,228,122,.08); }
+        .sell-skin-card.selected { border-color:var(--emerald)!important; box-shadow:0 0 0 1px var(--emerald),0 0 30px rgba(34,228,122,.12)!important; }
+        input, select, .filter-input, .filter-select, .setting-row input[type=text] { background:rgba(3,8,5,.7)!important; border:1px solid rgba(113,145,124,.2)!important; color:#ecf8ef!important; border-radius:11px!important; }
+        input:focus, select:focus { border-color:rgba(34,228,122,.65)!important; box-shadow:0 0 0 3px rgba(34,228,122,.08)!important; outline:none!important; }
+        .transaction-table { border-collapse:separate!important; border-spacing:0 8px!important; }
+        .transaction-table th { color:#6f8678!important; text-transform:uppercase; font-size:11px!important; letter-spacing:.09em; }
+        .transaction-table td { background:rgba(5,11,7,.55); border-bottom:0!important; padding:15px 12px!important; }
+        .transaction-table tr td:first-child { border-radius:10px 0 0 10px; }
+        .transaction-table tr td:last-child { border-radius:0 10px 10px 0; }
+        .transaction-table tbody tr:hover td { background:rgba(34,228,122,.055); }
+        .admin-control-card { padding:22px; border-radius:18px; }
+        .header-balance { display:inline-flex; align-items:center; gap:6px; margin-left:8px; padding:7px 10px; border-radius:10px; background:rgba(34,228,122,.08); border:1px solid rgba(34,228,122,.18); color:#8ff5b6; font-size:13px; font-weight:800; white-space:nowrap; }
+        .public-profile-card { max-width:760px; margin:55px auto; padding:44px; text-align:center; border-radius:24px; background:linear-gradient(145deg,rgba(14,24,18,.96),rgba(7,13,10,.92)); border:1px solid var(--line); box-shadow:0 24px 80px rgba(0,0,0,.34), 0 0 45px rgba(34,228,122,.05); }
+        .public-profile-card .public-profile-label { color:#6f8678; font-size:12px; text-transform:uppercase; letter-spacing:.12em; margin-bottom:10px; }
+        .public-profile-card h2 { color:#effff5; font-size:30px; margin-bottom:14px; }
+        .public-profile-id { color:#22e47a; font-size:34px; font-weight:900; text-shadow:0 0 24px rgba(34,228,122,.22); }
+        .public-profile-layout { display:flex; gap:18px; align-items:flex-start; }
+        .public-profile-left { width:245px; min-width:245px; }
+        .public-avatar-box { padding:20px 14px!important; }
+        .public-avatar { background:linear-gradient(145deg,#183d29,#0b1b12)!important; color:#35e98a!important; border:1px solid rgba(34,228,122,.25); box-shadow:0 0 28px rgba(34,228,122,.08); }
+        .public-profile-id-small { margin-top:5px; color:#8a9d91; font-size:13px; font-weight:700; }
+        .public-profile-transactions { margin-top:18px; }
+        @media(max-width:992px){ .public-profile-layout{flex-direction:column;} .public-profile-left{width:100%;min-width:unset;} }
+        .admin-management-grid { display:grid; grid-template-columns:minmax(220px,1fr) minmax(220px,1fr); gap:12px; margin-top:16px; }
+        .admin-management-help { color:#7f9487; font-size:12px; margin-top:10px; }
+        .admin-management-status { min-height:20px; margin-top:12px; color:#8ff5b6; font-size:13px; }
+        .admin-user-state { display:inline-flex; padding:3px 7px; border-radius:999px; font-size:9px; font-weight:800; margin-left:5px; }
+        .admin-user-state.banned { color:#ff8b8b; background:rgba(255,70,70,.08); border:1px solid rgba(255,70,70,.2); }
+        @media(max-width:700px){ .admin-management-grid{grid-template-columns:1fr;} .header-balance{font-size:11px;padding:6px 8px;} .public-profile-card{margin:28px 10px;padding:30px 18px;} .public-profile-id{font-size:28px;} }
+        .admin-control-title { font-size:19px; font-weight:800; color:#effff5; margin-bottom:5px; }
+        .admin-control-subtitle { color:#7f9487; font-size:13px; margin-bottom:15px; }
+        .admin-access-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+        .admin-access-row .filter-input { flex:1 1 220px; min-width:180px; }
+        .admin-action-btn { min-height:42px; }
+        .admin-grant-status { margin-top:12px; min-height:20px; color:#8deeb1; font-size:13px; }
+        .admin-badge { display:inline-flex; align-items:center; padding:3px 7px; margin-left:6px; border-radius:999px; background:rgba(34,228,122,.1); border:1px solid rgba(34,228,122,.25); color:#6df3a2; font-size:9px; font-weight:800; letter-spacing:.08em; }
+        .modal-overlay { backdrop-filter:blur(9px)!important; background:rgba(0,0,0,.65)!important; }
+        .modal-content { background:linear-gradient(145deg,#101a14,#080e0b)!important; border:1px solid rgba(34,228,122,.45)!important; box-shadow:0 25px 100px rgba(0,0,0,.6),0 0 55px rgba(34,228,122,.08)!important; border-radius:20px!important; }
+        ::-webkit-scrollbar { width:8px; height:8px; }
+        ::-webkit-scrollbar-track { background:#050806; }
+        ::-webkit-scrollbar-thumb { background:#173b27; border-radius:99px; }
+        ::-webkit-scrollbar-thumb:hover { background:#1e633e; }
+        @media(max-width:700px){ .header-inner{min-height:64px}.nav{gap:12px}.sell-hero{padding-top:28px}.admin-access-row{flex-direction:column;align-items:stretch}.admin-action-btn{width:100%} }
+        .sale-status-btn { min-height:36px; padding:8px 14px; border-radius:10px; font-weight:800; cursor:pointer; border:1px solid rgba(34,228,122,.35); background:linear-gradient(135deg,#20d873,#12b85d); color:#06120b; box-shadow:0 8px 20px rgba(34,228,122,.10); transition:.18s ease; }
+        .sale-status-btn:hover { transform:translateY(-1px); box-shadow:0 12px 26px rgba(34,228,122,.18); }
+        .sale-status-btn.no { background:rgba(255,255,255,.04); color:#d9e8de; border-color:rgba(255,255,255,.16); }
+        .sale-status-btn.no:hover { background:rgba(255,255,255,.08); }
+        .sale-pending-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+        .ban-page { min-height:calc(100vh - 90px); display:flex; align-items:center; justify-content:center; padding:50px 20px; }
+        .ban-card { width:min(680px,100%); text-align:center; padding:54px 34px; border-radius:28px; background:linear-gradient(145deg,rgba(10,25,17,.97),rgba(4,12,8,.96)); border:1px solid rgba(34,228,122,.34); box-shadow:0 30px 100px rgba(0,0,0,.45),0 0 60px rgba(34,228,122,.07); }
+        .ban-icon { font-size:64px; margin-bottom:18px; filter:drop-shadow(0 0 24px rgba(34,228,122,.22)); }
+        .ban-card h1 { margin:0 0 14px; color:#effff5; font-size:32px; }
+        .ban-card p { margin:8px auto; color:#a6b8ac; line-height:1.65; max-width:560px; }
+        .ban-card .ban-contact { display:inline-block; margin-top:18px; color:#62ee9b; font-size:18px; font-weight:900; text-decoration:none; border-bottom:1px solid rgba(98,238,155,.35); padding-bottom:3px; }
+        .ban-card .ban-contact:hover { color:#a0ffc4; border-bottom-color:#a0ffc4; }
+
+        /* ===== ПРОФИЛЬ: РАЗДЕЛЫ ПО МАКЕТУ ===== */
+        .profile-content-section { display:none !important; }
+        .profile-content-section.active { display:block !important; }
+        .reviews-page-head{display:flex;justify-content:space-between;gap:30px;align-items:flex-end;margin:28px 0 24px;padding-bottom:18px;border-bottom:1px solid rgba(46,204,113,.16)}
+        .reviews-page-head h1{margin:0;font-size:28px;font-weight:900;color:#f5f7fa}.reviews-page-head p{margin:6px 0 0;color:#8d96a3}
+        .reviews-summary{display:flex;align-items:center;gap:18px}.reviews-summary-avatars{display:flex;align-items:center}.reviews-summary-avatars img,.reviews-avatar-fallback{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid #15171b;margin-left:-8px;background:#303238;display:grid;place-items:center;color:#fff;font-weight:800}.reviews-summary-avatars img:first-child,.reviews-avatar-fallback:first-child{margin-left:0}.reviews-summary>div:nth-child(2){display:flex;flex-direction:column;gap:3px;color:#8d96a3;font-size:13px}.reviews-summary>div:nth-child(2) strong{color:#f2f4f7;font-size:14px}.reviews-score{border-left:1px solid #34363b;padding-left:18px;display:flex;flex-direction:column;gap:2px;font-size:13px;color:#8d96a3}.reviews-score>strong{font-size:16px;color:#fff}.reviews-trust-stars{color:#00b67a;font-size:18px;letter-spacing:1px}.reviews-score b{color:#fff}
+        .reviews-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-items:start}.review-card{background:#2b2c30;border-radius:6px;padding:16px;min-height:96px;position:relative;border:1px solid rgba(255,255,255,.02);box-shadow:0 4px 12px rgba(0,0,0,.12)}.review-card-top{display:flex;align-items:center;gap:10px;padding-right:38px}.review-card-avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;background:#3b3d43;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:800;flex:0 0 34px}.review-card-name{font-size:14px;font-weight:800;color:#fff}.review-card-date{font-size:10px;color:#a4a8b0;margin-top:3px}.review-card-rating{position:absolute;right:14px;top:15px;width:34px;height:34px;border-radius:50%;background:#202226;color:#ff6b21;display:grid;place-items:center;font-weight:800;font-size:13px}.review-card-text{margin-top:12px;color:#e7e9ed;font-size:12px;line-height:1.45;word-break:break-word}.review-card-photo{display:block;width:100%;max-height:160px;object-fit:cover;border-radius:7px;margin-top:10px;border:1px solid rgba(255,255,255,.06)}.reviews-empty{text-align:center;color:#8d96a3;padding:50px 0}.review-admin-thumb{width:38px;height:38px;border-radius:50%;object-fit:cover;background:#34363c}.review-admin-actions{display:flex;gap:6px}.review-edit-btn,.review-delete-btn{border:0;border-radius:8px;padding:7px 10px;cursor:pointer;font-weight:800}.review-edit-btn{background:rgba(46,204,113,.1);color:#6df3a2}.review-delete-btn{background:rgba(255,70,70,.08);color:#ff8b8b}.review-photo-input-wrap{display:flex;flex-direction:column;gap:7px;min-width:0}.review-photo-or{font-size:11px;color:#77808d;text-align:center}.review-photo-file{padding:10px}.review-photo-status{font-size:11px;color:#6df3a2;min-height:16px;word-break:break-word}
+        body.light .reviews-page-head h1,body.light .review-card-name,body.light .review-card-rating,body.light .reviews-score>strong{color:#222}body.light .review-card{background:#fff;border-color:#d7dbe0;box-shadow:0 5px 18px rgba(0,0,0,.06)}body.light .review-card-text{color:#3d4248}body.light .reviews-page-head{border-color:#d7dbe0}
+        @media(max-width:900px){.reviews-page-head{flex-direction:column;align-items:flex-start}.reviews-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.reviews-summary{flex-wrap:wrap}}
+        @media(max-width:620px){.reviews-grid{grid-template-columns:1fr}.reviews-summary{display:block}.reviews-score{border-left:0;padding-left:0;margin-top:12px}}
+        .admin-danger-btn { min-height:36px; padding:8px 12px; border-radius:10px; font-weight:800; cursor:pointer; border:1px solid rgba(255,90,90,.35); background:rgba(255,70,70,.08); color:#ff8b8b; transition:.18s ease; }
+        .admin-danger-btn:hover { background:rgba(255,70,70,.16); transform:translateY(-1px); }
+        .admin-stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; }
+        .admin-stat-grid .filter-input { width:100%; }
+        .profile-section-card { background:linear-gradient(145deg,#111a15,#0b120e); border:1px solid rgba(34,228,122,.22); border-radius:16px; padding:22px; }
+        .profile-section-head { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:16px; }
+        .profile-section-title { display:flex; align-items:center; gap:10px; font-size:18px; font-weight:800; color:#effff5; }
+        .profile-section-muted { color:#81948a; font-size:12px; line-height:1.5; }
+        .exchange-toggle { display:flex; gap:8px; }
+        .exchange-toggle button { min-width:78px; padding:8px 14px; border-radius:9px; border:1px solid rgba(255,255,255,.12); background:#0b100d; color:#8c9a93; font-weight:800; cursor:pointer; }
+        .exchange-toggle button.active { border-color:#526dff; color:#8090ff; box-shadow:0 0 0 1px rgba(82,109,255,.12) inset; }
+        .exchange-empty { min-height:165px; border-radius:12px; background:rgba(3,9,6,.42); display:flex; align-items:center; justify-content:center; color:#effff5; font-weight:800; }
+        .verify-status { display:inline-flex; align-items:center; padding:7px 11px; border-radius:9px; background:rgba(174,123,27,.35); color:#ffbe36; font-size:12px; font-weight:900; }
+        .verify-text { color:#91a39a; font-size:12px; line-height:1.55; margin-bottom:14px; }
+        .verify-warning { padding:15px 16px; border-radius:12px; background:rgba(121,88,28,.58); color:#ffbf3e; font-size:12px; line-height:1.5; }
+        .email-box { margin-top:18px; padding:16px; border:1px solid rgba(34,228,122,.13); border-radius:12px; background:rgba(4,11,7,.42); }
+        .email-row { display:flex; gap:10px; flex-wrap:wrap; }
+        .email-row input { flex:1; min-width:220px; background:#080e0b; border:1px solid rgba(255,255,255,.1); border-radius:9px; padding:11px 12px; color:#effff5; outline:none; }
+        .email-row input:focus { border-color:#22e47a; }
+        .email-code-row { display:none; margin-top:10px; gap:10px; }
+        .email-code-row.show { display:flex; }
+        .email-code-row input { flex:1; background:#080e0b; border:1px solid rgba(255,255,255,.1); border-radius:9px; padding:11px 12px; color:#effff5; outline:none; }
+        .verify-ok { color:#53ef97; font-weight:800; }
+        .sessions-list { display:flex; flex-direction:column; gap:10px; }
+        .session-row { display:grid; grid-template-columns:1.15fr 1fr .8fr .75fr auto; gap:16px; align-items:center; padding:14px 16px; border:1px solid rgba(255,255,255,.12); border-radius:12px; background:rgba(6,13,9,.42); }
+        .session-label { color:#7e9087; font-size:10px; margin-bottom:4px; }
+        .session-value { color:#eaf5ee; font-size:12px; font-weight:800; word-break:break-word; }
+        .session-status { color:#20e47a; font-weight:900; font-size:12px; }
+        .session-current { color:#8da2ff; font-size:11px; font-weight:800; }
+        .session-kill { background:transparent; border:1px solid rgba(255,90,90,.28); color:#ff8e8e; padding:7px 10px; border-radius:8px; cursor:pointer; font-weight:800; }
+        .session-kill:hover { background:rgba(255,90,90,.08); }
+        .api-card { padding:18px; border-radius:13px; background:rgba(4,11,7,.42); }
+        .api-key-row { display:flex; gap:10px; margin-top:14px; }
+        .api-key-row input { flex:1; background:#080e0b; border:1px solid rgba(255,255,255,.1); border-radius:9px; padding:12px 14px; color:#eaf5ee; font-family:monospace; letter-spacing:.06em; }
+        .api-doc { color:#45e991; font-weight:800; text-decoration:none; }
+        .api-note { margin-top:14px; color:#8c9d94; font-size:11px; line-height:1.5; }
+        .email-code-modal { width:min(520px, calc(100vw - 32px)); padding:28px; border-radius:18px; background:linear-gradient(145deg,#1d2638,#172031); border:1px solid rgba(125,145,210,.22); box-shadow:0 30px 90px rgba(0,0,0,.5); text-align:center; }
+        .email-code-modal h2 { margin:0; color:#f5f7ff; font-size:21px; }
+        .email-code-modal p { margin:18px auto 24px; color:#aeb6c9; line-height:1.45; max-width:390px; }
+        .email-code-inputs { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin-bottom:18px; }
+        .email-code-input { width:100%; box-sizing:border-box; height:62px; border-radius:9px; border:1px solid #43506b; background:#2b354d; color:#f7f9ff; text-align:center; font-size:25px; font-weight:800; outline:none; }
+        .email-code-input:focus { border-color:#7283e8; box-shadow:0 0 0 2px rgba(114,131,232,.15); }
+        .email-modal-close { position:absolute; top:14px; right:14px; border:0; width:30px; height:30px; border-radius:8px; background:#2b354d; color:#aeb6c9; cursor:pointer; font-weight:900; }
+        .email-code-modal-wrap { position:relative; }
+        .sale-delete-btn { width:30px; height:30px; padding:0; margin-left:8px; border-radius:8px; border:1px solid rgba(255,90,90,.32); background:rgba(255,70,70,.07); color:#ff8d8d; font-size:18px; line-height:28px; font-weight:900; cursor:pointer; vertical-align:middle; }
+        .sale-delete-btn:hover { background:rgba(255,70,70,.16); transform:translateY(-1px); }
+        .api-key-wrap { position:relative; flex:1; min-width:0; }
+        .api-key-wrap input { width:100%; padding-right:48px; }
+        .api-eye { position:absolute; right:8px; top:50%; transform:translateY(-50%); width:34px; height:34px; border:0; border-radius:8px; background:transparent; color:#8c9d94; cursor:pointer; font-size:17px; }
+        .api-eye:hover { background:rgba(255,255,255,.06); color:#eaf5ee; }
+        .email-unbind-btn { background:#ff5757 !important; color:#fff !important; }
+        .email-unbind-btn:hover { background:#ff4444 !important; }
+        .online-indicator { display:inline-flex; align-items:center; gap:7px; color:#8c9d94; font-size:12px; margin-top:20px; }
+        .online-dot { width:8px; height:8px; border-radius:50%; background:#2ecc71; box-shadow:0 0 9px rgba(46,204,113,.65); }
+
+        /* ===== Полная светлая тема для профиля, модалок, таблиц и служебных блоков ===== */
+        body.light .profile-section-card,
+        body.light .api-card,
+        body.light .email-box,
+        body.light .session-row,
+        body.light .exchange-empty,
+        body.light .filters-row,
+        body.light .public-profile-card,
+        body.light .ban-card { background:#ffffff !important; border-color:#d0d4da !important; }
+        body.light .sell-hero,
+        body.light .market-hero { color:#222 !important; }
+        body.light .unavailable-tooltip { background:#ffffff !important; color:#333 !important; border-color:#2ecc71 !important; }
+        body.light .header-balance { background:#eef7f1 !important; border-color:#bfe7cd !important; color:#218a4d !important; }
+        body.light .profile-content-section { color:#333 !important; }
+        body.light .profile-section-title { color:#222 !important; }
+        body.light .profile-section-muted,
+        body.light .verify-text,
+        body.light .api-note { color:#667078 !important; }
+        body.light .exchange-toggle button { background:#f5f6fa !important; border-color:#d0d4da !important; color:#555 !important; }
+        body.light .exchange-toggle button.active { background:#eef7f1 !important; color:#218a4d !important; border-color:#2ecc71 !important; }
+        body.light .email-row input,
+        body.light .email-code-row input,
+        body.light .api-key-row input { background:#f5f6fa !important; border-color:#d0d4da !important; color:#222 !important; }
+        body.light .email-row input:disabled { background:#edf0f4 !important; color:#555 !important; }
+        body.light .session-label { color:#777 !important; }
+        body.light .session-value { color:#333 !important; }
+        body.light .session-kill { border-color:#e3a1a1 !important; color:#d44 !important; }
+        body.light .api-doc { color:#218a4d !important; }
+        body.light .api-eye { color:#667078 !important; }
+        body.light .email-code-modal { background:#ffffff !important; border-color:#d0d4da !important; box-shadow:0 30px 90px rgba(0,0,0,.18) !important; }
+        body.light .email-code-modal h2 { color:#222 !important; }
+        body.light .email-code-modal p { color:#667078 !important; }
+        body.light .email-code-input { background:#f5f6fa !important; border-color:#cbd2dc !important; color:#222 !important; }
+        body.light .email-modal-close { background:#edf0f4 !important; color:#667078 !important; }
+        body.light .transaction-table th,
+        body.light .transaction-table td { color:#444 !important; border-bottom-color:#e0e4ea !important; }
+        body.light .filter-input, body.light .filter-select { background:#ffffff !important; color:#333 !important; border-color:#d0d4da !important; }
+        body.light .admin-control-card { background:#ffffff !important; border-color:#d0d4da !important; color:#333 !important; }
+        body.light .admin-control-title { color:#222 !important; }
+        body.light .admin-control-subtitle, body.light .admin-management-help { color:#667078 !important; }
+        body.light .admin-users, body.light .admin-sales { background:#ffffff !important; }
+        body.light .btn { color:#07120b !important; }
+        body.light .email-unbind-btn { color:#fff !important; }
+        body.light .modal-overlay { background:rgba(20,25,30,.35) !important; }
+        body.light .online-indicator { color:#667078 !important; }
+        body.light .api-key-wrap .api-eye:hover { background:rgba(0,0,0,.05) !important; }
+
+        @media(max-width:900px){ .session-row{grid-template-columns:1fr 1fr;} .session-kill{grid-column:1/-1; justify-self:start;} }
+        @media(max-width:600px){ .session-row{grid-template-columns:1fr;} .email-row,.email-code-row,.api-key-row{flex-direction:column;} }
+    
+/* ===== EMERALD GUEST HOME — reference layout ===== */
+.guest-page{background:#020b09;min-height:calc(100vh - 58px);color:#e9f8f1}
+.guest-shell{position:relative;overflow:hidden;padding:0 0 42px;background:radial-gradient(ellipse at 55% 18%,rgba(0,255,136,.13),transparent 34%),linear-gradient(180deg,#03110d 0%,#020b09 48%,#020b09 100%)}
+.guest-shell:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 35% 25%,rgba(0,255,145,.09),transparent 25%),radial-gradient(circle at 80% 45%,rgba(0,255,145,.06),transparent 22%);pointer-events:none}
+.guest-grid{position:absolute;inset:0;opacity:.11;background-image:linear-gradient(rgba(72,255,170,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(72,255,170,.08) 1px,transparent 1px);background-size:46px 46px;mask-image:linear-gradient(to bottom,#000 0,#000 72%,transparent 100%);pointer-events:none}
+.guest-reference{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(360px,.95fr);gap:10px;padding-top:0}
+.guest-left,.guest-right{min-width:0}
+.guest-hero-ref{min-height:382px;padding:54px 28px 24px;position:relative;overflow:hidden;border:1px solid rgba(37,255,155,.18);border-top:0;background:radial-gradient(circle at 70% 38%,rgba(19,255,145,.14),transparent 28%),linear-gradient(135deg,rgba(3,28,21,.88),rgba(2,13,10,.94));box-shadow:inset 0 0 80px rgba(0,255,140,.035)}
+.guest-hero-ref:after{content:"";position:absolute;width:460px;height:460px;right:6%;top:-100px;border-radius:50%;border:1px solid rgba(51,255,163,.15);box-shadow:0 0 60px rgba(0,255,140,.08),inset 0 0 60px rgba(0,255,140,.04);pointer-events:none}
+.guest-copy-ref{position:relative;z-index:3;max-width:570px}
+.guest-copy-ref h1{font-size:48px;line-height:.94;letter-spacing:-.045em;margin:0 0 17px;font-weight:900;color:#f5faf7;text-transform:uppercase}.guest-copy-ref h1 span{display:block;color:#42efa3}.guest-copy-ref p{font-size:15px;color:#d0dad5;margin:0 0 22px}.guest-main-cta{display:inline-flex;align-items:center;justify-content:center;min-width:400px;height:42px;border-radius:5px;background:linear-gradient(180deg,#13e980,#0bcf70);color:#02140c!important;font-weight:900;text-transform:uppercase;text-decoration:none;box-shadow:0 0 22px rgba(17,239,132,.17)}
+.guest-trust{display:flex;align-items:center;gap:9px;margin-top:14px;font-size:11px;color:#b4c3bc}.guest-trust .stars{letter-spacing:2px;color:#36e999;font-size:15px}.guest-benefits{position:absolute;left:28px;right:28px;bottom:14px;display:grid;grid-template-columns:repeat(4,1fr);gap:22px;z-index:3}.guest-benefit{display:flex;gap:9px;align-items:flex-start}.guest-benefit-icon{font-size:28px;color:#31ee9a;line-height:1;filter:drop-shadow(0 0 8px rgba(39,255,155,.25))}.guest-benefit strong{display:block;font-size:12px;color:#eefaf4;margin-bottom:4px}.guest-benefit small{display:block;font-size:9px;line-height:1.35;color:#7f9189}
+.guest-crystal{position:absolute;right:23%;top:45px;width:190px;height:225px;z-index:2;transform:rotate(3deg);filter:drop-shadow(0 0 28px rgba(30,255,144,.28))}.guest-crystal:before{content:"";position:absolute;inset:0;clip-path:polygon(50% 0,88% 22%,78% 76%,50% 100%,21% 76%,12% 22%);background:linear-gradient(135deg,#0c6,#4effad 25%,#10bd73 42%,#063b28 43%,#17ed91 64%,#0b5d3d 77%,#35f7a0);border:1px solid #4effb0}.guest-crystal:after{content:"";position:absolute;inset:22% 28% 22%;clip-path:polygon(50% 0,100% 25%,80% 100%,20% 100%,0 25%);background:linear-gradient(135deg,rgba(4,40,28,.7),rgba(42,242,153,.85),rgba(2,55,37,.7));box-shadow:inset 0 0 30px rgba(255,255,255,.15)}
+.guest-visual-card{position:absolute;width:116px;height:150px;border:1px solid rgba(47,255,157,.48);border-radius:7px;background:linear-gradient(160deg,rgba(6,39,28,.92),rgba(3,17,13,.95));box-shadow:0 0 20px rgba(0,255,142,.07);z-index:4;padding:10px}.guest-visual-card:before{content:"";display:block;width:56px;height:68px;margin:8px auto;background:linear-gradient(135deg,#0d6,#39e999,#073b29);clip-path:polygon(50% 0,100% 25%,80% 100%,20% 100%,0 25%);opacity:.9}.guest-visual-card b{font-size:9px;color:#d9eee5}.guest-visual-card span{display:block;font-size:8px;color:#6d857b;margin-top:3px}.gvc1{right:39%;top:75px;transform:rotate(-3deg)}.gvc2{right:17%;top:155px;transform:rotate(2deg)}.gvc3{right:28%;top:225px;transform:rotate(-2deg)}
+.guest-login-panel{height:402px;border:1px solid rgba(38,255,154,.18);background:linear-gradient(160deg,rgba(6,28,21,.96),rgba(2,13,10,.96));padding:15px;position:relative;overflow:hidden}.guest-login-panel h3{font-size:14px;margin:0 0 11px}.guest-login-stage{height:345px;border:1px solid rgba(44,255,160,.14);background:radial-gradient(circle at 50% 43%,rgba(0,255,143,.09),transparent 27%),rgba(1,9,7,.65);display:grid;place-items:center;position:relative;overflow:hidden}.guest-login-stage:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 49.7%,rgba(62,255,170,.06) 50%,transparent 50.3%),linear-gradient(transparent 49.7%,rgba(62,255,170,.06) 50%,transparent 50.3%);background-size:100% 80px,80px 100%;opacity:.45}.guest-login-card{position:relative;z-index:2;width:270px;padding:16px;border:1px solid rgba(39,255,157,.48);border-radius:7px;background:rgba(5,28,21,.9);text-align:center;box-shadow:0 0 30px rgba(0,255,142,.08)}.guest-login-logo{width:56px;height:56px;margin:0 auto 9px;clip-path:polygon(50% 0,90% 25%,78% 80%,50% 100%,22% 80%,10% 25%);background:linear-gradient(135deg,#16c979,#68ffc0,#0c8d57);filter:drop-shadow(0 0 13px rgba(40,255,157,.25))}.guest-login-card strong{font-size:13px;display:block}.guest-login-card span{font-size:9px;color:#7f928a;display:block;margin:3px 0 11px}.guest-login-card a{display:flex;height:30px;align-items:center;justify-content:center;border-radius:4px;background:#13e980;color:#032016!important;font-size:10px;font-weight:900;text-decoration:none}
+.guest-payment-strip{height:48px;margin-top:10px;border:1px solid rgba(38,255,154,.14);display:flex;align-items:center;gap:28px;padding:0 20px;color:#b5c4bd;font-size:10px;background:rgba(2,18,13,.7)}.guest-payment-strip b{color:#35e99b;font-size:17px}.guest-payment-strip span{white-space:nowrap}
+.guest-lower{display:grid;grid-template-columns:1.08fr .92fr;margin-top:10px;border:1px solid rgba(38,255,154,.16);background:rgba(2,14,11,.72)}.guest-stat-area{padding:22px 32px;border-right:1px solid rgba(38,255,154,.13)}.guest-section-title{color:#38e99b;font-size:15px;font-weight:900;text-transform:uppercase;margin-bottom:6px}.guest-section-copy{font-size:9px;color:#8a9b93;line-height:1.55;max-width:470px}.guest-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:0}.guest-stat-grid div strong{display:block;color:#32e99a;font-size:17px}.guest-stat-grid div span{display:block;color:#a6b5af;font-size:8px;margin-top:2px}.guest-review-area{padding:22px 28px}.guest-review-head{display:flex;justify-content:space-between;align-items:center}.guest-review-stars{color:#34ed9b;letter-spacing:2px}.guest-review-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}.guest-review-card{border:1px solid rgba(38,255,154,.14);border-radius:5px;background:rgba(4,28,21,.74);padding:9px;min-height:62px}.guest-review-card strong{font-size:9px}.guest-review-card p{font-size:8px;color:#82948c;margin-top:6px}
+.guest-side-section{border:1px solid rgba(38,255,154,.14);background:rgba(2,16,12,.72);padding:18px 22px;margin-top:10px}.guest-side-title{font-size:13px;font-weight:900;text-transform:uppercase;margin-bottom:12px}.guest-mini-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.guest-mini-card{height:86px;border:1px solid rgba(38,255,154,.14);border-radius:5px;background:linear-gradient(160deg,rgba(8,38,27,.8),rgba(2,16,12,.9));padding:8px}.guest-mini-art{height:45px;border-radius:4px;background:radial-gradient(circle,#24ec98 0,#08734a 38%,#031c13 75%);opacity:.85}.guest-mini-card b{display:block;font-size:8px;margin-top:5px}.guest-mini-card span{font-size:7px;color:#6d8078}.guest-blog{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.guest-blog-card{height:92px;border:1px solid rgba(38,255,154,.14);background:linear-gradient(135deg,rgba(5,37,26,.9),rgba(2,15,11,.95));padding:10px;position:relative;overflow:hidden}.guest-blog-card:after{content:"";position:absolute;width:90px;height:90px;right:-18px;top:-18px;transform:rotate(20deg);background:linear-gradient(135deg,transparent,#1eea93 50%,#064a30);opacity:.55}.guest-blog-card small{color:#2fe89a;font-size:7px}.guest-blog-card b{display:block;max-width:150px;font-size:10px;line-height:1.2;margin-top:5px}.guest-blog-card span{display:block;font-size:7px;color:#71847b;margin-top:7px}
+body.light .guest-page{background:#eef5f1;color:#18241f}.light .guest-shell{background:linear-gradient(180deg,#f7fbf8,#edf5f0)}body.light .guest-hero-ref,body.light .guest-login-panel,body.light .guest-lower,body.light .guest-side-section{background:#fff;border-color:#d5e5dc}body.light .guest-copy-ref h1{color:#17231e}body.light .guest-copy-ref p{color:#53645b}body.light .guest-login-stage{background:#f4faf6}body.light .guest-login-card,.light .guest-review-card,.light .guest-mini-card,.light .guest-blog-card{background:#f7fbf9;border-color:#d5e5dc}body.light .guest-payment-strip{background:#fff;border-color:#d5e5dc;color:#53645b}
+@media(max-width:1050px){.guest-reference{grid-template-columns:1fr}.guest-login-panel{height:380px}.guest-login-stage{height:322px}.guest-benefits{grid-template-columns:repeat(2,1fr)}.guest-stat-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.guest-hero-ref{min-height:560px;padding:36px 18px 20px}.guest-copy-ref h1{font-size:38px}.guest-main-cta{min-width:0;width:100%}.guest-crystal{right:15%;top:205px;width:150px;height:180px}.guest-visual-card{transform:scale(.82)}.gvc1{right:42%;top:250px}.gvc2{right:7%;top:305px}.gvc3{right:25%;top:355px}.guest-benefits{left:18px;right:18px;bottom:12px;gap:10px}.guest-benefit small{font-size:8px}.guest-lower{grid-template-columns:1fr}.guest-stat-area{border-right:0;border-bottom:1px solid rgba(38,255,154,.13)}.guest-mini-grid{grid-template-columns:repeat(2,1fr)}.guest-blog{grid-template-columns:1fr}.guest-payment-strip{overflow:auto;gap:18px}}
+</style>
+    <link rel="icon" type="image/png" href="/favicon.png">
 </head>
 <body>
 
@@ -472,17 +707,39 @@
     </div>
 </div>
 
+<div class="modal-overlay" id="emailCodeModal" style="display:none;">
+    <div class="email-code-modal-wrap">
+        <div class="email-code-modal">
+            <button class="email-modal-close" type="button" onclick="closeEmailCodeModal()">×</button>
+            <h2>✉️ Подтверждение Email</h2>
+            <p>Мы отправили вам письмо с кодом на почтовый адрес<br><strong id="emailCodeTarget"></strong></p>
+            <div class="email-code-inputs" id="emailCodeInputs">
+                <input class="email-code-input" maxlength="1" inputmode="numeric" autocomplete="one-time-code">
+                <input class="email-code-input" maxlength="1" inputmode="numeric">
+                <input class="email-code-input" maxlength="1" inputmode="numeric">
+                <input class="email-code-input" maxlength="1" inputmode="numeric">
+                <input class="email-code-input" maxlength="1" inputmode="numeric">
+                <input class="email-code-input" maxlength="1" inputmode="numeric">
+            </div>
+            <button class="btn" type="button" style="width:100%;" onclick="verifyEmailCode(true)">Подтвердить</button>
+            <div id="emailModalMessage" class="profile-section-muted" style="margin-top:12px;"></div>
+        </div>
+    </div>
+</div>
+
 <div class="wrapper">
 
 <header class="header">
     <div class="container header-inner">
         <a href="#" class="logo" id="logoLink">EMERALD<span>Market</span></a>
         <nav class="nav">
-            <a class="active" data-page="sell">Продать скины</a>
-            <a data-page="market">Купить скины</a>
+            <a class="active" data-page="guest">Главная</a>
+            <a data-page="sell" id="sellNavLink">Продать скины</a>
+            <a data-page="market" id="marketNavLink">Купить скины</a>
             <a data-page="profile">Профиль</a>
-            <a data-page="faq"></a>
-            <a data-page="support"></a>
+            <a data-page="admin" id="adminNavLink" style="display:none;">Админка</a>
+            <a data-page="faq">FAQ</a>
+            <a data-page="support">Поддержка</a>
         </nav>
         <div class="header-actions" id="headerActions">
             <a href="/auth/steam" class="btn btn-steam">Войти через Steam</a>
@@ -492,8 +749,45 @@
 
 <div class="content">
 
+<!-- ГОСТЕВАЯ ГЛАВНАЯ -->
+<div class="page active guest-page" id="guestPage">
+<div class="guest-shell"><div class="guest-grid"></div><div class="container guest-reference">
+  <div class="guest-left">
+    <section class="guest-hero-ref">
+      <div class="guest-copy-ref">
+        <h1>EMERALD <span>MARKET</span></h1>
+        <p>Фирменный зелёно-чёрный интерфейс EMERALD Market для посетителей сайта.</p>
+        <a href="/auth/steam" class="guest-main-cta">ВОЙТИ ЧЕРЕЗ STEAM</a>
+        <div class="guest-trust"><span class="stars">★★★★★</span><span>Безопасная авторизация через Steam</span></div>
+      </div>
+      <div class="guest-crystal" aria-hidden="true"></div>
+      <div class="guest-visual-card gvc1"><b>EMERALD</b><span>Featured item</span></div>
+      <div class="guest-visual-card gvc2"><b>MARKET</b><span>Premium item</span></div>
+      <div class="guest-visual-card gvc3"><b>EMERALD</b><span>Collection</span></div>
+      <div class="guest-benefits">
+        <div class="guest-benefit"><div class="guest-benefit-icon">ϟ</div><div><strong>Выгодно</strong><small>Понятный интерфейс и быстрый доступ</small></div></div>
+        <div class="guest-benefit"><div class="guest-benefit-icon">◷</div><div><strong>Быстро</strong><small>Минимум действий для входа</small></div></div>
+        <div class="guest-benefit"><div class="guest-benefit-icon">▣</div><div><strong>Безопасно</strong><small>Защищённая авторизация аккаунта</small></div></div>
+        <div class="guest-benefit"><div class="guest-benefit-icon">◉</div><div><strong>Поддержка</strong><small>Помощь пользователям сайта</small></div></div>
+      </div>
+    </section>
+    <div class="guest-payment-strip"><b>◆</b><span>СБП</span><span>Cards</span><span>USDT</span><span>Bitcoin</span><span>Ethereum</span><span>USDC</span><span>Solana</span></div>
+    <section class="guest-lower">
+      <div class="guest-stat-area"><div class="guest-section-title">Статистика EMERALD Market</div><p class="guest-section-copy">Ключевые показатели сайта, обновляемые в реальном времени. Единый стиль и удобная навигация.</p><div class="guest-stat-grid"><div><strong>24/7</strong><span>Доступность</span></div><div><strong>10K+</strong><span>Посетителей</span></div><div><strong>4.9</strong><span>Оценка</span></div><div><strong>9</strong><span>Лет опыта</span></div></div></div>
+      <div class="guest-review-area"><div class="guest-review-head"><div class="guest-section-title">Отзывы EMERALD Market</div><span class="guest-review-stars">★★★★★</span></div><div class="guest-review-cards"><div class="guest-review-card"><strong>Пользователь</strong><p>Отличный интерфейс.</p></div><div class="guest-review-card"><strong>Пользователь</strong><p>Быстро и удобно.</p></div><div class="guest-review-card"><strong>Пользователь</strong><p>Всё понятно с первого раза.</p></div></div></div>
+    </section>
+  </div>
+  <aside class="guest-right">
+    <section class="guest-login-panel"><h3>EMERALD Market</h3><div class="guest-login-stage"><div class="guest-login-card"><div class="guest-login-logo"></div><strong>Авторизуйтесь через Steam</strong><span>чтобы открыть персональные возможности аккаунта</span><a href="/auth/steam">ВОЙТИ ЧЕРЕЗ STEAM</a></div></div></section>
+    
+    
+    
+  </aside>
+</div></div>
+</div>
+
 <!-- СТРАНИЦА ПРОДАЖИ -->
-<div class="page active" id="sellPage">
+<div class="page" id="sellPage">
     <div class="container">
         <div class="sell-hero">
             <h1>Продавайте скины <span>Counter Strike 2</span> выгодно</h1>
@@ -633,6 +927,54 @@
 <!-- СТРАНИЦА ПРОФИЛЯ -->
 <div class="page" id="profilePage">
     <div class="container">
+        <div id="publicProfileContent" style="display:none;">
+            <div class="public-profile-layout">
+                <div class="profile-left public-profile-left">
+                    <div class="profile-avatar-box public-avatar-box">
+                        <div class="profile-avatar public-avatar" id="publicProfileAvatar">EM</div>
+                        <div class="profile-name">Профиль EMERALD Market</div>
+                        <div id="publicProfileId" class="public-profile-id-small">ID: —</div>
+                    </div>
+                </div>
+
+                <div class="profile-right">
+                    <div class="profile-cards">
+                        <div class="profile-card">
+                            <div class="icon">🛒</div>
+                            <div class="value" id="publicProfileSoldTotal">0,00 ₽</div>
+                            <div class="label">Продано на сумму</div>
+                        </div>
+                        <div class="profile-card">
+                            <div class="icon">🛍️</div>
+                            <div class="value">0,00 ₽</div>
+                            <div class="label">Куплено на сумму</div>
+                        </div>
+                        <div class="profile-card">
+                            <div class="icon">⏰</div>
+                            <div class="value">—</div>
+                            <div class="label">Времени на сайте</div>
+                        </div>
+                        <div class="profile-card">
+                            <div class="icon">🛡️</div>
+                            <div class="value">Отсутствует</div>
+                            <div class="label">КУС верификация</div>
+                        </div>
+                    </div>
+
+                    <div class="profile-transactions public-profile-transactions">
+                        <h3>Транзакции</h3>
+                        <table class="transaction-table">
+                            <thead>
+                                <tr><th>Сервис</th><th>Дата</th><th>Сумма</th><th>Статус</th></tr>
+                            </thead>
+                            <tbody id="publicProfileTransactionsBody">
+                                <tr><td colspan="4" style="text-align:center;padding:30px;color:#6a6d7a;">Нет транзакций</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div id="profileLoginBox" style="display:block;">
             <div class="profile-login-box">
                 <div class="icon" style="font-size: 64px;">🎮</div>
@@ -647,7 +989,8 @@
                     <div class="profile-avatar-box">
                         <div class="profile-avatar" id="profileAvatar"></div>
                         <div class="profile-name" id="profileName"></div>
-                        <div class="profile-balance">0,00 ₽</div>
+                        <div id="profilePublicId" style="font-size:13px; color:#8a8d99; margin-top:4px;">ID: —</div>
+                        <div class="profile-balance" id="profileBalance">💰 0,00 ₽</div>
                     </div>
 
                     <div class="profile-tabs">
@@ -678,7 +1021,7 @@
                     <div class="profile-cards">
                         <div class="profile-card">
                             <div class="icon">🛒</div>
-                            <div class="value">0,00 ₽</div>
+                            <div class="value" id="profileSoldTotal">0,00 ₽</div>
                             <div class="label">Продано на сумму</div>
                         </div>
                         <div class="profile-card">
@@ -720,22 +1063,180 @@
                     </div>
 
                     <div class="profile-content-section" id="section-exchanges">
-                        <div class="in-development">В РАЗРАБОТКЕ</div>
+                        <div class="profile-section-card">
+                            <div class="profile-section-head">
+                                <div class="profile-section-title"><span>🔫</span> Обмены</div>
+                                <div class="exchange-toggle">
+                                    <button class="active" type="button" onclick="switchExchangeTab(this, 'purchases')">Покупки</button>
+                                    <button type="button" onclick="switchExchangeTab(this, 'sales')">Продажи</button>
+                                </div>
+                            </div>
+                            <div class="exchange-empty" id="exchangePurchases">У вас пока нет предметов</div>
+                            <div class="exchange-empty" id="exchangeSales" style="display:none;">У вас пока нет предметов</div>
+                        </div>
                     </div>
 
                     <div class="profile-content-section" id="section-verification">
-                        <div class="in-development"></div>
+                        <div class="profile-section-card">
+                            <div class="profile-section-head" style="justify-content:flex-start;">
+                                <div class="profile-section-title"><span>ⓘ</span> Верификация</div>
+                                <span class="verify-status">Отсутствует</span>
+                            </div>
+                            <div class="verify-text">Статус верификации пока не подтвержден. Если в будущем для аккаунта будет доступна верификация, требования и необходимые действия будут показаны здесь.</div>
+                            <div class="verify-warning">⚠️ &nbsp; Проверка личности предназначена для повышения безопасности платформы и доступна только пользователям, которые соответствуют требованиям сервиса.</div>
+
+                            <div class="email-box">
+                                <div class="profile-section-title" style="font-size:15px; margin-bottom:8px;">✉️ Email <span id="emailVerifyStatus" class="verify-status">Не подтвержден</span></div>
+                                <div class="verify-text">Укажите свой Email и подтвердите его кодом из письма.</div>
+                                <div class="email-row">
+                                    <input id="profileEmail" type="email" placeholder="Введите вашу почту" autocomplete="email">
+                                    <button id="emailActionButton" class="btn" type="button" onclick="requestEmailCode()">Подтвердить</button>
+                                </div>
+                                <div class="email-code-row" id="emailCodeRow">
+                                    <input id="profileEmailCode" type="text" inputmode="numeric" maxlength="6" placeholder="Код из письма">
+                                    <button class="btn" type="button" onclick="verifyEmailCode()">Подтвердить код</button>
+                                </div>
+                                <div id="emailVerifyMessage" class="profile-section-muted" style="margin-top:10px;"></div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="profile-content-section" id="section-sessions">
-                        <div class="in-development"></div>
+                        <div class="profile-section-card">
+                            <div class="profile-section-head" style="display:block;">
+                                <div class="profile-section-title">🔒 Ваши сессии</div>
+                                <div class="profile-section-muted">Здесь отображаются активные входы в ваш аккаунт. IP-адрес виден только владельцу аккаунта.</div>
+                            </div>
+                            <div class="sessions-list" id="profileSessionsList">
+                                <div class="profile-section-muted">Загрузка сессий...</div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="profile-content-section" id="section-api">
-                        <div class="in-development"></div>
+                        <div class="profile-section-card">
+                            <div class="profile-section-head">
+                                <div>
+                                    <div class="profile-section-title">Ваш API Key</div>
+                                    <div class="profile-section-muted">Используйте ключ только в своих приложениях и никому его не передавайте.</div>
+                                </div>
+                                <a class="api-doc" href="#" onclick="return false;">Перейти к документации</a>
+                            </div>
+                            <div class="api-key-row">
+                                <div class="api-key-wrap">
+                                    <input id="profileApiKey" type="password" readonly placeholder="Не сгенерирован" maxlength="17" autocomplete="off">
+                                    <button id="apiKeyEye" class="api-eye" type="button" aria-label="Показать API Key" onclick="toggleApiKeyVisibility()">👁</button>
+                                </div>
+                                <button class="btn" type="button" onclick="generateProfileApiKey()">Сгенерировать</button>
+                            </div>
+                            <div class="api-note">🔐 API-ключ является секретом вашего аккаунта. Если вы больше не хотите его использовать, сгенерируйте новый — старый будет заменён.</div>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- СТРАНИЦА ОТЗЫВОВ -->
+<div class="page" id="reviewsPage">
+    <div class="container">
+        <div class="reviews-page-head">
+            <div><h1>ОТЗЫВЫ</h1><p>Мнения пользователей EMERALD Market</p></div>
+            <div class="reviews-summary">
+                <div class="reviews-summary-avatars" id="reviewsSummaryAvatars"></div>
+                <div><strong id="reviewsCountText">0 пользователей</strong><span>уже оставили свой отзыв</span></div>
+                <div class="reviews-score"><strong>Отлично</strong><div><span class="reviews-trust-stars">★ ★ ★ ★ ★</span> <b>Trustpilot</b></div><span>Оценка <b id="reviewsAverage">0.0</b> из 5</span></div>
+            </div>
+        </div>
+        <div class="reviews-grid" id="reviewsGrid"></div>
+        <div class="reviews-empty" id="reviewsEmpty" style="display:none;">Отзывов пока нет.</div>
+    </div>
+</div>
+
+<!-- СТРАНИЦА БАНА -->
+<div class="page" id="bannedPage">
+    <div class="ban-page">
+        <div class="ban-card">
+            <div class="ban-icon">🛡️</div>
+            <h1>Доступ ограничен</h1>
+            <p>Вам был выдан бан на сайте по некорректной причине.</p>
+            <p>Если вас что-то не устраивает, напишите, пожалуйста, сюда:</p>
+            <a class="ban-contact" href="https://t.me/ikiawka" target="_blank" rel="noopener noreferrer">@ikiawka</a>
+        </div>
+    </div>
+</div>
+
+<!-- АДМИНКА -->
+<div class="page" id="adminPage">
+    <div class="container">
+        <div class="sell-hero"><h1>Админка <span>EMERALD Market</span></h1></div>
+        <div class="profile-cards" style="margin-bottom:24px;">
+            <div class="profile-card"><div class="icon">👥</div><div class="value" id="adminUsersCount">0</div><div class="label">Пользователей</div></div>
+            <div class="profile-card"><div class="icon">🛒</div><div class="value" id="adminSalesCount">0</div><div class="label">Продаж</div></div>
+            <div class="profile-card"><div class="icon">💰</div><div class="value" id="adminSoldTotal">0,00 ₽</div><div class="label">Продано на сумму</div></div>
+            <div class="profile-card"><div class="icon">💸</div><div class="value" id="adminPayoutTotal">0,00 ₽</div><div class="label">Начислено пользователям</div></div>
+        </div>
+        <div class="admin-control-card" id="adminAccessCard" style="display:none; margin-bottom:24px;">
+            <div class="admin-control-title">🛡️ Управление доступом</div>
+            <div class="admin-control-subtitle">Полное управление пользователями и продажами доступно администраторам.</div>
+            <div class="admin-access-row">
+                <input id="adminGrantId" class="filter-input" type="number" min="1" placeholder="ID пользователя">
+                <button class="btn admin-action-btn" onclick="grantAdminAccess()">Выдать админку</button>
+                <button class="btn-outline admin-action-btn" onclick="revokeAdminAccess()">Забрать</button>
+            </div>
+            <div class="admin-management-grid">
+                <select id="adminManageAction" class="filter-select" onchange="updateAdminActionFields()">
+                    <option value="ban">🚫 Выдать бан</option>
+                    <option value="unban">✅ Снять бан</option>
+                    <option value="balance_add">💰 Выдать баланс</option>
+                    <option value="balance_remove">💸 Убрать баланс</option>
+                    <option value="stats_set">📊 Изменить статистику</option>
+                    <option value="change_id">🔢 Изменить ID</option>
+                </select>
+                <input id="adminManageId" class="filter-input" type="number" min="1" placeholder="ID пользователя">
+                <input id="adminManageAmount" class="filter-input" type="number" step="0.01" placeholder="Сумма баланса" style="display:none;">
+                <input id="adminManageNewId" class="filter-input" type="number" min="100000" max="999999" placeholder="Новый ID" style="display:none;">
+                <input id="adminManageReason" class="filter-input" type="text" maxlength="200" placeholder="Причина бана" style="display:none;">
+            </div>
+            <div id="adminStatsFields" class="admin-stat-grid" style="display:none;">
+                <input id="adminManageTotalSold" class="filter-input" type="number" min="0" step="0.01" placeholder="Продано на сумму">
+                <input id="adminManageTotalPayout" class="filter-input" type="number" min="0" step="0.01" placeholder="Выплачено">
+            </div>
+            <div class="admin-access-row" style="margin-top:12px;">
+                <button class="btn admin-action-btn" onclick="manageUser()">Применить действие</button>
+            </div>
+            <div class="admin-management-help">Баланс можно выдать или убрать. Статистику «Продано» и «Выплачено» можно установить вручную. ID — случайный 6-значный диапазон 100000–999999, кроме 666.</div>
+            <div id="adminGrantStatus" class="admin-grant-status"></div>
+            <div id="adminManagementStatus" class="admin-management-status"></div>
+        </div>
+
+        <div class="admin-control-card" id="adminReviewsCard" style="margin-bottom:24px;">
+            <div class="admin-control-title">⭐ Управление отзывами</div>
+            <div class="admin-control-subtitle">Добавляйте отзывы вручную: имя, оценка, текст и ссылка на фото.</div>
+            <div class="admin-management-grid">
+                <input id="reviewAdminName" class="filter-input" type="text" maxlength="80" placeholder="Имя пользователя">
+                <select id="reviewAdminRating" class="filter-select"><option value="5">5 — отлично</option><option value="4">4 — хорошо</option><option value="3">3 — нормально</option><option value="2">2 — плохо</option><option value="1">1 — очень плохо</option></select>
+                <div class="review-photo-input-wrap">
+                    <input id="reviewAdminPhoto" class="filter-input" type="url" maxlength="2000" placeholder="Ссылка на фото (необязательно)">
+                    <div class="review-photo-or">или PNG с компьютера</div>
+                    <input id="reviewAdminPhotoFile" class="filter-input review-photo-file" type="file" accept="image/png">
+                    <div id="reviewAdminPhotoStatus" class="review-photo-status"></div>
+                </div>
+                <input id="reviewAdminText" class="filter-input" type="text" maxlength="2000" placeholder="Текст отзыва">
+            </div>
+            <div class="admin-access-row" style="margin-top:12px;"><button class="btn admin-action-btn" onclick="saveAdminReview()">Добавить отзыв</button><button class="btn-outline admin-action-btn" onclick="clearAdminReviewForm()">Очистить</button></div>
+            <div id="adminReviewStatus" class="admin-management-status"></div>
+            <div style="overflow:auto;margin-top:16px;"><table class="transaction-table"><thead><tr><th>Фото</th><th>Имя</th><th>Оценка</th><th>Отзыв</th><th>Дата</th><th>Действия</th></tr></thead><tbody id="adminReviewsBody"></tbody></table></div>
+        </div>
+
+        <div class="profile-transactions" style="margin-bottom:24px;">
+            <h3>Пользователи</h3>
+            <div style="overflow:auto;"><table class="transaction-table"><thead><tr><th>ID</th><th>Steam ID</th><th>Имя</th><th>Trade URL</th><th>Последний вход</th><th>Продано</th><th>Выплачено</th><th>Баланс</th><th>Статус</th></tr></thead><tbody id="adminUsersBody"></tbody></table></div>
+        </div>
+        <div class="profile-transactions">
+            <h3>Продажи</h3>
+            <div style="overflow:auto;"><table class="transaction-table"><thead><tr><th>Дата</th><th>ID</th><th>Пользователь</th><th>Сумма</th><th>Выплата</th><th>Метод</th><th>Скины</th><th>Статус</th></tr></thead><tbody id="adminSalesBody"></tbody></table></div>
         </div>
     </div>
 </div>
@@ -995,8 +1496,10 @@
             <div class="col">
                 <h4>Информация</h4>
                 <a onclick="navigateTo('privacy')">Политика конфиденциальности</a>
+                <a onclick="navigateTo('reviews')">Отзывы</a>
             </div>
         </div>
+        <div class="online-indicator"><span class="online-dot"></span> Сейчас на сайте: <strong id="siteOnlineCount">0</strong></div>
         <div class="footer-bottom">
             © 2025 EMERALD Market. Все права защищены.
         </div>
@@ -1202,7 +1705,7 @@ function getRequisites() {
 }
 
 // ===== ФУНКЦИЯ ПРОДАЖИ =====
-function processSale() {
+async function processSale() {
     if (selectedSteamSkins.length === 0) {
         showModal('Ошибка', 'Выберите хотя бы один скин для продажи');
         return;
@@ -1253,6 +1756,29 @@ function processSale() {
     
     const message = `Привет, у меня есть скины:\n${skinList}\n\nГотов купить их у меня? Если да, погнали в чат ТГК ))\n\nВот мои реквизиты:\n${reqText}`;
     
+    const total = selectedItems.reduce((sum, item) => sum + (Number(item.price) || 0), 0);
+    const payoutPercent = calculatePayoutPercent(total);
+    const payout = total * (payoutPercent / 100);
+    const paymentMethod = requisites.method;
+
+    try {
+        const saleResponse = await fetch('/api/record-sale', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                total,
+                payout,
+                paymentMethod,
+                items: selectedItems.map(item => `${item.weapon || 'CS2'} | ${item.skinName || item.name} ${item.quality || 'Field-Tested'}`)
+            })
+        });
+        const saleData = await saleResponse.json();
+        if (!saleResponse.ok) throw new Error(saleData.error || 'Не удалось сохранить заявку');
+    } catch (error) {
+        showModal('Ошибка', error.message);
+        return;
+    }
+
     const encodedMessage = encodeURIComponent(message);
     const telegramUrl = `https://t.me/ikiawka?text=${encodedMessage}`;
     window.open(telegramUrl, '_blank');
@@ -1271,14 +1797,359 @@ function updateTotals() {
     document.getElementById('payoutDisplay').textContent = `${payoutAmount.toFixed(2)} ₽`;
 }
 
+function getProfileIdFromPath() {
+    const match = window.location.pathname.match(/^\/profile\/?(\d+)?\/?$/);
+    return match && match[1] ? Number(match[1]) : null;
+}
+
+function navigateTo(page, push = true) {
+    if (currentUser?.banned && page !== 'banned') page = 'banned';
+    if (page === 'admin' && !currentUser?.isAdmin) return;
+
+    if (push) {
+        if (page === 'admin') history.pushState({}, '', '/admin');
+        else if (page === 'profile') history.pushState({}, '', '/profile');
+        else if (page === 'reviews') history.pushState({}, '', '/reviews');
+        else history.pushState({}, '', '/');
+    }
+
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav a').forEach(a => a.classList.toggle('active', a.dataset.page === page));
+    const target = document.getElementById(page + 'Page');
+    if (target) target.classList.add('active');
+
+    if (page === 'profile') renderProfile();
+    if (page === 'reviews') loadReviewsPage();
+    if (page === 'admin') loadAdminData();
+    if (page === 'banned') {
+        document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
+    }
+}
+
+async function renderPublicProfile(publicId) {
+    const publicBox = document.getElementById('publicProfileContent');
+    const loginBox = document.getElementById('profileLoginBox');
+    const ownContent = document.getElementById('profileContent');
+    if (!publicBox || !loginBox || !ownContent) return;
+
+    if (!publicId) {
+        publicBox.style.display = 'none';
+        if (currentUser) { loginBox.style.display = 'none'; ownContent.style.display = 'block'; }
+        else { loginBox.style.display = 'block'; ownContent.style.display = 'none'; }
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/profile/${encodeURIComponent(publicId)}`);
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Профиль не найден');
+
+        publicBox.style.display = 'block';
+        loginBox.style.display = 'none';
+        ownContent.style.display = 'none';
+
+        document.getElementById('publicProfileId').textContent = `ID: ${data.publicId}`;
+        document.getElementById('publicProfileSoldTotal').textContent = `${Number(data.totalSold || 0).toFixed(2)} ₽`;
+
+        const body = document.getElementById('publicProfileTransactionsBody');
+        const sales = Array.isArray(data.sales) ? data.sales : [];
+        body.innerHTML = sales.length ? sales.map(sale => {
+            const status = sale.status === 'sold'
+                ? '<span style="color:#2ecc71;font-weight:800;">Продал</span>'
+                : sale.status === 'not_sold'
+                    ? '<span style="color:#ff6b6b;font-weight:800;">Не продал</span>'
+                    : '<span style="color:#e8c75b;font-weight:800;">Ожидает</span>';
+            return `<tr>
+                <td>EMERALD Market</td>
+                <td>${formatAdminDate(sale.createdAt)}</td>
+                <td>${Number(sale.total || 0).toFixed(2)} ₽</td>
+                <td>${status}</td>
+            </tr>`;
+        }).join('') : '<tr><td colspan="4" style="text-align:center;padding:30px;color:#6a6d7a;">Нет транзакций</td></tr>';
+    } catch (error) {
+        publicBox.style.display = 'block';
+        loginBox.style.display = 'none';
+        ownContent.style.display = 'none';
+        document.getElementById('publicProfileId').textContent = error.message;
+    }
+}
+
+async function loadReviewsPage() {
+    const grid = document.getElementById('reviewsGrid');
+    const empty = document.getElementById('reviewsEmpty');
+    if (!grid) return;
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px;color:#8d96a3;">Загрузка отзывов...</div>';
+    try {
+        const response = await fetch('/api/reviews');
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Ошибка загрузки отзывов');
+        const reviews = Array.isArray(data.reviews) ? data.reviews : [];
+        if (!reviews.length) { grid.innerHTML=''; if(empty) empty.style.display='block'; updateReviewsSummary([]); return; }
+        if(empty) empty.style.display='none';
+        grid.innerHTML = reviews.map(review => {
+            const first = escapeHtml((review.name || '?').slice(0,1).toUpperCase());
+            const avatar = review.photoUrl ? `<img class="review-card-avatar" src="${escapeHtml(review.photoUrl)}" alt="" loading="lazy" onerror="this.outerHTML='<div class=\"review-card-avatar\">${first}</div>'>` : `<div class="review-card-avatar">${first}</div>`;
+            return `<article class="review-card"><div class="review-card-top">${avatar}<div><div class="review-card-name">${escapeHtml(review.name)}</div><div class="review-card-date">${formatAdminDate(review.createdAt)}</div></div></div><div class="review-card-rating">${Number(review.rating)}</div><div class="review-card-text">${escapeHtml(review.text)}</div>${review.photoUrl ? `<img class="review-card-photo" src="${escapeHtml(review.photoUrl)}" alt="Фото отзыва" loading="lazy" onerror="this.style.display='none'">` : ''}</article>`;
+        }).join('');
+        updateReviewsSummary(reviews);
+    } catch (error) { grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:30px;color:#ff8b8b;">${escapeHtml(error.message)}</div>`; }
+}
+
+function updateReviewsSummary(reviews) {
+    const count = reviews.length;
+    const avg = count ? (reviews.reduce((sum,r)=>sum+Number(r.rating||0),0)/count).toFixed(1) : '0.0';
+    const countEl=document.getElementById('reviewsCountText'); if(countEl) countEl.textContent=`${count} ${count===1?'пользователь':'пользователей'}`;
+    const avgEl=document.getElementById('reviewsAverage'); if(avgEl) avgEl.textContent=avg;
+    const avatars=document.getElementById('reviewsSummaryAvatars');
+    if(avatars) avatars.innerHTML=reviews.slice(0,4).map(r=>r.photoUrl?`<img src="${escapeHtml(r.photoUrl)}" alt="" loading="lazy" onerror="this.outerHTML='<div class=\"reviews-avatar-fallback\">${escapeHtml((r.name||'?').slice(0,1).toUpperCase())}</div>'">`:`<div class="reviews-avatar-fallback">${escapeHtml((r.name||'?').slice(0,1).toUpperCase())}</div>`).join('');
+}
+
+let reviewAdminPhotoData = '';
+
+function clearAdminReviewForm(){
+    ['reviewAdminName','reviewAdminPhoto','reviewAdminText'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    const file=document.getElementById('reviewAdminPhotoFile'); if(file) file.value='';
+    reviewAdminPhotoData='';
+    const rating=document.getElementById('reviewAdminRating');if(rating)rating.value='5';
+    const status=document.getElementById('adminReviewStatus');if(status)status.textContent='';
+    const photoStatus=document.getElementById('reviewAdminPhotoStatus');if(photoStatus)photoStatus.textContent='';
+    document.getElementById('adminReviewsCard')?.removeAttribute('data-edit-id');
+}
+function editAdminReview(review){
+    document.getElementById('reviewAdminName').value=review.name||'';
+    document.getElementById('reviewAdminRating').value=String(review.rating||5);
+    const photoInput=document.getElementById('reviewAdminPhoto'), photoStatus=document.getElementById('reviewAdminPhotoStatus'), fileInput=document.getElementById('reviewAdminPhotoFile');
+    if(fileInput)fileInput.value='';
+    if(String(review.photoUrl||'').startsWith('data:image/png;base64,')){photoInput.value='';reviewAdminPhotoData=review.photoUrl||'';if(photoStatus)photoStatus.textContent='✓ PNG уже загружен и будет сохранён, если не выбрать новый';}
+    else{photoInput.value=review.photoUrl||'';reviewAdminPhotoData='';if(photoStatus)photoStatus.textContent='';}
+    document.getElementById('reviewAdminText').value=review.text||'';
+    document.getElementById('adminReviewsCard').dataset.editId=review.id;
+    document.getElementById('adminReviewStatus').textContent=`Редактирование отзыва #${review.id}`;
+    document.getElementById('adminReviewsCard').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function initReviewPhotoUpload(){
+    const fileInput=document.getElementById('reviewAdminPhotoFile'), photoStatus=document.getElementById('reviewAdminPhotoStatus');
+    if(!fileInput||fileInput.dataset.bound==='1')return; fileInput.dataset.bound='1';
+    fileInput.addEventListener('change',()=>{
+        const file=fileInput.files?.[0];
+        if(!file){reviewAdminPhotoData='';if(photoStatus)photoStatus.textContent='';return;}
+        if(file.type!=='image/png'){fileInput.value='';reviewAdminPhotoData='';if(photoStatus)photoStatus.textContent='✕ Можно загружать только PNG';return;}
+        if(file.size>5*1024*1024){fileInput.value='';reviewAdminPhotoData='';if(photoStatus)photoStatus.textContent='✕ PNG должен быть не больше 5 МБ';return;}
+        const reader=new FileReader();
+        reader.onload=()=>{reviewAdminPhotoData=String(reader.result||'');if(photoStatus)photoStatus.textContent=`✓ PNG выбран: ${file.name} (${(file.size/1024/1024).toFixed(2)} МБ)`;};
+        reader.onerror=()=>{reviewAdminPhotoData='';if(photoStatus)photoStatus.textContent='✕ Не удалось прочитать PNG';};
+        reader.readAsDataURL(file);
+    });
+}
+async function saveAdminReview(){
+    if(!currentUser?.isAdmin)return; initReviewPhotoUpload();
+    const card=document.getElementById('adminReviewsCard'), editId=card?.dataset.editId;
+    const photoLink=document.getElementById('reviewAdminPhoto').value.trim();
+    const photoUrl=reviewAdminPhotoData||photoLink;
+    const body={name:document.getElementById('reviewAdminName').value.trim(),rating:Number(document.getElementById('reviewAdminRating').value),photoUrl,text:document.getElementById('reviewAdminText').value.trim()};
+    const status=document.getElementById('adminReviewStatus');status.textContent='⏳ Сохраняем...';
+    try{const response=await fetch(editId?`/api/admin/reviews/${encodeURIComponent(editId)}`:'/api/admin/reviews',{method:editId?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const data=await response.json();if(!response.ok)throw new Error(data.error||'Не удалось сохранить отзыв');clearAdminReviewForm();status.textContent=editId?'✓ Отзыв изменён':'✓ Отзыв добавлен';await loadAdminReviews();}catch(error){status.textContent=`✕ ${error.message}`;}
+}
+async function deleteAdminReview(id){if(!currentUser?.isAdmin)return;if(!confirm('Удалить этот отзыв?'))return;try{const response=await fetch(`/api/admin/reviews/${encodeURIComponent(id)}`,{method:'DELETE'});const data=await response.json();if(!response.ok)throw new Error(data.error||'Не удалось удалить отзыв');await loadAdminReviews();}catch(error){showModal('Ошибка',error.message);}}
+async function loadAdminReviews(){if(!currentUser?.isAdmin)return;const body=document.getElementById('adminReviewsBody');if(!body)return;try{const response=await fetch('/api/reviews');const data=await response.json();if(!response.ok)throw new Error(data.error||'Ошибка загрузки отзывов');const reviews=data.reviews||[];body.innerHTML=reviews.map(review=>`<tr><td>${review.photoUrl?`<img class="review-admin-thumb" src="${escapeHtml(review.photoUrl)}" alt="" onerror="this.style.display='none'">`:'—'}</td><td>${escapeHtml(review.name)}</td><td>${'★'.repeat(Number(review.rating))}</td><td style="min-width:260px;max-width:480px;white-space:normal;">${escapeHtml(review.text)}</td><td>${formatAdminDate(review.createdAt)}</td><td><div class="review-admin-actions"><button class="review-edit-btn" onclick='editAdminReview(${JSON.stringify(review).replace(/'/g,"&#39;")})'>Изменить</button><button class="review-delete-btn" onclick="deleteAdminReview(${Number(review.id)})">Удалить</button></div></td></tr>`).join('')||'<tr><td colspan="6" style="text-align:center;padding:25px;color:#6a6d7a;">Отзывов пока нет</td></tr>';}catch(error){body.innerHTML=`<tr><td colspan="6" style="color:#ff8b8b;">${escapeHtml(error.message)}</td></tr>`;}}
+document.addEventListener('DOMContentLoaded',initReviewPhotoUpload);
+
+async function loadAdminData() {
+    if (!currentUser?.isAdmin) return;
+    try {
+        const response = await fetch('/api/admin/data');
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Ошибка загрузки админки');
+
+        document.getElementById('adminUsersCount').textContent = data.users.length;
+        document.getElementById('adminSalesCount').textContent = data.sales.length;
+        const accessCard = document.getElementById('adminAccessCard');
+        if (accessCard) accessCard.style.display = currentUser?.isAdmin ? 'block' : 'none';
+        const confirmedSales = data.sales.filter(x => x.status === 'sold');
+        document.getElementById('adminSoldTotal').textContent = `${confirmedSales.reduce((s,x)=>s+Number(x.total||0),0).toFixed(2)} ₽`;
+        document.getElementById('adminPayoutTotal').textContent = `${confirmedSales.reduce((s,x)=>s+Number(x.payout||0),0).toFixed(2)} ₽`;
+
+        document.getElementById('adminUsersBody').innerHTML = data.users.map(user => `
+            <tr>
+                <td><a href="/profile/${user.publicId}" onclick="event.preventDefault(); history.pushState({}, '', this.href); navigateTo('profile', false); renderPublicProfile(${user.publicId});" style="color:#2ecc71;">${user.publicId}</a></td>
+                <td>${escapeHtml(user.steamId)}</td>
+                <td>${escapeHtml(user.username)} ${user.isAdmin ? '<span class=\"admin-badge\">ADMIN</span>' : ''}</td>
+                <td style="max-width:260px; word-break:break-all;">${escapeHtml(user.tradeUrl || '—')}</td>
+                <td>${formatAdminDate(user.lastLoginAt)}</td>
+                <td>${Number(user.totalSold||0).toFixed(2)} ₽</td>
+                <td>${Number(user.totalPayout||0).toFixed(2)} ₽</td>
+                <td>${Number(user.balance||0).toFixed(2)} ₽</td>
+                <td>${user.banned ? '<span class="admin-user-state banned">БАН</span>' : '<span style="color:#6df3a2;">Активен</span>'}</td>
+            </tr>`).join('') || '<tr><td colspan="9">Пользователей нет</td></tr>';
+
+        document.getElementById('adminSalesBody').innerHTML = data.sales.map(sale => `
+            <tr>
+                <td>${formatAdminDate(sale.createdAt)}</td>
+                <td>${escapeHtml(sale.id)}</td>
+                <td><a href="/profile/${sale.publicId}" onclick="event.preventDefault(); history.pushState({}, '', this.href); navigateTo('profile', false); renderPublicProfile(${sale.publicId});" style="color:#2ecc71;">#${sale.publicId}</a> ${escapeHtml(sale.username)}</td>
+                <td>${Number(sale.total||0).toFixed(2)} ₽</td>
+                <td>${Number(sale.payout||0).toFixed(2)} ₽</td>
+                <td>${escapeHtml(sale.paymentMethod || '—')}</td>
+                <td>${(sale.items || []).map(escapeHtml).join('<br>') || '—'}</td>
+                <td style="white-space:nowrap;">${sale.status === 'pending' ? `<div class="sale-pending-actions"><button class="sale-status-btn" onclick="setSaleStatus('${sale.id}','sold')">Продал</button><button class="sale-status-btn no" onclick="setSaleStatus('${sale.id}','not_sold')">Не продал</button></div>` : (sale.status === 'sold' ? '<span style="color:#2ecc71;font-weight:800;">Продал</span>' : '<span style="color:#ff6b6b;font-weight:800;">Не продал</span>')}<button class="sale-delete-btn" title="Удалить продажу" onclick="deleteSale('${sale.id}')">×</button></td>
+            </tr>`).join('') || '<tr><td colspan="8">Продаж пока нет</td></tr>';
+    } catch (error) {
+        showModal('Ошибка', error.message);
+    }
+}
+
+async function grantAdminAccess() {
+    if (!currentUser?.isAdmin) return;
+    const id = Number(document.getElementById('adminGrantId').value);
+    const status = document.getElementById('adminGrantStatus');
+    status.textContent = '⏳ Сохраняем...';
+    try {
+        const response = await fetch('/api/admin/grants', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ publicId: id })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Не удалось выдать доступ');
+        status.textContent = `✓ ID ${id} теперь имеет доступ к админке`;
+        await loadAdminData();
+    } catch (error) { status.textContent = `✕ ${error.message}`; }
+}
+
+async function revokeAdminAccess() {
+    if (!currentUser?.isAdmin) return;
+    const id = Number(document.getElementById('adminGrantId').value);
+    const status = document.getElementById('adminGrantStatus');
+    status.textContent = '⏳ Сохраняем...';
+    try {
+        const response = await fetch(`/api/admin/grants/${encodeURIComponent(id)}`, { method: 'DELETE' });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Не удалось забрать доступ');
+        status.textContent = `✓ Доступ у ID ${id} отозван`;
+        await loadAdminData();
+    } catch (error) { status.textContent = `✕ ${error.message}`; }
+}
+
+function updateAdminActionFields() {
+    const action = document.getElementById('adminManageAction')?.value;
+    const amount = document.getElementById('adminManageAmount');
+    const newId = document.getElementById('adminManageNewId');
+    const reason = document.getElementById('adminManageReason');
+    const stats = document.getElementById('adminStatsFields');
+    if (!amount || !newId || !reason || !stats) return;
+    amount.style.display = ['balance_add','balance_remove'].includes(action) ? 'block' : 'none';
+    newId.style.display = action === 'change_id' ? 'block' : 'none';
+    reason.style.display = action === 'ban' ? 'block' : 'none';
+    stats.style.display = action === 'stats_set' ? 'grid' : 'none';
+}
+
+async function manageUser() {
+    if (!currentUser?.isAdmin) return;
+    const status = document.getElementById('adminManagementStatus');
+    const action = document.getElementById('adminManageAction').value;
+    const publicId = Number(document.getElementById('adminManageId').value);
+    if (!Number.isInteger(publicId) || publicId <= 0) {
+        status.textContent = '✕ Введите ID пользователя';
+        return;
+    }
+    const body = { action, publicId };
+    if (action === 'balance_add' || action === 'balance_remove') body.amount = Number(document.getElementById('adminManageAmount').value);
+    if (action === 'change_id') body.newPublicId = Number(document.getElementById('adminManageNewId').value);
+    if (action === 'stats_set') {
+        body.totalSold = Number(document.getElementById('adminManageTotalSold').value);
+        body.totalPayout = Number(document.getElementById('adminManageTotalPayout').value);
+    }
+    if (action === 'ban') body.reason = document.getElementById('adminManageReason').value.trim();
+    status.textContent = '⏳ Применяем...';
+    try {
+        const response = await fetch('/api/admin/manage-user', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Не удалось применить действие');
+        if (action === 'change_id') status.textContent = `✓ ID изменён на ${data.publicId}`;
+        else if (action === 'balance_add') status.textContent = `✓ Баланс выдан. Текущий баланс: ${Number(data.balance || 0).toFixed(2)} ₽`;
+        else if (action === 'balance_remove') status.textContent = `✓ Баланс уменьшен. Текущий баланс: ${Number(data.balance || 0).toFixed(2)} ₽`;
+        else if (action === 'stats_set') status.textContent = `✓ Статистика ID ${publicId} изменена`;
+        else if (action === 'ban') status.textContent = `✓ Пользователь #${publicId} заблокирован`;
+        else status.textContent = `✓ Пользователь #${publicId} разблокирован`;
+        await loadAdminData();
+    } catch (error) { status.textContent = `✕ ${error.message}`; }
+}
+
+async function setSaleStatus(saleId, status) {
+    if (!currentUser?.isAdmin) return;
+    try {
+        const response = await fetch(`/api/admin/sales/${encodeURIComponent(saleId)}/status`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Ошибка изменения статуса');
+        await loadAdminData();
+    } catch (error) {
+        showModal('Ошибка', error.message);
+    }
+}
+
+async function deleteSale(saleId) {
+    if (!currentUser?.isAdmin) return;
+    if (!confirm('Удалить эту продажу? Пользователь и его аккаунт останутся.')) return;
+    try {
+        const response = await fetch(`/api/admin/sales/${encodeURIComponent(saleId)}`, { method: 'DELETE' });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Не удалось удалить продажу');
+        await loadAdminData();
+    } catch (error) {
+        showModal('Ошибка', error.message);
+    }
+}
+
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
+}
+function formatAdminDate(value) {
+    if (!value) return '—';
+    const d = new Date(value);
+    return Number.isNaN(d.getTime()) ? '—' : d.toLocaleString('ru-RU');
+}
+
 async function fetchUser() {
     try {
         const response = await fetch('/api/user');
         const data = await response.json();
         if (data.loggedIn) {
-            currentUser = { id: data.user.id, name: data.user.name, avatar: data.user.avatar };
+            currentUser = {
+                id: data.user.id,
+                publicId: Number(data.user.publicId),
+                isOwner: data.user.isOwner === true,
+                isAdmin: data.user.isAdmin === true,
+                name: data.user.name,
+                avatar: data.user.avatar,
+                totalSold: Number(data.user.totalSold || 0),
+                totalPayout: Number(data.user.totalPayout || 0),
+                balance: Number(data.user.balance || 0),
+                banned: data.user.banned === true,
+                email: data.user.email || '',
+                emailVerified: data.user.emailVerified === true
+            };
             updateUserUI();
+            if (currentUser.banned) {
+                navigateTo('banned', false);
+                return;
+            }
             renderProfile();
+            const profileId = getProfileIdFromPath();
+            if (profileId) {
+                navigateTo('profile', false);
+                await renderPublicProfile(profileId);
+            } else if (window.location.pathname === '/admin') {
+                navigateTo('admin', false);
+            } else if (window.location.pathname === '/reviews') {
+                navigateTo('reviews', false);
+            } else {
+                navigateTo('sell', false);
+            }
             loadTradeUrl();
             loadSettings();
             await fetchMarketPrices();
@@ -1286,6 +2157,15 @@ async function fetchUser() {
             currentUser = null;
             updateUserUI();
             renderProfile();
+            const profileId = getProfileIdFromPath();
+            if (profileId) {
+                navigateTo('profile', false);
+                await renderPublicProfile(profileId);
+            } else if (window.location.pathname === '/reviews') {
+                navigateTo('reviews', false);
+            } else {
+                navigateTo('guest', false);
+            }
         }
     } catch (error) {
         console.error('Ошибка загрузки пользователя:', error);
@@ -1300,13 +2180,23 @@ function updateUserUI() {
         actions.innerHTML = `
             <div class="steam-user" style="cursor:pointer;" onclick="navigateTo('profile')">
                 <div class="steam-avatar" style="background-image:url('${currentUser.avatar}');"></div>
-                <span class="steam-name">${currentUser.name}</span>
+                <span class="steam-name">${escapeHtml(currentUser.name)}</span>
+                <span class="header-balance">💰 ${Number(currentUser.balance || 0).toFixed(2)} ₽</span>
                 <button class="steam-logout" onclick="event.stopPropagation(); logoutUser()">✕</button>
             </div>
         `;
     } else {
         actions.innerHTML = `<a href="/auth/steam" class="btn btn-steam">Войти через Steam</a>`;
     }
+
+    const adminLink = document.getElementById('adminNavLink');
+    if (adminLink) adminLink.style.display = currentUser?.isAdmin ? 'block' : 'none';
+    const guestLink = document.querySelector('.nav a[data-page="guest"]');
+    const sellLink = document.getElementById('sellNavLink');
+    const marketLink = document.getElementById('marketNavLink');
+    if (guestLink) guestLink.style.display = currentUser ? 'none' : 'block';
+    if (sellLink) sellLink.style.display = currentUser ? 'block' : 'none';
+    if (marketLink) marketLink.style.display = currentUser ? 'block' : 'none';
 }
 
 // ===== НАСТРОЙКИ =====
@@ -1554,6 +2444,7 @@ async function loadSteamInventory() {
     }
 }
 
+
 function escapeHtml(text) {
     return String(text)
         .replace(/&/g, '&amp;')
@@ -1589,38 +2480,243 @@ function updateSkinSelectionUI() {
     });
 }
 
-// ===== НАВИГАЦИЯ =====
-function navigateTo(page) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    const target = document.getElementById(page + 'Page');
-    if (target) target.classList.add('active');
-    document.querySelectorAll('.nav a').forEach(a => {
-        if (a.dataset.page === page) {
-            a.classList.add('active');
-        } else {
-            a.classList.remove('active');
-        }
-    });
-}
-
 // ===== ПРОФИЛЬ =====
 function renderProfile() {
     if (currentUser) {
         document.getElementById('profileLoginBox').style.display = 'none';
         document.getElementById('profileContent').style.display = 'block';
         document.getElementById('profileName').textContent = currentUser.name;
+        const soldEl = document.getElementById('profileSoldTotal');
+        const balanceEl = document.getElementById('profileBalance');
+        if (soldEl) soldEl.textContent = `${Number(currentUser.totalSold || 0).toFixed(2)} ₽`;
+        if (balanceEl) balanceEl.textContent = `💰 ${Number(currentUser.balance || 0).toFixed(2)} ₽`;
+        const publicIdEl = document.getElementById('profilePublicId');
+        if (publicIdEl) publicIdEl.textContent = `ID: ${currentUser.publicId || '—'}`;
+        const avatar = document.getElementById('profileAvatar');
         if (currentUser.avatar) {
-            document.getElementById('profileAvatar').style.backgroundImage = `url('${currentUser.avatar}')`;
-            document.getElementById('profileAvatar').style.backgroundSize = 'cover';
-            document.getElementById('profileAvatar').style.backgroundPosition = 'center';
-            document.getElementById('profileAvatar').textContent = '';
-        } else {
-            document.getElementById('profileAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
-        }
+            avatar.style.backgroundImage = `url('${currentUser.avatar}')`;
+            avatar.style.backgroundSize = 'cover';
+            avatar.style.backgroundPosition = 'center';
+            avatar.textContent = '';
+        } else avatar.textContent = currentUser.name.charAt(0).toUpperCase();
+        loadProfileSections();
     } else {
         document.getElementById('profileLoginBox').style.display = 'block';
         document.getElementById('profileContent').style.display = 'none';
     }
+}
+
+setupEmailCodeInputs();
+
+async function loadProfileSections() {
+    await Promise.allSettled([loadEmailVerification(), loadProfileSessions(), loadProfileApiKey()]);
+}
+
+function switchExchangeTab(button, tab) {
+    document.querySelectorAll('.exchange-toggle button').forEach(b => b.classList.remove('active'));
+    button.classList.add('active');
+    document.getElementById('exchangePurchases').style.display = tab === 'purchases' ? 'flex' : 'none';
+    document.getElementById('exchangeSales').style.display = tab === 'sales' ? 'flex' : 'none';
+}
+
+let emailActionMode = 'verify';
+
+function updateEmailActionUI(email, verified) {
+    const input = document.getElementById('profileEmail');
+    const button = document.getElementById('emailActionButton');
+    const status = document.getElementById('emailVerifyStatus');
+    if (!input || !button || !status) return;
+    input.value = email || '';
+    status.textContent = verified ? 'Подтвержден' : 'Не подтвержден';
+    status.className = verified ? 'verify-status verify-ok' : 'verify-status';
+    if (verified && email) {
+        input.disabled = true;
+        button.textContent = 'Отвязать';
+        button.classList.add('email-unbind-btn');
+        button.onclick = requestEmailUnbindCode;
+    } else {
+        input.disabled = false;
+        button.textContent = 'Подтвердить';
+        button.classList.remove('email-unbind-btn');
+        button.onclick = requestEmailCode;
+    }
+}
+
+async function loadEmailVerification() {
+    try {
+        const r = await fetch('/api/profile/email');
+        const d = await r.json();
+        updateEmailActionUI(d.email || '', d.verified === true);
+    } catch(e) {}
+}
+
+function openEmailCodeModal(email, mode = 'verify') {
+    const modal = document.getElementById('emailCodeModal');
+    const target = document.getElementById('emailCodeTarget');
+    const msg = document.getElementById('emailModalMessage');
+    const title = modal?.querySelector('h2');
+    if (!modal) return;
+    emailActionMode = mode;
+    if (title) title.textContent = mode === 'unbind' ? 'Удаление Email' : 'Подтверждение Email';
+    target.textContent = email;
+    msg.textContent = '';
+    document.querySelectorAll('#emailCodeInputs .email-code-input').forEach(input => input.value = '');
+    modal.style.display = 'flex';
+    setTimeout(() => document.querySelector('#emailCodeInputs .email-code-input')?.focus(), 50);
+}
+
+function closeEmailCodeModal() {
+    const modal = document.getElementById('emailCodeModal');
+    if (modal) modal.style.display = 'none';
+    emailActionMode = 'verify';
+}
+
+async function requestEmailUnbindCode() {
+    const input = document.getElementById('profileEmail');
+    const msg = document.getElementById('emailVerifyMessage');
+    const email = input?.value || '';
+    msg.textContent = '⏳ Отправляем код для отвязки...';
+    try {
+        const r = await fetch('/api/profile/email/unbind/request', {method:'POST', headers:{'Content-Type':'application/json'}});
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || 'Не удалось отправить код');
+        msg.textContent = '✓ Код для отвязки отправлен на вашу почту.';
+        openEmailCodeModal(email, 'unbind');
+    } catch(e) { msg.textContent = `✕ ${e.message}`; }
+}
+
+function setupEmailCodeInputs() {
+    const inputs = [...document.querySelectorAll('#emailCodeInputs .email-code-input')];
+    inputs.forEach((input, index) => {
+        input.addEventListener('input', () => {
+            input.value = input.value.replace(/\D/g, '').slice(0, 1);
+            if (input.value && inputs[index + 1]) inputs[index + 1].focus();
+        });
+        input.addEventListener('keydown', event => {
+            if (event.key === 'Backspace' && !input.value && inputs[index - 1]) inputs[index - 1].focus();
+        });
+        input.addEventListener('paste', event => {
+            const pasted = (event.clipboardData?.getData('text') || '').replace(/\D/g, '').slice(0, 6);
+            if (!pasted) return;
+            event.preventDefault();
+            inputs.forEach((el, i) => el.value = pasted[i] || '');
+            inputs[Math.min(pasted.length, 6) - 1]?.focus();
+        });
+    });
+}
+
+async function requestEmailCode() {
+    const email = document.getElementById('profileEmail').value.trim();
+    const msg = document.getElementById('emailVerifyMessage');
+    msg.textContent = '⏳ Отправляем код...';
+    try {
+        const r = await fetch('/api/profile/email/request', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email})});
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || 'Не удалось отправить код');
+        msg.textContent = '✓ Код отправлен на указанную почту. Он действует 10 минут.';
+        openEmailCodeModal(email, 'verify');
+    } catch(e) { msg.textContent = `✕ ${e.message}`; }
+}
+
+async function verifyEmailCode(fromModal = false) {
+    const inputs = [...document.querySelectorAll('#emailCodeInputs .email-code-input')];
+    const code = fromModal ? inputs.map(x => x.value).join('') : document.getElementById('profileEmailCode')?.value.trim();
+    const msg = fromModal ? document.getElementById('emailModalMessage') : document.getElementById('emailVerifyMessage');
+    if (!/^\d{6}$/.test(code || '')) { msg.textContent = '✕ Введите 6-значный код'; return; }
+    try {
+        const endpoint = emailActionMode === 'unbind' ? '/api/profile/email/unbind/confirm' : '/api/profile/email/verify';
+        const r = await fetch(endpoint, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({code})});
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || 'Не удалось выполнить действие');
+
+        if (emailActionMode === 'unbind') {
+            updateEmailActionUI('', false);
+            document.getElementById('emailVerifyMessage').textContent = '✓ Email отвязан.';
+            if (fromModal) {
+                msg.textContent = '✓ Email успешно отвязан.';
+                setTimeout(closeEmailCodeModal, 700);
+            }
+            return;
+        }
+
+        updateEmailActionUI(d.email || document.getElementById('profileEmail').value, true);
+        document.getElementById('emailCodeRow')?.classList.remove('show');
+        document.getElementById('emailVerifyMessage').textContent = `✓ Email ${d.email} подтвержден.`;
+        if (fromModal) {
+            msg.textContent = '✓ Email успешно подтвержден.';
+            setTimeout(closeEmailCodeModal, 700);
+        }
+    } catch(e) { msg.textContent = `✕ ${e.message}`; }
+}
+
+async function loadProfileSessions() {
+    const box = document.getElementById('profileSessionsList');
+    if (!box) return;
+    try {
+        const r = await fetch('/api/profile/sessions');
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || 'Не удалось загрузить сессии');
+        if (!d.sessions?.length) { box.innerHTML = '<div class="profile-section-muted">Активных сессий нет.</div>'; return; }
+        box.innerHTML = d.sessions.map(s => `
+            <div class="session-row">
+                <div><div class="session-label">Устройство</div><div class="session-value">${escapeHtml(s.device)}</div></div>
+                <div><div class="session-label">Местоположение</div><div class="session-value">${escapeHtml(s.country)}</div></div>
+                <div><div class="session-label">IP-Адрес</div><div class="session-value">${escapeHtml(s.ip)}</div></div>
+                <div><div class="session-label">Статус</div><div class="session-status">${escapeHtml(s.status)}</div></div>
+                <div>${s.current ? '<span class="session-current">Эта сессия</span>' : `<button class="session-kill" onclick="terminateProfileSession('${encodeURIComponent(s.id)}')">Выйти</button>`}</div>
+            </div>`).join('');
+    } catch(e) { box.innerHTML = `<div class="profile-section-muted">✕ ${escapeHtml(e.message)}</div>`; }
+}
+
+async function terminateProfileSession(id) {
+    try {
+        const r = await fetch(`/api/profile/sessions/${id}`, {method:'DELETE'});
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || 'Не удалось завершить сессию');
+        await loadProfileSessions();
+    } catch(e) { showModal('Ошибка', e.message); }
+}
+
+async function loadProfileApiKey() {
+    const input = document.getElementById('profileApiKey');
+    if (!input) return;
+    try {
+        const r = await fetch('/api/profile/api-key');
+        const d = await r.json();
+        if (r.ok) {
+            input.value = d.apiKey || '';
+            input.type = 'password';
+            updateApiEye(false);
+        }
+    } catch(e) {}
+}
+
+function updateApiEye(visible) {
+    const eye = document.getElementById('apiKeyEye');
+    if (!eye) return;
+    eye.textContent = visible ? '🙈' : '👁';
+    eye.setAttribute('aria-label', visible ? 'Скрыть API Key' : 'Показать API Key');
+}
+
+function toggleApiKeyVisibility() {
+    const input = document.getElementById('profileApiKey');
+    if (!input) return;
+    const visible = input.type !== 'password';
+    input.type = visible ? 'password' : 'text';
+    updateApiEye(!visible);
+}
+
+async function generateProfileApiKey() {
+    try {
+        const r = await fetch('/api/profile/api-key/generate', {method:'POST'});
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || 'Не удалось сгенерировать API Key');
+        const input = document.getElementById('profileApiKey');
+        input.value = d.apiKey;
+        input.type = 'password';
+        updateApiEye(false);
+        showModal('Успех', 'Новый API Key сгенерирован. Старый ключ больше недействителен.');
+    } catch(e) { showModal('Ошибка', e.message); }
 }
 
 // ===== ВКЛАДКИ ПРОФИЛЯ =====
@@ -1635,6 +2731,36 @@ document.querySelectorAll('.profile-tab').forEach(tab => {
         document.getElementById('section-' + tabName).classList.add('active');
     });
 });
+
+// ===== РЕАЛЬНЫЙ ОНЛАЙН =====
+function getPresenceId() {
+    try {
+        let id = localStorage.getItem('emerald_presence_id');
+        if (!id || !/^[A-Za-z0-9_-]{16,100}$/.test(id)) {
+            id = (crypto.randomUUID ? crypto.randomUUID() : ('v_' + Date.now() + '_' + Math.random().toString(36).slice(2)))
+                .replace(/[^A-Za-z0-9_-]/g, '');
+            localStorage.setItem('emerald_presence_id', id);
+        }
+        return id;
+    } catch(e) {
+        return 'v_' + Date.now().toString(36) + Math.random().toString(36).slice(2);
+    }
+}
+
+async function updateSiteOnline() {
+    const countEl = document.getElementById('siteOnlineCount');
+    try {
+        const r = await fetch('/api/presence/heartbeat', {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({visitorId:getPresenceId()}), cache:'no-store'
+        });
+        const d = await r.json();
+        if (r.ok && countEl) countEl.textContent = Number(d.online || 0);
+    } catch(e) {}
+}
+
+updateSiteOnline();
+setInterval(updateSiteOnline, 30000);
 
 // ===== FAQ =====
 function toggleFaq(element) {
@@ -1670,7 +2796,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     document.getElementById('logoLink').addEventListener('click', function(e) {
         e.preventDefault();
-        navigateTo('sell');
+        navigateTo(currentUser ? 'sell' : 'guest');
     });
 
     fetchUser();
@@ -1689,6 +2815,24 @@ document.addEventListener('DOMContentLoaded', function() {
         showModal('Успех', `Выбрано ${selectedSteamSkins.length} скинов`);
     });
 });
+window.addEventListener('popstate', async () => {
+    const profileId = getProfileIdFromPath();
+    if (profileId) { navigateTo('profile', false); await renderPublicProfile(profileId); }
+    else if (window.location.pathname === '/admin') navigateTo('admin', false);
+    else if (window.location.pathname === '/reviews') navigateTo('reviews', false);
+    else navigateTo(currentUser ? 'sell' : 'guest', false);
+});
 </script>
 </body>
 </html>
+<style>
+/* Emerald UI polish */
+#loginSteam, #loginSteam a, a[href*="/auth/steam"] {
+    text-decoration: none !important;
+    color: #d9ffe8 !important;
+}
+#loginSteam:hover, #loginSteam a:hover, a[href*="/auth/steam"]:hover {
+    text-decoration: none !important;
+    color: #ffffff !important;
+}
+</style>
