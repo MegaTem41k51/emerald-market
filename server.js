@@ -53,7 +53,7 @@ const MAX_PUBLIC_ID = 999999;
 
 app.use(express.static(__dirname));
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '8mb' }));
 
 app.use(express.urlencoded({
     extended: true
@@ -1632,12 +1632,12 @@ app.post('/api/admin/reviews', async (req, res) => {
     try {
         const name = String(req.body?.name || '').trim().slice(0, 80);
         const text = String(req.body?.text || '').trim().slice(0, 2000);
-        const photoUrl = String(req.body?.photoUrl || '').trim().slice(0, 1000);
+        const photoUrl = String(req.body?.photoUrl || '').trim().slice(0, 7000000);
         const rating = Number(req.body?.rating);
         if (!name) return res.status(400).json({ error: 'Укажите имя' });
         if (!text) return res.status(400).json({ error: 'Введите текст отзыва' });
         if (!Number.isInteger(rating) || rating < 1 || rating > 5) return res.status(400).json({ error: 'Оценка должна быть от 1 до 5' });
-        if (photoUrl && !/^https?:\/\//i.test(photoUrl)) return res.status(400).json({ error: 'Фото должно быть ссылкой http/https' });
+        if (photoUrl && !/^https?:\/\//i.test(photoUrl) && !/^data:image\/png;base64,[A-Za-z0-9+/=]+$/i.test(photoUrl)) return res.status(400).json({ error: 'Фото должно быть PNG-файлом или ссылкой http/https' });
 
         const result = await pool.query(`
             INSERT INTO reviews (name, rating, review_text, photo_url)
@@ -1662,13 +1662,13 @@ app.put('/api/admin/reviews/:id', async (req, res) => {
         const id = Number(req.params.id);
         const name = String(req.body?.name || '').trim().slice(0, 80);
         const text = String(req.body?.text || '').trim().slice(0, 2000);
-        const photoUrl = String(req.body?.photoUrl || '').trim().slice(0, 1000);
+        const photoUrl = String(req.body?.photoUrl || '').trim().slice(0, 7000000);
         const rating = Number(req.body?.rating);
         if (!Number.isInteger(id) || id <= 0) return res.status(400).json({ error: 'Некорректный ID отзыва' });
         if (!name) return res.status(400).json({ error: 'Укажите имя' });
         if (!text) return res.status(400).json({ error: 'Введите текст отзыва' });
         if (!Number.isInteger(rating) || rating < 1 || rating > 5) return res.status(400).json({ error: 'Оценка должна быть от 1 до 5' });
-        if (photoUrl && !/^https?:\/\//i.test(photoUrl)) return res.status(400).json({ error: 'Фото должно быть ссылкой http/https' });
+        if (photoUrl && !/^https?:\/\//i.test(photoUrl) && !/^data:image\/png;base64,[A-Za-z0-9+/=]+$/i.test(photoUrl)) return res.status(400).json({ error: 'Фото должно быть PNG-файлом или ссылкой http/https' });
 
         const result = await pool.query(`
             UPDATE reviews SET name=$1, rating=$2, review_text=$3, photo_url=$4, updated_at=NOW()
