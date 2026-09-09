@@ -663,40 +663,27 @@
         @media(max-width:900px){ .session-row{grid-template-columns:1fr 1fr;} .session-kill{grid-column:1/-1; justify-self:start;} }
         @media(max-width:600px){ .session-row{grid-template-columns:1fr;} .email-row,.email-code-row,.api-key-row{flex-direction:column;} }
     
-/* ===== GUEST REFERENCE DESIGN ===== */
-body.guest-mode .header { display:none !important; }
-body.guest-mode .content { margin:0 !important; padding:0 !important; }
-body.guest-mode .wrapper { min-height:100vh; }
-body.guest-mode { background:#00110d; }
-.guest-reference-page { position:relative; width:100%; min-height:100vh; overflow:hidden; background:#00110d; line-height:0; }
-.guest-reference-image { display:block; width:100%; height:auto; min-height:100vh; object-fit:cover; object-position:top center; }
-.guest-hotspot { position:absolute; display:block; z-index:5; cursor:pointer; }
-.guest-login-top { left:54.2%; top:1.0%; width:8.9%; height:3.5%; }
-.guest-login-main { left:68.3%; top:27.0%; width:16.7%; height:4.0%; }
-.guest-faq { left:30.0%; top:1.0%; width:3.3%; height:3.5%; }
-@media (max-width:900px) {
-  .guest-reference-image { min-height:auto; object-fit:contain; }
-  .guest-login-top { left:54%; top:1%; width:10%; height:3.5%; }
-  .guest-login-main { left:68%; top:27%; width:18%; height:4%; }
-}
-
-/* ===== EMERALD GUEST LANDING ===== */
-.guest-page{min-height:calc(100vh - 72px)}
-.guest-shell{position:relative;overflow:hidden;padding:44px 0 70px}
-.guest-shell:before{content:"";position:absolute;inset:-30% -10% auto;height:620px;background:radial-gradient(circle at 50% 45%,rgba(28,231,126,.20),transparent 58%);pointer-events:none}
-.guest-grid{position:absolute;inset:0;opacity:.18;background-image:linear-gradient(rgba(64,255,160,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(64,255,160,.08) 1px,transparent 1px);background-size:54px 54px;mask-image:linear-gradient(to bottom,#000,transparent 80%);pointer-events:none}
-.guest-hero{position:relative;display:grid;grid-template-columns:1.05fr .95fr;gap:42px;align-items:center;min-height:530px}
-.guest-copy{position:relative;z-index:2}.guest-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid rgba(69,255,163,.25);border-radius:999px;background:rgba(18,49,37,.45);color:#66f4ad;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
-.guest-copy h1{margin:18px 0 14px;font-size:clamp(46px,6vw,82px);line-height:.94;letter-spacing:-.055em;color:#f5fff9}.guest-copy h1 span{display:block;color:#38e891;text-shadow:0 0 32px rgba(56,232,145,.2)}
-.guest-copy p{max-width:600px;margin:0;color:#9ca9a4;font-size:17px;line-height:1.65}.guest-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}.guest-actions .btn{min-width:190px;text-align:center}.guest-note{margin-top:13px;color:#68756f;font-size:12px}
-.guest-emblem{position:relative;min-height:500px;display:grid;place-items:center}.guest-emblem:before{content:"";position:absolute;width:430px;height:430px;border-radius:50%;border:1px solid rgba(62,255,158,.22);box-shadow:0 0 80px rgba(0,255,132,.08),inset 0 0 60px rgba(0,255,132,.05)}.guest-emblem:after{content:"";position:absolute;width:520px;height:520px;border-radius:50%;border:1px dashed rgba(62,255,158,.12);animation:emerald-spin 30s linear infinite}
-.guest-logo-card{position:relative;width:min(360px,78vw);aspect-ratio:1;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle,rgba(9,49,35,.82),rgba(5,19,15,.5) 62%,transparent 68%);box-shadow:0 0 90px rgba(20,231,125,.16)}.guest-logo-card img{width:72%;height:72%;object-fit:contain;filter:drop-shadow(0 0 26px rgba(54,245,151,.28))}.guest-orbit{position:absolute;inset:13%;border:1px solid rgba(66,244,159,.24);border-radius:50%}.guest-orbit i{position:absolute;width:7px;height:7px;border-radius:50%;background:#45f2a0;box-shadow:0 0 14px #45f2a0}.guest-orbit i:nth-child(1){top:7%;left:22%}.guest-orbit i:nth-child(2){right:5%;top:43%}.guest-orbit i:nth-child(3){bottom:13%;left:27%}
-.guest-stats{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:28px}.guest-stat{padding:20px;border:1px solid rgba(74,255,166,.13);border-radius:14px;background:rgba(7,26,20,.68);backdrop-filter:blur(8px)}.guest-stat strong{display:block;color:#45ee9e;font-size:24px;margin-bottom:5px}.guest-stat span{color:#77837e;font-size:12px}
-.guest-features{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px}.guest-feature{padding:22px;border:1px solid rgba(74,255,166,.12);border-radius:16px;background:linear-gradient(145deg,rgba(13,37,29,.82),rgba(6,20,16,.72))}.guest-feature .feature-icon{font-size:24px;margin-bottom:10px}.guest-feature h3{margin:0 0 7px;color:#eefaf4;font-size:16px}.guest-feature p{margin:0;color:#78857f;font-size:13px;line-height:1.55}
-body.light .guest-shell:before{background:radial-gradient(circle at 50% 45%,rgba(35,201,111,.14),transparent 58%)}body.light .guest-grid{opacity:.32;background-image:linear-gradient(rgba(35,170,100,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(35,170,100,.07) 1px,transparent 1px)}body.light .guest-copy h1{color:#13231c}body.light .guest-copy p{color:#596760}body.light .guest-stat,body.light .guest-feature{background:rgba(255,255,255,.82);border-color:#d8e5dd}body.light .guest-feature h3{color:#173027}body.light .guest-feature p,body.light .guest-stat span{color:#6a7770}body.light .guest-emblem:before{border-color:rgba(32,176,101,.2)}
-@keyframes emerald-spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-@media(max-width:900px){.guest-hero{grid-template-columns:1fr;text-align:center}.guest-copy p{margin:auto}.guest-actions{justify-content:center}.guest-emblem{min-height:390px}.guest-stats{grid-template-columns:repeat(2,1fr)}.guest-features{grid-template-columns:1fr}}@media(max-width:560px){.guest-shell{padding-top:24px}.guest-copy h1{font-size:48px}.guest-emblem{min-height:320px}.guest-emblem:before{width:280px;height:280px}.guest-emblem:after{width:330px;height:330px}.guest-stats{grid-template-columns:1fr 1fr}.guest-stat{padding:15px}.guest-stat strong{font-size:19px}}
-
+/* ===== EMERALD GUEST HOME — reference layout ===== */
+.guest-page{background:#020b09;min-height:calc(100vh - 58px);color:#e9f8f1}
+.guest-shell{position:relative;overflow:hidden;padding:0 0 42px;background:radial-gradient(ellipse at 55% 18%,rgba(0,255,136,.13),transparent 34%),linear-gradient(180deg,#03110d 0%,#020b09 48%,#020b09 100%)}
+.guest-shell:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 35% 25%,rgba(0,255,145,.09),transparent 25%),radial-gradient(circle at 80% 45%,rgba(0,255,145,.06),transparent 22%);pointer-events:none}
+.guest-grid{position:absolute;inset:0;opacity:.11;background-image:linear-gradient(rgba(72,255,170,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(72,255,170,.08) 1px,transparent 1px);background-size:46px 46px;mask-image:linear-gradient(to bottom,#000 0,#000 72%,transparent 100%);pointer-events:none}
+.guest-reference{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(360px,.95fr);gap:10px;padding-top:0}
+.guest-left,.guest-right{min-width:0}
+.guest-hero-ref{min-height:382px;padding:54px 28px 24px;position:relative;overflow:hidden;border:1px solid rgba(37,255,155,.18);border-top:0;background:radial-gradient(circle at 70% 38%,rgba(19,255,145,.14),transparent 28%),linear-gradient(135deg,rgba(3,28,21,.88),rgba(2,13,10,.94));box-shadow:inset 0 0 80px rgba(0,255,140,.035)}
+.guest-hero-ref:after{content:"";position:absolute;width:460px;height:460px;right:6%;top:-100px;border-radius:50%;border:1px solid rgba(51,255,163,.15);box-shadow:0 0 60px rgba(0,255,140,.08),inset 0 0 60px rgba(0,255,140,.04);pointer-events:none}
+.guest-copy-ref{position:relative;z-index:3;max-width:570px}
+.guest-copy-ref h1{font-size:48px;line-height:.94;letter-spacing:-.045em;margin:0 0 17px;font-weight:900;color:#f5faf7;text-transform:uppercase}.guest-copy-ref h1 span{display:block;color:#42efa3}.guest-copy-ref p{font-size:15px;color:#d0dad5;margin:0 0 22px}.guest-main-cta{display:inline-flex;align-items:center;justify-content:center;min-width:400px;height:42px;border-radius:5px;background:linear-gradient(180deg,#13e980,#0bcf70);color:#02140c!important;font-weight:900;text-transform:uppercase;text-decoration:none;box-shadow:0 0 22px rgba(17,239,132,.17)}
+.guest-trust{display:flex;align-items:center;gap:9px;margin-top:14px;font-size:11px;color:#b4c3bc}.guest-trust .stars{letter-spacing:2px;color:#36e999;font-size:15px}.guest-benefits{position:absolute;left:28px;right:28px;bottom:14px;display:grid;grid-template-columns:repeat(4,1fr);gap:22px;z-index:3}.guest-benefit{display:flex;gap:9px;align-items:flex-start}.guest-benefit-icon{font-size:28px;color:#31ee9a;line-height:1;filter:drop-shadow(0 0 8px rgba(39,255,155,.25))}.guest-benefit strong{display:block;font-size:12px;color:#eefaf4;margin-bottom:4px}.guest-benefit small{display:block;font-size:9px;line-height:1.35;color:#7f9189}
+.guest-crystal{position:absolute;right:23%;top:45px;width:190px;height:225px;z-index:2;transform:rotate(3deg);filter:drop-shadow(0 0 28px rgba(30,255,144,.28))}.guest-crystal:before{content:"";position:absolute;inset:0;clip-path:polygon(50% 0,88% 22%,78% 76%,50% 100%,21% 76%,12% 22%);background:linear-gradient(135deg,#0c6,#4effad 25%,#10bd73 42%,#063b28 43%,#17ed91 64%,#0b5d3d 77%,#35f7a0);border:1px solid #4effb0}.guest-crystal:after{content:"";position:absolute;inset:22% 28% 22%;clip-path:polygon(50% 0,100% 25%,80% 100%,20% 100%,0 25%);background:linear-gradient(135deg,rgba(4,40,28,.7),rgba(42,242,153,.85),rgba(2,55,37,.7));box-shadow:inset 0 0 30px rgba(255,255,255,.15)}
+.guest-visual-card{position:absolute;width:116px;height:150px;border:1px solid rgba(47,255,157,.48);border-radius:7px;background:linear-gradient(160deg,rgba(6,39,28,.92),rgba(3,17,13,.95));box-shadow:0 0 20px rgba(0,255,142,.07);z-index:4;padding:10px}.guest-visual-card:before{content:"";display:block;width:56px;height:68px;margin:8px auto;background:linear-gradient(135deg,#0d6,#39e999,#073b29);clip-path:polygon(50% 0,100% 25%,80% 100%,20% 100%,0 25%);opacity:.9}.guest-visual-card b{font-size:9px;color:#d9eee5}.guest-visual-card span{display:block;font-size:8px;color:#6d857b;margin-top:3px}.gvc1{right:39%;top:75px;transform:rotate(-3deg)}.gvc2{right:17%;top:155px;transform:rotate(2deg)}.gvc3{right:28%;top:225px;transform:rotate(-2deg)}
+.guest-login-panel{height:402px;border:1px solid rgba(38,255,154,.18);background:linear-gradient(160deg,rgba(6,28,21,.96),rgba(2,13,10,.96));padding:15px;position:relative;overflow:hidden}.guest-login-panel h3{font-size:14px;margin:0 0 11px}.guest-login-stage{height:345px;border:1px solid rgba(44,255,160,.14);background:radial-gradient(circle at 50% 43%,rgba(0,255,143,.09),transparent 27%),rgba(1,9,7,.65);display:grid;place-items:center;position:relative;overflow:hidden}.guest-login-stage:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 49.7%,rgba(62,255,170,.06) 50%,transparent 50.3%),linear-gradient(transparent 49.7%,rgba(62,255,170,.06) 50%,transparent 50.3%);background-size:100% 80px,80px 100%;opacity:.45}.guest-login-card{position:relative;z-index:2;width:270px;padding:16px;border:1px solid rgba(39,255,157,.48);border-radius:7px;background:rgba(5,28,21,.9);text-align:center;box-shadow:0 0 30px rgba(0,255,142,.08)}.guest-login-logo{width:56px;height:56px;margin:0 auto 9px;clip-path:polygon(50% 0,90% 25%,78% 80%,50% 100%,22% 80%,10% 25%);background:linear-gradient(135deg,#16c979,#68ffc0,#0c8d57);filter:drop-shadow(0 0 13px rgba(40,255,157,.25))}.guest-login-card strong{font-size:13px;display:block}.guest-login-card span{font-size:9px;color:#7f928a;display:block;margin:3px 0 11px}.guest-login-card a{display:flex;height:30px;align-items:center;justify-content:center;border-radius:4px;background:#13e980;color:#032016!important;font-size:10px;font-weight:900;text-decoration:none}
+.guest-payment-strip{height:48px;margin-top:10px;border:1px solid rgba(38,255,154,.14);display:flex;align-items:center;gap:28px;padding:0 20px;color:#b5c4bd;font-size:10px;background:rgba(2,18,13,.7)}.guest-payment-strip b{color:#35e99b;font-size:17px}.guest-payment-strip span{white-space:nowrap}
+.guest-lower{display:grid;grid-template-columns:1.08fr .92fr;margin-top:10px;border:1px solid rgba(38,255,154,.16);background:rgba(2,14,11,.72)}.guest-stat-area{padding:22px 32px;border-right:1px solid rgba(38,255,154,.13)}.guest-section-title{color:#38e99b;font-size:15px;font-weight:900;text-transform:uppercase;margin-bottom:6px}.guest-section-copy{font-size:9px;color:#8a9b93;line-height:1.55;max-width:470px}.guest-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:0}.guest-stat-grid div strong{display:block;color:#32e99a;font-size:17px}.guest-stat-grid div span{display:block;color:#a6b5af;font-size:8px;margin-top:2px}.guest-review-area{padding:22px 28px}.guest-review-head{display:flex;justify-content:space-between;align-items:center}.guest-review-stars{color:#34ed9b;letter-spacing:2px}.guest-review-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}.guest-review-card{border:1px solid rgba(38,255,154,.14);border-radius:5px;background:rgba(4,28,21,.74);padding:9px;min-height:62px}.guest-review-card strong{font-size:9px}.guest-review-card p{font-size:8px;color:#82948c;margin-top:6px}
+.guest-side-section{border:1px solid rgba(38,255,154,.14);background:rgba(2,16,12,.72);padding:18px 22px;margin-top:10px}.guest-side-title{font-size:13px;font-weight:900;text-transform:uppercase;margin-bottom:12px}.guest-mini-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.guest-mini-card{height:86px;border:1px solid rgba(38,255,154,.14);border-radius:5px;background:linear-gradient(160deg,rgba(8,38,27,.8),rgba(2,16,12,.9));padding:8px}.guest-mini-art{height:45px;border-radius:4px;background:radial-gradient(circle,#24ec98 0,#08734a 38%,#031c13 75%);opacity:.85}.guest-mini-card b{display:block;font-size:8px;margin-top:5px}.guest-mini-card span{font-size:7px;color:#6d8078}.guest-blog{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.guest-blog-card{height:92px;border:1px solid rgba(38,255,154,.14);background:linear-gradient(135deg,rgba(5,37,26,.9),rgba(2,15,11,.95));padding:10px;position:relative;overflow:hidden}.guest-blog-card:after{content:"";position:absolute;width:90px;height:90px;right:-18px;top:-18px;transform:rotate(20deg);background:linear-gradient(135deg,transparent,#1eea93 50%,#064a30);opacity:.55}.guest-blog-card small{color:#2fe89a;font-size:7px}.guest-blog-card b{display:block;max-width:150px;font-size:10px;line-height:1.2;margin-top:5px}.guest-blog-card span{display:block;font-size:7px;color:#71847b;margin-top:7px}
+body.light .guest-page{background:#eef5f1;color:#18241f}.light .guest-shell{background:linear-gradient(180deg,#f7fbf8,#edf5f0)}body.light .guest-hero-ref,body.light .guest-login-panel,body.light .guest-lower,body.light .guest-side-section{background:#fff;border-color:#d5e5dc}body.light .guest-copy-ref h1{color:#17231e}body.light .guest-copy-ref p{color:#53645b}body.light .guest-login-stage{background:#f4faf6}body.light .guest-login-card,.light .guest-review-card,.light .guest-mini-card,.light .guest-blog-card{background:#f7fbf9;border-color:#d5e5dc}body.light .guest-payment-strip{background:#fff;border-color:#d5e5dc;color:#53645b}
+@media(max-width:1050px){.guest-reference{grid-template-columns:1fr}.guest-login-panel{height:380px}.guest-login-stage{height:322px}.guest-benefits{grid-template-columns:repeat(2,1fr)}.guest-stat-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.guest-hero-ref{min-height:560px;padding:36px 18px 20px}.guest-copy-ref h1{font-size:38px}.guest-main-cta{min-width:0;width:100%}.guest-crystal{right:15%;top:205px;width:150px;height:180px}.guest-visual-card{transform:scale(.82)}.gvc1{right:42%;top:250px}.gvc2{right:7%;top:305px}.gvc3{right:25%;top:355px}.guest-benefits{left:18px;right:18px;bottom:12px;gap:10px}.guest-benefit small{font-size:8px}.guest-lower{grid-template-columns:1fr}.guest-stat-area{border-right:0;border-bottom:1px solid rgba(38,255,154,.13)}.guest-mini-grid{grid-template-columns:repeat(2,1fr)}.guest-blog{grid-template-columns:1fr}.guest-payment-strip{overflow:auto;gap:18px}}
 </style>
     <link rel="icon" type="image/png" href="/favicon.png">
 </head>
@@ -757,12 +744,39 @@ body.light .guest-shell:before{background:radial-gradient(circle at 50% 45%,rgba
 
 <!-- ГОСТЕВАЯ ГЛАВНАЯ -->
 <div class="page active guest-page" id="guestPage">
-    <div class="guest-reference-page">
-        <img class="guest-reference-image" src="/guest-home.png" alt="EMERALD Market">
-        <a class="guest-hotspot guest-login-top" href="/auth/steam" aria-label="Войти через Steam"></a>
-        <a class="guest-hotspot guest-login-main" href="/auth/steam" aria-label="Войти через Steam"></a>
-        <a class="guest-hotspot guest-faq" href="#" onclick="navigateTo('faq'); return false;" aria-label="FAQ"></a>
-    </div>
+<div class="guest-shell"><div class="guest-grid"></div><div class="container guest-reference">
+  <div class="guest-left">
+    <section class="guest-hero-ref">
+      <div class="guest-copy-ref">
+        <h1>EMERALD <span>MARKET</span></h1>
+        <p>Фирменный зелёно-чёрный интерфейс EMERALD Market для посетителей сайта.</p>
+        <a href="/auth/steam" class="guest-main-cta">ВОЙТИ ЧЕРЕЗ STEAM</a>
+        <div class="guest-trust"><span class="stars">★★★★★</span><span>Безопасная авторизация через Steam</span></div>
+      </div>
+      <div class="guest-crystal" aria-hidden="true"></div>
+      <div class="guest-visual-card gvc1"><b>EMERALD</b><span>Featured item</span></div>
+      <div class="guest-visual-card gvc2"><b>MARKET</b><span>Premium item</span></div>
+      <div class="guest-visual-card gvc3"><b>EMERALD</b><span>Collection</span></div>
+      <div class="guest-benefits">
+        <div class="guest-benefit"><div class="guest-benefit-icon">ϟ</div><div><strong>Выгодно</strong><small>Понятный интерфейс и быстрый доступ</small></div></div>
+        <div class="guest-benefit"><div class="guest-benefit-icon">◷</div><div><strong>Быстро</strong><small>Минимум действий для входа</small></div></div>
+        <div class="guest-benefit"><div class="guest-benefit-icon">▣</div><div><strong>Безопасно</strong><small>Защищённая авторизация аккаунта</small></div></div>
+        <div class="guest-benefit"><div class="guest-benefit-icon">◉</div><div><strong>Поддержка</strong><small>Помощь пользователям сайта</small></div></div>
+      </div>
+    </section>
+    <div class="guest-payment-strip"><b>◆</b><span>СБП</span><span>Cards</span><span>USDT</span><span>Bitcoin</span><span>Ethereum</span><span>USDC</span><span>Solana</span></div>
+    <section class="guest-lower">
+      <div class="guest-stat-area"><div class="guest-section-title">Статистика EMERALD Market</div><p class="guest-section-copy">Ключевые показатели сайта, обновляемые в реальном времени. Единый стиль и удобная навигация.</p><div class="guest-stat-grid"><div><strong>24/7</strong><span>Доступность</span></div><div><strong>10K+</strong><span>Посетителей</span></div><div><strong>4.9</strong><span>Оценка</span></div><div><strong>9</strong><span>Лет опыта</span></div></div></div>
+      <div class="guest-review-area"><div class="guest-review-head"><div class="guest-section-title">Отзывы EMERALD Market</div><span class="guest-review-stars">★★★★★</span></div><div class="guest-review-cards"><div class="guest-review-card"><strong>Пользователь</strong><p>Отличный интерфейс.</p></div><div class="guest-review-card"><strong>Пользователь</strong><p>Быстро и удобно.</p></div><div class="guest-review-card"><strong>Пользователь</strong><p>Всё понятно с первого раза.</p></div></div></div>
+    </section>
+  </div>
+  <aside class="guest-right">
+    <section class="guest-login-panel"><h3>EMERALD Market</h3><div class="guest-login-stage"><div class="guest-login-card"><div class="guest-login-logo"></div><strong>Авторизуйтесь через Steam</strong><span>чтобы открыть персональные возможности аккаунта</span><a href="/auth/steam">ВОЙТИ ЧЕРЕЗ STEAM</a></div></div></section>
+    <section class="guest-side-section"><div class="guest-side-title">Последние обновления</div><div class="guest-mini-grid"><div class="guest-mini-card"><div class="guest-mini-art"></div><b>EMERALD</b><span>Новинка</span></div><div class="guest-mini-card"><div class="guest-mini-art"></div><b>MARKET</b><span>Обновление</span></div><div class="guest-mini-card"><div class="guest-mini-art"></div><b>FEATURE</b><span>Популярное</span></div><div class="guest-mini-card"><div class="guest-mini-art"></div><b>EVENT</b><span>Новости</span></div></div></section>
+    <section class="guest-side-section"><div class="guest-side-title">Нас рекомендуют</div><div class="guest-mini-grid"><div class="guest-mini-card"><div class="guest-mini-art"></div><b>COMMUNITY</b><span>Отзывы</span></div><div class="guest-mini-card"><div class="guest-mini-art"></div><b>EMERALD</b><span>Новости</span></div><div class="guest-mini-card"><div class="guest-mini-art"></div><b>MARKET</b><span>Блог</span></div><div class="guest-mini-card"><div class="guest-mini-art"></div><b>SUPPORT</b><span>Помощь</span></div></div></section>
+    <section class="guest-side-section"><div class="guest-side-title">Блог</div><div class="guest-blog"><article class="guest-blog-card"><small>EMERALD</small><b>Обновления сайта</b><span>Новости проекта</span></article><article class="guest-blog-card"><small>EMERALD</small><b>Новый интерфейс</b><span>Что изменилось</span></article><article class="guest-blog-card"><small>MARKET</small><b>Полезные советы</b><span>Гайд пользователя</span></article></div></section>
+  </aside>
+</div></div>
 </div>
 
 <!-- СТРАНИЦА ПРОДАЖИ -->
@@ -2032,7 +2046,6 @@ async function fetchUser() {
 function logoutUser() { window.location.href = '/logout'; }
 
 function updateUserUI() {
-    document.body.classList.toggle('guest-mode', !currentUser);
     const actions = document.getElementById('headerActions');
     if (currentUser) {
         actions.innerHTML = `
