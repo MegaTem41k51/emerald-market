@@ -1,32 +1,35 @@
-# Email verification on Render Free
+# Email и Render
 
-This version sends verification emails through the Resend HTTPS API. It does not connect to SMTP ports, so it avoids Render Free SMTP restrictions.
+Для отправки кодов подтверждения используется Resend HTTPS API. SMTP-порты Render для этой функции не нужны.
 
-## Render Environment Variables
+## Environment в Render
 
-Add these two variables:
+Оставьте:
 
-```text
-RESEND_API_KEY=re_...
-EMAIL_FROM=your-verified-sender@example.com
-```
+- `BASE_URL` — текущий публичный URL сайта Render
+- `DATABASE_URL` — Internal Database URL PostgreSQL
+- `SESSION_SECRET` — ваш секрет сессии
+- `STEAM_API_KEY` — ваш Steam API key
 
-Optional:
+Добавьте:
 
-```text
-EMAIL_FROM_NAME=EMERALD Market
-```
+- `RESEND_API_KEY` — API key из Resend
+- `EMAIL_FROM` — подтверждённый адрес отправителя в Resend
+- `EMAIL_FROM_NAME` — например `EMERALD Market`
 
-The old SMTP variables (`EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_SECURE`, `EMAIL_USER`, `EMAIL_PASS`) are no longer used by this email-verification code and can be removed from Render after deployment.
+Старые SMTP-переменные `EMAIL_HOST`, `EMAIL_PASS`, `EMAIL_PORT`, `EMAIL_SECURE`, `EMAIL_USER` этой версией не требуются.
 
-## Resend setup
+## Email verification
 
-1. Create a Resend account.
-2. Create an API key and copy it once.
-3. For testing, Resend provides the `onboarding@resend.dev` sender; this test sender is restricted to the account email.
-4. For sending verification codes to arbitrary users, add and verify a domain in Resend, then use an address from that verified domain as `EMAIL_FROM`.
-5. Put the API key into Render as `RESEND_API_KEY`.
-6. Put the sender address into `EMAIL_FROM`.
-7. Redeploy the Render service.
+- обычное подтверждение отправляет 6-значный код;
+- код действует 10 минут;
+- после успешного подтверждения `email_verified` остаётся TRUE и не истекает;
+- кнопка меняется на `Отвязать`;
+- отвязка требует отдельного 6-значного кода, отправленного на уже подтверждённую почту;
+- письмо для отвязки сообщает, что код нужен для действия «удаление email».
 
-The server calls `https://api.resend.com/emails` over HTTPS.
+## Онлайн
+
+Сайт отправляет heartbeat каждые 30 секунд. Сервер хранит активность браузеров в PostgreSQL и считает посетителя онлайн, если его heartbeat был не более 90 секунд назад. Один браузер использует один visitor ID через localStorage.
+
+После изменения Environment сделайте redeploy.

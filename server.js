@@ -272,6 +272,9 @@ async function initDatabase() {
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NULL DEFAULT FALSE`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verification_code TEXT NOT NULL DEFAULT ''`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verification_expires_at TIMESTAMPTZ`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_action TEXT NOT NULL DEFAULT ''`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_action_code TEXT NOT NULL DEFAULT ''`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_action_expires_at TIMESTAMPTZ`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS api_key TEXT NOT NULL DEFAULT ''`);
     await pool.query(`
         CREATE TABLE IF NOT EXISTS user_sessions (
@@ -285,6 +288,14 @@ async function initDatabase() {
         )
     `);
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_user_sessions_steam_id ON user_sessions(steam_id)`);
+
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS site_presence (
+            visitor_id TEXT PRIMARY KEY,
+            last_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    `);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_site_presence_last_seen ON site_presence(last_seen_at)`);
 
     await pool.query(`
         CREATE TABLE IF NOT EXISTS admin_grants (
@@ -1285,6 +1296,39 @@ function deviceName(userAgent) {
     return `${os} (${browser}${version ? ' ' + version.split('.')[0] : ''})`;
 }
 
+app.post('/api/presence/heartbeat', async (req, res) => {
+    if (!requireDatabase(res)) return;
+    const visitorId = String(req.body.visitorId || '').trim();
+    if (!/^[A-Za-z0-9_-]{16,100}$/.test(visitorId)) {
+        return res.status(400).json({ error: 'Некорректный visitorId' });
+    }
+    try {
+        await pool.query(`
+            INSERT INTO site_presence (visitor_id, last_seen_at)
+            VALUES ($1, NOW())
+            ON CONFLICT (visitor_id) DO UPDATE SET last_seen_at=NOW()
+        `, [visitorId]);
+        await pool.query(`DELETE FROM site_presence WHERE last_seen_at < NOW() - INTERVAL '90 seconds'`);
+        const count = await pool.query(`SELECT COUNT(*)::int AS count FROM site_presence WHERE last_seen_at >= NOW() - INTERVAL '90 seconds'`);
+        res.json({ online: Number(count.rows[0]?.count || 0) });
+    } catch (error) {
+        console.error('Ошибка online heartbeat:', error.message);
+        res.status(500).json({ error: 'Не удалось обновить онлайн' });
+    }
+});
+
+app.get('/api/presence', async (req, res) => {
+    if (!requireDatabase(res)) return;
+    try {
+        await pool.query(`DELETE FROM site_presence WHERE last_seen_at < NOW() - INTERVAL '90 seconds'`);
+        const count = await pool.query(`SELECT COUNT(*)::int AS count FROM site_presence WHERE last_seen_at >= NOW() - INTERVAL '90 seconds'`);
+        res.json({ online: Number(count.rows[0]?.count || 0) });
+    } catch (error) {
+        console.error('Ошибка получения online:', error.message);
+        res.status(500).json({ error: 'Не удалось получить онлайн' });
+    }
+});
+
 app.get('/api/profile/sessions', async (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
     if (!requireDatabase(res)) return;
@@ -1365,7 +1409,12 @@ app.post('/api/profile/email/request', async (req, res) => {
     const expires = new Date(Date.now() + 10 * 60 * 1000);
     try {
         await sendVerificationEmail(email, code);
-        await pool.query('UPDATE users SET email=$1, email_verified=FALSE, email_verification_code=$2, email_verification_expires_at=$3 WHERE steam_id=$4', [email, code, expires, String(req.user.id)]);
+        await pool.query(`
+            UPDATE users
+            SET email=$1, email_verified=FALSE, email_verification_code=$2, email_verification_expires_at=$3,
+                email_action='', email_action_code='', email_action_expires_at=NULL
+            WHERE steam_id=$4
+        `, [email, code, expires, String(req.user.id)]);
         res.json({ success: true });
     } catch (error) {
         console.error('Ошибка отправки Email:', error.message);
@@ -1384,11 +1433,104 @@ app.post('/api/profile/email/verify', async (req, res) => {
         if (!row.email_verification_code || row.email_verification_code !== code || !row.email_verification_expires_at || new Date(row.email_verification_expires_at).getTime() < Date.now()) {
             return res.status(400).json({ error: 'Неверный или просроченный код' });
         }
-        await pool.query('UPDATE users SET email_verified=TRUE, email_verification_code=\'\', email_verification_expires_at=NULL WHERE steam_id=$1', [String(req.user.id)]);
+        // После успешного подтверждения email_verified остаётся TRUE бессрочно.
+        await pool.query(`
+            UPDATE users
+            SET email_verified=TRUE, email_verification_code='', email_verification_expires_at=NULL
+            WHERE steam_id=$1
+        `, [String(req.user.id)]);
+        const record = ensureUserRecord(req.user);
+        record.email = row.email;
+        record.emailVerified = true;
         res.json({ success: true, email: row.email });
     } catch (error) {
         console.error('Ошибка подтверждения Email:', error.message);
         res.status(500).json({ error: 'Не удалось подтвердить Email' });
+    }
+});
+
+async function sendEmailUnbindEmail(to, code) {
+    const apiKey = String(process.env.RESEND_API_KEY || '').trim();
+    const senderEmail = String(process.env.EMAIL_FROM || '').trim();
+    const senderName = String(process.env.EMAIL_FROM_NAME || 'EMERALD Market').trim();
+    if (!apiKey) throw new Error('Email-сервис не настроен: добавьте RESEND_API_KEY в Render Environment');
+    if (!senderEmail) throw new Error('EMAIL_FROM не задан');
+    const subject = 'EMERALD Market — удаление Email';
+    const text = `Вы запросили одноразовый код для подтверждения действия «удаление email» на emerald.market\n\nВведите код в модальном окне на сайте.\n\nКод: ${code}\n\nКод действует 10 минут. Если вы не запрашивали это действие, просто проигнорируйте письмо.`;
+    const html = `
+        <div style="font-family:Arial,sans-serif;line-height:1.55;color:#111;max-width:560px;margin:auto">
+            <h2>EMERALD Market</h2>
+            <p>Вы запросили одноразовый код для подтверждения действия <b>«удаление email»</b> на emerald.market.</p>
+            <p>Введите его в модальном окне на сайте.</p>
+            <div style="font-size:32px;font-weight:700;letter-spacing:8px;margin:22px 0">${code}</div>
+            <p>Код действует <b>10 минут</b>.</p>
+            <p style="color:#666;font-size:13px">Если вы не запрашивали это действие, просто проигнорируйте письмо.</p>
+        </div>
+    `;
+    const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ from: `${senderName} <${senderEmail}>`, to: [to], subject, text, html }),
+        signal: AbortSignal.timeout(15000)
+    });
+    const raw = await response.text();
+    let data = {};
+    try { data = raw ? JSON.parse(raw) : {}; } catch (_) {}
+    if (!response.ok) throw new Error(`Resend API ${response.status}: ${data?.message || data?.name || raw || 'ошибка'}`);
+    console.log('Email удаления отправлен через Resend:', data?.id || 'OK');
+}
+
+app.post('/api/profile/email/unbind/request', async (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+    if (!requireDatabase(res)) return;
+    try {
+        const result = await pool.query('SELECT email, email_verified FROM users WHERE steam_id=$1', [String(req.user.id)]);
+        const row = result.rows[0];
+        if (!row?.email) return res.status(400).json({ error: 'Email не привязан' });
+        if (!row.email_verified) return res.status(400).json({ error: 'Сначала подтвердите Email' });
+        const code = String(crypto.randomInt(100000, 1000000));
+        const expires = new Date(Date.now() + 10 * 60 * 1000);
+        await sendEmailUnbindEmail(row.email, code);
+        await pool.query(`
+            UPDATE users SET email_action='unbind', email_action_code=$1, email_action_expires_at=$2
+            WHERE steam_id=$3
+        `, [code, expires, String(req.user.id)]);
+        res.json({ success: true, email: row.email });
+    } catch (error) {
+        console.error('Ошибка запроса отвязки Email:', error.message);
+        res.status(500).json({ error: 'Не удалось отправить код для удаления Email' });
+    }
+});
+
+app.post('/api/profile/email/unbind/confirm', async (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+    if (!requireDatabase(res)) return;
+    const code = String(req.body.code || '').trim();
+    try {
+        const result = await pool.query(`
+            SELECT email, email_verified, email_action, email_action_code, email_action_expires_at
+            FROM users WHERE steam_id=$1
+        `, [String(req.user.id)]);
+        const row = result.rows[0];
+        if (!row?.email || !row.email_verified || row.email_action !== 'unbind') {
+            return res.status(400).json({ error: 'Запрос на удаление Email не найден' });
+        }
+        if (!row.email_action_code || row.email_action_code !== code || !row.email_action_expires_at || new Date(row.email_action_expires_at).getTime() < Date.now()) {
+            return res.status(400).json({ error: 'Неверный или просроченный код' });
+        }
+        await pool.query(`
+            UPDATE users
+            SET email='', email_verified=FALSE, email_verification_code='', email_verification_expires_at=NULL,
+                email_action='', email_action_code='', email_action_expires_at=NULL
+            WHERE steam_id=$1
+        `, [String(req.user.id)]);
+        const record = ensureUserRecord(req.user);
+        record.email = '';
+        record.emailVerified = false;
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Ошибка удаления Email:', error.message);
+        res.status(500).json({ error: 'Не удалось удалить Email' });
     }
 });
 

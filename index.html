@@ -604,6 +604,62 @@
         .email-code-modal-wrap { position:relative; }
         .sale-delete-btn { width:30px; height:30px; padding:0; margin-left:8px; border-radius:8px; border:1px solid rgba(255,90,90,.32); background:rgba(255,70,70,.07); color:#ff8d8d; font-size:18px; line-height:28px; font-weight:900; cursor:pointer; vertical-align:middle; }
         .sale-delete-btn:hover { background:rgba(255,70,70,.16); transform:translateY(-1px); }
+        .api-key-wrap { position:relative; flex:1; min-width:0; }
+        .api-key-wrap input { width:100%; padding-right:48px; }
+        .api-eye { position:absolute; right:8px; top:50%; transform:translateY(-50%); width:34px; height:34px; border:0; border-radius:8px; background:transparent; color:#8c9d94; cursor:pointer; font-size:17px; }
+        .api-eye:hover { background:rgba(255,255,255,.06); color:#eaf5ee; }
+        .email-unbind-btn { background:#ff5757 !important; color:#fff !important; }
+        .email-unbind-btn:hover { background:#ff4444 !important; }
+        .online-indicator { display:inline-flex; align-items:center; gap:7px; color:#8c9d94; font-size:12px; margin-top:20px; }
+        .online-dot { width:8px; height:8px; border-radius:50%; background:#2ecc71; box-shadow:0 0 9px rgba(46,204,113,.65); }
+
+        /* ===== Полная светлая тема для профиля, модалок, таблиц и служебных блоков ===== */
+        body.light .profile-section-card,
+        body.light .api-card,
+        body.light .email-box,
+        body.light .session-row,
+        body.light .exchange-empty,
+        body.light .filters-row,
+        body.light .public-profile-card,
+        body.light .ban-card { background:#ffffff !important; border-color:#d0d4da !important; }
+        body.light .sell-hero,
+        body.light .market-hero { color:#222 !important; }
+        body.light .unavailable-tooltip { background:#ffffff !important; color:#333 !important; border-color:#2ecc71 !important; }
+        body.light .header-balance { background:#eef7f1 !important; border-color:#bfe7cd !important; color:#218a4d !important; }
+        body.light .profile-content-section { color:#333 !important; }
+        body.light .profile-section-title { color:#222 !important; }
+        body.light .profile-section-muted,
+        body.light .verify-text,
+        body.light .api-note { color:#667078 !important; }
+        body.light .exchange-toggle button { background:#f5f6fa !important; border-color:#d0d4da !important; color:#555 !important; }
+        body.light .exchange-toggle button.active { background:#eef7f1 !important; color:#218a4d !important; border-color:#2ecc71 !important; }
+        body.light .email-row input,
+        body.light .email-code-row input,
+        body.light .api-key-row input { background:#f5f6fa !important; border-color:#d0d4da !important; color:#222 !important; }
+        body.light .email-row input:disabled { background:#edf0f4 !important; color:#555 !important; }
+        body.light .session-label { color:#777 !important; }
+        body.light .session-value { color:#333 !important; }
+        body.light .session-kill { border-color:#e3a1a1 !important; color:#d44 !important; }
+        body.light .api-doc { color:#218a4d !important; }
+        body.light .api-eye { color:#667078 !important; }
+        body.light .email-code-modal { background:#ffffff !important; border-color:#d0d4da !important; box-shadow:0 30px 90px rgba(0,0,0,.18) !important; }
+        body.light .email-code-modal h2 { color:#222 !important; }
+        body.light .email-code-modal p { color:#667078 !important; }
+        body.light .email-code-input { background:#f5f6fa !important; border-color:#cbd2dc !important; color:#222 !important; }
+        body.light .email-modal-close { background:#edf0f4 !important; color:#667078 !important; }
+        body.light .transaction-table th,
+        body.light .transaction-table td { color:#444 !important; border-bottom-color:#e0e4ea !important; }
+        body.light .filter-input, body.light .filter-select { background:#ffffff !important; color:#333 !important; border-color:#d0d4da !important; }
+        body.light .admin-control-card { background:#ffffff !important; border-color:#d0d4da !important; color:#333 !important; }
+        body.light .admin-control-title { color:#222 !important; }
+        body.light .admin-control-subtitle, body.light .admin-management-help { color:#667078 !important; }
+        body.light .admin-users, body.light .admin-sales { background:#ffffff !important; }
+        body.light .btn { color:#07120b !important; }
+        body.light .email-unbind-btn { color:#fff !important; }
+        body.light .modal-overlay { background:rgba(20,25,30,.35) !important; }
+        body.light .online-indicator { color:#667078 !important; }
+        body.light .api-key-wrap .api-eye:hover { background:rgba(0,0,0,.05) !important; }
+
         @media(max-width:900px){ .session-row{grid-template-columns:1fr 1fr;} .session-kill{grid-column:1/-1; justify-self:start;} }
         @media(max-width:600px){ .session-row{grid-template-columns:1fr;} .email-row,.email-code-row,.api-key-row{flex-direction:column;} }
     </style>
@@ -966,7 +1022,7 @@
                                 <div class="verify-text">Укажите свой Email и подтвердите его кодом из письма.</div>
                                 <div class="email-row">
                                     <input id="profileEmail" type="email" placeholder="Введите вашу почту" autocomplete="email">
-                                    <button class="btn" type="button" onclick="requestEmailCode()">Подтвердить</button>
+                                    <button id="emailActionButton" class="btn" type="button" onclick="requestEmailCode()">Подтвердить</button>
                                 </div>
                                 <div class="email-code-row" id="emailCodeRow">
                                     <input id="profileEmailCode" type="text" inputmode="numeric" maxlength="6" placeholder="Код из письма">
@@ -999,7 +1055,10 @@
                                 <a class="api-doc" href="#" onclick="return false;">Перейти к документации</a>
                             </div>
                             <div class="api-key-row">
-                                <input id="profileApiKey" type="text" readonly placeholder="Не сгенерирован" maxlength="17">
+                                <div class="api-key-wrap">
+                                    <input id="profileApiKey" type="password" readonly placeholder="Не сгенерирован" maxlength="17" autocomplete="off">
+                                    <button id="apiKeyEye" class="api-eye" type="button" aria-label="Показать API Key" onclick="toggleApiKeyVisibility()">👁</button>
+                                </div>
                                 <button class="btn" type="button" onclick="generateProfileApiKey()">Сгенерировать</button>
                             </div>
                             <div class="api-note">🔐 API-ключ является секретом вашего аккаунта. Если вы больше не хотите его использовать, сгенерируйте новый — старый будет заменён.</div>
@@ -1336,6 +1395,7 @@
                 <a onclick="navigateTo('privacy')">Политика конфиденциальности</a>
             </div>
         </div>
+        <div class="online-indicator"><span class="online-dot"></span> Сейчас на сайте: <strong id="siteOnlineCount">0</strong></div>
         <div class="footer-bottom">
             © 2025 EMERALD Market. Все права защищены.
         </div>
@@ -2263,24 +2323,45 @@ function switchExchangeTab(button, tab) {
     document.getElementById('exchangeSales').style.display = tab === 'sales' ? 'flex' : 'none';
 }
 
+let emailActionMode = 'verify';
+
+function updateEmailActionUI(email, verified) {
+    const input = document.getElementById('profileEmail');
+    const button = document.getElementById('emailActionButton');
+    const status = document.getElementById('emailVerifyStatus');
+    if (!input || !button || !status) return;
+    input.value = email || '';
+    status.textContent = verified ? 'Подтвержден' : 'Не подтвержден';
+    status.className = verified ? 'verify-status verify-ok' : 'verify-status';
+    if (verified && email) {
+        input.disabled = true;
+        button.textContent = 'Отвязать';
+        button.classList.add('email-unbind-btn');
+        button.onclick = requestEmailUnbindCode;
+    } else {
+        input.disabled = false;
+        button.textContent = 'Подтвердить';
+        button.classList.remove('email-unbind-btn');
+        button.onclick = requestEmailCode;
+    }
+}
+
 async function loadEmailVerification() {
     try {
         const r = await fetch('/api/profile/email');
         const d = await r.json();
-        const input = document.getElementById('profileEmail');
-        const status = document.getElementById('emailVerifyStatus');
-        if (!input || !status) return;
-        input.value = d.email || '';
-        status.textContent = d.verified ? 'Подтвержден' : 'Не подтвержден';
-        status.className = d.verified ? 'verify-status verify-ok' : 'verify-status';
+        updateEmailActionUI(d.email || '', d.verified === true);
     } catch(e) {}
 }
 
-function openEmailCodeModal(email) {
+function openEmailCodeModal(email, mode = 'verify') {
     const modal = document.getElementById('emailCodeModal');
     const target = document.getElementById('emailCodeTarget');
     const msg = document.getElementById('emailModalMessage');
+    const title = modal?.querySelector('h2');
     if (!modal) return;
+    emailActionMode = mode;
+    if (title) title.textContent = mode === 'unbind' ? 'Удаление Email' : 'Подтверждение Email';
     target.textContent = email;
     msg.textContent = '';
     document.querySelectorAll('#emailCodeInputs .email-code-input').forEach(input => input.value = '');
@@ -2291,6 +2372,21 @@ function openEmailCodeModal(email) {
 function closeEmailCodeModal() {
     const modal = document.getElementById('emailCodeModal');
     if (modal) modal.style.display = 'none';
+    emailActionMode = 'verify';
+}
+
+async function requestEmailUnbindCode() {
+    const input = document.getElementById('profileEmail');
+    const msg = document.getElementById('emailVerifyMessage');
+    const email = input?.value || '';
+    msg.textContent = '⏳ Отправляем код для отвязки...';
+    try {
+        const r = await fetch('/api/profile/email/unbind/request', {method:'POST', headers:{'Content-Type':'application/json'}});
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || 'Не удалось отправить код');
+        msg.textContent = '✓ Код для отвязки отправлен на вашу почту.';
+        openEmailCodeModal(email, 'unbind');
+    } catch(e) { msg.textContent = `✕ ${e.message}`; }
 }
 
 function setupEmailCodeInputs() {
@@ -2322,7 +2418,7 @@ async function requestEmailCode() {
         const d = await r.json();
         if (!r.ok) throw new Error(d.error || 'Не удалось отправить код');
         msg.textContent = '✓ Код отправлен на указанную почту. Он действует 10 минут.';
-        openEmailCodeModal(email);
+        openEmailCodeModal(email, 'verify');
     } catch(e) { msg.textContent = `✕ ${e.message}`; }
 }
 
@@ -2332,11 +2428,22 @@ async function verifyEmailCode(fromModal = false) {
     const msg = fromModal ? document.getElementById('emailModalMessage') : document.getElementById('emailVerifyMessage');
     if (!/^\d{6}$/.test(code || '')) { msg.textContent = '✕ Введите 6-значный код'; return; }
     try {
-        const r = await fetch('/api/profile/email/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({code})});
+        const endpoint = emailActionMode === 'unbind' ? '/api/profile/email/unbind/confirm' : '/api/profile/email/verify';
+        const r = await fetch(endpoint, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({code})});
         const d = await r.json();
-        if (!r.ok) throw new Error(d.error || 'Не удалось подтвердить Email');
-        document.getElementById('emailVerifyStatus').textContent = 'Подтвержден';
-        document.getElementById('emailVerifyStatus').className = 'verify-status verify-ok';
+        if (!r.ok) throw new Error(d.error || 'Не удалось выполнить действие');
+
+        if (emailActionMode === 'unbind') {
+            updateEmailActionUI('', false);
+            document.getElementById('emailVerifyMessage').textContent = '✓ Email отвязан.';
+            if (fromModal) {
+                msg.textContent = '✓ Email успешно отвязан.';
+                setTimeout(closeEmailCodeModal, 700);
+            }
+            return;
+        }
+
+        updateEmailActionUI(d.email || document.getElementById('profileEmail').value, true);
         document.getElementById('emailCodeRow')?.classList.remove('show');
         document.getElementById('emailVerifyMessage').textContent = `✓ Email ${d.email} подтвержден.`;
         if (fromModal) {
@@ -2380,8 +2487,27 @@ async function loadProfileApiKey() {
     try {
         const r = await fetch('/api/profile/api-key');
         const d = await r.json();
-        if (r.ok) input.value = d.apiKey || '';
+        if (r.ok) {
+            input.value = d.apiKey || '';
+            input.type = 'password';
+            updateApiEye(false);
+        }
     } catch(e) {}
+}
+
+function updateApiEye(visible) {
+    const eye = document.getElementById('apiKeyEye');
+    if (!eye) return;
+    eye.textContent = visible ? '🙈' : '👁';
+    eye.setAttribute('aria-label', visible ? 'Скрыть API Key' : 'Показать API Key');
+}
+
+function toggleApiKeyVisibility() {
+    const input = document.getElementById('profileApiKey');
+    if (!input) return;
+    const visible = input.type !== 'password';
+    input.type = visible ? 'password' : 'text';
+    updateApiEye(!visible);
 }
 
 async function generateProfileApiKey() {
@@ -2389,7 +2515,10 @@ async function generateProfileApiKey() {
         const r = await fetch('/api/profile/api-key/generate', {method:'POST'});
         const d = await r.json();
         if (!r.ok) throw new Error(d.error || 'Не удалось сгенерировать API Key');
-        document.getElementById('profileApiKey').value = d.apiKey;
+        const input = document.getElementById('profileApiKey');
+        input.value = d.apiKey;
+        input.type = 'password';
+        updateApiEye(false);
         showModal('Успех', 'Новый API Key сгенерирован. Старый ключ больше недействителен.');
     } catch(e) { showModal('Ошибка', e.message); }
 }
@@ -2406,6 +2535,36 @@ document.querySelectorAll('.profile-tab').forEach(tab => {
         document.getElementById('section-' + tabName).classList.add('active');
     });
 });
+
+// ===== РЕАЛЬНЫЙ ОНЛАЙН =====
+function getPresenceId() {
+    try {
+        let id = localStorage.getItem('emerald_presence_id');
+        if (!id || !/^[A-Za-z0-9_-]{16,100}$/.test(id)) {
+            id = (crypto.randomUUID ? crypto.randomUUID() : ('v_' + Date.now() + '_' + Math.random().toString(36).slice(2)))
+                .replace(/[^A-Za-z0-9_-]/g, '');
+            localStorage.setItem('emerald_presence_id', id);
+        }
+        return id;
+    } catch(e) {
+        return 'v_' + Date.now().toString(36) + Math.random().toString(36).slice(2);
+    }
+}
+
+async function updateSiteOnline() {
+    const countEl = document.getElementById('siteOnlineCount');
+    try {
+        const r = await fetch('/api/presence/heartbeat', {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({visitorId:getPresenceId()}), cache:'no-store'
+        });
+        const d = await r.json();
+        if (r.ok && countEl) countEl.textContent = Number(d.online || 0);
+    } catch(e) {}
+}
+
+updateSiteOnline();
+setInterval(updateSiteOnline, 30000);
 
 // ===== FAQ =====
 function toggleFaq(element) {
