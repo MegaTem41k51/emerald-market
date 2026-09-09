@@ -305,6 +305,19 @@ async function initDatabase() {
         )
     `);
 
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS reviews (
+            id BIGSERIAL PRIMARY KEY,
+            name TEXT NOT NULL DEFAULT '',
+            rating INTEGER NOT NULL DEFAULT 5 CHECK (rating BETWEEN 1 AND 5),
+            review_text TEXT NOT NULL DEFAULT '',
+            photo_url TEXT NOT NULL DEFAULT '',
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    `);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_reviews_created_at ON reviews(created_at DESC)`);
+
     // Один подтверждённый Email может принадлежать только одному аккаунту.
     // Индекс защищает от гонки запросов даже при одновременной регистрации двух пользователей.
     await pool.query(`
@@ -1584,6 +1597,108 @@ app.post('/api/profile/email/unbind/confirm', async (req, res) => {
     }
 });
 
+// =====================================================
+// ОТЗЫВЫ
+// =====================================================
+
+app.get('/api/reviews', async (req, res) => {
+    if (!requireDatabase(res)) return;
+    try {
+        const result = await pool.query(`
+            SELECT id, name, rating, review_text, photo_url, created_at, updated_at
+            FROM reviews
+            ORDER BY created_at DESC, id DESC
+        `);
+        res.json({
+            reviews: result.rows.map(row => ({
+                id: Number(row.id),
+                name: row.name,
+                rating: Number(row.rating),
+                text: row.review_text,
+                photoUrl: row.photo_url || '',
+                createdAt: new Date(row.created_at).toISOString(),
+                updatedAt: new Date(row.updated_at).toISOString()
+            }))
+        });
+    } catch (error) {
+        console.error('Ошибка загрузки отзывов:', error.message);
+        res.status(500).json({ error: 'Не удалось загрузить отзывы' });
+    }
+});
+
+app.post('/api/admin/reviews', async (req, res) => {
+    if (!(await isAdmin(req))) return res.status(403).json({ error: 'Доступ запрещён' });
+    if (!requireDatabase(res)) return;
+    try {
+        const name = String(req.body?.name || '').trim().slice(0, 80);
+        const text = String(req.body?.text || '').trim().slice(0, 2000);
+        const photoUrl = String(req.body?.photoUrl || '').trim().slice(0, 1000);
+        const rating = Number(req.body?.rating);
+        if (!name) return res.status(400).json({ error: 'Укажите имя' });
+        if (!text) return res.status(400).json({ error: 'Введите текст отзыва' });
+        if (!Number.isInteger(rating) || rating < 1 || rating > 5) return res.status(400).json({ error: 'Оценка должна быть от 1 до 5' });
+        if (photoUrl && !/^https?:\/\//i.test(photoUrl)) return res.status(400).json({ error: 'Фото должно быть ссылкой http/https' });
+
+        const result = await pool.query(`
+            INSERT INTO reviews (name, rating, review_text, photo_url)
+            VALUES ($1,$2,$3,$4)
+            RETURNING id, name, rating, review_text, photo_url, created_at, updated_at
+        `, [name, rating, text, photoUrl]);
+        const row = result.rows[0];
+        res.json({
+            success: true,
+            review: { id: Number(row.id), name: row.name, rating: Number(row.rating), text: row.review_text, photoUrl: row.photo_url || '', createdAt: new Date(row.created_at).toISOString(), updatedAt: new Date(row.updated_at).toISOString() }
+        });
+    } catch (error) {
+        console.error('Ошибка добавления отзыва:', error.message);
+        res.status(500).json({ error: 'Не удалось добавить отзыв' });
+    }
+});
+
+app.put('/api/admin/reviews/:id', async (req, res) => {
+    if (!(await isAdmin(req))) return res.status(403).json({ error: 'Доступ запрещён' });
+    if (!requireDatabase(res)) return;
+    try {
+        const id = Number(req.params.id);
+        const name = String(req.body?.name || '').trim().slice(0, 80);
+        const text = String(req.body?.text || '').trim().slice(0, 2000);
+        const photoUrl = String(req.body?.photoUrl || '').trim().slice(0, 1000);
+        const rating = Number(req.body?.rating);
+        if (!Number.isInteger(id) || id <= 0) return res.status(400).json({ error: 'Некорректный ID отзыва' });
+        if (!name) return res.status(400).json({ error: 'Укажите имя' });
+        if (!text) return res.status(400).json({ error: 'Введите текст отзыва' });
+        if (!Number.isInteger(rating) || rating < 1 || rating > 5) return res.status(400).json({ error: 'Оценка должна быть от 1 до 5' });
+        if (photoUrl && !/^https?:\/\//i.test(photoUrl)) return res.status(400).json({ error: 'Фото должно быть ссылкой http/https' });
+
+        const result = await pool.query(`
+            UPDATE reviews SET name=$1, rating=$2, review_text=$3, photo_url=$4, updated_at=NOW()
+            WHERE id=$5
+            RETURNING id, name, rating, review_text, photo_url, created_at, updated_at
+        `, [name, rating, text, photoUrl, id]);
+        if (!result.rowCount) return res.status(404).json({ error: 'Отзыв не найден' });
+        const row = result.rows[0];
+        res.json({ success: true, review: { id: Number(row.id), name: row.name, rating: Number(row.rating), text: row.review_text, photoUrl: row.photo_url || '', createdAt: new Date(row.created_at).toISOString(), updatedAt: new Date(row.updated_at).toISOString() } });
+    } catch (error) {
+        console.error('Ошибка изменения отзыва:', error.message);
+        res.status(500).json({ error: 'Не удалось изменить отзыв' });
+    }
+});
+
+app.delete('/api/admin/reviews/:id', async (req, res) => {
+    if (!(await isAdmin(req))) return res.status(403).json({ error: 'Доступ запрещён' });
+    if (!requireDatabase(res)) return;
+    try {
+        const id = Number(req.params.id);
+        if (!Number.isInteger(id) || id <= 0) return res.status(400).json({ error: 'Некорректный ID отзыва' });
+        const result = await pool.query('DELETE FROM reviews WHERE id=$1', [id]);
+        if (!result.rowCount) return res.status(404).json({ error: 'Отзыв не найден' });
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Ошибка удаления отзыва:', error.message);
+        res.status(500).json({ error: 'Не удалось удалить отзыв' });
+    }
+});
+
 // Публичный профиль: только публичные показатели и внутренний ID.
 // Steam ID, имя, аватар, Trade URL и платёжные данные наружу не отдаём.
 app.get('/api/profile/:publicId', async (req, res) => {
@@ -1914,6 +2029,7 @@ app.get('/admin', async (req, res) => {
 
 app.get('/profile', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/profile/:publicId', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/reviews', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
 app.get('/api/health', async (req, res) => {
     if (!pool) {
