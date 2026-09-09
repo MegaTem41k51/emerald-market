@@ -663,6 +663,23 @@
         @media(max-width:900px){ .session-row{grid-template-columns:1fr 1fr;} .session-kill{grid-column:1/-1; justify-self:start;} }
         @media(max-width:600px){ .session-row{grid-template-columns:1fr;} .email-row,.email-code-row,.api-key-row{flex-direction:column;} }
     
+/* ===== GUEST REFERENCE DESIGN ===== */
+body.guest-mode .header { display:none !important; }
+body.guest-mode .content { margin:0 !important; padding:0 !important; }
+body.guest-mode .wrapper { min-height:100vh; }
+body.guest-mode { background:#00110d; }
+.guest-reference-page { position:relative; width:100%; min-height:100vh; overflow:hidden; background:#00110d; line-height:0; }
+.guest-reference-image { display:block; width:100%; height:auto; min-height:100vh; object-fit:cover; object-position:top center; }
+.guest-hotspot { position:absolute; display:block; z-index:5; cursor:pointer; }
+.guest-login-top { left:54.2%; top:1.0%; width:8.9%; height:3.5%; }
+.guest-login-main { left:68.3%; top:27.0%; width:16.7%; height:4.0%; }
+.guest-faq { left:30.0%; top:1.0%; width:3.3%; height:3.5%; }
+@media (max-width:900px) {
+  .guest-reference-image { min-height:auto; object-fit:contain; }
+  .guest-login-top { left:54%; top:1%; width:10%; height:3.5%; }
+  .guest-login-main { left:68%; top:27%; width:18%; height:4%; }
+}
+
 /* ===== EMERALD GUEST LANDING ===== */
 .guest-page{min-height:calc(100vh - 72px)}
 .guest-shell{position:relative;overflow:hidden;padding:44px 0 70px}
@@ -740,14 +757,12 @@ body.light .guest-shell:before{background:radial-gradient(circle at 50% 45%,rgba
 
 <!-- ГОСТЕВАЯ ГЛАВНАЯ -->
 <div class="page active guest-page" id="guestPage">
-<div class="guest-shell"><div class="guest-grid"></div><div class="container">
-<section class="guest-hero">
-<div class="guest-copy"><div class="guest-kicker">✦ EMERALD Market</div><h1>EMERALD<span>MARKET</span></h1><p>Современная площадка с фирменным интерфейсом EMERALD Market. Войдите через Steam, чтобы открыть персональные возможности аккаунта.</p><div class="guest-actions"><a href="/auth/steam" class="btn btn-steam">Войти через Steam</a><button class="btn-outline" type="button" onclick="navigateTo('faq')">Узнать больше</button></div><div class="guest-note">Авторизация проходит через Steam. Пароль Steam не передаётся сайту.</div></div>
-<div class="guest-emblem" aria-hidden="true"><div class="guest-logo-card"><div class="guest-orbit"><i></i><i></i><i></i></div><img src="/favicon.png" alt="EMERALD Market"></div></div>
-</section>
-<section class="guest-stats"><div class="guest-stat"><strong>24/7</strong><span>Доступ к аккаунту</span></div><div class="guest-stat"><strong>Steam</strong><span>Удобная авторизация</span></div><div class="guest-stat"><strong>Secure</strong><span>Защищённые сессии</span></div><div class="guest-stat"><strong>EMERALD</strong><span>Единый стиль интерфейса</span></div></section>
-<section class="guest-features"><article class="guest-feature"><div class="feature-icon">🛡️</div><h3>Безопасный аккаунт</h3><p>Сессии и настройки аккаунта работают в единой системе профиля.</p></article><article class="guest-feature"><div class="feature-icon">⚡</div><h3>Быстрый интерфейс</h3><p>Минималистичная навигация, плавные состояния и адаптация под разные экраны.</p></article><article class="guest-feature"><div class="feature-icon">💎</div><h3>Стиль EMERALD</h3><p>Тёмная графитовая база, изумрудное свечение и аккуратные стеклянные карточки.</p></article></section>
-</div></div></div>
+    <div class="guest-reference-page">
+        <img class="guest-reference-image" src="/guest-home.png" alt="EMERALD Market">
+        <a class="guest-hotspot guest-login-top" href="/auth/steam" aria-label="Войти через Steam"></a>
+        <a class="guest-hotspot guest-login-main" href="/auth/steam" aria-label="Войти через Steam"></a>
+        <a class="guest-hotspot guest-faq" href="#" onclick="navigateTo('faq'); return false;" aria-label="FAQ"></a>
+    </div>
 </div>
 
 <!-- СТРАНИЦА ПРОДАЖИ -->
@@ -2017,6 +2032,7 @@ async function fetchUser() {
 function logoutUser() { window.location.href = '/logout'; }
 
 function updateUserUI() {
+    document.body.classList.toggle('guest-mode', !currentUser);
     const actions = document.getElementById('headerActions');
     if (currentUser) {
         actions.innerHTML = `
