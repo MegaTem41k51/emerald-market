@@ -662,7 +662,25 @@
 
         @media(max-width:900px){ .session-row{grid-template-columns:1fr 1fr;} .session-kill{grid-column:1/-1; justify-self:start;} }
         @media(max-width:600px){ .session-row{grid-template-columns:1fr;} .email-row,.email-code-row,.api-key-row{flex-direction:column;} }
-    </style>
+    
+/* ===== EMERALD GUEST LANDING ===== */
+.guest-page{min-height:calc(100vh - 72px)}
+.guest-shell{position:relative;overflow:hidden;padding:44px 0 70px}
+.guest-shell:before{content:"";position:absolute;inset:-30% -10% auto;height:620px;background:radial-gradient(circle at 50% 45%,rgba(28,231,126,.20),transparent 58%);pointer-events:none}
+.guest-grid{position:absolute;inset:0;opacity:.18;background-image:linear-gradient(rgba(64,255,160,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(64,255,160,.08) 1px,transparent 1px);background-size:54px 54px;mask-image:linear-gradient(to bottom,#000,transparent 80%);pointer-events:none}
+.guest-hero{position:relative;display:grid;grid-template-columns:1.05fr .95fr;gap:42px;align-items:center;min-height:530px}
+.guest-copy{position:relative;z-index:2}.guest-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid rgba(69,255,163,.25);border-radius:999px;background:rgba(18,49,37,.45);color:#66f4ad;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.guest-copy h1{margin:18px 0 14px;font-size:clamp(46px,6vw,82px);line-height:.94;letter-spacing:-.055em;color:#f5fff9}.guest-copy h1 span{display:block;color:#38e891;text-shadow:0 0 32px rgba(56,232,145,.2)}
+.guest-copy p{max-width:600px;margin:0;color:#9ca9a4;font-size:17px;line-height:1.65}.guest-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}.guest-actions .btn{min-width:190px;text-align:center}.guest-note{margin-top:13px;color:#68756f;font-size:12px}
+.guest-emblem{position:relative;min-height:500px;display:grid;place-items:center}.guest-emblem:before{content:"";position:absolute;width:430px;height:430px;border-radius:50%;border:1px solid rgba(62,255,158,.22);box-shadow:0 0 80px rgba(0,255,132,.08),inset 0 0 60px rgba(0,255,132,.05)}.guest-emblem:after{content:"";position:absolute;width:520px;height:520px;border-radius:50%;border:1px dashed rgba(62,255,158,.12);animation:emerald-spin 30s linear infinite}
+.guest-logo-card{position:relative;width:min(360px,78vw);aspect-ratio:1;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle,rgba(9,49,35,.82),rgba(5,19,15,.5) 62%,transparent 68%);box-shadow:0 0 90px rgba(20,231,125,.16)}.guest-logo-card img{width:72%;height:72%;object-fit:contain;filter:drop-shadow(0 0 26px rgba(54,245,151,.28))}.guest-orbit{position:absolute;inset:13%;border:1px solid rgba(66,244,159,.24);border-radius:50%}.guest-orbit i{position:absolute;width:7px;height:7px;border-radius:50%;background:#45f2a0;box-shadow:0 0 14px #45f2a0}.guest-orbit i:nth-child(1){top:7%;left:22%}.guest-orbit i:nth-child(2){right:5%;top:43%}.guest-orbit i:nth-child(3){bottom:13%;left:27%}
+.guest-stats{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:28px}.guest-stat{padding:20px;border:1px solid rgba(74,255,166,.13);border-radius:14px;background:rgba(7,26,20,.68);backdrop-filter:blur(8px)}.guest-stat strong{display:block;color:#45ee9e;font-size:24px;margin-bottom:5px}.guest-stat span{color:#77837e;font-size:12px}
+.guest-features{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px}.guest-feature{padding:22px;border:1px solid rgba(74,255,166,.12);border-radius:16px;background:linear-gradient(145deg,rgba(13,37,29,.82),rgba(6,20,16,.72))}.guest-feature .feature-icon{font-size:24px;margin-bottom:10px}.guest-feature h3{margin:0 0 7px;color:#eefaf4;font-size:16px}.guest-feature p{margin:0;color:#78857f;font-size:13px;line-height:1.55}
+body.light .guest-shell:before{background:radial-gradient(circle at 50% 45%,rgba(35,201,111,.14),transparent 58%)}body.light .guest-grid{opacity:.32;background-image:linear-gradient(rgba(35,170,100,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(35,170,100,.07) 1px,transparent 1px)}body.light .guest-copy h1{color:#13231c}body.light .guest-copy p{color:#596760}body.light .guest-stat,body.light .guest-feature{background:rgba(255,255,255,.82);border-color:#d8e5dd}body.light .guest-feature h3{color:#173027}body.light .guest-feature p,body.light .guest-stat span{color:#6a7770}body.light .guest-emblem:before{border-color:rgba(32,176,101,.2)}
+@keyframes emerald-spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@media(max-width:900px){.guest-hero{grid-template-columns:1fr;text-align:center}.guest-copy p{margin:auto}.guest-actions{justify-content:center}.guest-emblem{min-height:390px}.guest-stats{grid-template-columns:repeat(2,1fr)}.guest-features{grid-template-columns:1fr}}@media(max-width:560px){.guest-shell{padding-top:24px}.guest-copy h1{font-size:48px}.guest-emblem{min-height:320px}.guest-emblem:before{width:280px;height:280px}.guest-emblem:after{width:330px;height:330px}.guest-stats{grid-template-columns:1fr 1fr}.guest-stat{padding:15px}.guest-stat strong{font-size:19px}}
+
+</style>
     <link rel="icon" type="image/png" href="/favicon.png">
 </head>
 <body>
@@ -704,12 +722,13 @@
     <div class="container header-inner">
         <a href="#" class="logo" id="logoLink">EMERALD<span>Market</span></a>
         <nav class="nav">
-            <a class="active" data-page="sell">Продать скины</a>
-            <a data-page="market">Купить скины</a>
+            <a class="active" data-page="guest">Главная</a>
+            <a data-page="sell" id="sellNavLink">Продать скины</a>
+            <a data-page="market" id="marketNavLink">Купить скины</a>
             <a data-page="profile">Профиль</a>
             <a data-page="admin" id="adminNavLink" style="display:none;">Админка</a>
-            <a data-page="faq"></a>
-            <a data-page="support"></a>
+            <a data-page="faq">FAQ</a>
+            <a data-page="support">Поддержка</a>
         </nav>
         <div class="header-actions" id="headerActions">
             <a href="/auth/steam" class="btn btn-steam">Войти через Steam</a>
@@ -719,8 +738,20 @@
 
 <div class="content">
 
+<!-- ГОСТЕВАЯ ГЛАВНАЯ -->
+<div class="page active guest-page" id="guestPage">
+<div class="guest-shell"><div class="guest-grid"></div><div class="container">
+<section class="guest-hero">
+<div class="guest-copy"><div class="guest-kicker">✦ EMERALD Market</div><h1>EMERALD<span>MARKET</span></h1><p>Современная площадка с фирменным интерфейсом EMERALD Market. Войдите через Steam, чтобы открыть персональные возможности аккаунта.</p><div class="guest-actions"><a href="/auth/steam" class="btn btn-steam">Войти через Steam</a><button class="btn-outline" type="button" onclick="navigateTo('faq')">Узнать больше</button></div><div class="guest-note">Авторизация проходит через Steam. Пароль Steam не передаётся сайту.</div></div>
+<div class="guest-emblem" aria-hidden="true"><div class="guest-logo-card"><div class="guest-orbit"><i></i><i></i><i></i></div><img src="/favicon.png" alt="EMERALD Market"></div></div>
+</section>
+<section class="guest-stats"><div class="guest-stat"><strong>24/7</strong><span>Доступ к аккаунту</span></div><div class="guest-stat"><strong>Steam</strong><span>Удобная авторизация</span></div><div class="guest-stat"><strong>Secure</strong><span>Защищённые сессии</span></div><div class="guest-stat"><strong>EMERALD</strong><span>Единый стиль интерфейса</span></div></section>
+<section class="guest-features"><article class="guest-feature"><div class="feature-icon">🛡️</div><h3>Безопасный аккаунт</h3><p>Сессии и настройки аккаунта работают в единой системе профиля.</p></article><article class="guest-feature"><div class="feature-icon">⚡</div><h3>Быстрый интерфейс</h3><p>Минималистичная навигация, плавные состояния и адаптация под разные экраны.</p></article><article class="guest-feature"><div class="feature-icon">💎</div><h3>Стиль EMERALD</h3><p>Тёмная графитовая база, изумрудное свечение и аккуратные стеклянные карточки.</p></article></section>
+</div></div></div>
+</div>
+
 <!-- СТРАНИЦА ПРОДАЖИ -->
-<div class="page active" id="sellPage">
+<div class="page" id="sellPage">
     <div class="container">
         <div class="sell-hero">
             <h1>Продавайте скины <span>Counter Strike 2</span> выгодно</h1>
@@ -1975,7 +2006,7 @@ async function fetchUser() {
                 navigateTo('profile', false);
                 await renderPublicProfile(profileId);
             } else {
-                navigateTo('sell', false);
+                navigateTo('guest', false);
             }
         }
     } catch (error) {
@@ -2002,6 +2033,12 @@ function updateUserUI() {
 
     const adminLink = document.getElementById('adminNavLink');
     if (adminLink) adminLink.style.display = currentUser?.isAdmin ? 'block' : 'none';
+    const guestLink = document.querySelector('.nav a[data-page="guest"]');
+    const sellLink = document.getElementById('sellNavLink');
+    const marketLink = document.getElementById('marketNavLink');
+    if (guestLink) guestLink.style.display = currentUser ? 'none' : 'block';
+    if (sellLink) sellLink.style.display = currentUser ? 'block' : 'none';
+    if (marketLink) marketLink.style.display = currentUser ? 'block' : 'none';
 }
 
 // ===== НАСТРОЙКИ =====
@@ -2601,7 +2638,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     document.getElementById('logoLink').addEventListener('click', function(e) {
         e.preventDefault();
-        navigateTo('sell');
+        navigateTo(currentUser ? 'sell' : 'guest');
     });
 
     fetchUser();
@@ -2624,7 +2661,7 @@ window.addEventListener('popstate', async () => {
     const profileId = getProfileIdFromPath();
     if (profileId) { navigateTo('profile', false); await renderPublicProfile(profileId); }
     else if (window.location.pathname === '/admin') navigateTo('admin', false);
-    else navigateTo('sell', false);
+    else navigateTo(currentUser ? 'sell' : 'guest', false);
 });
 </script>
 </body>
