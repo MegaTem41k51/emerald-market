@@ -1,26 +1,32 @@
 # Email verification on Render Free
 
-The project now supports sending verification emails through the Brevo HTTPS API. This avoids direct SMTP connections from Render Free.
+This version sends verification emails through the Resend HTTPS API. It does not connect to SMTP ports, so it avoids Render Free SMTP restrictions.
 
 ## Render Environment Variables
 
-Add:
+Add these two variables:
 
 ```text
-BREVO_API_KEY=xkeysib-...
+RESEND_API_KEY=re_...
 EMAIL_FROM=your-verified-sender@example.com
+```
+
+Optional:
+
+```text
 EMAIL_FROM_NAME=EMERALD Market
 ```
 
-`EMAIL_FROM` must be a sender verified in Brevo. The existing `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_SECURE`, `EMAIL_USER`, and `EMAIL_PASS` variables can remain, but when `BREVO_API_KEY` is present the server uses Brevo first and does not use SMTP for verification emails.
+The old SMTP variables (`EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_SECURE`, `EMAIL_USER`, `EMAIL_PASS`) are no longer used by this email-verification code and can be removed from Render after deployment.
 
-## Brevo
+## Resend setup
 
-1. Create a Brevo account.
-2. Add/verify the sender email in the transactional email settings.
-3. Create an API key.
-4. Put the API key into Render as `BREVO_API_KEY`.
-5. Put the verified sender address into `EMAIL_FROM`.
-6. Redeploy the Render service.
+1. Create a Resend account.
+2. Create an API key and copy it once.
+3. For testing, Resend provides the `onboarding@resend.dev` sender; this test sender is restricted to the account email.
+4. For sending verification codes to arbitrary users, add and verify a domain in Resend, then use an address from that verified domain as `EMAIL_FROM`.
+5. Put the API key into Render as `RESEND_API_KEY`.
+6. Put the sender address into `EMAIL_FROM`.
+7. Redeploy the Render service.
 
-The server calls `https://api.brevo.com/v3/smtp/email` over HTTPS. If `BREVO_API_KEY` is absent, the old SMTP path remains available for hosting where SMTP is allowed.
+The server calls `https://api.resend.com/emails` over HTTPS.

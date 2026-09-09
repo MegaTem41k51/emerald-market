@@ -8,7 +8,6 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { Pool } = require('pg');
-const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -1223,32 +1222,20 @@ function makeApiKey() {
     return key;
 }
 
-function getMailer() {
-    const user = process.env.EMAIL_USER;
-    const pass = process.env.EMAIL_PASS;
-    if (!user || !pass) return null;
-
-    const host = process.env.EMAIL_HOST || 'smtp.mail.ru';
-    const port = Number(process.env.EMAIL_PORT || 465);
-    const secure = process.env.EMAIL_SECURE
-        ? String(process.env.EMAIL_SECURE).toLowerCase() === 'true'
-        : port === 465;
-
-    return nodemailer.createTransport({
-        host,
-        port,
-        secure,
-        auth: { user, pass },
-        connectionTimeout: 15000,
-        greetingTimeout: 15000,
-        socketTimeout: 20000
-    });
-}
-
-// На Render Free исходящие SMTP-порты могут быть недоступны.
-// Поэтому при наличии BREVO_API_KEY отправляем письмо через HTTPS API Brevo.
-// SMTP остаётся резервным вариантом для платного/другого хостинга.
+// Отправка кодов подтверждения через Resend HTTPS API.
+// Это не использует SMTP-порты 465/587, поэтому подходит для Render Free.
 async function sendVerificationEmail(to, code) {
+    const apiKey = String(process.env.RESEND_API_KEY || '').trim();
+    if (!apiKey) {
+        throw new Error('Email-сервис не настроен: добавьте RESEND_API_KEY в Render Environment');
+    }
+
+    const senderEmail = String(process.env.EMAIL_FROM || '').trim();
+    const senderName = String(process.env.EMAIL_FROM_NAME || 'EMERALD Market').trim();
+    if (!senderEmail) {
+        throw new Error('EMAIL_FROM не задан');
+    }
+
     const subject = 'EMERALD Market — подтверждение Email';
     const text = `Ваш код подтверждения: ${code}. Код действует 10 минут.`;
     const html = `
@@ -1261,56 +1248,33 @@ async function sendVerificationEmail(to, code) {
         </div>
     `;
 
-    const brevoKey = String(process.env.BREVO_API_KEY || '').trim();
-    if (brevoKey) {
-        const senderEmail = String(process.env.EMAIL_FROM || process.env.EMAIL_USER || '').trim();
-        const senderName = String(process.env.EMAIL_FROM_NAME || 'EMERALD Market').trim();
-        if (!senderEmail) throw new Error('EMAIL_FROM не задан для Brevo');
-
-        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-            method: 'POST',
-            headers: {
-                'accept': 'application/json',
-                'api-key': brevoKey,
-                'content-type': 'application/json'
-            },
-            body: JSON.stringify({
-                sender: { email: senderEmail, name: senderName },
-                to: [{ email: to }],
-                subject,
-                htmlContent: html,
-                textContent: text
-            }),
-            signal: AbortSignal.timeout(15000)
-        });
-
-        const raw = await response.text();
-        let data = {};
-        try { data = raw ? JSON.parse(raw) : {}; } catch (_) {}
-
-        if (!response.ok) {
-            const detail = data?.message || data?.code || raw || `HTTP ${response.status}`;
-            throw new Error(`Brevo API ${response.status}: ${detail}`);
-        }
-
-        console.log('Email отправлен через Brevo:', data?.messageId || 'OK');
-        return data;
-    }
-
-    const mailer = getMailer();
-    if (!mailer) {
-        throw new Error('Email-сервис не настроен: добавьте BREVO_API_KEY или SMTP-переменные');
-    }
-
-    const info = await mailer.sendMail({
-        from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
-        to,
-        subject,
-        text,
-        html
+    const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            from: `${senderName} <${senderEmail}>`,
+            to: [to],
+            subject,
+            text,
+            html
+        }),
+        signal: AbortSignal.timeout(15000)
     });
-    console.log('Email отправлен через SMTP:', info.messageId || 'OK');
-    return info;
+
+    const raw = await response.text();
+    let data = {};
+    try { data = raw ? JSON.parse(raw) : {}; } catch (_) {}
+
+    if (!response.ok) {
+        const detail = data?.message || data?.name || raw || `HTTP ${response.status}`;
+        throw new Error(`Resend API ${response.status}: ${detail}`);
+    }
+
+    console.log('Email отправлен через Resend:', data?.id || 'OK');
+    return data;
 }
 
 function deviceName(userAgent) {
