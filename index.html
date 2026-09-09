@@ -277,8 +277,9 @@
         .profile-settings { background: #14161c; border: 1px solid #26282f; border-radius: 12px; padding: 16px; }
         .setting-row { display: flex; gap: 8px; margin-bottom: 12px; }
         .setting-row input[type="text"] { flex: 1; background: #0b0c10; border: 1px solid #26282f; border-radius: 8px; padding: 8px 12px; color: #e4e6eb; font-size: 13px; outline: none; }
-        .setting-row .toggle-btn { padding: 8px 12px; border-radius: 8px; border: 1px solid #26282f; background: transparent; color: #b2b4bb; cursor: pointer; font-size: 12px; }
+        .setting-row .toggle-btn { padding: 8px 12px; border-radius: 8px; border: 1px solid #26282f; background: #050806; color: #b2b4bb; cursor: pointer; font-size: 12px; transition: background .2s, border-color .2s, color .2s; }
         .setting-row .toggle-btn.active { background: #2ecc71; border-color: #2ecc71; color: #fff; }
+        .setting-row .toggle-btn.animation-toggle { min-width: 120px; }
 
         .footer { background: #0d0e14; border-top: 1px solid #1c1d24; padding: 40px 0 24px; }
         .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 30px; }
@@ -738,8 +739,6 @@ body.light .guest-page{background:#eef5f1;color:#18241f}.light .guest-shell{back
             <a data-page="market" id="marketNavLink">Купить скины</a>
             <a data-page="profile">Профиль</a>
             <a data-page="admin" id="adminNavLink" style="display:none;">Админка</a>
-            <a data-page="faq">FAQ</a>
-            <a data-page="support">Поддержка</a>
         </nav>
         <div class="header-actions" id="headerActions">
             <a href="/auth/steam" class="btn btn-steam">Войти через Steam</a>
@@ -1007,12 +1006,7 @@ body.light .guest-page{background:#eef5f1;color:#18241f}.light .guest-shell{back
                             <button class="btn" style="padding: 8px 12px; font-size: 12px;" onclick="saveProfileTradeUrl()">Сохранить</button>
                         </div>
                         <div class="setting-row">
-                            <button class="toggle-btn active" id="themeToggle">Тёмная</button>
-                            <button class="toggle-btn" id="themeToggleLight">Светлая</button>
-                        </div>
-                        <div class="setting-row">
-                            <button class="toggle-btn active" id="rainToggle">Анимация Вкл</button>
-                            <button class="toggle-btn" id="rainToggleOff">Анимация Выкл</button>
+                            <button class="toggle-btn animation-toggle active" id="rainToggle" type="button">Анимация</button>
                         </div>
                     </div>
                 </div>
@@ -2205,67 +2199,42 @@ async function loadSettings() {
         const response = await fetch('/api/get-settings');
         const data = await response.json();
 
-        if (data.theme === 'light') {
-            document.body.classList.add('light');
-            document.getElementById('themeToggle').classList.remove('active');
-            document.getElementById('themeToggleLight').classList.add('active');
-        } else {
-            document.body.classList.remove('light');
-            document.getElementById('themeToggle').classList.add('active');
-            document.getElementById('themeToggleLight').classList.remove('active');
-        }
+        // Тема сайта фиксированная: всегда используется текущая тёмная тема.
+        document.body.classList.remove('light');
 
-        if (data.rain) {
-            document.getElementById('rainContainer').style.display = 'block';
-            document.getElementById('rainToggle').classList.add('active');
-            document.getElementById('rainToggleOff').classList.remove('active');
-        } else {
-            document.getElementById('rainContainer').style.display = 'none';
-            document.getElementById('rainToggle').classList.remove('active');
-            document.getElementById('rainToggleOff').classList.add('active');
-        }
+        const rainToggle = document.getElementById('rainToggle');
+        const enabled = data.rain !== false;
+        document.getElementById('rainContainer').style.display = enabled ? 'block' : 'none';
+        if (rainToggle) rainToggle.classList.toggle('active', enabled);
     } catch (error) {
         console.warn('Не удалось загрузить настройки');
+        document.body.classList.remove('light');
     }
 }
 
 async function saveSettings() {
-    const theme = document.body.classList.contains('light') ? 'light' : 'dark';
     const rain = document.getElementById('rainContainer').style.display !== 'none';
-    await fetch('/api/save-settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ theme, rain })
-    });
+    try {
+        await fetch('/api/save-settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ rain })
+        });
+    } catch (error) {
+        console.warn('Не удалось сохранить настройки');
+    }
 }
 
-document.getElementById('themeToggle').addEventListener('click', function() {
-    document.body.classList.remove('light');
-    this.classList.add('active');
-    document.getElementById('themeToggleLight').classList.remove('active');
-    saveSettings();
-});
-
-document.getElementById('themeToggleLight').addEventListener('click', function() {
-    document.body.classList.add('light');
-    this.classList.add('active');
-    document.getElementById('themeToggle').classList.remove('active');
-    saveSettings();
-});
-
-document.getElementById('rainToggle').addEventListener('click', function() {
-    document.getElementById('rainContainer').style.display = 'block';
-    this.classList.add('active');
-    document.getElementById('rainToggleOff').classList.remove('active');
-    saveSettings();
-});
-
-document.getElementById('rainToggleOff').addEventListener('click', function() {
-    document.getElementById('rainContainer').style.display = 'none';
-    this.classList.add('active');
-    document.getElementById('rainToggle').classList.remove('active');
-    saveSettings();
-});
+const rainToggleButton = document.getElementById('rainToggle');
+if (rainToggleButton) {
+    rainToggleButton.addEventListener('click', function() {
+        const isOn = document.getElementById('rainContainer').style.display !== 'none';
+        const next = !isOn;
+        document.getElementById('rainContainer').style.display = next ? 'block' : 'none';
+        this.classList.toggle('active', next);
+        saveSettings();
+    });
+}
 
 // ===== TRADE URL =====
 async function loadTradeUrl() {
