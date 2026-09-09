@@ -1,237 +1,2088 @@
 const express = require('express');
 const session = require('express-session');
-const FileStore = require('session-file-store')(session);
 const passport = require('passport');
 const SteamStrategy = require('passport-steam').Strategy;
 const axios = require('axios');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
+const { Pool } = require('pg');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const STEAM_API_KEY = process.env.STEAM_API_KEY;
-const SESSION_SECRET = process.env.SESSION_SECRET || 'my_secret_123';
-const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
+// =====================================================
+// НАСТРОЙКИ
+// =====================================================
 
-app.use(bodyParser.json());
+const STEAM_API_KEY = process.env.STEAM_API_KEY;
+const SESSION_SECRET = process.env.SESSION_SECRET || 'supersecret';
+
+const BASE_URL =
+    process.env.BASE_URL ||
+    'https://emerald-market-2.onrender.com';
+
+// Render может передавать URL под разными именами в зависимости от способа
+// подключения PostgreSQL. Берём первый непустой вариант.
+const DATABASE_URL = String(
+    process.env.DATABASE_URL ||
+    process.env.RENDER_DATABASE_URL ||
+    process.env.DATABASE_INTERNAL_URL ||
+    process.env.POSTGRES_URL ||
+    ''
+).trim() || (() => {
+    const { PGHOST, PGUSER, PGPASSWORD, PGDATABASE, PGPORT } = process.env;
+    if (!PGHOST || !PGUSER || !PGPASSWORD || !PGDATABASE) return '';
+    const port = PGPORT || '5432';
+    return `postgresql://${encodeURIComponent(PGUSER)}:${encodeURIComponent(PGPASSWORD)}@${PGHOST}:${port}/${PGDATABASE}`;
+})();
+
+// =====================================================
+// ВНУТРЕННИЕ ID / ПРИВАТНЫЙ ДОСТУП
+// =====================================================
+
+const OWNER_STEAM_ID = '76561199802780329';
+const OWNER_PUBLIC_ID = 666;
+const MIN_PUBLIC_ID = 100000;
+const MAX_PUBLIC_ID = 999999;
+
+// =====================================================
+// MIDDLEWARE
+// =====================================================
+
 app.use(express.static(__dirname));
 
+app.use(bodyParser.json({ limit: '8mb' }));
+
+app.use(express.urlencoded({
+    extended: true
+}));
+
 app.use(session({
-    store: new FileStore({ logErrors: false, retries: 0 }),
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 * 7 }
+
+    cookie: {
+        secure: false,
+        maxAge: 1000 * 60 * 60 * 24 * 7
+    }
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.serializeUser((user, done) => done(null, user));
-passport.deserializeUser((obj, done) => done(null, obj));
-
-passport.use(new SteamStrategy({
-    returnURL: `${BASE_URL}/auth/steam/return`,
-    realm: BASE_URL,
-    apiKey: STEAM_API_KEY
-}, (identifier, profile, done) => done(null, profile)));
-
-app.get('/auth/steam', passport.authenticate('steam', { failureRedirect: '/' }));
-app.get('/auth/steam/return', passport.authenticate('steam', { failureRedirect: '/' }), (req, res) => res.redirect('/'));
-app.get('/logout', (req, res) => {
-    req.logout(() => res.redirect('/'));
-});
-
-// ==========================================
-// ТЕХРАБОТЫ: ХРАНЕНИЕ ДАТЫ ОКОНЧАНИЯ
-// ==========================================
-const DB_FILE = path.join(__dirname, 'maintenance.json');
-let maintenanceEndTime = null;
-
-function loadMaintenance() {
-    try {
-        if (fs.existsSync(DB_FILE)) {
-            const data = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
-            maintenanceEndTime = data.endTime;
-        }
-    } catch(e) {
-        maintenanceEndTime = null;
-    }
-}
-
-function saveMaintenance() {
-    fs.writeFileSync(DB_FILE, JSON.stringify({ endTime: maintenanceEndTime }));
-}
-
-function initMaintenance() {
-    loadMaintenance();
-
-    // Если техработы ещё не запускались, запускаем их на 12 часов.
-    if (!maintenanceEndTime || maintenanceEndTime < Date.now()) {
-        maintenanceEndTime = Date.now() + 12 * 60 * 60 * 1000; // + 12 часов
-        saveMaintenance();
-    }
-}
-
-// Эндпоинт, который возвращает оставшееся время
-app.get('/api/maintenance-time', (req, res) => {
-    const remaining = Math.max(0, Math.floor((maintenanceEndTime - Date.now()) / 1000));
-    res.json({ remaining });
-});
-
-// ==========================================
-// ДАННЫЕ ПОЛЬЗОВАТЕЛЯ (Trade URL + API Key)
-// ==========================================
-const USER_DB_FILE = path.join(__dirname, 'userData.json');
-let userData = {};
-function loadUserData() {
-    try {
-        if (fs.existsSync(USER_DB_FILE)) {
-            userData = JSON.parse(fs.readFileSync(USER_DB_FILE, 'utf8'));
-        }
-    } catch(e) { userData = {}; }
-}
-function saveUserData() {
-    fs.writeFileSync(USER_DB_FILE, JSON.stringify(userData, null, 2));
-}
-loadUserData();
-
-app.post('/api/save-trade-url', (req, res) => {
-    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+// Сохраняем активную сессию в PostgreSQL для раздела «Сессии».
+app.use((req, res, next) => {
+    if (!req.user || !pool || !dbReady || !req.sessionID) return next();
+    const sessionId = String(req.sessionID);
     const steamId = String(req.user.id);
-    const tradeUrl = req.body.tradeUrl;
-    if (!userData[steamId]) userData[steamId] = { tradeUrl: '', apiKey: '' };
-    userData[steamId].tradeUrl = tradeUrl;
-    saveUserData();
-    res.json({ success: true });
+    const userAgent = String(req.get('user-agent') || '').slice(0, 500);
+    const forwarded = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
+    const ip = forwarded || req.ip || req.socket?.remoteAddress || '';
+    const country = String(req.headers['cf-ipcountry'] || req.headers['x-vercel-ip-country'] || '').slice(0, 8);
+    pool.query(`
+        INSERT INTO user_sessions (session_id, steam_id, user_agent, ip_address, country, created_at, last_seen_at)
+        VALUES ($1,$2,$3,$4,$5,NOW(),NOW())
+        ON CONFLICT (session_id) DO UPDATE SET
+            steam_id=EXCLUDED.steam_id,
+            user_agent=EXCLUDED.user_agent,
+            ip_address=EXCLUDED.ip_address,
+            country=EXCLUDED.country,
+            last_seen_at=NOW()
+    `, [sessionId, steamId, userAgent, ip, country]).catch(err => console.error('⚠️ Сессия:', err.message));
+    next();
+});
+
+// =====================================================
+// STEAM AUTH
+// =====================================================
+
+passport.serializeUser((user, done) => {
+    done(null, user);
+});
+
+passport.deserializeUser((user, done) => {
+    done(null, user);
+});
+
+passport.use(
+    new SteamStrategy(
+        {
+            returnURL: `${BASE_URL}/auth/steam/return`,
+            realm: BASE_URL,
+            apiKey: STEAM_API_KEY
+        },
+
+        (identifier, profile, done) => {
+            recordLogin(profile)
+                .then(() => done(null, profile))
+                .catch(error => {
+                    console.error('Ошибка выдачи внутреннего ID:', error.message);
+                    done(error);
+                });
+        }
+    )
+);
+
+// Вход через Steam
+app.get(
+    '/auth/steam',
+    passport.authenticate('steam', {
+        failureRedirect: '/'
+    })
+);
+
+// Возврат после Steam
+app.get(
+    '/auth/steam/return',
+    passport.authenticate('steam', {
+        failureRedirect: '/'
+    }),
+    (req, res) => {
+        res.redirect('/');
+    }
+);
+
+// Выход
+app.get('/logout', (req, res) => {
+    req.logout(() => {
+        res.redirect('/');
+    });
+});
+
+// =====================================================
+// API: ТЕКУЩИЙ ПОЛЬЗОВАТЕЛЬ
+// =====================================================
+
+app.get('/api/user', async (req, res) => {
+
+    if (!req.user) {
+        return res.json({
+            loggedIn: false
+        });
+    }
+
+    res.json({
+        loggedIn: true,
+
+        user: {
+            id: String(req.user.id),
+            publicId: ensureUserRecord(req.user).publicId,
+            isOwner: isOwner(req),
+            isAdmin: await isAdmin(req),
+            totalSold: Number(ensureUserRecord(req.user).totalSold || 0),
+            totalPayout: Number(ensureUserRecord(req.user).totalPayout || 0),
+            balance: Number(ensureUserRecord(req.user).balance || 0),
+            banned: ensureUserRecord(req.user).banned === true,
+            email: ensureUserRecord(req.user).email || '',
+            emailVerified: ensureUserRecord(req.user).emailVerified === true,
+
+            name:
+                req.user.displayName ||
+                req.user.username ||
+                'Steam User',
+
+            avatar:
+                req.user.photos?.[2]?.value ||
+                req.user.photos?.[1]?.value ||
+                req.user.photos?.[0]?.value ||
+                ''
+        }
+    });
+});
+
+// =====================================================
+// ПОСТОЯННАЯ БАЗА ДАННЫХ (PostgreSQL)
+// =====================================================
+
+if (!DATABASE_URL) {
+    console.warn('⚠️ PostgreSQL не настроен. Добавьте DATABASE_URL в Render → Environment (или PGHOST/PGUSER/PGPASSWORD/PGDATABASE).');
+}
+
+const pool = DATABASE_URL
+    ? new Pool({
+        connectionString: DATABASE_URL,
+        // Для Render PostgreSQL SSL обычно нужен. Если конкретный URL
+        // явно задаёт sslmode=disable, pg сам использует параметры URL.
+        ssl: { rejectUnauthorized: false },
+        max: 5,
+        connectionTimeoutMillis: 10000,
+        idleTimeoutMillis: 30000
+    })
+    : null;
+
+console.log(`🔎 PostgreSQL env: ${DATABASE_URL ? 'URL найден' : 'URL НЕ найден'}`);
+
+let userData = {};
+let dbReady = false;
+
+async function initDatabase() {
+    if (!pool) return;
+    try { await pool.query('SELECT 1'); }
+    catch (error) {
+        console.error('❌ PostgreSQL: не удалось подключиться:', error.message);
+        throw error;
+    }
+
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS users (
+            steam_id TEXT PRIMARY KEY,
+            public_id INTEGER UNIQUE NOT NULL,
+            username TEXT NOT NULL DEFAULT 'Steam User',
+            avatar TEXT NOT NULL DEFAULT '',
+            trade_url TEXT NOT NULL DEFAULT '',
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            last_login_at TIMESTAMPTZ,
+            login_count INTEGER NOT NULL DEFAULT 0,
+            total_sold NUMERIC(14,2) NOT NULL DEFAULT 0,
+            total_payout NUMERIC(14,2) NOT NULL DEFAULT 0,
+            last_sale_at TIMESTAMPTZ,
+            theme TEXT NOT NULL DEFAULT 'dark',
+            rain BOOLEAN NOT NULL DEFAULT TRUE,
+            balance NUMERIC(14,2) NOT NULL DEFAULT 0,
+            banned BOOLEAN NOT NULL DEFAULT FALSE,
+            ban_reason TEXT NOT NULL DEFAULT '',
+            email TEXT NOT NULL DEFAULT '',
+            email_verified BOOLEAN NOT NULL DEFAULT FALSE,
+            email_verification_code TEXT NOT NULL DEFAULT '',
+            email_verification_expires_at TIMESTAMPTZ
+        )
+    `);
+
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS sales (
+            id TEXT PRIMARY KEY,
+            steam_id TEXT NOT NULL REFERENCES users(steam_id) ON DELETE CASCADE,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            total NUMERIC(14,2) NOT NULL,
+            payout NUMERIC(14,2) NOT NULL,
+            payment_method TEXT NOT NULL DEFAULT '',
+            items JSONB NOT NULL DEFAULT '[]'::jsonb,
+            status TEXT NOT NULL DEFAULT 'pending'
+        )
+    `);
+
+    await pool.query(`ALTER TABLE sales ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'pending'`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS balance NUMERIC(14,2) NOT NULL DEFAULT 0`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS banned BOOLEAN NOT NULL DEFAULT FALSE`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS ban_reason TEXT NOT NULL DEFAULT ''`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email TEXT NOT NULL DEFAULT ''`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NULL DEFAULT FALSE`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verification_code TEXT NOT NULL DEFAULT ''`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verification_expires_at TIMESTAMPTZ`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_action TEXT NOT NULL DEFAULT ''`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_action_code TEXT NOT NULL DEFAULT ''`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_action_expires_at TIMESTAMPTZ`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS api_key TEXT NOT NULL DEFAULT ''`);
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS user_sessions (
+            session_id TEXT PRIMARY KEY,
+            steam_id TEXT NOT NULL REFERENCES users(steam_id) ON DELETE CASCADE,
+            user_agent TEXT NOT NULL DEFAULT '',
+            ip_address TEXT NOT NULL DEFAULT '',
+            country TEXT NOT NULL DEFAULT '',
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            last_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    `);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_user_sessions_steam_id ON user_sessions(steam_id)`);
+
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS site_presence (
+            visitor_id TEXT PRIMARY KEY,
+            last_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    `);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_site_presence_last_seen ON site_presence(last_seen_at)`);
+
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS admin_grants (
+            steam_id TEXT PRIMARY KEY REFERENCES users(steam_id) ON DELETE CASCADE,
+            granted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            granted_by TEXT NOT NULL
+        )
+    `);
+
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS reviews (
+            id BIGSERIAL PRIMARY KEY,
+            name TEXT NOT NULL DEFAULT '',
+            rating INTEGER NOT NULL DEFAULT 5 CHECK (rating BETWEEN 1 AND 5),
+            review_text TEXT NOT NULL DEFAULT '',
+            photo_url TEXT NOT NULL DEFAULT '',
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    `);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_reviews_created_at ON reviews(created_at DESC)`);
+
+    // Один подтверждённый Email может принадлежать только одному аккаунту.
+    // Индекс защищает от гонки запросов даже при одновременной регистрации двух пользователей.
+    await pool.query(`
+        CREATE UNIQUE INDEX IF NOT EXISTS users_verified_email_unique
+        ON users (LOWER(email))
+        WHERE email_verified = TRUE AND email <> ''
+    `);
+
+    const users = await pool.query('SELECT * FROM users ORDER BY public_id');
+    for (const row of users.rows) {
+        userData[row.steam_id] = dbRowToUser(row);
+    }
+
+    const sales = await pool.query('SELECT * FROM sales ORDER BY created_at');
+    for (const row of sales.rows) {
+        if (!userData[row.steam_id]) continue;
+        if (!Array.isArray(userData[row.steam_id].sales)) userData[row.steam_id].sales = [];
+        userData[row.steam_id].sales.push({
+            id: row.id,
+            createdAt: new Date(row.created_at).toISOString(),
+            total: Number(row.total),
+            payout: Number(row.payout),
+            paymentMethod: row.payment_method || '',
+            items: Array.isArray(row.items) ? row.items : [],
+            status: row.status === 'sold' ? 'sold' : (row.status === 'not_sold' ? 'not_sold' : 'pending')
+        });
+    }
+
+    // Однократная миграция старых userData.json, если он существует и БД ещё пустая.
+    const legacyFile = path.join(__dirname, 'userData.json');
+    if (users.rows.length === 0 && fs.existsSync(legacyFile)) {
+        try {
+            const legacy = JSON.parse(fs.readFileSync(legacyFile, 'utf8'));
+            for (const record of Object.values(legacy)) {
+                if (!record?.steamId || !Number.isInteger(Number(record.publicId))) continue;
+                await upsertUserToDb(record);
+                for (const sale of (Array.isArray(record.sales) ? record.sales : [])) {
+                    await insertSaleToDb(record.steamId, sale);
+                }
+                userData[record.steamId] = { ...record };
+            }
+            console.log('✅ Старые данные userData.json перенесены в PostgreSQL');
+        } catch (error) {
+            console.error('⚠️ Ошибка миграции userData.json:', error.message);
+        }
+    }
+
+    dbReady = true;
+    console.log(`🗄️ PostgreSQL подключён. Пользователей: ${Object.keys(userData).length}`);
+}
+
+function dbRowToUser(row) {
+    return {
+        steamId: row.steam_id,
+        publicId: Number(row.public_id),
+        username: row.username,
+        avatar: row.avatar,
+        tradeUrl: row.trade_url || '',
+        createdAt: row.created_at ? new Date(row.created_at).toISOString() : null,
+        lastLoginAt: row.last_login_at ? new Date(row.last_login_at).toISOString() : null,
+        loginCount: Number(row.login_count || 0),
+        totalSold: Number(row.total_sold || 0),
+        totalPayout: Number(row.total_payout || 0),
+        lastSaleAt: row.last_sale_at ? new Date(row.last_sale_at).toISOString() : null,
+        theme: row.theme || 'dark',
+        rain: row.rain !== false,
+        balance: Number(row.balance || 0),
+        banned: row.banned === true,
+        banReason: row.ban_reason || '',
+        email: row.email || '',
+        emailVerified: row.email_verified === true,
+        apiKey: row.api_key || '',
+        sales: []
+    };
+}
+
+async function upsertUserToDb(record) {
+    if (!pool || !record?.steamId) return;
+    await pool.query(`
+        INSERT INTO users
+            (steam_id, public_id, username, avatar, trade_url, created_at, last_login_at,
+             login_count, total_sold, total_payout, last_sale_at, theme, rain, balance, banned, ban_reason, email, email_verified, api_key)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)
+        ON CONFLICT (steam_id) DO UPDATE SET
+            public_id=EXCLUDED.public_id,
+            username=EXCLUDED.username,
+            avatar=EXCLUDED.avatar,
+            trade_url=EXCLUDED.trade_url,
+            created_at=EXCLUDED.created_at,
+            last_login_at=EXCLUDED.last_login_at,
+            login_count=EXCLUDED.login_count,
+            total_sold=EXCLUDED.total_sold,
+            total_payout=EXCLUDED.total_payout,
+            last_sale_at=EXCLUDED.last_sale_at,
+            theme=EXCLUDED.theme,
+            rain=EXCLUDED.rain,
+            balance=EXCLUDED.balance,
+            banned=EXCLUDED.banned,
+            ban_reason=EXCLUDED.ban_reason,
+            email=EXCLUDED.email,
+            email_verified=EXCLUDED.email_verified,
+            api_key=EXCLUDED.api_key
+    `, [
+        String(record.steamId), Number(record.publicId), record.username || 'Steam User', record.avatar || '',
+        record.tradeUrl || '', record.createdAt || new Date().toISOString(), record.lastLoginAt || null,
+        Number(record.loginCount || 0), Number(record.totalSold || 0), Number(record.totalPayout || 0),
+        record.lastSaleAt || null, record.theme === 'light' ? 'light' : 'dark', record.rain !== false,
+        Number(record.balance || 0), record.banned === true, record.banReason || '',
+        record.email || '', record.emailVerified === true, record.apiKey || ''
+    ]);
+}
+
+async function insertSaleToDb(steamId, sale) {
+    if (!pool || !sale?.id) return;
+    await pool.query(`
+        INSERT INTO sales (id, steam_id, created_at, total, payout, payment_method, items, status)
+        VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8)
+        ON CONFLICT (id) DO UPDATE SET
+            total=EXCLUDED.total, payout=EXCLUDED.payout, payment_method=EXCLUDED.payment_method,
+            items=EXCLUDED.items, status=EXCLUDED.status
+    `, [sale.id, String(steamId), sale.createdAt || new Date().toISOString(), Number(sale.total || 0),
+        Number(sale.payout || 0), sale.paymentMethod || '', JSON.stringify(Array.isArray(sale.items) ? sale.items : []),
+        sale.status === 'sold' ? 'sold' : (sale.status === 'not_sold' ? 'not_sold' : 'pending')]);
+}
+
+async function saveUserData() {
+    if (!pool || !dbReady) return;
+    const records = Object.values(userData);
+    await Promise.all(records.map(record => upsertUserToDb(record)));
+}
+
+async function waitForDatabase() {
+    if (!pool) return false;
+    while (!dbReady) await new Promise(resolve => setTimeout(resolve, 50));
+    return true;
+}
+
+function requireDatabase(res) {
+    if (!pool || !dbReady) {
+        res.status(503).json({ error: 'База данных не подключена. В Render добавьте DATABASE_URL (Internal Database URL) и перезапустите сервис.' });
+        return false;
+    }
+    return true;
+}
+
+// =====================================================
+// НАСТРОЙКИ ПОЛЬЗОВАТЕЛЯ
+// =====================================================
+
+app.post('/api/save-settings', async (req, res) => {
+
+    if (!req.user) {
+        return res.status(401).json({
+            error: 'Войдите через Steam'
+        });
+    }
+
+    if (!requireDatabase(res)) return;
+
+    const steamId = String(req.user.id);
+    ensureUserRecord(req.user);
+
+    userData[steamId].theme =
+        req.body.theme === 'light'
+            ? 'light'
+            : 'dark';
+
+    userData[steamId].rain =
+        req.body.rain !== false;
+
+    await saveUserData();
+
+    res.json({
+        success: true
+    });
+});
+
+app.get('/api/get-settings', (req, res) => {
+
+    if (!req.user) {
+
+        return res.json({
+            theme: 'dark',
+            rain: true
+        });
+    }
+
+    const steamId = String(req.user.id);
+    ensureUserRecord(req.user);
+
+    res.json({
+
+        theme:
+            userData[steamId]?.theme ||
+            'dark',
+
+        rain:
+            userData[steamId]?.rain !== false
+
+    });
+});
+
+// =====================================================
+// TRADE URL
+// =====================================================
+
+function isValidTradeUrl(url) {
+
+    if (!url || typeof url !== 'string') {
+        return false;
+    }
+
+    try {
+
+        const parsed = new URL(url);
+
+        // Steam может присылать URL как с завершающим /, так и без него,
+        // а иногда ссылка открывается через www.steamcommunity.com.
+        const hostname = parsed.hostname.toLowerCase().replace(/^www\./, '');
+        const pathname = parsed.pathname.replace(/\/+$/, '');
+
+        if (hostname !== 'steamcommunity.com') {
+            return false;
+        }
+
+        if (pathname !== '/tradeoffer/new') {
+            return false;
+        }
+
+        const partner =
+            parsed.searchParams.get('partner');
+
+        const token =
+            parsed.searchParams.get('token');
+
+        return Boolean(partner && token);
+
+    } catch (error) {
+
+        return false;
+    }
+}
+
+app.post('/api/save-trade-url', async (req, res) => {
+
+    if (!req.user) {
+
+        return res.status(401).json({
+            error: 'Войдите через Steam'
+        });
+    }
+
+    if (!requireDatabase(res)) return;
+
+    const steamId = String(req.user.id);
+    ensureUserRecord(req.user);
+
+    const tradeUrl =
+        String(req.body.tradeUrl || '').trim();
+
+    if (!isValidTradeUrl(tradeUrl)) {
+
+        return res.status(400).json({
+            error:
+                'Неверная Trade URL. Вставьте ссылку из Steam.'
+        });
+    }
+
+    if (!userData[steamId]) {
+        userData[steamId] = {};
+    }
+
+    userData[steamId].tradeUrl =
+        tradeUrl;
+
+    await saveUserData();
+
+    res.json({
+        success: true
+    });
 });
 
 app.get('/api/get-trade-url', (req, res) => {
-    if (!req.user) return res.json({ tradeUrl: '' });
+
+    if (!req.user) {
+
+        return res.json({
+            tradeUrl: ''
+        });
+    }
+
     const steamId = String(req.user.id);
-    res.json({ tradeUrl: userData[steamId] ? userData[steamId].tradeUrl : '' });
+
+    res.json({
+        tradeUrl:
+            userData[steamId]?.tradeUrl ||
+            ''
+    });
 });
 
-app.post('/api/generate-api-key', (req, res) => {
-    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
-    const steamId = String(req.user.id);
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let key = '';
-    for (let i = 0; i < 17; i++) key += chars.charAt(Math.floor(Math.random() * chars.length));
-    
-    if (!userData[steamId]) userData[steamId] = { tradeUrl: '', apiKey: '' };
-    userData[steamId].apiKey = key;
-    saveUserData();
-    res.json({ apiKey: key });
-});
+// =====================================================
+// STEAM INVENTORY
+// =====================================================
 
-app.get('/api/get-api-key', (req, res) => {
-    if (!req.user) return res.json({ apiKey: '' });
-    const steamId = String(req.user.id);
-    res.json({ apiKey: userData[steamId] ? userData[steamId].apiKey : '' });
-});
+async function getSteamInventory(
+    steamId,
+    startAssetId = ''
+) {
 
-// ==========================================
-// ИНВЕНТАРЬ
-// ==========================================
-const DEFAULT_SKINS = [
-    'usp-s', 'glock-18', 'p250', 'deagle', 'five-seven', 'tec-9', 'cz75-auto',
-    'ak-47', 'm4a4', 'm4a1-s', 'famas', 'galil ar', 'ssg 08', 'awp', 'scar-20',
-    'g3sg1', 'mp9', 'mac-10', 'mp7', 'ump-45', 'p90', 'pp-bizon', 'mp5-sd',
-    'nova', 'xm1014', 'mag-7', 'sawed-off', 'm249', 'negev', 'knife', 'taser'
-];
+    let url =
+        `https://steamcommunity.com/inventory/${steamId}/730/2` +
+        `?l=english&count=2000`;
 
-const MIN_PRICE = 5;
+    if (startAssetId) {
+        url += `&start_assetid=${startAssetId}`;
+    }
+
+    const response = await axios.get(
+        url,
+        {
+            timeout: 15000,
+
+            headers: {
+                'User-Agent':
+                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
+
+                'Accept':
+                    'application/json, text/plain, */*',
+
+                'Referer':
+                    'https://steamcommunity.com/'
+            }
+        }
+    );
+
+    return response.data;
+}
+
+// Проверяем, является ли предмет скином/оружием
+function isSkinItem(desc) {
+
+    const name =
+        String(
+            desc.market_hash_name ||
+            desc.name ||
+            ''
+        );
+
+    const lowerName =
+        name.toLowerCase();
+
+    // Кейсы
+    if (
+        lowerName.includes('case') ||
+        lowerName.includes('crate') ||
+        lowerName.includes('capsule') ||
+        lowerName.includes('package') ||
+        lowerName.includes('container')
+    ) {
+        return false;
+    }
+
+    // Стикеры
+    if (
+        lowerName.includes('sticker')
+    ) {
+        return false;
+    }
+
+    // Graffiti
+    if (
+        lowerName.includes('graffiti')
+    ) {
+        return false;
+    }
+
+    // Музыкальные наборы
+    if (
+        lowerName.includes('music kit')
+    ) {
+        return false;
+    }
+
+    // Чармы
+    if (
+        lowerName.includes('charm')
+    ) {
+        return false;
+    }
+
+    // Скины обычно имеют разделитель |
+    if (name.includes('|')) {
+        return true;
+    }
+
+    // Дополнительно проверяем категории Steam
+    if (Array.isArray(desc.tags)) {
+
+        const categories =
+            desc.tags.map(tag =>
+                String(
+                    tag.category ||
+                    ''
+                ).toLowerCase()
+            );
+
+        if (
+            categories.includes('weapon') ||
+            categories.includes('knife') ||
+            categories.includes('gloves')
+        ) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// =====================================================
+// КЭШ ИНВЕНТАРЯ
+// =====================================================
+
+const inventoryCache = new Map();
+
+const INVENTORY_CACHE_TIME = 5 * 60 * 1000; // 5 минут
+
+function getCachedInventory(steamId) {
+    const cached = inventoryCache.get(steamId);
+
+    if (!cached) {
+        return null;
+    }
+
+    const age = Date.now() - cached.timestamp;
+
+    if (age > INVENTORY_CACHE_TIME) {
+        inventoryCache.delete(steamId);
+        return null;
+    }
+
+    return cached.items;
+}
+
+function setCachedInventory(steamId, items) {
+    inventoryCache.set(steamId, {
+        timestamp: Date.now(),
+        items
+    });
+}
+
+
+// =====================================================
+// ПОСЛЕДНИЙ ЗАПРОС К STEAM
+// =====================================================
+
+let lastSteamInventoryRequest = 0;
+
+const STEAM_REQUEST_DELAY = 5000;
+
+
+// =====================================================
+// CS2 INVENTORY
+// =====================================================
 
 app.post('/api/get-inventory', async (req, res) => {
-    if (!req.user) return res.status(401).json({ error: 'Пожалуйста, войдите через Steam' });
+
+    if (!req.user) {
+        return res.status(401).json({
+            error: 'Войдите через Steam'
+        });
+    }
+
     const steamId = String(req.user.id);
 
-    try {
-        const inventoryUrl = `https://steamcommunity.com/inventory/${steamId}/730/2?l=english&count=1000`;
-        const inventoryResponse = await axios.get(inventoryUrl, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                'Referer': 'https://steamcommunity.com/'
-            }
-        });
+    // -----------------------------------------------
+    // Сначала проверяем кэш
+    // -----------------------------------------------
 
-        const inventory = inventoryResponse.data;
-        if (!inventory.assets || inventory.assets.length === 0) return res.json({ success: true, items: [] });
+    const cachedItems = getCachedInventory(steamId);
+
+    if (cachedItems) {
+
+        console.log(
+            `📦 Используем кэш инвентаря ${steamId}`
+        );
+
+        return res.json({
+            success: true,
+            cached: true,
+            items: cachedItems
+        });
+    }
+
+
+    // -----------------------------------------------
+    // Защита от слишком частых запросов
+    // -----------------------------------------------
+
+    const now = Date.now();
+
+    const timeSinceLastRequest =
+        now - lastSteamInventoryRequest;
+
+    if (
+        timeSinceLastRequest <
+        STEAM_REQUEST_DELAY
+    ) {
+
+        const wait =
+            Math.ceil(
+                (
+                    STEAM_REQUEST_DELAY -
+                    timeSinceLastRequest
+                ) / 1000
+            );
+
+        return res.status(429).json({
+            error:
+                `Подождите ${wait} сек. перед повторной загрузкой инвентаря.`
+        });
+    }
+
+    lastSteamInventoryRequest = now;
+
+
+    try {
+
+        console.log(
+            `📦 Запрашиваем CS2 inventory: ${steamId}`
+        );
+
+
+        // -----------------------------------------------
+        // ОДИН запрос к Steam
+        // -----------------------------------------------
+
+        const inventoryUrl =
+            `https://steamcommunity.com/inventory/${steamId}/730/2` +
+            `?l=english&count=2000`;
+
+
+        const response =
+            await axios.get(
+                inventoryUrl,
+                {
+                    timeout: 20000,
+
+                    headers: {
+                        'User-Agent':
+                            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
+
+                        'Accept':
+                            'application/json,text/plain,*/*',
+
+                        'Accept-Language':
+                            'en-US,en;q=0.9',
+
+                        'Referer':
+                            'https://steamcommunity.com/'
+                    },
+
+                    validateStatus:
+                        () => true
+                }
+            );
+
+
+        console.log(
+            `Steam inventory response: ${response.status}`
+        );
+
+
+        // -----------------------------------------------
+        // 429
+        // -----------------------------------------------
+
+        if (
+            response.status === 429
+        ) {
+
+            console.error(
+                '❌ Steam вернул 429 Too Many Requests'
+            );
+
+            return res.status(429).json({
+                error:
+                    'Steam временно ограничил запросы к инвентарю. Подождите немного и попробуйте позже.'
+            });
+        }
+
+
+        // -----------------------------------------------
+        // Другие ошибки
+        // -----------------------------------------------
+
+        if (
+            response.status !== 200
+        ) {
+
+            console.error(
+                '❌ Steam HTTP:',
+                response.status
+            );
+
+            return res.status(502).json({
+                error:
+                    'Steam временно не отвечает на запрос инвентаря.'
+            });
+        }
+
+
+        const inventory =
+            response.data;
+
+
+        // -----------------------------------------------
+        // Проверка ответа
+        // -----------------------------------------------
+
+        if (
+            !inventory ||
+            inventory.success === false
+        ) {
+
+            return res.status(400).json({
+                error:
+                    'Steam не разрешил получить инвентарь. Проверьте настройки приватности Steam.'
+            });
+        }
+
+
+        if (
+            !Array.isArray(
+                inventory.assets
+            ) ||
+            !Array.isArray(
+                inventory.descriptions
+            )
+        ) {
+
+            return res.json({
+                success: true,
+                items: []
+            });
+        }
+
+
+        // -----------------------------------------------
+        // DESCRIPTION MAP
+        // -----------------------------------------------
+
+        const descriptions = {};
+
+
+        for (
+            const desc
+            of inventory.descriptions
+        ) {
+
+            const key =
+                `${desc.classid}_${desc.instanceid}`;
+
+            descriptions[key] =
+                desc;
+        }
+
+
+        // -----------------------------------------------
+        // ITEMS
+        // -----------------------------------------------
 
         const items = [];
-        const descriptions = {};
-        inventory.descriptions.forEach(desc => { descriptions[`${desc.classid}_${desc.instanceid}`] = desc; });
 
-        inventory.assets.forEach(asset => {
-            const key = `${asset.classid}_${asset.instanceid}`;
-            const desc = descriptions[key];
-            if (desc) {
-                const name = desc.market_hash_name || desc.name;
-                const weapon = (name.split('|')[0] || '').toLowerCase().trim();
-                const isDefault = DEFAULT_SKINS.includes(weapon) || desc.tags?.some(tag => tag.internal_name === 'normal');
-                if (!isDefault && !name.toLowerCase().includes('case') && !name.toLowerCase().includes('crate')) {
-                    items.push({
-                        assetid: asset.assetid,
-                        name: name,
-                        image: desc.icon_url ? `https://community.akamai.steamstatic.com/economy/image/${desc.icon_url}` : '',
-                        type: desc.type || '',
-                        minPrice: MIN_PRICE
-                    });
-                }
+
+        for (
+            const asset
+            of inventory.assets
+        ) {
+
+            const key =
+                `${asset.classid}_${asset.instanceid}`;
+
+
+            const desc =
+                descriptions[key];
+
+
+            if (!desc) {
+                continue;
             }
-        });
 
-        res.json({ success: true, items });
-    } catch (error) {
-        res.status(500).json({ error: 'Не удалось получить инвентарь. Подожди 2 минуты и попробуй снова.' });
-    }
-});
 
-// ==========================================
-// РЫНОК
-// ==========================================
-const MARKET_FILE = path.join(__dirname, 'marketData.json');
-let marketData = [];
+            const name =
+                desc.market_hash_name ||
+                desc.name ||
+                '';
 
-function loadMarket() {
-    try {
-        if (fs.existsSync(MARKET_FILE)) {
-            marketData = JSON.parse(fs.readFileSync(MARKET_FILE, 'utf8'));
+
+            if (!name) {
+                continue;
+            }
+
+
+            const lowerName =
+                name.toLowerCase();
+
+
+            // -------------------------------------------
+            // Исключаем мусор
+            // -------------------------------------------
+
+            if (
+                lowerName.includes('case') ||
+                lowerName.includes('crate') ||
+                lowerName.includes('capsule') ||
+                lowerName.includes('sticker') ||
+                lowerName.includes('graffiti') ||
+                lowerName.includes('music kit') ||
+                lowerName.includes('souvenir package') ||
+                lowerName.includes('charm')
+            ) {
+                continue;
+            }
+
+
+            // -------------------------------------------
+            // Проверяем, что предмет похож на скин
+            // -------------------------------------------
+
+            let isSkin = false;
+
+
+            // Большинство обычных CS2 скинов
+            if (
+                name.includes('|')
+            ) {
+                isSkin = true;
+            }
+
+
+            // Ножи / перчатки
+            if (
+                lowerName.includes('knife') ||
+                lowerName.includes('karambit') ||
+                lowerName.includes('bayonet') ||
+                lowerName.includes('butterfly') ||
+                lowerName.includes('gloves')
+            ) {
+                isSkin = true;
+            }
+
+
+            if (!isSkin) {
+                continue;
+            }
+
+
+            const image =
+                desc.icon_url
+                    ? `https://community.akamai.steamstatic.com/economy/image/${desc.icon_url}`
+                    : '';
+
+
+            items.push({
+
+                assetid:
+                    String(asset.assetid),
+
+                classid:
+                    String(asset.classid),
+
+                instanceid:
+                    String(asset.instanceid),
+
+                name:
+                    name,
+
+                image:
+                    image,
+
+                type:
+                    desc.type ||
+                    'Скин',
+
+                tradable:
+                    desc.tradable === 1,
+
+                marketable:
+                    desc.marketable === 1
+
+            });
         }
-    } catch(e) { marketData = []; }
-}
-function saveMarket() {
-    fs.writeFileSync(MARKET_FILE, JSON.stringify(marketData, null, 2));
-}
-loadMarket();
 
-app.get('/api/market', (req, res) => { res.json(marketData); });
-app.post('/api/market/save', (req, res) => {
-    if (!req.user) return res.status(401).json({ error: 'Нет доступа' });
-    marketData = req.body.skins;
-    saveMarket();
-    res.json({ success: true });
-});
 
-app.get('/api/user', (req, res) => {
-    if (req.user) {
-        res.json({ 
-            loggedIn: true, 
-            user: { 
-                id: String(req.user.id), 
-                name: req.user.displayName, 
-                avatar: req.user.photos && req.user.photos[2] ? req.user.photos[2].value : ''
-            } 
+        // -----------------------------------------------
+        // КЭШ
+        // -----------------------------------------------
+
+        setCachedInventory(
+            steamId,
+            items
+        );
+
+
+        console.log(
+            `✅ ${steamId}: найдено ${items.length} скинов`
+        );
+
+
+        return res.json({
+
+            success: true,
+
+            cached: false,
+
+            items: items
+
         });
-    } else {
-        res.json({ loggedIn: false });
+
+
+    } catch (error) {
+
+        console.error(
+            '❌ Ошибка Steam inventory:',
+            error.response?.status ||
+            error.code ||
+            error.message
+        );
+
+
+        return res.status(500).json({
+            error:
+                'Ошибка соединения со Steam. Попробуйте позже.'
+        });
     }
 });
 
-app.listen(PORT, () => {
-    initMaintenance(); // Запускаем техработы при старте сервера
-    console.log(`✅ Сервер запущен на порту ${PORT}`);
+// =====================================================
+// ПРОФИЛИ / ТРАНЗАКЦИИ / АДМИНКА
+// =====================================================
+
+// Выдаём постоянный внутренний ID пользователю.
+function getRandomPublicId() {
+    const used = new Set(Object.values(userData).map(data => Number(data?.publicId)).filter(Number.isInteger));
+    for (let attempt = 0; attempt < 200; attempt++) {
+        const id = Math.floor(Math.random() * (MAX_PUBLIC_ID - MIN_PUBLIC_ID + 1)) + MIN_PUBLIC_ID;
+        if (id !== OWNER_PUBLIC_ID && !used.has(id)) return id;
+    }
+    for (let id = MIN_PUBLIC_ID; id <= MAX_PUBLIC_ID; id++) {
+        if (id !== OWNER_PUBLIC_ID && !used.has(id)) return id;
+    }
+    return null;
+}
+
+function ensureUserRecord(profile) {
+    const steamId = String(profile.id);
+    const owner = steamId === OWNER_STEAM_ID;
+
+    if (!userData[steamId]) {
+        userData[steamId] = {};
+    }
+
+    const record = userData[steamId];
+
+    if (owner) {
+        for (const [otherSteamId, otherRecord] of Object.entries(userData)) {
+            if (otherSteamId === steamId) continue;
+            if (Number(otherRecord?.publicId) === OWNER_PUBLIC_ID) {
+                const replacementId = getRandomPublicId();
+                if (replacementId === null) {
+                    throw new Error('Невозможно освободить ID 666: свободные ID закончились');
+                }
+                otherRecord.publicId = replacementId;
+            }
+        }
+        record.publicId = OWNER_PUBLIC_ID;
+    } else if (Number(record.publicId) === OWNER_PUBLIC_ID) {
+        const nextId = getRandomPublicId();
+        if (nextId === null) throw new Error('Свободные внутренние ID закончились');
+        record.publicId = nextId;
+    } else if (!Number.isInteger(Number(record.publicId))) {
+        const nextId = getRandomPublicId();
+        if (nextId === null) throw new Error('Свободные внутренние ID закончились');
+        record.publicId = nextId;
+    }
+
+    record.steamId = steamId;
+    record.username = profile.displayName || profile.username || record.username || 'Steam User';
+    record.avatar =
+        profile.photos?.[2]?.value ||
+        profile.photos?.[1]?.value ||
+        profile.photos?.[0]?.value ||
+        record.avatar || '';
+
+    if (!Array.isArray(record.sales)) record.sales = [];
+    if (!record.theme) record.theme = 'dark';
+    if (typeof record.rain !== 'boolean') record.rain = true;
+
+    return record;
+}
+
+function isOwner(req) {
+    return Boolean(req.user) && String(req.user.id) === OWNER_STEAM_ID;
+}
+
+async function isAdmin(req) {
+    if (!req.user) return false;
+    if (isOwner(req)) return true;
+    if (!pool || !dbReady) return false;
+    const result = await pool.query('SELECT 1 FROM admin_grants WHERE steam_id=$1', [String(req.user.id)]);
+    return result.rowCount > 0;
+}
+
+async function recordLogin(profile) {
+    const record = ensureUserRecord(profile);
+    const now = new Date().toISOString();
+    if (!record.createdAt) record.createdAt = now;
+    record.lastLoginAt = now;
+    record.loginCount = Number(record.loginCount || 0) + 1;
+    await saveUserData();
+    return record;
+}
+
+
+// =====================================================
+// ПРОФИЛЬ: СЕССИИ / API / EMAIL
+// =====================================================
+
+function makeApiKey() {
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let key = '';
+    const bytes = crypto.randomBytes(17);
+    for (let i = 0; i < 17; i++) key += alphabet[bytes[i] % alphabet.length];
+    return key;
+}
+
+// Отправка кодов подтверждения через Resend HTTPS API.
+// Это не использует SMTP-порты 465/587, поэтому подходит для Render Free.
+async function sendVerificationEmail(to, code) {
+    const apiKey = String(process.env.RESEND_API_KEY || '').trim();
+    if (!apiKey) {
+        throw new Error('Email-сервис не настроен: добавьте RESEND_API_KEY в Render Environment');
+    }
+
+    const senderEmail = String(process.env.EMAIL_FROM || '').trim();
+    const senderName = String(process.env.EMAIL_FROM_NAME || 'EMERALD Market').trim();
+    if (!senderEmail) {
+        throw new Error('EMAIL_FROM не задан');
+    }
+
+    const subject = 'EMERALD Market — подтверждение Email';
+    const text = `Ваш код подтверждения: ${code}. Код действует 10 минут.`;
+    const html = `
+        <div style="font-family:Arial,sans-serif;line-height:1.5;color:#111">
+            <h2>EMERALD Market</h2>
+            <p>Ваш код подтверждения Email:</p>
+            <div style="font-size:32px;font-weight:700;letter-spacing:8px;margin:18px 0">${code}</div>
+            <p>Код действует <b>10 минут</b>.</p>
+            <p style="color:#666;font-size:13px">Если вы не запрашивали этот код, просто проигнорируйте письмо.</p>
+        </div>
+    `;
+
+    const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            from: `${senderName} <${senderEmail}>`,
+            to: [to],
+            subject,
+            text,
+            html
+        }),
+        signal: AbortSignal.timeout(15000)
+    });
+
+    const raw = await response.text();
+    let data = {};
+    try { data = raw ? JSON.parse(raw) : {}; } catch (_) {}
+
+    if (!response.ok) {
+        const detail = data?.message || data?.name || raw || `HTTP ${response.status}`;
+        throw new Error(`Resend API ${response.status}: ${detail}`);
+    }
+
+    console.log('Email отправлен через Resend:', data?.id || 'OK');
+    return data;
+}
+
+function deviceName(userAgent) {
+    const ua = String(userAgent || '');
+    const browser = /Edg\//i.test(ua) ? 'Edge' : /Chrome\//i.test(ua) ? 'Chrome' : /Firefox\//i.test(ua) ? 'Firefox' : /Safari\//i.test(ua) ? 'Safari' : 'Браузер';
+    const os = /Windows/i.test(ua) ? 'Windows' : /Android/i.test(ua) ? 'Android' : /iPhone|iPad/i.test(ua) ? 'iOS' : /Mac OS/i.test(ua) ? 'macOS' : /Linux/i.test(ua) ? 'Linux' : 'Устройство';
+    const version = (ua.match(new RegExp(browser === 'Chrome' ? 'Chrome\\/([\\d.]+)' : browser === 'Edge' ? 'Edg\\/([\\d.]+)' : browser === 'Firefox' ? 'Firefox\\/([\\d.]+)' : browser === 'Safari' ? 'Version\\/([\\d.]+)' : '')) || [])[1];
+    return `${os} (${browser}${version ? ' ' + version.split('.')[0] : ''})`;
+}
+
+app.post('/api/presence/heartbeat', async (req, res) => {
+    if (!requireDatabase(res)) return;
+    const visitorId = String(req.body.visitorId || '').trim();
+    if (!/^[A-Za-z0-9_-]{16,100}$/.test(visitorId)) {
+        return res.status(400).json({ error: 'Некорректный visitorId' });
+    }
+    try {
+        await pool.query(`
+            INSERT INTO site_presence (visitor_id, last_seen_at)
+            VALUES ($1, NOW())
+            ON CONFLICT (visitor_id) DO UPDATE SET last_seen_at=NOW()
+        `, [visitorId]);
+        await pool.query(`DELETE FROM site_presence WHERE last_seen_at < NOW() - INTERVAL '90 seconds'`);
+        const count = await pool.query(`SELECT COUNT(*)::int AS count FROM site_presence WHERE last_seen_at >= NOW() - INTERVAL '90 seconds'`);
+        res.json({ online: Number(count.rows[0]?.count || 0) });
+    } catch (error) {
+        console.error('Ошибка online heartbeat:', error.message);
+        res.status(500).json({ error: 'Не удалось обновить онлайн' });
+    }
 });
+
+app.get('/api/presence', async (req, res) => {
+    if (!requireDatabase(res)) return;
+    try {
+        await pool.query(`DELETE FROM site_presence WHERE last_seen_at < NOW() - INTERVAL '90 seconds'`);
+        const count = await pool.query(`SELECT COUNT(*)::int AS count FROM site_presence WHERE last_seen_at >= NOW() - INTERVAL '90 seconds'`);
+        res.json({ online: Number(count.rows[0]?.count || 0) });
+    } catch (error) {
+        console.error('Ошибка получения online:', error.message);
+        res.status(500).json({ error: 'Не удалось получить онлайн' });
+    }
+});
+
+app.get('/api/profile/sessions', async (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+    if (!requireDatabase(res)) return;
+    try {
+        const result = await pool.query(`SELECT session_id, user_agent, ip_address, country, created_at, last_seen_at FROM user_sessions WHERE steam_id=$1 ORDER BY last_seen_at DESC`, [String(req.user.id)]);
+        res.json({ sessions: result.rows.map(row => ({
+            id: row.session_id,
+            device: deviceName(row.user_agent),
+            country: row.country || '—',
+            ip: row.ip_address || '—',
+            status: String(row.session_id) === String(req.sessionID) ? 'Текущая' : 'Онлайн',
+            current: String(row.session_id) === String(req.sessionID),
+            createdAt: row.created_at,
+            lastSeenAt: row.last_seen_at
+        })) });
+    } catch (error) {
+        console.error('Ошибка загрузки сессий:', error.message);
+        res.status(500).json({ error: 'Не удалось загрузить сессии' });
+    }
+});
+
+app.delete('/api/profile/sessions/:sessionId', async (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+    if (!requireDatabase(res)) return;
+    const sessionId = String(req.params.sessionId || '');
+    if (!sessionId || sessionId.length > 300) return res.status(400).json({ error: 'Некорректная сессия' });
+    try {
+        const result = await pool.query('DELETE FROM user_sessions WHERE session_id=$1 AND steam_id=$2 RETURNING session_id', [sessionId, String(req.user.id)]);
+        if (!result.rowCount) return res.status(404).json({ error: 'Сессия не найдена' });
+        if (sessionId === String(req.sessionID)) {
+            return req.logout(() => req.session.destroy(() => res.json({ success: true, loggedOut: true })));
+        }
+        if (req.sessionStore?.destroy) req.sessionStore.destroy(sessionId, () => {});
+        res.json({ success: true, loggedOut: false });
+    } catch (error) {
+        console.error('Ошибка удаления сессии:', error.message);
+        res.status(500).json({ error: 'Не удалось завершить сессию' });
+    }
+});
+
+app.get('/api/profile/api-key', async (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+    if (!requireDatabase(res)) return;
+    try {
+        const row = await pool.query('SELECT api_key FROM users WHERE steam_id=$1', [String(req.user.id)]);
+        res.json({ apiKey: row.rows[0]?.api_key || '' });
+    } catch (error) { res.status(500).json({ error: 'Не удалось загрузить API Key' }); }
+});
+
+app.post('/api/profile/api-key/generate', async (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+    if (!requireDatabase(res)) return;
+    try {
+        const apiKey = makeApiKey();
+        const record = ensureUserRecord(req.user);
+        record.apiKey = apiKey;
+        await upsertUserToDb(record);
+        res.json({ success: true, apiKey });
+    } catch (error) {
+        console.error('Ошибка генерации API Key:', error.message);
+        res.status(500).json({ error: 'Не удалось сгенерировать API Key' });
+    }
+});
+
+app.get('/api/profile/email', async (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+    if (!requireDatabase(res)) return;
+    const row = await pool.query('SELECT email, email_verified FROM users WHERE steam_id=$1', [String(req.user.id)]);
+    res.json({ email: row.rows[0]?.email || '', verified: row.rows[0]?.email_verified === true });
+});
+
+app.post('/api/profile/email/request', async (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+    if (!requireDatabase(res)) return;
+    const steamId = String(req.user.id);
+    const email = String(req.body.email || '').trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({ error: 'Введите корректный Email' });
+    }
+
+    try {
+        // Если Email уже подтверждён другим аккаунтом — письмо вообще не отправляем.
+        const occupied = await pool.query(
+            `SELECT steam_id FROM users
+             WHERE LOWER(email)=LOWER($1) AND email_verified=TRUE AND steam_id<>$2
+             LIMIT 1`,
+            [email, steamId]
+        );
+        if (occupied.rowCount) {
+            return res.status(409).json({ error: 'Эта почта уже занята другим пользователем' });
+        }
+
+        const code = String(crypto.randomInt(100000, 1000000));
+        const expires = new Date(Date.now() + 10 * 60 * 1000);
+
+        // Сначала отправляем письмо, затем сохраняем код. Так при ошибке почтового сервиса
+        // у пользователя не останется нерабочий код подтверждения.
+        await sendVerificationEmail(email, code);
+
+        try {
+            await pool.query(`
+                UPDATE users
+                SET email=$1, email_verified=FALSE, email_verification_code=$2, email_verification_expires_at=$3,
+                    email_action='', email_action_code='', email_action_expires_at=NULL
+                WHERE steam_id=$4
+            `, [email, code, expires, steamId]);
+        } catch (dbError) {
+            // Если другой пользователь успел подтвердить эту почту между проверкой и UPDATE,
+            // уникальный индекс не даст создать второго владельца.
+            if (dbError?.code === '23505') {
+                return res.status(409).json({ error: 'Эта почта уже занята другим пользователем' });
+            }
+            throw dbError;
+        }
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Ошибка отправки Email:', error.message);
+        if (error?.code === '23505') {
+            return res.status(409).json({ error: 'Эта почта уже занята другим пользователем' });
+        }
+        res.status(500).json({ error: 'Не удалось отправить код подтверждения' });
+    }
+});
+
+app.post('/api/profile/email/verify', async (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+    if (!requireDatabase(res)) return;
+    const code = String(req.body.code || '').trim();
+    try {
+        const result = await pool.query('SELECT email, email_verification_code, email_verification_expires_at FROM users WHERE steam_id=$1', [String(req.user.id)]);
+        const row = result.rows[0];
+        if (!row?.email) return res.status(400).json({ error: 'Сначала укажите Email' });
+        if (!row.email_verification_code || row.email_verification_code !== code || !row.email_verification_expires_at || new Date(row.email_verification_expires_at).getTime() < Date.now()) {
+            return res.status(400).json({ error: 'Неверный или просроченный код' });
+        }
+        // После успешного подтверждения email_verified остаётся TRUE бессрочно.
+        try {
+            await pool.query(`
+                UPDATE users
+                SET email_verified=TRUE, email_verification_code='', email_verification_expires_at=NULL
+                WHERE steam_id=$1
+            `, [String(req.user.id)]);
+        } catch (dbError) {
+            if (dbError?.code === '23505') {
+                return res.status(409).json({ error: 'Эта почта уже занята другим пользователем' });
+            }
+            throw dbError;
+        }
+        const record = ensureUserRecord(req.user);
+        record.email = row.email;
+        record.emailVerified = true;
+        res.json({ success: true, email: row.email });
+    } catch (error) {
+        console.error('Ошибка подтверждения Email:', error.message);
+        if (error?.code === '23505') {
+            return res.status(409).json({ error: 'Эта почта уже занята другим пользователем' });
+        }
+        res.status(500).json({ error: 'Не удалось подтвердить Email' });
+    }
+});
+
+async function sendEmailUnbindEmail(to, code) {
+    const apiKey = String(process.env.RESEND_API_KEY || '').trim();
+    const senderEmail = String(process.env.EMAIL_FROM || '').trim();
+    const senderName = String(process.env.EMAIL_FROM_NAME || 'EMERALD Market').trim();
+    if (!apiKey) throw new Error('Email-сервис не настроен: добавьте RESEND_API_KEY в Render Environment');
+    if (!senderEmail) throw new Error('EMAIL_FROM не задан');
+    const subject = 'EMERALD Market — удаление Email';
+    const text = `Вы запросили одноразовый код для подтверждения действия «удаление email» на emerald.market\n\nВведите код в модальном окне на сайте.\n\nКод: ${code}\n\nКод действует 10 минут. Если вы не запрашивали это действие, просто проигнорируйте письмо.`;
+    const html = `
+        <div style="font-family:Arial,sans-serif;line-height:1.55;color:#111;max-width:560px;margin:auto">
+            <h2>EMERALD Market</h2>
+            <p>Вы запросили одноразовый код для подтверждения действия <b>«удаление email»</b> на emerald.market.</p>
+            <p>Введите его в модальном окне на сайте.</p>
+            <div style="font-size:32px;font-weight:700;letter-spacing:8px;margin:22px 0">${code}</div>
+            <p>Код действует <b>10 минут</b>.</p>
+            <p style="color:#666;font-size:13px">Если вы не запрашивали это действие, просто проигнорируйте письмо.</p>
+        </div>
+    `;
+    const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ from: `${senderName} <${senderEmail}>`, to: [to], subject, text, html }),
+        signal: AbortSignal.timeout(15000)
+    });
+    const raw = await response.text();
+    let data = {};
+    try { data = raw ? JSON.parse(raw) : {}; } catch (_) {}
+    if (!response.ok) throw new Error(`Resend API ${response.status}: ${data?.message || data?.name || raw || 'ошибка'}`);
+    console.log('Email удаления отправлен через Resend:', data?.id || 'OK');
+}
+
+app.post('/api/profile/email/unbind/request', async (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+    if (!requireDatabase(res)) return;
+    try {
+        const result = await pool.query('SELECT email, email_verified FROM users WHERE steam_id=$1', [String(req.user.id)]);
+        const row = result.rows[0];
+        if (!row?.email) return res.status(400).json({ error: 'Email не привязан' });
+        if (!row.email_verified) return res.status(400).json({ error: 'Сначала подтвердите Email' });
+        const code = String(crypto.randomInt(100000, 1000000));
+        const expires = new Date(Date.now() + 10 * 60 * 1000);
+        await sendEmailUnbindEmail(row.email, code);
+        await pool.query(`
+            UPDATE users SET email_action='unbind', email_action_code=$1, email_action_expires_at=$2
+            WHERE steam_id=$3
+        `, [code, expires, String(req.user.id)]);
+        res.json({ success: true, email: row.email });
+    } catch (error) {
+        console.error('Ошибка запроса отвязки Email:', error.message);
+        res.status(500).json({ error: 'Не удалось отправить код для удаления Email' });
+    }
+});
+
+app.post('/api/profile/email/unbind/confirm', async (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+    if (!requireDatabase(res)) return;
+    const code = String(req.body.code || '').trim();
+    try {
+        const result = await pool.query(`
+            SELECT email, email_verified, email_action, email_action_code, email_action_expires_at
+            FROM users WHERE steam_id=$1
+        `, [String(req.user.id)]);
+        const row = result.rows[0];
+        if (!row?.email || !row.email_verified || row.email_action !== 'unbind') {
+            return res.status(400).json({ error: 'Запрос на удаление Email не найден' });
+        }
+        if (!row.email_action_code || row.email_action_code !== code || !row.email_action_expires_at || new Date(row.email_action_expires_at).getTime() < Date.now()) {
+            return res.status(400).json({ error: 'Неверный или просроченный код' });
+        }
+        await pool.query(`
+            UPDATE users
+            SET email='', email_verified=FALSE, email_verification_code='', email_verification_expires_at=NULL,
+                email_action='', email_action_code='', email_action_expires_at=NULL
+            WHERE steam_id=$1
+        `, [String(req.user.id)]);
+        const record = ensureUserRecord(req.user);
+        record.email = '';
+        record.emailVerified = false;
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Ошибка удаления Email:', error.message);
+        res.status(500).json({ error: 'Не удалось удалить Email' });
+    }
+});
+
+// =====================================================
+// ОТЗЫВЫ
+// =====================================================
+
+app.get('/api/reviews', async (req, res) => {
+    if (!requireDatabase(res)) return;
+    try {
+        const result = await pool.query(`
+            SELECT id, name, rating, review_text, photo_url, created_at, updated_at
+            FROM reviews
+            ORDER BY created_at DESC, id DESC
+        `);
+        res.json({
+            reviews: result.rows.map(row => ({
+                id: Number(row.id),
+                name: row.name,
+                rating: Number(row.rating),
+                text: row.review_text,
+                photoUrl: row.photo_url || '',
+                createdAt: new Date(row.created_at).toISOString(),
+                updatedAt: new Date(row.updated_at).toISOString()
+            }))
+        });
+    } catch (error) {
+        console.error('Ошибка загрузки отзывов:', error.message);
+        res.status(500).json({ error: 'Не удалось загрузить отзывы' });
+    }
+});
+
+app.post('/api/admin/reviews', async (req, res) => {
+    if (!(await isAdmin(req))) return res.status(403).json({ error: 'Доступ запрещён' });
+    if (!requireDatabase(res)) return;
+    try {
+        const name = String(req.body?.name || '').trim().slice(0, 80);
+        const text = String(req.body?.text || '').trim().slice(0, 2000);
+        const photoUrl = String(req.body?.photoUrl || '').trim().slice(0, 7000000);
+        const rating = Number(req.body?.rating);
+        if (!name) return res.status(400).json({ error: 'Укажите имя' });
+        if (!text) return res.status(400).json({ error: 'Введите текст отзыва' });
+        if (!Number.isInteger(rating) || rating < 1 || rating > 5) return res.status(400).json({ error: 'Оценка должна быть от 1 до 5' });
+        if (photoUrl && !/^https?:\/\//i.test(photoUrl) && !/^data:image\/png;base64,[A-Za-z0-9+/=]+$/i.test(photoUrl)) return res.status(400).json({ error: 'Фото должно быть PNG-файлом или ссылкой http/https' });
+
+        const result = await pool.query(`
+            INSERT INTO reviews (name, rating, review_text, photo_url)
+            VALUES ($1,$2,$3,$4)
+            RETURNING id, name, rating, review_text, photo_url, created_at, updated_at
+        `, [name, rating, text, photoUrl]);
+        const row = result.rows[0];
+        res.json({
+            success: true,
+            review: { id: Number(row.id), name: row.name, rating: Number(row.rating), text: row.review_text, photoUrl: row.photo_url || '', createdAt: new Date(row.created_at).toISOString(), updatedAt: new Date(row.updated_at).toISOString() }
+        });
+    } catch (error) {
+        console.error('Ошибка добавления отзыва:', error.message);
+        res.status(500).json({ error: 'Не удалось добавить отзыв' });
+    }
+});
+
+app.put('/api/admin/reviews/:id', async (req, res) => {
+    if (!(await isAdmin(req))) return res.status(403).json({ error: 'Доступ запрещён' });
+    if (!requireDatabase(res)) return;
+    try {
+        const id = Number(req.params.id);
+        const name = String(req.body?.name || '').trim().slice(0, 80);
+        const text = String(req.body?.text || '').trim().slice(0, 2000);
+        const photoUrl = String(req.body?.photoUrl || '').trim().slice(0, 7000000);
+        const rating = Number(req.body?.rating);
+        if (!Number.isInteger(id) || id <= 0) return res.status(400).json({ error: 'Некорректный ID отзыва' });
+        if (!name) return res.status(400).json({ error: 'Укажите имя' });
+        if (!text) return res.status(400).json({ error: 'Введите текст отзыва' });
+        if (!Number.isInteger(rating) || rating < 1 || rating > 5) return res.status(400).json({ error: 'Оценка должна быть от 1 до 5' });
+        if (photoUrl && !/^https?:\/\//i.test(photoUrl) && !/^data:image\/png;base64,[A-Za-z0-9+/=]+$/i.test(photoUrl)) return res.status(400).json({ error: 'Фото должно быть PNG-файлом или ссылкой http/https' });
+
+        const result = await pool.query(`
+            UPDATE reviews SET name=$1, rating=$2, review_text=$3, photo_url=$4, updated_at=NOW()
+            WHERE id=$5
+            RETURNING id, name, rating, review_text, photo_url, created_at, updated_at
+        `, [name, rating, text, photoUrl, id]);
+        if (!result.rowCount) return res.status(404).json({ error: 'Отзыв не найден' });
+        const row = result.rows[0];
+        res.json({ success: true, review: { id: Number(row.id), name: row.name, rating: Number(row.rating), text: row.review_text, photoUrl: row.photo_url || '', createdAt: new Date(row.created_at).toISOString(), updatedAt: new Date(row.updated_at).toISOString() } });
+    } catch (error) {
+        console.error('Ошибка изменения отзыва:', error.message);
+        res.status(500).json({ error: 'Не удалось изменить отзыв' });
+    }
+});
+
+app.delete('/api/admin/reviews/:id', async (req, res) => {
+    if (!(await isAdmin(req))) return res.status(403).json({ error: 'Доступ запрещён' });
+    if (!requireDatabase(res)) return;
+    try {
+        const id = Number(req.params.id);
+        if (!Number.isInteger(id) || id <= 0) return res.status(400).json({ error: 'Некорректный ID отзыва' });
+        const result = await pool.query('DELETE FROM reviews WHERE id=$1', [id]);
+        if (!result.rowCount) return res.status(404).json({ error: 'Отзыв не найден' });
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Ошибка удаления отзыва:', error.message);
+        res.status(500).json({ error: 'Не удалось удалить отзыв' });
+    }
+});
+
+// Публичный профиль: только публичные показатели и внутренний ID.
+// Steam ID, имя, аватар, Trade URL и платёжные данные наружу не отдаём.
+app.get('/api/profile/:publicId', async (req, res) => {
+    const publicId = Number(req.params.publicId);
+    if (!Number.isInteger(publicId) || publicId < MIN_PUBLIC_ID || publicId > MAX_PUBLIC_ID) {
+        return res.status(400).json({ error: 'Некорректный ID профиля' });
+    }
+    if (!requireDatabase(res)) return;
+
+    try {
+        const userResult = await pool.query(
+            'SELECT steam_id, public_id, total_sold, total_payout, created_at FROM users WHERE public_id=$1 LIMIT 1',
+            [publicId]
+        );
+        if (!userResult.rowCount) return res.status(404).json({ error: 'Профиль не найден' });
+
+        const user = userResult.rows[0];
+        const salesResult = await pool.query(
+            'SELECT id, created_at, total, payout, status FROM sales WHERE steam_id=$1 ORDER BY created_at DESC',
+            [user.steam_id]
+        );
+
+        const sales = salesResult.rows.map(row => ({
+            id: row.id,
+            createdAt: new Date(row.created_at).toISOString(),
+            total: Number(row.total || 0),
+            payout: Number(row.payout || 0),
+            status: row.status === 'sold' ? 'sold' : (row.status === 'not_sold' ? 'not_sold' : 'pending')
+        }));
+
+        const sold = sales.filter(sale => sale.status === 'sold');
+        const totalSold = Number(sold.reduce((sum, sale) => sum + sale.total, 0).toFixed(2));
+        const totalPayout = Number(sold.reduce((sum, sale) => sum + sale.payout, 0).toFixed(2));
+
+        res.json({
+            publicId,
+            totalSold,
+            totalPayout,
+            sales
+        });
+    } catch (error) {
+        console.error('Ошибка публичного профиля:', error.message);
+        res.status(500).json({ error: 'Не удалось загрузить профиль' });
+    }
+});
+
+// Администраторы видят внутренние данные пользователей и историю продаж.
+app.get('/api/admin/data', async (req, res) => {
+    if (!(await isAdmin(req))) return res.status(403).json({ error: 'Доступ запрещён' });
+    if (!requireDatabase(res)) return;
+
+    const grantsResult = await pool.query('SELECT steam_id FROM admin_grants');
+    const grantedAdmins = new Set(grantsResult.rows.map(row => String(row.steam_id)));
+
+    const users = Object.values(userData)
+        .map(record => ({
+            publicId: Number(record.publicId),
+            steamId: String(record.steamId || ''),
+            username: record.username || 'Steam User',
+            avatar: record.avatar || '',
+            tradeUrl: record.tradeUrl || '',
+            createdAt: record.createdAt || null,
+            lastLoginAt: record.lastLoginAt || null,
+            loginCount: Number(record.loginCount || 0),
+            totalSold: Number(record.totalSold || 0),
+            totalPayout: Number(record.totalPayout || 0),
+            balance: Number(record.balance || 0),
+            banned: record.banned === true,
+            banReason: record.banReason || '',
+            isAdmin: String(record.steamId || '') === OWNER_STEAM_ID || grantedAdmins.has(String(record.steamId || '')),
+            sales: Array.isArray(record.sales) ? record.sales : []
+        }))
+        .sort((a, b) => a.publicId - b.publicId);
+
+    const sales = users.flatMap(user => user.sales.map(sale => ({
+        ...sale, publicId: user.publicId, username: user.username, steamId: user.steamId
+    }))).sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+
+    res.json({ users, sales });
+});
+
+// Администраторы могут выдавать и отзывать админ-доступ; владельца 666 изменить нельзя.
+app.post('/api/admin/grants', async (req, res) => {
+    if (!(await isAdmin(req))) return res.status(403).json({ error: 'Доступ запрещён' });
+    if (!requireDatabase(res)) return;
+    const publicId = Number(req.body.publicId);
+    if (!Number.isInteger(publicId) || publicId <= 0) return res.status(400).json({ error: 'Введите корректный ID' });
+    const target = Object.values(userData).find(item => Number(item?.publicId) === publicId);
+    if (!target) return res.status(404).json({ error: 'Пользователь с таким ID не найден' });
+    if (String(target.steamId) === OWNER_STEAM_ID) return res.status(400).json({ error: 'ID 666 уже является владельцем' });
+    await pool.query('INSERT INTO admin_grants (steam_id, granted_by) VALUES ($1,$2) ON CONFLICT (steam_id) DO NOTHING', [String(target.steamId), OWNER_STEAM_ID]);
+    res.json({ success: true, publicId });
+});
+
+app.delete('/api/admin/grants/:publicId', async (req, res) => {
+    if (!(await isAdmin(req))) return res.status(403).json({ error: 'Доступ запрещён' });
+    if (!requireDatabase(res)) return;
+    const publicId = Number(req.params.publicId);
+    const target = Object.values(userData).find(item => Number(item?.publicId) === publicId);
+    if (!target) return res.status(404).json({ error: 'Пользователь с таким ID не найден' });
+    if (String(target.steamId) === OWNER_STEAM_ID) return res.status(400).json({ error: 'Нельзя забрать доступ у владельца' });
+    await pool.query('DELETE FROM admin_grants WHERE steam_id=$1', [String(target.steamId)]);
+    res.json({ success: true, publicId });
+});
+
+// Создаём заявку на продажу. Окончательный статус устанавливает владелец в админке.
+app.post('/api/record-sale', async (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
+
+    if (!requireDatabase(res)) return;
+
+    const steamId = String(req.user.id);
+    const record = ensureUserRecord(req.user);
+    const total = Number(req.body.total);
+    const payout = Number(req.body.payout);
+    const items = Array.isArray(req.body.items) ? req.body.items : [];
+
+    if (!Number.isFinite(total) || total < 0 || !Number.isFinite(payout) || payout < 0) {
+        return res.status(400).json({ error: 'Некорректная сумма продажи' });
+    }
+
+    const sale = {
+        id: `sale_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        createdAt: new Date().toISOString(),
+        total: Number(total.toFixed(2)),
+        payout: Number(payout.toFixed(2)),
+        paymentMethod: String(req.body.paymentMethod || '').slice(0, 30),
+        items: items.slice(0, 100).map(item => String(item).slice(0, 200)),
+        status: 'pending'
+    };
+
+    if (!Array.isArray(record.sales)) record.sales = [];
+    record.sales.push(sale);
+    record.lastSaleAt = sale.createdAt;
+    // Суммы считаются только по подтверждённым владельцем продажам.
+    record.totalSold = record.sales.filter(x => x.status === 'sold').reduce((sum, x) => sum + Number(x.total || 0), 0);
+    record.totalPayout = record.sales.filter(x => x.status === 'sold').reduce((sum, x) => sum + Number(x.payout || 0), 0);
+    userData[steamId] = record;
+
+    try {
+        await insertSaleToDb(steamId, sale);
+        await upsertUserToDb(record);
+        res.json({ success: true, saleId: sale.id });
+    } catch (error) {
+        console.error('Ошибка сохранения продажи:', error.message);
+        return res.status(500).json({ error: 'Не удалось сохранить продажу' });
+    }
+});
+
+// Администратор может удалить пользователя из админки. Связанные продажи/сессии удаляются каскадно.
+app.delete('/api/admin/users/:publicId', async (req, res) => {
+    if (!(await isAdmin(req))) return res.status(403).json({ error: 'Доступ запрещён' });
+    if (!requireDatabase(res)) return;
+    const publicId = Number(req.params.publicId);
+    if (!Number.isInteger(publicId) || publicId <= 0) return res.status(400).json({ error: 'Некорректный ID пользователя' });
+    try {
+        const targetResult = await pool.query('SELECT steam_id FROM users WHERE public_id=$1', [publicId]);
+        if (!targetResult.rowCount) return res.status(404).json({ error: 'Пользователь не найден' });
+        const steamId = String(targetResult.rows[0].steam_id);
+        if (steamId === OWNER_STEAM_ID) return res.status(400).json({ error: 'Нельзя удалить владельца 666' });
+        await pool.query('DELETE FROM users WHERE steam_id=$1', [steamId]);
+        delete userData[steamId];
+        res.json({ success: true, publicId });
+    } catch (error) {
+        console.error('Ошибка удаления пользователя:', error.message);
+        res.status(500).json({ error: 'Не удалось удалить пользователя' });
+    }
+});
+
+// Администратор управляет пользователями: бан, баланс и публичный ID.
+app.post('/api/admin/manage-user', async (req, res) => {
+    if (!(await isAdmin(req))) return res.status(403).json({ error: 'Доступ запрещён' });
+    if (!requireDatabase(res)) return;
+
+    const action = String(req.body.action || '');
+    const publicId = Number(req.body.publicId);
+    if (!Number.isInteger(publicId) || publicId <= 0) {
+        return res.status(400).json({ error: 'Введите корректный ID пользователя' });
+    }
+
+    const target = Object.values(userData).find(item => Number(item?.publicId) === publicId);
+    if (!target) return res.status(404).json({ error: 'Пользователь с таким ID не найден' });
+    if (String(target.steamId) === OWNER_STEAM_ID && !['balance_add','balance_remove','stats_set'].includes(action)) {
+        return res.status(400).json({ error: 'Нельзя изменить доступ или ID владельца 666' });
+    }
+
+    try {
+        if (action === 'ban') {
+            target.banned = true;
+            target.banReason = String(req.body.reason || 'Нарушение правил').slice(0, 200);
+        } else if (action === 'unban') {
+            target.banned = false;
+            target.banReason = '';
+        } else if (action === 'balance_add' || action === 'balance_remove') {
+            const amount = Number(req.body.amount);
+            if (!Number.isFinite(amount) || amount <= 0) return res.status(400).json({ error: 'Введите положительную сумму' });
+            const delta = action === 'balance_add' ? amount : -amount;
+            const nextBalance = Number((Number(target.balance || 0) + delta).toFixed(2));
+            if (nextBalance < 0) return res.status(400).json({ error: 'Баланс не может быть отрицательным' });
+            target.balance = nextBalance;
+        } else if (action === 'stats_set') {
+            const totalSold = Number(req.body.totalSold);
+            const totalPayout = Number(req.body.totalPayout);
+            if (!Number.isFinite(totalSold) || totalSold < 0 || !Number.isFinite(totalPayout) || totalPayout < 0) {
+                return res.status(400).json({ error: 'Введите корректные значения статистики' });
+            }
+            target.totalSold = Number(totalSold.toFixed(2));
+            target.totalPayout = Number(totalPayout.toFixed(2));
+        } else if (action === 'change_id') {
+            const newId = Number(req.body.newPublicId);
+            if (!Number.isInteger(newId) || newId < MIN_PUBLIC_ID || newId > MAX_PUBLIC_ID || newId === OWNER_PUBLIC_ID) {
+                return res.status(400).json({ error: `Новый ID должен быть от ${MIN_PUBLIC_ID} до ${MAX_PUBLIC_ID}, кроме 666` });
+            }
+            const occupied = Object.values(userData).find(item => Number(item?.publicId) === newId && item !== target);
+            if (occupied) return res.status(409).json({ error: 'Этот ID уже занят' });
+            target.publicId = newId;
+        } else {
+            return res.status(400).json({ error: 'Неизвестное действие' });
+        }
+
+        await upsertUserToDb(target);
+        res.json({ success: true, publicId: target.publicId, balance: Number(target.balance || 0), banned: target.banned === true });
+    } catch (error) {
+        console.error('Ошибка управления пользователем:', error.message);
+        res.status(500).json({ error: 'Не удалось применить действие' });
+    }
+});
+
+// Администратор меняет статус заявки: продажа остаётся в истории в любом случае.
+// Администратор может удалить только конкретную заявку продажи.
+// Пользователь при этом НЕ удаляется.
+app.delete('/api/admin/sales/:saleId', async (req, res) => {
+    if (!(await isAdmin(req))) return res.status(403).json({ error: 'Доступ запрещён' });
+    if (!requireDatabase(res)) return;
+
+    const saleId = String(req.params.saleId || '').trim();
+    if (!saleId || saleId.length > 200) return res.status(400).json({ error: 'Некорректный ID продажи' });
+
+    try {
+        const result = await pool.query(
+            'DELETE FROM sales WHERE id=$1 RETURNING id, steam_id',
+            [saleId]
+        );
+        if (!result.rowCount) return res.status(404).json({ error: 'Продажа не найдена' });
+
+        const steamId = String(result.rows[0].steam_id);
+        const record = userData[steamId];
+        if (record) {
+            const salesResult = await pool.query(
+                'SELECT * FROM sales WHERE steam_id=$1 ORDER BY created_at',
+                [steamId]
+            );
+            record.sales = salesResult.rows.map(row => ({
+                id: row.id,
+                createdAt: new Date(row.created_at).toISOString(),
+                total: Number(row.total),
+                payout: Number(row.payout),
+                paymentMethod: row.payment_method || '',
+                items: Array.isArray(row.items) ? row.items : [],
+                status: row.status === 'sold' ? 'sold' : (row.status === 'not_sold' ? 'not_sold' : 'pending')
+            }));
+            const soldRows = salesResult.rows.filter(row => row.status === 'sold');
+            record.totalSold = Number(soldRows.reduce((sum, row) => sum + Number(row.total || 0), 0).toFixed(2));
+            record.totalPayout = Number(soldRows.reduce((sum, row) => sum + Number(row.payout || 0), 0).toFixed(2));
+            await upsertUserToDb(record);
+        }
+
+        res.json({ success: true, saleId });
+    } catch (error) {
+        console.error('Ошибка удаления продажи:', error.message);
+        res.status(500).json({ error: 'Не удалось удалить продажу' });
+    }
+});
+
+app.post('/api/admin/sales/:saleId/status', async (req, res) => {
+    if (!(await isAdmin(req))) return res.status(403).json({ error: 'Доступ запрещён' });
+    const saleId = String(req.params.saleId);
+    const status = req.body.status === 'sold' ? 'sold' : (req.body.status === 'not_sold' ? 'not_sold' : '');
+
+    if (!status) return res.status(400).json({ error: 'Некорректный статус' });
+    if (!requireDatabase(res)) return;
+
+    try {
+        const result = await pool.query(
+            "UPDATE sales SET status=$1 WHERE id=$2 AND status='pending' RETURNING id, steam_id",
+            [status, saleId]
+        );
+        if (!result.rowCount) {
+            const exists = await pool.query('SELECT status FROM sales WHERE id=$1', [saleId]);
+            if (!exists.rowCount) return res.status(404).json({ error: 'Продажа не найдена' });
+            return res.status(409).json({ error: 'Статус этой продажи уже подтверждён и больше не изменяется' });
+        }
+
+        const steamId = result.rows[0].steam_id;
+        const record = userData[steamId] || ensureUserRecord({ id: steamId });
+        const salesResult = await pool.query(
+            'SELECT total, payout, status, created_at FROM sales WHERE steam_id=$1 ORDER BY created_at',
+            [steamId]
+        );
+        record.sales = salesResult.rows.map(row => {
+            const existing = (record.sales || []).find(x => x.id === saleId && saleId);
+            return existing;
+        }).filter(Boolean);
+        const soldRows = salesResult.rows.filter(row => row.status === 'sold');
+        record.totalSold = Number(soldRows.reduce((sum, row) => sum + Number(row.total || 0), 0).toFixed(2));
+        record.totalPayout = Number(soldRows.reduce((sum, row) => sum + Number(row.payout || 0), 0).toFixed(2));
+        userData[steamId] = record;
+        await upsertUserToDb(record);
+
+        // Перезагрузим локальную копию продаж из БД, чтобы статус сразу был актуальным.
+        const allSales = await pool.query('SELECT * FROM sales WHERE steam_id=$1 ORDER BY created_at', [steamId]);
+        record.sales = allSales.rows.map(row => ({
+            id: row.id, createdAt: new Date(row.created_at).toISOString(), total: Number(row.total),
+            payout: Number(row.payout), paymentMethod: row.payment_method || '',
+            items: Array.isArray(row.items) ? row.items : [], status: row.status === 'sold' ? 'sold' : (row.status === 'not_sold' ? 'not_sold' : 'pending')
+        }));
+        res.json({ success: true, saleId, status });
+    } catch (error) {
+        console.error('Ошибка изменения статуса продажи:', error.message);
+        res.status(500).json({ error: 'Не удалось изменить статус продажи' });
+    }
+});
+
+app.get('/admin', async (req, res) => {
+    if (!(await isAdmin(req))) return res.status(403).send('Доступ запрещён');
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/profile', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/profile/:publicId', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/reviews', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+
+app.get('/api/health', async (req, res) => {
+    if (!pool) {
+        return res.status(503).json({
+            ok: false,
+            database: false,
+            dbReady,
+            error: 'DATABASE_URL не найден в окружении Render'
+        });
+    }
+    try {
+        await pool.query('SELECT 1');
+        res.json({ ok: true, database: true, dbReady });
+    } catch (error) {
+        console.error('❌ /api/health PostgreSQL:', error.message);
+        res.status(503).json({
+            ok: false,
+            database: false,
+            dbReady,
+            error: error.message
+        });
+    }
+});
+
+// =====================================================
+// ГЛАВНАЯ
+// =====================================================
+
+app.get('/', (req, res) => {
+
+    res.sendFile(
+        path.join(
+            __dirname,
+            'index.html'
+        )
+    );
+});
+
+// =====================================================
+// ЗАПУСК
+// =====================================================
+
+initDatabase()
+    .then(() => {
+        app.listen(PORT, () => {
+            console.log('====================================');
+            console.log('✅ EMERALD Market запущен');
+            console.log(`🌐 PORT: ${PORT}`);
+            console.log(`🌐 BASE_URL: ${BASE_URL}`);
+            console.log('====================================');
+        });
+    })
+    .catch(error => {
+        console.error('❌ Не удалось запустить базу данных:', error.message);
+        process.exit(1);
+    });
