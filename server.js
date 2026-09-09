@@ -305,6 +305,14 @@ async function initDatabase() {
         )
     `);
 
+    // Один подтверждённый Email может принадлежать только одному аккаунту.
+    // Индекс защищает от гонки запросов даже при одновременной регистрации двух пользователей.
+    await pool.query(`
+        CREATE UNIQUE INDEX IF NOT EXISTS users_verified_email_unique
+        ON users (LOWER(email))
+        WHERE email_verified = TRUE AND email <> ''
+    `);
+
     const users = await pool.query('SELECT * FROM users ORDER BY public_id');
     for (const row of users.rows) {
         userData[row.steam_id] = dbRowToUser(row);
@@ -1403,21 +1411,53 @@ app.get('/api/profile/email', async (req, res) => {
 app.post('/api/profile/email/request', async (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
     if (!requireDatabase(res)) return;
+    const steamId = String(req.user.id);
     const email = String(req.body.email || '').trim().toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: 'Введите корректный Email' });
-    const code = String(crypto.randomInt(100000, 1000000));
-    const expires = new Date(Date.now() + 10 * 60 * 1000);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({ error: 'Введите корректный Email' });
+    }
+
     try {
+        // Если Email уже подтверждён другим аккаунтом — письмо вообще не отправляем.
+        const occupied = await pool.query(
+            `SELECT steam_id FROM users
+             WHERE LOWER(email)=LOWER($1) AND email_verified=TRUE AND steam_id<>$2
+             LIMIT 1`,
+            [email, steamId]
+        );
+        if (occupied.rowCount) {
+            return res.status(409).json({ error: 'Эта почта уже занята другим пользователем' });
+        }
+
+        const code = String(crypto.randomInt(100000, 1000000));
+        const expires = new Date(Date.now() + 10 * 60 * 1000);
+
+        // Сначала отправляем письмо, затем сохраняем код. Так при ошибке почтового сервиса
+        // у пользователя не останется нерабочий код подтверждения.
         await sendVerificationEmail(email, code);
-        await pool.query(`
-            UPDATE users
-            SET email=$1, email_verified=FALSE, email_verification_code=$2, email_verification_expires_at=$3,
-                email_action='', email_action_code='', email_action_expires_at=NULL
-            WHERE steam_id=$4
-        `, [email, code, expires, String(req.user.id)]);
+
+        try {
+            await pool.query(`
+                UPDATE users
+                SET email=$1, email_verified=FALSE, email_verification_code=$2, email_verification_expires_at=$3,
+                    email_action='', email_action_code='', email_action_expires_at=NULL
+                WHERE steam_id=$4
+            `, [email, code, expires, steamId]);
+        } catch (dbError) {
+            // Если другой пользователь успел подтвердить эту почту между проверкой и UPDATE,
+            // уникальный индекс не даст создать второго владельца.
+            if (dbError?.code === '23505') {
+                return res.status(409).json({ error: 'Эта почта уже занята другим пользователем' });
+            }
+            throw dbError;
+        }
+
         res.json({ success: true });
     } catch (error) {
         console.error('Ошибка отправки Email:', error.message);
+        if (error?.code === '23505') {
+            return res.status(409).json({ error: 'Эта почта уже занята другим пользователем' });
+        }
         res.status(500).json({ error: 'Не удалось отправить код подтверждения' });
     }
 });
@@ -1434,17 +1474,27 @@ app.post('/api/profile/email/verify', async (req, res) => {
             return res.status(400).json({ error: 'Неверный или просроченный код' });
         }
         // После успешного подтверждения email_verified остаётся TRUE бессрочно.
-        await pool.query(`
-            UPDATE users
-            SET email_verified=TRUE, email_verification_code='', email_verification_expires_at=NULL
-            WHERE steam_id=$1
-        `, [String(req.user.id)]);
+        try {
+            await pool.query(`
+                UPDATE users
+                SET email_verified=TRUE, email_verification_code='', email_verification_expires_at=NULL
+                WHERE steam_id=$1
+            `, [String(req.user.id)]);
+        } catch (dbError) {
+            if (dbError?.code === '23505') {
+                return res.status(409).json({ error: 'Эта почта уже занята другим пользователем' });
+            }
+            throw dbError;
+        }
         const record = ensureUserRecord(req.user);
         record.email = row.email;
         record.emailVerified = true;
         res.json({ success: true, email: row.email });
     } catch (error) {
         console.error('Ошибка подтверждения Email:', error.message);
+        if (error?.code === '23505') {
+            return res.status(409).json({ error: 'Эта почта уже занята другим пользователем' });
+        }
         res.status(500).json({ error: 'Не удалось подтвердить Email' });
     }
 });
@@ -1580,7 +1630,7 @@ app.get('/api/profile/:publicId', async (req, res) => {
     }
 });
 
-// Владелец 666 видит внутренние данные пользователей и историю продаж.
+// Администраторы видят внутренние данные пользователей и историю продаж.
 app.get('/api/admin/data', async (req, res) => {
     if (!(await isAdmin(req))) return res.status(403).json({ error: 'Доступ запрещён' });
     if (!requireDatabase(res)) return;
@@ -1615,9 +1665,9 @@ app.get('/api/admin/data', async (req, res) => {
     res.json({ users, sales });
 });
 
-// Владелец 666 может выдавать и отзывать админ-доступ по публичному ID.
+// Администраторы могут выдавать и отзывать админ-доступ; владельца 666 изменить нельзя.
 app.post('/api/admin/grants', async (req, res) => {
-    if (!isOwner(req)) return res.status(403).json({ error: 'Только владелец 666 может управлять доступом' });
+    if (!(await isAdmin(req))) return res.status(403).json({ error: 'Доступ запрещён' });
     if (!requireDatabase(res)) return;
     const publicId = Number(req.body.publicId);
     if (!Number.isInteger(publicId) || publicId <= 0) return res.status(400).json({ error: 'Введите корректный ID' });
@@ -1629,7 +1679,7 @@ app.post('/api/admin/grants', async (req, res) => {
 });
 
 app.delete('/api/admin/grants/:publicId', async (req, res) => {
-    if (!isOwner(req)) return res.status(403).json({ error: 'Только владелец 666 может управлять доступом' });
+    if (!(await isAdmin(req))) return res.status(403).json({ error: 'Доступ запрещён' });
     if (!requireDatabase(res)) return;
     const publicId = Number(req.params.publicId);
     const target = Object.values(userData).find(item => Number(item?.publicId) === publicId);
@@ -1683,9 +1733,9 @@ app.post('/api/record-sale', async (req, res) => {
     }
 });
 
-// Владелец может удалить пользователя из админки. Связанные продажи/сессии удаляются каскадно.
+// Администратор может удалить пользователя из админки. Связанные продажи/сессии удаляются каскадно.
 app.delete('/api/admin/users/:publicId', async (req, res) => {
-    if (!isOwner(req)) return res.status(403).json({ error: 'Только владелец 666 может удалять пользователей' });
+    if (!(await isAdmin(req))) return res.status(403).json({ error: 'Доступ запрещён' });
     if (!requireDatabase(res)) return;
     const publicId = Number(req.params.publicId);
     if (!Number.isInteger(publicId) || publicId <= 0) return res.status(400).json({ error: 'Некорректный ID пользователя' });
@@ -1703,9 +1753,9 @@ app.delete('/api/admin/users/:publicId', async (req, res) => {
     }
 });
 
-// Владелец управляет пользователями: бан, баланс и публичный ID.
+// Администратор управляет пользователями: бан, баланс и публичный ID.
 app.post('/api/admin/manage-user', async (req, res) => {
-    if (!isOwner(req)) return res.status(403).json({ error: 'Только владелец 666 может управлять пользователями' });
+    if (!(await isAdmin(req))) return res.status(403).json({ error: 'Доступ запрещён' });
     if (!requireDatabase(res)) return;
 
     const action = String(req.body.action || '');
@@ -1762,7 +1812,7 @@ app.post('/api/admin/manage-user', async (req, res) => {
     }
 });
 
-// Владелец меняет статус заявки: продажа остаётся в истории в любом случае.
+// Администратор меняет статус заявки: продажа остаётся в истории в любом случае.
 // Администратор может удалить только конкретную заявку продажи.
 // Пользователь при этом НЕ удаляется.
 app.delete('/api/admin/sales/:saleId', async (req, res) => {

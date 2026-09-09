@@ -1095,7 +1095,7 @@
         </div>
         <div class="admin-control-card" id="adminAccessCard" style="display:none; margin-bottom:24px;">
             <div class="admin-control-title">🛡️ Управление доступом</div>
-            <div class="admin-control-subtitle">Выдача прав и управление пользователями. Изменять доступ может только владелец 666.</div>
+            <div class="admin-control-subtitle">Полное управление пользователями и продажами доступно администраторам.</div>
             <div class="admin-access-row">
                 <input id="adminGrantId" class="filter-input" type="number" min="1" placeholder="ID пользователя">
                 <button class="btn admin-action-btn" onclick="grantAdminAccess()">Выдать админку</button>
@@ -1769,7 +1769,7 @@ async function renderPublicProfile(publicId) {
 }
 
 async function loadAdminData() {
-    if (!currentUser?.isOwner) return;
+    if (!currentUser?.isAdmin) return;
     try {
         const response = await fetch('/api/admin/data');
         const data = await response.json();
@@ -1778,7 +1778,7 @@ async function loadAdminData() {
         document.getElementById('adminUsersCount').textContent = data.users.length;
         document.getElementById('adminSalesCount').textContent = data.sales.length;
         const accessCard = document.getElementById('adminAccessCard');
-        if (accessCard) accessCard.style.display = currentUser?.isOwner ? 'block' : 'none';
+        if (accessCard) accessCard.style.display = currentUser?.isAdmin ? 'block' : 'none';
         const confirmedSales = data.sales.filter(x => x.status === 'sold');
         document.getElementById('adminSoldTotal').textContent = `${confirmedSales.reduce((s,x)=>s+Number(x.total||0),0).toFixed(2)} ₽`;
         document.getElementById('adminPayoutTotal').textContent = `${confirmedSales.reduce((s,x)=>s+Number(x.payout||0),0).toFixed(2)} ₽`;
@@ -1813,7 +1813,7 @@ async function loadAdminData() {
 }
 
 async function grantAdminAccess() {
-    if (!currentUser?.isOwner) return;
+    if (!currentUser?.isAdmin) return;
     const id = Number(document.getElementById('adminGrantId').value);
     const status = document.getElementById('adminGrantStatus');
     status.textContent = '⏳ Сохраняем...';
@@ -1830,7 +1830,7 @@ async function grantAdminAccess() {
 }
 
 async function revokeAdminAccess() {
-    if (!currentUser?.isOwner) return;
+    if (!currentUser?.isAdmin) return;
     const id = Number(document.getElementById('adminGrantId').value);
     const status = document.getElementById('adminGrantStatus');
     status.textContent = '⏳ Сохраняем...';
@@ -1857,7 +1857,7 @@ function updateAdminActionFields() {
 }
 
 async function manageUser() {
-    if (!currentUser?.isOwner) return;
+    if (!currentUser?.isAdmin) return;
     const status = document.getElementById('adminManagementStatus');
     const action = document.getElementById('adminManageAction').value;
     const publicId = Number(document.getElementById('adminManageId').value);
@@ -1891,7 +1891,7 @@ async function manageUser() {
 }
 
 async function setSaleStatus(saleId, status) {
-    if (!currentUser?.isOwner) return;
+    if (!currentUser?.isAdmin) return;
     try {
         const response = await fetch(`/api/admin/sales/${encodeURIComponent(saleId)}/status`, {
             method: 'POST',
@@ -1907,7 +1907,7 @@ async function setSaleStatus(saleId, status) {
 }
 
 async function deleteSale(saleId) {
-    if (!currentUser?.isOwner) return;
+    if (!currentUser?.isAdmin) return;
     if (!confirm('Удалить эту продажу? Пользователь и его аккаунт останутся.')) return;
     try {
         const response = await fetch(`/api/admin/sales/${encodeURIComponent(saleId)}`, { method: 'DELETE' });
