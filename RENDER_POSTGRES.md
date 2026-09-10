@@ -1,22 +1,61 @@
-# EMERALD Market — Render / PostgreSQL
+# EMERALD Market — PostgreSQL на Render
 
-## Required variables
+Эта версия хранит пользователей и продажи в PostgreSQL, поэтому данные не пропадают при перезапуске сервиса Render.
 
-- `BASE_URL` = `https://emerald-market-2.onrender.com`
-- `SESSION_SECRET` = a long random secret
-- `STEAM_API_KEY` = your Steam API key
-- `DATABASE_URL` = Render Postgres **Internal Database URL**
+## 1. Создай PostgreSQL
 
-## Email verification
+В Render создай **PostgreSQL** в том же аккаунте/регионе, где находится Web Service.
 
-The profile verification tab supports email confirmation by a 6-digit code.
-Configure these variables on the Web Service if you want real email delivery:
+## 2. Подключи базу к Web Service
 
-- `EMAIL_HOST`
-- `EMAIL_PORT` (usually `587`)
-- `EMAIL_USER`
-- `EMAIL_PASS`
-- `EMAIL_FROM` (optional; defaults to EMAIL_USER)
-- `EMAIL_SECURE` = `true` only when your SMTP provider requires implicit TLS (otherwise omit or use `false`)
+В настройках Web Service → **Environment** добавь переменную:
 
-The app creates the required email, API-key and session columns/tables automatically on startup. Existing PostgreSQL data is kept.
+`DATABASE_URL`
+
+Укажи Internal Database URL от созданной Render PostgreSQL.
+
+Также должны оставаться:
+
+- `STEAM_API_KEY`
+- `SESSION_SECRET`
+- `BASE_URL=https://emerald-market-2.onrender.com`
+
+`SESSION_SECRET` лучше сделать длинной случайной строкой.
+
+## 3. Deploy
+
+После сохранения переменных сделай Manual Deploy / Deploy latest commit.
+
+В логах после запуска должно появиться примерно:
+
+`🗄️ PostgreSQL подключён. Пользователей: ...`
+
+а затем:
+
+`✅ EMERALD Market запущен`
+
+## Что хранится
+
+### users
+- Steam ID — только для админки
+- внутренний ID сайта
+- имя Steam — только для админки
+- аватар — только для админки
+- Trade URL — только для админки
+- дата регистрации
+- последний вход
+- количество входов
+- сумма продаж
+- сумма выплат
+- настройки темы/анимации
+
+### sales
+- ID продажи
+- ID пользователя через Steam ID
+- дата
+- сумма
+- выплата
+- метод выплаты
+- список проданных предметов
+
+Обычный пользователь через `/profile/ID` получает только публичный внутренний ID.
