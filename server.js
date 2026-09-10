@@ -30,8 +30,8 @@ const DATABASE_URL = process.env.DATABASE_URL;
 
 const OWNER_STEAM_ID = '76561199802780329';
 const OWNER_PUBLIC_ID = 666;
-const MIN_PUBLIC_ID = 1;
-const MAX_PUBLIC_ID = 100000;
+const MIN_PUBLIC_ID = 100000;
+const MAX_PUBLIC_ID = 999999;
 
 // =====================================================
 // MIDDLEWARE
@@ -201,9 +201,12 @@ async function initDatabase() {
             total NUMERIC(14,2) NOT NULL,
             payout NUMERIC(14,2) NOT NULL,
             payment_method TEXT NOT NULL DEFAULT '',
-            items JSONB NOT NULL DEFAULT '[]'::jsonb
+            items JSONB NOT NULL DEFAULT '[]'::jsonb,
+            status TEXT NOT NULL DEFAULT 'not_sold'
         )
     `);
+
+    await pool.query(`ALTER TABLE sales ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'not_sold'`);
 
     const users = await pool.query('SELECT * FROM users ORDER BY public_id');
     for (const row of users.rows) {
@@ -220,7 +223,8 @@ async function initDatabase() {
             total: Number(row.total),
             payout: Number(row.payout),
             paymentMethod: row.payment_method || '',
-            items: Array.isArray(row.items) ? row.items : []
+            items: Array.isArray(row.items) ? row.items : [],
+            status: row.status === 'sold' ? 'sold' : 'not_sold'
         });
     }
 
@@ -297,11 +301,14 @@ async function upsertUserToDb(record) {
 async function insertSaleToDb(steamId, sale) {
     if (!pool || !sale?.id) return;
     await pool.query(`
-        INSERT INTO sales (id, steam_id, created_at, total, payout, payment_method, items)
-        VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb)
-        ON CONFLICT (id) DO NOTHING
+        INSERT INTO sales (id, steam_id, created_at, total, payout, payment_method, items, status)
+        VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8)
+        ON CONFLICT (id) DO UPDATE SET
+            total=EXCLUDED.total, payout=EXCLUDED.payout, payment_method=EXCLUDED.payment_method,
+            items=EXCLUDED.items, status=EXCLUDED.status
     `, [sale.id, String(steamId), sale.createdAt || new Date().toISOString(), Number(sale.total || 0),
-        Number(sale.payout || 0), sale.paymentMethod || '', JSON.stringify(Array.isArray(sale.items) ? sale.items : [])]);
+        Number(sale.payout || 0), sale.paymentMethod || '', JSON.stringify(Array.isArray(sale.items) ? sale.items : []),
+        sale.status === 'sold' ? 'sold' : 'not_sold']);
 }
 
 function saveUserData() {
@@ -1008,6 +1015,72 @@ app.post('/api/get-inventory', async (req, res) => {
 // ПРОФИЛИ / ТРАНЗАКЦИИ / АДМИНКА
 // =====================================================
 
+// Выдаём постоянный внутренний ID пользователю.
+function getRandomPublicId() {
+    const used = new Set(Object.values(userData).map(data => Number(data?.publicId)).filter(Number.isInteger));
+    for (let attempt = 0; attempt < 200; attempt++) {
+        const id = Math.floor(Math.random() * (MAX_PUBLIC_ID - MIN_PUBLIC_ID + 1)) + MIN_PUBLIC_ID;
+        if (id !== OWNER_PUBLIC_ID && !used.has(id)) return id;
+    }
+    for (let id = MIN_PUBLIC_ID; id <= MAX_PUBLIC_ID; id++) {
+        if (id !== OWNER_PUBLIC_ID && !used.has(id)) return id;
+    }
+    return null;
+}
+
+function ensureUserRecord(profile) {
+    const steamId = String(profile.id);
+    const owner = steamId === OWNER_STEAM_ID;
+
+    if (!userData[steamId]) {
+        userData[steamId] = {};
+    }
+
+    const record = userData[steamId];
+
+    if (owner) {
+        for (const [otherSteamId, otherRecord] of Object.entries(userData)) {
+            if (otherSteamId === steamId) continue;
+            if (Number(otherRecord?.publicId) === OWNER_PUBLIC_ID) {
+                const replacementId = getRandomPublicId();
+                if (replacementId === null) {
+                    throw new Error('Невозможно освободить ID 666: свободные ID закончились');
+                }
+                otherRecord.publicId = replacementId;
+                saveUserData();
+            }
+        }
+        record.publicId = OWNER_PUBLIC_ID;
+    } else if (Number(record.publicId) === OWNER_PUBLIC_ID) {
+        const nextId = getRandomPublicId();
+        if (nextId === null) throw new Error('Свободные внутренние ID закончились');
+        record.publicId = nextId;
+    } else if (!Number.isInteger(Number(record.publicId))) {
+        const nextId = getRandomPublicId();
+        if (nextId === null) throw new Error('Свободные внутренние ID закончились');
+        record.publicId = nextId;
+    }
+
+    record.steamId = steamId;
+    record.username = profile.displayName || profile.username || record.username || 'Steam User';
+    record.avatar =
+        profile.photos?.[2]?.value ||
+        profile.photos?.[1]?.value ||
+        profile.photos?.[0]?.value ||
+        record.avatar || '';
+
+    if (!Array.isArray(record.sales)) record.sales = [];
+    if (!record.theme) record.theme = 'dark';
+    if (typeof record.rain !== 'boolean') record.rain = true;
+
+    saveUserData();
+    return record;
+}
+
+function isOwner(req) {
+    return Boolean(req.user) && String(req.user.id) === OWNER_STEAM_ID;
+}
+
 function recordLogin(profile) {
     const record = ensureUserRecord(profile);
     const now = new Date().toISOString();
@@ -1061,8 +1134,8 @@ app.get('/api/admin/data', (req, res) => {
     res.json({ users, sales });
 });
 
-// Фиксируем факт продажи и сумму. Платёжные реквизиты намеренно не сохраняются.
-app.post('/api/record-sale', (req, res) => {
+// Создаём заявку на продажу. Окончательный статус устанавливает владелец в админке.
+app.post('/api/record-sale', async (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Войдите через Steam' });
 
     const steamId = String(req.user.id);
@@ -1081,18 +1154,71 @@ app.post('/api/record-sale', (req, res) => {
         total: Number(total.toFixed(2)),
         payout: Number(payout.toFixed(2)),
         paymentMethod: String(req.body.paymentMethod || '').slice(0, 30),
-        items: items.slice(0, 100).map(item => String(item).slice(0, 200))
+        items: items.slice(0, 100).map(item => String(item).slice(0, 200)),
+        status: 'not_sold'
     };
 
     if (!Array.isArray(record.sales)) record.sales = [];
     record.sales.push(sale);
-    record.totalSold = Number((Number(record.totalSold || 0) + sale.total).toFixed(2));
-    record.totalPayout = Number((Number(record.totalPayout || 0) + sale.payout).toFixed(2));
     record.lastSaleAt = sale.createdAt;
+    // Суммы считаются только по подтверждённым владельцем продажам.
+    record.totalSold = record.sales.filter(x => x.status === 'sold').reduce((sum, x) => sum + Number(x.total || 0), 0);
+    record.totalPayout = record.sales.filter(x => x.status === 'sold').reduce((sum, x) => sum + Number(x.payout || 0), 0);
     userData[steamId] = record;
-    saveUserData();
 
-    res.json({ success: true, saleId: sale.id });
+    try {
+        await insertSaleToDb(steamId, sale);
+        await upsertUserToDb(record);
+        res.json({ success: true, saleId: sale.id });
+    } catch (error) {
+        console.error('Ошибка сохранения продажи:', error.message);
+        return res.status(500).json({ error: 'Не удалось сохранить продажу' });
+    }
+});
+
+// Владелец меняет статус заявки: продажа остаётся в истории в любом случае.
+app.post('/api/admin/sales/:saleId/status', async (req, res) => {
+    if (!isOwner(req)) return res.status(403).json({ error: 'Доступ запрещён' });
+    const saleId = String(req.params.saleId);
+    const status = req.body.status === 'sold' ? 'sold' : 'not_sold';
+
+    if (!pool) return res.status(500).json({ error: 'База данных не подключена' });
+
+    try {
+        const result = await pool.query(
+            'UPDATE sales SET status=$1 WHERE id=$2 RETURNING id, steam_id',
+            [status, saleId]
+        );
+        if (!result.rowCount) return res.status(404).json({ error: 'Продажа не найдена' });
+
+        const steamId = result.rows[0].steam_id;
+        const record = userData[steamId] || ensureUserRecord({ id: steamId });
+        const salesResult = await pool.query(
+            'SELECT total, payout, status, created_at FROM sales WHERE steam_id=$1 ORDER BY created_at',
+            [steamId]
+        );
+        record.sales = salesResult.rows.map(row => {
+            const existing = (record.sales || []).find(x => x.id === saleId && saleId);
+            return existing;
+        }).filter(Boolean);
+        const soldRows = salesResult.rows.filter(row => row.status === 'sold');
+        record.totalSold = Number(soldRows.reduce((sum, row) => sum + Number(row.total || 0), 0).toFixed(2));
+        record.totalPayout = Number(soldRows.reduce((sum, row) => sum + Number(row.payout || 0), 0).toFixed(2));
+        userData[steamId] = record;
+        await upsertUserToDb(record);
+
+        // Перезагрузим локальную копию продаж из БД, чтобы статус сразу был актуальным.
+        const allSales = await pool.query('SELECT * FROM sales WHERE steam_id=$1 ORDER BY created_at', [steamId]);
+        record.sales = allSales.rows.map(row => ({
+            id: row.id, createdAt: new Date(row.created_at).toISOString(), total: Number(row.total),
+            payout: Number(row.payout), paymentMethod: row.payment_method || '',
+            items: Array.isArray(row.items) ? row.items : [], status: row.status === 'sold' ? 'sold' : 'not_sold'
+        }));
+        res.json({ success: true, saleId, status });
+    } catch (error) {
+        console.error('Ошибка изменения статуса продажи:', error.message);
+        res.status(500).json({ error: 'Не удалось изменить статус продажи' });
+    }
 });
 
 app.get('/admin', (req, res) => {

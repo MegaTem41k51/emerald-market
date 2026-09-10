@@ -765,7 +765,7 @@
         </div>
         <div class="profile-transactions">
             <h3>Продажи</h3>
-            <div style="overflow:auto;"><table class="transaction-table"><thead><tr><th>Дата</th><th>ID</th><th>Пользователь</th><th>Сумма</th><th>Выплата</th><th>Метод</th><th>Скины</th></tr></thead><tbody id="adminSalesBody"></tbody></table></div>
+            <div style="overflow:auto;"><table class="transaction-table"><thead><tr><th>Дата</th><th>ID</th><th>Пользователь</th><th>Сумма</th><th>Выплата</th><th>Метод</th><th>Скины</th><th>Статус</th></tr></thead><tbody id="adminSalesBody"></tbody></table></div>
         </div>
     </div>
 </div>
@@ -1378,8 +1378,9 @@ async function loadAdminData() {
 
         document.getElementById('adminUsersCount').textContent = data.users.length;
         document.getElementById('adminSalesCount').textContent = data.sales.length;
-        document.getElementById('adminSoldTotal').textContent = `${data.sales.reduce((s,x)=>s+Number(x.total||0),0).toFixed(2)} ₽`;
-        document.getElementById('adminPayoutTotal').textContent = `${data.sales.reduce((s,x)=>s+Number(x.payout||0),0).toFixed(2)} ₽`;
+        const confirmedSales = data.sales.filter(x => x.status === 'sold');
+        document.getElementById('adminSoldTotal').textContent = `${confirmedSales.reduce((s,x)=>s+Number(x.total||0),0).toFixed(2)} ₽`;
+        document.getElementById('adminPayoutTotal').textContent = `${confirmedSales.reduce((s,x)=>s+Number(x.payout||0),0).toFixed(2)} ₽`;
 
         document.getElementById('adminUsersBody').innerHTML = data.users.map(user => `
             <tr>
@@ -1401,7 +1402,24 @@ async function loadAdminData() {
                 <td>${Number(sale.payout||0).toFixed(2)} ₽</td>
                 <td>${escapeHtml(sale.paymentMethod || '—')}</td>
                 <td>${(sale.items || []).map(escapeHtml).join('<br>') || '—'}</td>
-            </tr>`).join('') || '<tr><td colspan="7">Продаж пока нет</td></tr>';
+                <td style="white-space:nowrap;">${sale.status === 'sold' ? '<span style=\"color:#2ecc71;font-weight:700;\">Продал</span>' : '<span style=\"color:#ff6b6b;font-weight:700;\">Не продал</span>'}<br><button onclick="setSaleStatus('${sale.id}','sold')" style="margin-top:6px;padding:5px 8px;">Продал</button> <button onclick="setSaleStatus('${sale.id}','not_sold')" style="margin-top:6px;padding:5px 8px;">Не продал</button></td>
+            </tr>`).join('') || '<tr><td colspan="8">Продаж пока нет</td></tr>';
+    } catch (error) {
+        showModal('Ошибка', error.message);
+    }
+}
+
+async function setSaleStatus(saleId, status) {
+    if (!currentUser?.isOwner) return;
+    try {
+        const response = await fetch(`/api/admin/sales/${encodeURIComponent(saleId)}/status`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Ошибка изменения статуса');
+        await loadAdminData();
     } catch (error) {
         showModal('Ошибка', error.message);
     }
