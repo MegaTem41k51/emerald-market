@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EMERALD Market WW</title>
+    <title>EMERALD Market</title>
 
     <!-- Yandex.Metrika counter -->
     <script type="text/javascript">
@@ -2173,7 +2173,10 @@ function updateUserUI() {
             <div class="steam-user" style="cursor:pointer;" onclick="navigateTo('profile')">
                 <div class="steam-avatar" style="background-image:url('${currentUser.avatar}');"></div>
                 <span class="steam-name">${escapeHtml(currentUser.name)}</span>
-           
+                <span class="header-balance">💰 ${Number(currentUser.balance || 0).toFixed(2)} ₽</span>
+                <button class="steam-logout" onclick="event.stopPropagation(); logoutUser()">✕</button>
+            </div>
+        `;
     } else {
         actions.innerHTML = `<a href="/auth/steam" class="btn btn-steam">Войти через Steam</a>`;
     }
