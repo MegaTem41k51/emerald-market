@@ -511,7 +511,6 @@
         .transaction-table tr td:last-child { border-radius:0 10px 10px 0; }
         .transaction-table tbody tr:hover td { background:rgba(34,228,122,.055); }
         .admin-control-card { padding:22px; border-radius:18px; }
-        .header-balance { display:inline-flex; align-items:center; gap:6px; margin-left:8px; padding:7px 10px; border-radius:10px; background:rgba(34,228,122,.08); border:1px solid rgba(34,228,122,.18); color:#8ff5b6; font-size:13px; font-weight:800; white-space:nowrap; }
         .public-profile-card { max-width:760px; margin:55px auto; padding:44px; text-align:center; border-radius:24px; background:linear-gradient(145deg,rgba(14,24,18,.96),rgba(7,13,10,.92)); border:1px solid var(--line); box-shadow:0 24px 80px rgba(0,0,0,.34), 0 0 45px rgba(34,228,122,.05); }
         .public-profile-card .public-profile-label { color:#6f8678; font-size:12px; text-transform:uppercase; letter-spacing:.12em; margin-bottom:10px; }
         .public-profile-card h2 { color:#effff5; font-size:30px; margin-bottom:14px; }
@@ -528,7 +527,7 @@
         .admin-management-status { min-height:20px; margin-top:12px; color:#8ff5b6; font-size:13px; }
         .admin-user-state { display:inline-flex; padding:3px 7px; border-radius:999px; font-size:9px; font-weight:800; margin-left:5px; }
         .admin-user-state.banned { color:#ff8b8b; background:rgba(255,70,70,.08); border:1px solid rgba(255,70,70,.2); }
-        @media(max-width:700px){ .admin-management-grid{grid-template-columns:1fr;} .header-balance{font-size:11px;padding:6px 8px;} .public-profile-card{margin:28px 10px;padding:30px 18px;} .public-profile-id{font-size:28px;} }
+        @media(max-width:700px){ .admin-management-grid{grid-template-columns:1fr;} .public-profile-card{margin:28px 10px;padding:30px 18px;} .public-profile-id{font-size:28px;} }
         .admin-control-title { font-size:19px; font-weight:800; color:#effff5; margin-bottom:5px; }
         .admin-control-subtitle { color:#7f9487; font-size:13px; margin-bottom:15px; }
         .admin-access-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
@@ -633,7 +632,6 @@
         body.light .sell-hero,
         body.light .market-hero { color:#222 !important; }
         body.light .unavailable-tooltip { background:#ffffff !important; color:#333 !important; border-color:#2ecc71 !important; }
-        body.light .header-balance { background:#eef7f1 !important; border-color:#bfe7cd !important; color:#218a4d !important; }
         body.light .profile-content-section { color:#333 !important; }
         body.light .profile-section-title { color:#222 !important; }
         body.light .profile-section-muted,
@@ -2173,7 +2171,6 @@ function updateUserUI() {
             <div class="steam-user" style="cursor:pointer;" onclick="navigateTo('profile')">
                 <div class="steam-avatar" style="background-image:url('${currentUser.avatar}');"></div>
                 <span class="steam-name">${escapeHtml(currentUser.name)}</span>
-                <span class="header-balance">💰 ${Number(currentUser.balance || 0).toFixed(2)} ₽</span>
                 <button class="steam-logout" onclick="event.stopPropagation(); logoutUser()">✕</button>
             </div>
         `;
